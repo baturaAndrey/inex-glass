@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Inex Glass — кнопки и поля</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../design-system/colors_and_type.css">
+<link rel="stylesheet" href="../design-system/components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F6B60}a:hover{color:#16403D}
+.pn{background:#fff;border-radius:24px;padding:28px;box-shadow:0 2px 8px rgba(28,31,34,.06);display:flex;flex-direction:column;gap:20px}
+.mx{display:grid;grid-template-columns:150px repeat(4,minmax(0,1fr));gap:16px 20px;align-items:center}
+.mono{font:400 12px/1.4 ui-monospace,Menlo,monospace;color:#5B636B}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1500px; box-sizing: border-box; padding: 64px; background: #F4F5F3; font-family: 'Rubik', system-ui, sans-serif; color: #1C1F22; display: flex; flex-direction: column; gap: 28px">
+  <div style="display: flex; flex-direction: column; gap: 12px">
+    <span class="ig-label">Дизайн-система Inex Glass · 04</span>
+    <h1 class="ig-h2">Кнопки, поля, чипсы</h1>
+  </div>
+
+  <div class="pn">
+    <span class="ig-h6">Кнопки — пилюля, подпись-глагол</span>
+    <div class="mx">
+      <span></span><span class="mono">default</span><span class="mono">hover</span><span class="mono">pressed</span><span class="mono">disabled</span>
+      <span class="mono">primary</span>
+      <div><button class="ig-btn ig-btn--primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>Рассчитать стоимость</button></div>
+      <div><button class="ig-btn ig-btn--primary is-hover" type="button" style="background: #267D70">Рассчитать стоимость</button></div>
+      <div><button class="ig-btn ig-btn--primary" type="button" style="background: #1F6B60; transform: scale(.98)">Рассчитать стоимость</button></div>
+      <div><button class="ig-btn ig-btn--primary" type="button" disabled>Рассчитать стоимость</button></div>
+      <span class="mono">secondary-outline</span>
+      <div><button class="ig-btn ig-btn--secondary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>Отправить чертёж</button></div>
+      <div><button class="ig-btn ig-btn--secondary is-hover" type="button">Отправить чертёж</button></div>
+      <div><button class="ig-btn ig-btn--secondary" type="button" style="background: #DCEBE8; transform: scale(.98)">Отправить чертёж</button></div>
+      <div><button class="ig-btn ig-btn--secondary" type="button" disabled>Отправить чертёж</button></div>
+      <span class="mono">ghost</span>
+      <div><button class="ig-btn ig-btn--ghost" type="button">Скачать спецификацию</button></div>
+      <div><button class="ig-btn ig-btn--ghost is-hover" type="button">Скачать спецификацию</button></div>
+      <div><button class="ig-btn ig-btn--ghost" type="button" style="background: #D9DCDE; transform: scale(.98)">Скачать спецификацию</button></div>
+      <div><button class="ig-btn ig-btn--ghost" type="button" disabled style="color: #9AA1A8">Скачать спецификацию</button></div>
+      <span class="mono">ссылка</span>
+      <div><a class="ig-link ig-link--arrow" href="#">Как мы работаем: 6 шагов<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></div>
+      <div><a class="ig-link" href="#" style="color: #16403D">допуски по ГОСТ</a></div>
+      <div><a class="ig-link ig-link--dashed" href="#">Заказать звонок</a></div>
+      <div><span class="mono">Пунктир — действие на месте (звонок, модалка)</span></div>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding-top: 20px; border-top: 1px solid #E6E8E6">
+      <span class="mono" style="width: 150px">размеры L / M / S</span>
+      <button class="ig-btn ig-btn--primary ig-btn--l" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>Рассчитать стоимость</button>
+      <button class="ig-btn ig-btn--primary ig-btn--m" type="button">Получить расчёт</button>
+      <button class="ig-btn ig-btn--primary ig-btn--s" type="button">Понятно</button>
+      <button class="ig-btn ig-btn--secondary ig-btn--s" type="button">Заказать образец</button>
+      <button class="ig-btn ig-btn--primary ig-btn--icon" type="button" aria-label="Рассчитать стоимость"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg></button>
+      <span class="mono">L 56 · M 48 · S 40 · иконка-кнопка 48 (≤ 1100 px в шапке)</span>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px">
+    <div class="pn">
+      <span class="ig-h6">Поля</span>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px">
+        <label class="ig-field"><span class="ig-field__label">Компания <span class="ig-req">*</span></span><input class="ig-input" placeholder="ООО «Название»"></label>
+        <label class="ig-field"><span class="ig-field__label">ИНН <span class="ig-field__opt">— необязательно</span></span><input class="ig-input is-focus" value="7451234567" readonly></label>
+        <label class="ig-field"><span class="ig-field__label">Телефон <span class="ig-req">*</span></span><input class="ig-input is-error" value="+7 (351) 247-05" readonly><span class="ig-field__error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>Проверьте номер: не хватает цифр</span></label>
+        <label class="ig-field"><span class="ig-field__label">Площадь, м²</span><input class="ig-input" value="86" readonly><span class="ig-field__hint">Работаем с заказами от 50 м²</span></label>
+        <label class="ig-field"><span class="ig-field__label">Город доставки</span><select class="ig-select"><option>Челябинск</option><option>Екатеринбург</option><option>Тюмень</option></select></label>
+        <label class="ig-field"><span class="ig-field__label">E-mail</span><input class="ig-input" disabled placeholder="disabled"></label>
+        <label class="ig-field" style="grid-column: 1 / -1"><span class="ig-field__label">Комментарий</span><textarea class="ig-textarea" placeholder="Например: нужны отверстия под фурнитуру Dorma, срок до 20.12"></textarea></label>
+      </div>
+      <div class="mono">default · focus · error · с подсказкой · select · disabled · textarea — высота 48, radius md 10</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 20px">
+      <div class="pn">
+        <span class="ig-h6">Согласие на обработку ПДн — по умолчанию не отмечено</span>
+        <label class="ig-check {{consentCls}}"><input type="checkbox" checked="{{consent}}" onChange="{{toggleConsent}}"><span>Согласен на обработку персональных данных в соответствии с <a href="#">политикой обработки персональных данных</a></span></label>
+        <sc-if value="{{showErr}}" hint-placeholder-val="{{ false }}"><span class="ig-field__error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>Отметьте согласие — без него мы не можем принять заявку</span></sc-if>
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap">
+          <button class="ig-btn ig-btn--primary" type="button" disabled="{{noConsent}}">Получить расчёт</button>
+          <button class="ig-btn ig-btn--ghost ig-btn--s" type="button" onClick="{{showError}}">Показать ошибку</button>
+        </div>
+      </div>
+      <div class="pn">
+        <span class="ig-h6">Чипсы — выбор толщины</span>
+        <div class="ig-chips" role="group" aria-label="Толщина стекла">
+          <sc-for list="{{chips}}" as="c" hint-placeholder-count="8"><button type="button" class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for>
+        </div>
+        <span class="ig-small ig-muted">Выбрано: {{picked}} мм</span>
+        <span class="ig-h6" style="margin-top: 4px">Бейдж и хлебные крошки</span>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap"><span class="ig-badge ig-badge--promo">Акция</span><span class="ig-badge ig-badge--success">Согласовано</span><span class="ig-badge ig-badge--info">ГОСТ 30698</span><span class="ig-chip ig-chip--static">осветлённое 12 мм</span></div>
+        <nav class="ig-crumbs" aria-label="Хлебные крошки"><a href="#">Главная</a><span class="ig-crumbs__sep">/</span><a href="#">Закалённое стекло</a><span class="ig-crumbs__sep">/</span><span aria-current="page">10 мм</span></nav>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { consent: false, err: false, picked: '10' }; }
+  renderVals() {
+    const s = this.state;
+    const list = ['4', '5', '6', '8', '10', '12', '15', '19'];
+    return {
+      consent: s.consent,
+      noConsent: !s.consent,
+      showErr: s.err && !s.consent,
+      consentCls: s.err && !s.consent ? 'is-error' : '',
+      toggleConsent: () => this.setState({ consent: !s.consent }),
+      showError: () => this.setState({ err: true, consent: false }),
+      picked: s.picked,
+      chips: list.map((m) => ({
+        label: m + ' мм',
+        on: m === s.picked,
+        cls: 'ig-chip' + (m === s.picked ? ' is-active' : ''),
+        pick: () => this.setState({ picked: m })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

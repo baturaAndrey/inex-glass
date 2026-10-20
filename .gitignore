@@ -45,4 +45,15 @@ next-env.d.ts
 # uploads
 public/uploads
 
+# stray Windows "nul" device-name files
 nul
+
+# local data (Postgres volumes are in Docker; uploads/media in dev)
+/.data
+
+# playwright
+/test-results
+/playwright-report
+
+# payload
+/src/payload-generated-schema.ts

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Inex Glass — cookie, sticky-CTA, таймлайн</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../design-system/colors_and_type.css">
+<link rel="stylesheet" href="../design-system/components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F6B60}a:hover{color:#16403D}
+.phone{width:375px;flex:none;height:560px;background:#F4F5F3;border-radius:28px;border:1px solid #D9DCDE;overflow:hidden;position:relative;box-sizing:border-box;display:flex;flex-direction:column}
+.ph-lbl{font:500 12px/1.4 'Rubik',sans-serif;color:#5B636B;text-transform:uppercase;letter-spacing:.06em}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1300px; box-sizing: border-box; padding: 64px; background: #F4F5F3; font-family: 'Rubik', system-ui, sans-serif; color: #1C1F22; display: flex; flex-direction: column; gap: 40px">
+  <div style="display: flex; flex-direction: column; gap: 12px">
+    <span class="ig-label">Дизайн-система Inex Glass · 08</span>
+    <h1 class="ig-h2">Cookie-баннер, sticky-CTA, таймлайн заказа</h1>
+  </div>
+
+  <section style="display: flex; flex-direction: column; gap: 16px">
+    <span class="ig-h6">Cookie-баннер — вариант A (одна кнопка) и вариант B (решит юрист)</span>
+    <div class="ig-cookie">
+      <p>Мы используем файлы cookie и Яндекс.Метрику, чтобы сайт работал удобнее, а мы понимали, какие разделы полезны. Подробнее — в <a href="#">политике обработки персональных данных</a>.</p>
+      <div class="ig-cookie__actions"><button class="ig-btn ig-btn--primary ig-btn--s" type="button">Понятно</button></div>
+    </div>
+    <div class="ig-cookie">
+      <p>Мы используем файлы cookie и Яндекс.Метрику, чтобы сайт работал удобнее, а мы понимали, какие разделы полезны. Подробнее — в <a href="#">политике обработки персональных данных</a>.</p>
+      <div class="ig-cookie__actions"><button class="ig-btn ig-btn--secondary ig-btn--s" type="button">Только необходимые</button><button class="ig-btn ig-btn--primary ig-btn--s" type="button">Принять</button></div>
+    </div>
+  </section>
+
+  <section style="display: flex; gap: 40px; align-items: flex-start">
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+      <span class="ig-h6">Таймлайн статусов заказа — десктоп</span>
+      <div style="background: #fff; border-radius: 24px; padding: 32px; box-shadow: 0 2px 8px rgba(28,31,34,.06); display: flex; flex-direction: column; gap: 28px">
+        <div style="display: flex; flex-direction: column; gap: 6px"><span class="ig-h4">Заказ № 2026-0147</span><span class="ig-small ig-muted">Закалённое стекло 10 мм, 86 м², 42 позиции</span></div>
+        <div class="ig-tl">
+          <div class="ig-tl__step is-done"><span class="ig-tl__bar" aria-hidden="true"></span><span class="ig-tl__dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span><span class="ig-tl__title">Спецификация согласована</span><span class="ig-tl__date">28.10.2026</span></div>
+          <div class="ig-tl__step is-current"><span class="ig-tl__bar" aria-hidden="true"></span><span class="ig-tl__dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle></svg></span><span class="ig-tl__title">В производстве</span><span class="ig-tl__date">с 30.10.2026</span></div>
+          <div class="ig-tl__step"><span class="ig-tl__bar" aria-hidden="true"></span><span class="ig-tl__dot"></span><span class="ig-tl__title">Упаковано</span><span class="ig-tl__date">—</span></div>
+          <div class="ig-tl__step"><span class="ig-tl__bar" aria-hidden="true"></span><span class="ig-tl__dot"></span><span class="ig-tl__title">Отгружено</span><span class="ig-tl__date">план 15.11</span></div>
+          <div class="ig-tl__step"><span class="ig-tl__dot"></span><span class="ig-tl__title">Получено</span><span class="ig-tl__date">—</span></div>
+        </div>
+        <div class="ig-callout ig-callout--info" style="padding: 18px 20px">
+          <span class="ig-callout__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg></span>
+          <div><p class="ig-callout__title" style="font-size: 16px; margin-bottom: 4px">Комментарий менеджера</p><p class="ig-body" style="margin: 0">Срок изготовления перенесён на 14.11 — завод заменил оборудование на линии закалки. Отгрузка 15.11.</p></div>
+        </div>
+        <span class="ig-small ig-muted">Пройденные — с датой · текущий — primary · будущие — text-muted</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <span class="ph-lbl">375 · таймлайн вертикально</span>
+      <div class="phone" style="height: auto; padding: 20px 16px">
+        <div class="ig-tl ig-tl--v">
+          <div class="ig-tl__step is-done"><span class="ig-tl__bar" aria-hidden="true"></span><span class="ig-tl__dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="ig-tl__title">Спецификация согласована</span><span class="ig-tl__date">28.10.2026</span></span></div>
+          <div class="ig-tl__step is-current"><span class="ig-tl__bar" aria-hidden="true"></span><span class="ig-tl__dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle></svg></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="ig-tl__title">В производстве</span><span class="ig-tl__date">с 30.10.2026</span></span></div>
+          <div class="ig-tl__step"><span class="ig-tl__bar" aria-hidden="true"></span><span class="ig-tl__dot"></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="ig-tl__title">Упаковано</span></span></div>
+          <div class="ig-tl__step"><span class="ig-tl__bar" aria-hidden="true"></span><span class="ig-tl__dot"></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="ig-tl__title">Отгружено</span><span class="ig-tl__date">план 15.11</span></span></div>
+          <div class="ig-tl__step" style="padding-bottom: 0"><span class="ig-tl__dot"></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="ig-tl__title">Получено</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <span class="ph-lbl">375 · sticky-CTA + cookie</span>
+      <div class="phone">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff; border-bottom: 1px solid #E6E8E6">
+          <img src="../design-system/assets/inex-glass-logo-dark.svg" alt="Inex Glass" style="height: 30px; width: auto">
+          <div style="display: flex; gap: 4px">
+            <button class="ig-btn ig-btn--ghost ig-btn--icon" type="button" aria-label="Поиск" style="width: 44px; height: 44px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></button>
+            <a class="ig-btn ig-btn--ghost ig-btn--icon" href="tel:+73512470557" aria-label="Позвонить +7 (351) 247-05-57" style="width: 44px; height: 44px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></a>
+            <button class="ig-btn ig-btn--ghost ig-btn--icon" type="button" aria-label="Меню" style="width: 44px; height: 44px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button>
+          </div>
+        </div>
+        <div style="flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+          <div class="ig-ph" style="border-radius: 16px"><span>фото объекта</span></div>
+          <span style="font: 700 22px/1.25 'Rubik', sans-serif">Закалённое стекло 10 мм</span>
+        </div>
+        <div style="padding: 0 12px 10px"><div class="ig-cookie" style="flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; font-size: 13px"><p>Мы используем файлы cookie и Яндекс.Метрику. Подробнее — в <a href="#">политике обработки ПДн</a>.</p><button class="ig-btn ig-btn--primary ig-btn--s ig-btn--block" type="button">Понятно</button></div></div>
+        <div class="ig-sticky-cta"><button class="ig-btn ig-btn--primary ig-btn--block" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>Рассчитать стоимость</button></div>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

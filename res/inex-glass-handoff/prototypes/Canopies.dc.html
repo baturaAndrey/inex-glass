@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Стеклянный козырёк — триплекс под нагрузку | Inex Glass</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../design-system/colors_and_type.css">
+<link rel="stylesheet" href="../design-system/components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F6B60}a:hover{color:#16403D}
+.wrap{max-width:1920px;margin:0 auto;padding:0 70px;box-sizing:border-box}
+.top{background:#ECEEEC;font:400 13px/1.4 'Rubik',sans-serif}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:8px 24px;padding-top:8px;padding-bottom:8px}
+.top a,.top button{color:#1C1F22;text-decoration:none;display:inline-flex;align-items:center;gap:4px;background:none;border:0;padding:0;font:inherit;cursor:pointer}
+.top a:hover,.top button:hover{color:#1F6B60}
+.top svg{width:14px;height:14px}
+.top__l,.top__r{display:flex;gap:20px;flex-wrap:wrap}
+.mainrow{background:#fff}
+.mainrow .wrap{display:flex;align-items:center;gap:16px;padding-top:14px;padding-bottom:14px}
+.logo{display:flex;flex:none}
+.logo img{height:44px;width:auto}
+.pills{display:flex;gap:8px;flex:none}
+.pill{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:999px;border:1.5px solid #1C1F22;background:#fff;font:500 15px/1 'Rubik',sans-serif;color:#1C1F22;cursor:pointer;transition:border-color 200ms,color 200ms}
+.pill:hover{border-color:#2B8C7E;color:#1F6B60}
+.pill svg{width:18px;height:18px}
+.nav{display:flex;gap:20px;font:500 15px/1 'Rubik',sans-serif;flex:none}
+.nav a{color:#1C1F22;text-decoration:none}
+.nav a:hover{color:#1F6B60}
+.search{flex:1 1 200px;min-width:0;position:relative;display:flex}
+.search input{height:44px;border-radius:999px;padding-left:44px}
+.search svg{position:absolute;left:16px;top:13px;width:18px;height:18px;color:#5B636B}
+.cta-full{height:44px;padding:0 22px;font-size:15px;flex:none}
+.cta-icon,.burger,.m-icons{display:none}
+.tel{display:flex;flex-direction:column;gap:2px;flex:none}
+.tel__h{font:400 12px/1.3 'Rubik',sans-serif;color:#5B636B;display:flex;align-items:center;gap:6px}
+.tel__dot{width:7px;height:7px;border-radius:50%;background:#2B8A3E}
+.tel__n{font:600 16px/1.3 'Rubik',sans-serif;color:#1C1F22;text-decoration:none}
+.ico{width:44px;height:44px;flex:none}
+.sec{background:#fff;border-top:1px solid #E6E8E6;box-shadow:0 1px 0 #E6E8E6}
+.sec .wrap{display:flex;justify-content:space-between;gap:8px 20px;padding-top:12px;padding-bottom:12px;font:400 14px/1.4 'Rubik',sans-serif}
+.sec a{color:#1C1F22;text-decoration:none}
+.sec a:hover{color:#1F6B60}
+.sec .more{display:none}
+
+.hero{position:relative;background:#EEF2F0;overflow:hidden}
+.hero__bg{position:absolute;inset:-40px;width:calc(100% + 80px);height:calc(100% + 80px);object-fit:cover;object-position:right center;filter:blur(28px) saturate(1.05);display:block}
+.hero__img{position:absolute;top:0;right:0;width:58%;height:100%;object-fit:cover;display:block;-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 32%);mask-image:linear-gradient(90deg,transparent 0%,#000 32%)}
+.hero__fade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(240,244,242,.9) 0%,rgba(240,244,242,.78) 38%,rgba(240,244,242,.35) 52%,rgba(240,244,242,0) 64%)}
+.hero__in{position:relative;max-width:1920px;margin:0 auto;padding:72px 70px 80px;box-sizing:border-box;min-height:760px;display:flex;align-items:center}
+.hero__col{max-width:960px;display:flex;flex-direction:column;gap:24px}
+.ind{margin-left:70px}
+.eyebrow{display:flex;flex-wrap:wrap;gap:4px 10px;font:500 14px/1.4 'Rubik',sans-serif;color:#3E464D}
+.eyebrow i{font-style:normal;color:#2B8C7E}
+.lead{font:400 20px/1.5 'Rubik',sans-serif;color:#2A2F34;margin-top:0;margin-bottom:0;max-width:640px;text-wrap:pretty}
+.stats{max-width:760px}
+.stats .ig-stat{font-size:48px;white-space:nowrap}
+.stats .ig-stat-tile__text{font:400 14px/1.4 'Rubik',sans-serif}
+.terms{display:flex;flex-wrap:wrap;gap:6px 20px;font:500 12px/1.4 'Rubik',sans-serif;color:#1C1F22}
+.terms svg{width:14px;height:14px}
+.terms span{display:flex;align-items:center;gap:8px}
+.terms svg{width:16px;height:16px;color:#1F6B60;flex:none}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.m-sticky{display:none}
+
+@media (max-width:1365px){
+  .sec .hide-s{display:none}
+  .sec .more{display:inline-flex}
+  .tel{display:none}
+}
+@media (max-width:1365px){
+  .wrap{padding:0 40px}
+  .hero__in{padding-left:40px;padding-right:40px}
+  .ind{margin-left:40px}
+}
+@media (max-width:1100px){
+  .wrap{padding:0 24px}
+  .hero__in{padding-left:24px;padding-right:24px}
+  .ind{margin-left:0}
+  .top__r,.pills,.nav,.search,.sec,.cta-full{display:none}
+  .cta-icon,.burger{display:inline-flex}
+  .mainrow .wrap{justify-content:space-between}
+  .hero__fade{background:linear-gradient(90deg,#EEF2F0 0%,#EEF2F0 55%,rgba(238,242,240,.75) 80%,rgba(238,242,240,.35) 100%)}
+}
+@media (max-width:599px){
+  .top,.cta-icon,.myc{display:none}
+  .wrap{padding:0 16px}
+  .mainrow .wrap{padding-top:10px;padding-bottom:10px;gap:4px}
+  .logo img{height:32px}
+  .m-icons{display:flex;gap:2px;margin-left:auto}
+  .burger{margin-left:0}
+  .hero__img{position:static;width:100%;height:240px;-webkit-mask-image:none;mask-image:none}
+  .hero__fade,.hero__bg,.d-br{display:none}
+  .hero__in{padding:24px 16px 32px;min-height:0}
+  .hero__col{gap:16px}
+  .eyebrow{font-size:13px}
+  .ig-h1--caps{text-transform:none;letter-spacing:0}
+  .lead{font-size:17px}
+  .stats{grid-template-columns:1fr;background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none;border:1px solid #E6E8E6}
+  .stats .ig-stat-tile{padding:16px 18px;flex-direction:row;align-items:center;gap:16px}
+  .stats .ig-stat-tile + .ig-stat-tile{border-left:0;border-top:1px solid #E6E8E6}
+  .stats .ig-stat{font-size:28px;flex:none;width:118px}
+  .terms{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;font-size:12px}
+  .btns{flex-direction:column}
+  .btns .ig-btn{width:100%}
+  .m-sticky{display:block;position:sticky;bottom:0;z-index:5}
+}
+/* ---- Блок 2 ---- */
+.why{position:relative;overflow:hidden;background:radial-gradient(55% 70% at 62% 38%,rgba(232,242,239,.95) 0%,rgba(232,242,239,0) 70%),radial-gradient(40% 60% at 12% 85%,rgba(210,230,225,.7) 0%,rgba(210,230,225,0) 70%),linear-gradient(135deg,#5A968E 0%,#A9CBC5 42%,#C9DEDA 58%,#6FA39B 100%)}
+.why__in{max-width:1920px;margin:0 auto;padding:96px 70px;box-sizing:border-box;display:flex;flex-direction:column;gap:40px}
+.why__head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px 64px}
+.why__h{font:700 40px/1.15 'Rubik',sans-serif;color:#16403D;margin:0;max-width:760px;text-wrap:balance}
+.why__sub{font:400 18px/1.5 'Rubik',sans-serif;color:#1F2A2E;margin:0;max-width:560px}
+.card{background:rgba(255,255,255,.94);border-radius:24px;box-shadow:0 12px 40px rgba(22,64,61,.14);padding:12px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.row{display:grid;grid-template-columns:220px minmax(0,1fr) minmax(0,1.12fr);column-gap:8px}
+.row + .row .c{border-top:1px solid rgba(28,31,34,.06)}
+.hd .c{padding:18px 24px;font:600 16px/1.3 'Rubik',sans-serif;display:flex;align-items:center;gap:10px}
+.hd .c--self{background:#FCF6EA;color:#8A5A00;border-radius:16px 16px 0 0}
+.hd .c--inex{background:#EAF3F1;color:#16403D;border-radius:16px 16px 0 0}
+.c{padding:18px 24px;display:flex;align-items:flex-start;gap:12px;font:400 16px/1.45 'Rubik',sans-serif}
+.c--topic{font:600 15px/1.4 'Rubik',sans-serif;color:#16403D;padding-left:16px}
+.c--self{background:#FCF6EA;color:#3A3F44}
+.c--inex{background:#EAF3F1;color:#1C1F22;font-weight:500}
+.row.last .c--self,.row.last .c--inex{border-radius:0 0 16px 16px}
+.ic{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;margin-top:1px}
+.ic svg{width:13px;height:13px}
+.ic--x{background:#F2D59C;color:#8A5A00}
+.ic--ok{background:#2B8C7E;color:#fff}
+.lbl{display:none}
+.foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:16px 32px}
+.foot__t{font:500 16px/1.4 'Rubik',sans-serif;color:#16403D}
+.foot__b{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.lnk{color:#16403D;font-weight:600}
+@media (max-width:1100px){
+  .why__in{padding:72px 24px}
+  .row{grid-template-columns:160px minmax(0,1fr) minmax(0,1.12fr)}
+}
+@media (max-width:760px){
+  .why__in{padding:48px 16px;gap:24px}
+  .why__h{font-size:28px;line-height:1.2}
+  .why__sub{font-size:16px}
+  .card{padding:0;background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;display:flex;flex-direction:column;gap:12px}
+  .hd{display:none}
+  .row{grid-template-columns:1fr;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(22,64,61,.12)}
+  .row + .row .c{border-top:0}
+  .c{padding:14px 16px;font-size:15px}
+  .c--topic{padding:14px 16px 10px;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+  .row.last .c--self,.row.last .c--inex{border-radius:0}
+  .lbl{display:block;font:500 11px/1.3 'Rubik',sans-serif;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+  .c--self .lbl{color:#8A5A00}
+  .c--inex .lbl{color:#1F6B60}
+  .foot{flex-direction:column;align-items:stretch}
+  .foot__b .ig-btn{width:100%}
+}
+
+@media (max-width:1365px) and (min-width:1101px){.why__in{padding-left:40px;padding-right:40px}}
+
+/* ---- Блоки главной 3–10 ---- */
+.blk{padding:96px 0}
+.blk--bg{background:#F4F5F3}
+.blk--sf{background:#FFFFFF}
+.blk__head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px 48px;margin-bottom:40px}
+.blk__h{font:700 40px/1.15 'Rubik',sans-serif;margin:0;color:#1C1F22;max-width:900px;text-wrap:balance}
+.blk__sub{font:400 18px/1.5 'Rubik',sans-serif;color:#5B636B;margin:0;max-width:620px;text-wrap:pretty}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.ph-wide{aspect-ratio:16/10}
+.note{display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;background:#EEF4FA;color:#2C5B86;font:500 15px/1.3 'Rubik',sans-serif}
+.note svg{width:18px;height:18px;flex:none}
+
+.proc{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:48px;align-items:start}
+.proc__l{display:flex;flex-direction:column;gap:20px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.tile{display:flex;flex-direction:column;justify-content:space-between;gap:28px;min-height:132px;padding:22px 22px 20px;border-radius:16px;background:#F4F5F3;color:#1C1F22;text-decoration:none;font:600 18px/1.3 'Rubik',sans-serif;transition:background-color 200ms cubic-bezier(.4,0,.2,1),transform 200ms cubic-bezier(.4,0,.2,1)}
+.tile:hover{background:#EAF3F1;color:#16403D;transform:translateY(-2px)}
+.tile svg{width:22px;height:22px;color:#1F6B60;align-self:flex-end}
+.tile--accent{background:#16403D;color:#fff}
+.tile--accent svg{color:#fff}
+.tile--accent:hover{background:#1F6B60;color:#fff}
+
+.seg{display:flex;flex-direction:column;gap:20px;padding:28px;border-radius:16px;background:#F4F5F3;color:#1C1F22;text-decoration:none;min-height:220px;transition:background-color 200ms,transform 200ms,box-shadow 200ms}
+.seg:hover{background:#fff;box-shadow:0 8px 24px rgba(28,31,34,.12);transform:translateY(-2px);color:#1C1F22}
+.seg__ic{width:56px;height:56px;border-radius:14px;background:#EAF3F1;color:#1F6B60;display:grid;place-items:center}
+.seg__ic svg{width:28px;height:28px}
+.seg__t{font:600 20px/1.3 'Rubik',sans-serif;margin:0}
+.seg__more{margin-top:auto;display:inline-flex;align-items:center;gap:6px;font:500 15px/1.3 'Rubik',sans-serif;color:#1F6B60}
+.seg__more svg{width:18px;height:18px}
+
+.stepsbox{background:#fff;border-radius:24px;padding:36px;box-shadow:0 2px 8px rgba(28,31,34,.06);display:flex;flex-direction:column;gap:32px}
+.stepsfoot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 32px;padding-top:28px;border-top:1px solid #E6E8E6}
+.stepsfoot .ig-terms{padding:0;border:0;background:none}
+
+.form{display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:64px;align-items:start}
+.form__l{display:flex;flex-direction:column;gap:24px;position:sticky;top:24px}
+.form__list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;font:500 16px/1.4 'Rubik',sans-serif}
+.form__list li{display:flex;gap:12px;align-items:flex-start}
+.form__list svg{width:20px;height:20px;color:#2B8C7E;flex:none;margin-top:1px}
+.form__card{background:#fff;border-radius:24px;padding:40px;box-shadow:0 2px 8px rgba(28,31,34,.06);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.span2{grid-column:1 / -1}
+.form__send{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px}
+
+.ftr{background:#324B64;color:#C9D3DD}
+.ftr a{color:#C9D3DD;text-decoration:none}
+.ftr a:hover{color:#fff;text-decoration:underline}
+.ftr h3{margin:0 0 4px;font:600 16px/1.3 'Rubik',sans-serif;color:#fff}
+.ftr__in{padding-top:56px;padding-bottom:32px;display:flex;flex-direction:column;gap:40px}
+.ftr__cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:32px;font:400 14px/1.5 'Rubik',sans-serif}
+.ftr__col{display:flex;flex-direction:column;gap:10px}
+.ftr__bot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px;padding-top:24px;border-top:1px solid rgba(255,255,255,.14);font:400 13px/1.4 'Rubik',sans-serif}
+
+@media (max-width:1365px){
+  .g4,.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .proc{grid-template-columns:1fr;gap:32px}
+  .ig-steps{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:28px}
+  .ig-step:nth-child(3) .ig-step__line{display:none}
+}
+@media (max-width:1100px){
+  .blk{padding:72px 0}
+  .g4,.g3,.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .form{grid-template-columns:1fr;gap:32px}
+  .form__l{position:static}
+  .ftr__cols{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:599px){
+  .blk{padding:48px 0}
+  .blk__head{margin-bottom:24px}
+  .blk__h{font-size:28px;line-height:1.2}
+  .blk__sub{font-size:16px}
+  .g4,.g3{grid-template-columns:1fr;gap:16px}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .tile{min-height:112px;padding:16px;font-size:15px;gap:16px}
+  .seg{min-height:0;padding:20px;flex-direction:row;align-items:center;gap:16px}
+  .seg__ic{width:48px;height:48px;flex:none}
+  .seg__t{font-size:17px}
+  .seg__more{display:none}
+  .stepsbox{padding:20px;gap:24px}
+  .ig-steps{grid-template-columns:1fr;row-gap:20px}
+  .ig-step{flex-direction:row;flex-wrap:wrap;column-gap:14px;row-gap:2px}
+  .ig-step__line{display:none}
+  .ig-step__num{width:36px;height:36px;font-size:15px}
+  .ig-step__title{flex:1;align-self:center}
+  .ig-step__text{flex-basis:100%;padding-left:50px}
+  .stepsfoot{flex-direction:column;align-items:stretch}
+  .stepsfoot .ig-btn{width:100%}
+  .form__card{grid-template-columns:1fr;padding:20px;gap:16px}
+  .form__send .ig-btn{width:100%}
+  .ftr__cols{grid-template-columns:1fr}
+  .ftr__in{padding-bottom:104px}
+}
+.seg__d{margin:0;font:400 15px/1.5 'Rubik',sans-serif;color:#5B636B}
+.ig-steps .ig-step__text{font-size:14px;line-height:1.5}
+@media (max-width:599px){
+  .seg{flex-direction:column;align-items:flex-start;gap:12px}
+  .seg__d{font-size:14px}
+}
+
+/* ---- Задание 5: страницы обработки и конструкций (p5-) ---- */
+.p5-top{padding:32px 0 64px}
+.p5-hero{display:flex;flex-direction:column;gap:20px;align-items:flex-start}
+.p5-h1{max-width:1100px;text-wrap:balance}
+.p5-lead{font:400 19px/1.55 'Rubik',sans-serif;color:#2A2F34;max-width:900px;margin:0;text-wrap:pretty}
+.p5-btns{display:flex;flex-wrap:wrap;gap:12px}
+.p5-terms{background:#fff}
+.p5-prose{max-width:900px;display:flex;flex-direction:column;gap:16px}
+.p5-p{font:400 17px/1.6 'Rubik',sans-serif;color:#1C1F22;margin:0;text-wrap:pretty}
+.p5-p--muted{color:#5B636B;font-size:15px}
+.p5-list{margin:0;padding-left:24px;display:flex;flex-direction:column;gap:10px;font:400 17px/1.55 'Rubik',sans-serif;color:#1C1F22}
+.p5-list li::marker{color:#1F6B60;font-weight:600}
+.p5-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:48px;align-items:start}
+.p5-col{display:flex;flex-direction:column;gap:20px;min-width:0}
+.p5-tmob{display:none;flex-direction:column;gap:10px}
+.p5-mct{font:600 16px/1.35 'Rubik',sans-serif}
+.p5-cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.p5-faq{max-width:1100px}
+.p5-strip{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 32px;padding:20px 28px;border-radius:16px;background:#fff;border:1px solid #D9DCDE}
+.p5-strip__t{font:600 17px/1.4 'Rubik',sans-serif;margin:0}
+.p5-strip__d{font:400 15px/1.5 'Rubik',sans-serif;color:#5B636B;margin:4px 0 0}
+.p5-objs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+/* калькулятор отверстий */
+.p5-calc{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:32px;align-items:stretch}
+.p5-scheme{background:#fff;border-radius:24px;padding:24px;box-shadow:0 2px 8px rgba(28,31,34,.06);display:flex;flex-direction:column;gap:12px}
+.p5-scheme svg{width:100%;height:auto;display:block}
+.p5-dim{font:600 15px 'Rubik',sans-serif;fill:#1F6B60}
+.p5-panel{background:#fff;border-radius:24px;padding:28px;box-shadow:0 2px 8px rgba(28,31,34,.06);display:flex;flex-direction:column;gap:20px}
+.p5-res{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.p5-res__i{background:#EAF3F1;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:6px}
+.p5-res__n{font:700 40px/1 'Rubik',sans-serif;color:#16403D;font-variant-numeric:tabular-nums}
+.p5-res__n small{font-size:18px;font-weight:500;margin-left:4px}
+.p5-res__t{font:400 14px/1.4 'Rubik',sans-serif;color:#1C1F22}
+.p5-min{display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:12px;background:#F4F5F3;font:500 15px/1.4 'Rubik',sans-serif}
+.p5-min svg{width:18px;height:18px;color:#2C5B86;flex:none}
+/* конструкции */
+.p5-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.p5-who{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.p5-who__col{border-radius:24px;padding:32px;display:flex;flex-direction:column;gap:18px}
+.p5-who__col--inex{background:#EAF3F1}
+.p5-who__col--team{background:#fff;border:1px solid #D9DCDE}
+.p5-who__h{display:flex;align-items:center;gap:14px;font:600 22px/1.3 'Rubik',sans-serif;margin:0}
+.p5-who__ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;flex:none}
+.p5-who__ic svg{width:26px;height:26px}
+.p5-who__col--inex .p5-who__ic{background:#2B8C7E;color:#fff}
+.p5-who__col--team .p5-who__ic{background:#F2D59C;color:#8A5A00}
+.p5-who ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;font:400 17px/1.5 'Rubik',sans-serif}
+.p5-who li{display:flex;gap:12px;align-items:flex-start}
+.p5-who li svg{width:20px;height:20px;flex:none;margin-top:2px;color:#1F6B60}
+.p5-who__col--team li svg{color:#8A5A00}
+/* перегородки */
+.p5-sys{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.p5-sys__c{background:#fff;border-radius:20px;padding:24px;box-shadow:0 2px 8px rgba(28,31,34,.06);display:flex;flex-direction:column;gap:14px}
+.p5-sys__pic{height:132px;border-radius:14px;background:#F4F5F3;display:grid;place-items:center}
+.p5-sys__pic svg{width:120px;height:120px}
+.p5-sys__t{font:600 19px/1.3 'Rubik',sans-serif;margin:0}
+.p5-sys__s{font:400 14px/1.45 'Rubik',sans-serif;color:#5B636B;margin:0}
+.p5-sys__k{font:500 12px/1.3 'Rubik',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#5B636B;margin:6px 0 2px}
+.p5-sys__v{font:400 15px/1.5 'Rubik',sans-serif;margin:0}
+.p5-brands{display:flex;flex-wrap:wrap;gap:10px}
+.p5-brand{display:inline-flex;align-items:center;height:48px;padding:0 22px;border-radius:12px;background:#fff;border:1px solid #D9DCDE;font:600 16px/1 'Rubik',sans-serif;color:#1C1F22}
+/* козырьки */
+.p5-schemes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.p5-snow{background:#16403D;color:#fff}
+.p5-snow .blk__h{color:#fff}
+.p5-snow__g{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:48px;align-items:center}
+.p5-snow__p{font:400 18px/1.6 'Rubik',sans-serif;color:#D7E6E3;margin:0}
+.p5-snow__p b{color:#fff}
+.p5-snow__box{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:18px}
+.p5-snow a.p5-lnk{color:#fff}
+@media (max-width:1365px){
+  .p5-cards,.p5-objs{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .p5-sys{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .p5-calc{grid-template-columns:1fr}
+}
+@media (max-width:1100px){
+  .p5-grid2,.p5-who,.p5-snow__g{grid-template-columns:1fr;gap:24px}
+  .p5-cards,.p5-objs,.p5-schemes{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:599px){
+  .p5-top{padding:20px 0 40px}
+  .p5-hero{gap:16px}
+  .p5-lead{font-size:16px}
+  .p5-btns{flex-direction:column;align-self:stretch}
+  .p5-btns .ig-btn,.p5-cta .ig-btn{width:100%}
+  .p5-p,.p5-list{font-size:16px}
+  .p5-tdesk{display:none}
+  .p5-tmob{display:flex}
+  .p5-cards,.p5-objs,.p5-schemes{grid-template-columns:1fr;gap:16px}
+  .p5-res{grid-template-columns:1fr}
+  .p5-res__i{flex-direction:row;align-items:baseline;gap:12px}
+  .p5-res__n{font-size:32px;flex:none;min-width:110px}
+  .p5-panel,.p5-scheme{padding:16px}
+  .p5-who__col{padding:20px}
+  .p5-sys{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;margin:0 -16px;padding:4px 16px 12px}
+  .p5-sys__c{flex:0 0 82%;scroll-snap-align:start}
+  .p5-strip{padding:16px}
+}
+</style>
+</helmet>
+<div style="width: 100%; background: #F4F5F3; font-family: 'Rubik', system-ui, sans-serif; color: #1C1F22">
+  <header>
+    <div class="top">
+      <div class="wrap">
+        <div class="top__l"><button type="button">Компания<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><button type="button">Связаться с нами<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button></div>
+        <a href="#" class="ig-badge ig-badge--promo" style="text-transform: none; letter-spacing: 0; font-size: 13px; color: #16403D">−5% на закалённое стекло при заказе от 100 м²</a>
+        <nav class="top__r" aria-label="Для кого"><a href="#">Застройщикам</a><a href="#">Подрядчикам</a><a href="#">Дизайнерам и архитекторам</a><a href="#">Производителям мебели</a></nav>
+      </div>
+    </div>
+    <div class="mainrow">
+      <div class="wrap">
+        <a class="logo" href="#"><img src="../design-system/assets/inex-glass-logo-dark.svg" alt="Inex Glass — на главную"></a>
+        <div class="pills">
+          <button class="pill" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>Услуги</button>
+          <button class="pill" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>Каталог</button>
+        </div>
+        <nav class="nav" aria-label="Основное"><a href="#">Акции</a><a href="#">Блог</a></nav>
+        <label class="search"><span style="position: absolute; left: -9999px">Поиск по сайту</span><input class="ig-input" placeholder="Введите запрос"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></label>
+        <a class="ig-btn ig-btn--primary cta-full" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>Рассчитать стоимость</a>
+        <div class="tel"><span class="tel__h"><span class="tel__dot" aria-hidden="true"></span>Звоните Пн–Пт 9–18</span><a class="tel__n" href="tel:+73512470557">+7 (351) 247-05-57</a><a class="ig-link ig-link--dashed" href="#" style="font-size: 12px">Заказать звонок</a></div>
+        <a class="ig-btn ig-btn--primary ig-btn--icon cta-icon" href="#" aria-label="Рассчитать стоимость" style="width: 44px; height: 44px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg></a>
+        <a class="ig-btn ig-btn--ghost ig-btn--icon ico myc" href="#" aria-label="Мой расчёт"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M12 11h4"></path><path d="M12 16h4"></path><path d="M8 11h.01"></path><path d="M8 16h.01"></path></svg></a>
+        <div class="m-icons">
+          <button class="ig-btn ig-btn--ghost ig-btn--icon ico" type="button" aria-label="Поиск"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></button>
+          <a class="ig-btn ig-btn--ghost ig-btn--icon ico" href="tel:+73512470557" aria-label="Позвонить +7 (351) 247-05-57"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.910a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></a>
+        </div>
+        <button class="ig-btn ig-btn--ghost ig-btn--icon ico burger" type="button" aria-label="Меню"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button>
+      </div>
+    </div>
+    <nav class="sec" aria-label="Разделы">
+      <div class="wrap">
+        <a href="#">Закалённое стекло</a><a href="#">Триплекс</a><a href="#">Обработка стекла</a><a href="#">Стеклянные перегородки</a><a href="#">Ограждения</a><a href="#" class="hide-s">Козырьки</a><a href="#" class="hide-s">Остекление зданий</a><a href="#" class="hide-s">Стекло для мебели</a><a href="#" class="hide-s">Зеркала</a><a href="#" class="more">Ещё ▾</a>
+      </div>
+    </nav>
+  </header>
+
+  <section class="blk--bg p5-top">
+    <div class="wrap p5-hero">
+      <nav class="ig-crumbs" aria-label="Хлебные крошки"><a href="#">Главная</a><span class="ig-crumbs__sep">/</span><a href="#">Стеклянные конструкции</a><span class="ig-crumbs__sep">/</span><span aria-current="page">Козырьки</span></nav>
+      <h1 class="ig-h1 p5-h1">Стеклянные козырьки над входом</h1>
+      <p class="p5-lead">Козырёк — это стекло над головой людей. Поэтому делаем его только из закалённого триплекса и рассчитываем под снеговую нагрузку вашего района. Стекло и крепления — одним комплектом.</p>
+      <div class="p5-btns"><a class="ig-btn ig-btn--primary ig-btn--l" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>Рассчитать козырёк</a><a class="ig-btn ig-btn--secondary ig-btn--l" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>Отправить проект</a></div>
+      <div class="ig-terms p5-terms"><span class="ig-terms__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Заказы от 50 м²</span><span class="ig-terms__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>От 10 рабочих дней с даты договора</span><span class="ig-terms__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>КП в среднем за 2–3 рабочих дня</span></div>
+    </div>
+  </section>
+  <section class="blk blk--sf "><div class="wrap"><div class="blk__head"><h2 class="blk__h">Схемы крепления</h2></div><div class="p5-schemes"><div class="p5-sys__c"><div class="p5-sys__pic" style="height: auto; padding: 16px"><svg viewBox="0 0 240 140" fill="none" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Схема козырька на тягах" style="width: 100%; height: auto; display: block"><rect x="12" y="8" width="18" height="124" fill="#ECEEEC" stroke="#5B636B" stroke-width="2"></rect><rect x="30" y="78" width="10" height="14" fill="#5B636B"></rect><line x1="36" y1="84" x2="224" y2="90" stroke="#2B8C7E" stroke-width="7" opacity=".55"></line><line x1="36" y1="84" x2="224" y2="90" stroke="#1F6B60" stroke-width="1.5"></line><line x1="30" y1="22" x2="200" y2="86" stroke="#5B636B" stroke-width="2.5"></line><circle cx="30" cy="22" r="4" fill="#5B636B"></circle><circle cx="200" cy="86" r="4" fill="#5B636B"></circle></svg></div><h3 class="p5-sys__t">На тягах (подвесах, вантах)</h3><p class="p5-sys__k">Как держится стекло</p><p class="p5-sys__v">Стекло опирается на кронштейны у стены, вынос держат тяги</p><p class="p5-sys__k">Что нужно в стекле</p><p class="p5-sys__v">Отверстия под кронштейны и узлы тяг</p></div><div class="p5-sys__c"><div class="p5-sys__pic" style="height: auto; padding: 16px"><svg viewBox="0 0 240 140" fill="none" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Схема консольного козырька на зажимном профиле" style="width: 100%; height: auto; display: block"><rect x="12" y="8" width="18" height="124" fill="#ECEEEC" stroke="#5B636B" stroke-width="2"></rect><rect x="30" y="72" width="22" height="26" rx="2" fill="#D9DCDE" stroke="#5B636B" stroke-width="2"></rect><line x1="40" y1="84" x2="224" y2="90" stroke="#2B8C7E" stroke-width="7" opacity=".55"></line><line x1="40" y1="84" x2="224" y2="90" stroke="#1F6B60" stroke-width="1.5"></line></svg></div><h3 class="p5-sys__t">Консольный на зажимном профиле</h3><p class="p5-sys__k">Как держится стекло</p><p class="p5-sys__v">Стекло зажато в профиле на стене, без тяг</p><p class="p5-sys__k">Что нужно в стекле</p><p class="p5-sys__v">Без отверстий; толщина триплекса больше</p></div><div class="p5-sys__c"><div class="p5-sys__pic" style="height: auto; padding: 16px"><svg viewBox="0 0 240 140" fill="none" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Схема козырька на спайдерах" style="width: 100%; height: auto; display: block"><rect x="12" y="8" width="18" height="124" fill="#ECEEEC" stroke="#5B636B" stroke-width="2"></rect><line x1="36" y1="84" x2="224" y2="90" stroke="#2B8C7E" stroke-width="7" opacity=".55"></line><line x1="36" y1="84" x2="224" y2="90" stroke="#1F6B60" stroke-width="1.5"></line><line x1="30" y1="112" x2="190" y2="112" stroke="#5B636B" stroke-width="3"></line><line x1="80" y1="112" x2="80" y2="89" stroke="#5B636B" stroke-width="2"></line><line x1="170" y1="112" x2="170" y2="92" stroke="#5B636B" stroke-width="2"></line><circle cx="80" cy="86" r="5" fill="#fff" stroke="#5B636B" stroke-width="2"></circle><circle cx="170" cy="89" r="5" fill="#fff" stroke="#5B636B" stroke-width="2"></circle><path d="M66 100l14 -14 14 14 M156 103l14 -14 14 14" stroke="#5B636B" stroke-width="2"></path></svg></div><h3 class="p5-sys__t">На спайдерах</h3><p class="p5-sys__k">Как держится стекло</p><p class="p5-sys__v">Стекло крепится точечно через отверстия</p><p class="p5-sys__k">Что нужно в стекле</p><p class="p5-sys__v">Цилиндрические или конусные отверстия по ГОСТ</p></div></div><p class="p5-p" style="margin-top: 24px">Делаем все три схемы. Комплектующие — тяги, кронштейны, профиль, спайдеры — продаём и отдельно от стекла. <a class="ig-link ig-link--arrow" href="#">Зажимной профиль и спайдеры<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></p>
+    </div></section>
+  <section class="blk blk--bg "><div class="wrap"><div class="p5-prose"><div class="blk__head"><h2 class="blk__h">Только триплекс из закалённого стекла</h2></div><p class="p5-p">Однослойное закалённое стекло при разрушении рассыпается и падает вниз. Триплекс трескается, но остаётся на плёнке. Для козырьков используем только триплекс из закалённых стёкол.</p></div>
+    </div></section>
+  <section class="blk p5-snow"><div class="wrap p5-snow__g">
+      <div style="display: flex; flex-direction: column; gap: 20px">
+        <h2 class="blk__h">Расчёт под снег</h2>
+        <p class="p5-snow__p">Схему триплекса, шаг креплений и вынос рассчитывает <b>инженер Inex Glass</b>: под снеговой район, размеры и схему крепления. По расчёту выдаём проектную документацию. <a class="p5-lnk" href="#">Проектирование</a></p>
+      </div>
+      <div class="p5-snow__box">
+        <p class="p5-snow__p">Пришлите: размеры козырька, город, схему крепления (если выбрана) и материал стены.</p>
+        <a class="ig-btn ig-btn--primary ig-btn--l" href="#" style="align-self: flex-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>Отправить проект на расчёт</a>
+      </div>
+  </div></section>
+  <section class="blk blk--sf "><div class="wrap"><div class="blk__head"><h2 class="blk__h">Что ещё учитываем</h2></div><ul class="p5-list"><li><b>Отверстия</b> — по ГОСТ 30698-2014: от кромки не ближе двух толщин стекла, от угла — шести; кромка отверстий обрабатывается. <a href="#">Отверстия и вырезы</a></li><li><b>Уклон</b> — чтобы вода и снег сходили, а не стояли на стекле.</li><li><b>Большие размеры</b> — максимальный размер зависит от схемы триплекса и завода; проверим по вашему проекту.</li></ul>
+    </div></section>
+  <section class="blk blk--bg "><div class="wrap"><div class="blk__head"><h2 class="blk__h">Частые вопросы</h2></div>
+      <div class="ig-acc p5-faq">
+        <sc-for list="{{faq}}" as="f" hint-placeholder-count="4">
+          <div class="{{f.cls}}">
+            <button class="ig-acc__btn" type="button" aria-expanded="{{f.open}}" onClick="{{f.toggle}}">{{f.q}}<span class="ig-acc__sign" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></span></button>
+            <sc-if value="{{f.open}}" hint-placeholder-val="{{ false }}"><div class="ig-acc__panel">{{f.a}}</div></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div></section>
+  <section class="blk blk--sf "><div class="wrap"><div class="p5-cta"><a class="ig-btn ig-btn--primary ig-btn--l" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>Рассчитать козырёк</a><a class="ig-btn ig-btn--secondary ig-btn--l" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>Отправить проект</a></div>
+    </div></section>
+
+  <footer class="ftr">
+    <div class="wrap ftr__in">
+      <img src="../design-system/assets/inex-glass-logo-light.svg" alt="Inex Glass" style="height: 44px; width: auto; align-self: flex-start">
+      <div class="ftr__cols">
+        <div class="ftr__col"><h3>Каталог</h3><a href="#">Закалённое стекло</a><a href="#">Триплекс</a><a href="#">Стеклянные перегородки</a><a href="#">Ограждения и перила</a><a href="#">Козырьки</a><a href="#">Остекление зданий</a><a href="#">Зеркала</a></div>
+        <div class="ftr__col"><h3>Услуги</h3><a href="#">Обработка стекла</a><a href="#">Проектирование</a><a href="#">Как заказать</a><a href="#">Требования к чертежам</a><a href="#">Калькулятор веса стекла</a></div>
+        <div class="ftr__col"><h3>Компания</h3><a href="#">О компании</a><a href="#">Объекты</a><a href="#">Контакты</a><a href="#">Реквизиты</a></div>
+        <div class="ftr__col" style="gap: 14px"><h3>Контакты</h3>
+          <a href="tel:+73512470557" style="font: 600 18px/1.3 'Rubik', sans-serif; color: #fff">+7 (351) 247-05-57</a>
+          <a href="mailto:sale@inex.su">sale@inex.su</a>
+          <span><span style="color: #fff">Челябинск — офис</span><br>ул. Артиллерийская, 124А · +7 951 489-04-09</span>
+          <span><span style="color: #fff">Челябинск — склад и самовывоз</span><br>Свердловский тракт, 7В · пн–пт, 9:00–18:00</span>
+          <span><span style="color: #fff">Екатеринбург — офис</span><br>ул. Данилы Зверева, 17б · +7 982 329-11-08</span>
+        </div>
+      </div>
+      <a href="#" style="align-self: flex-start; color: #fff; font: 500 15px/1.4 'Rubik', sans-serif">Двери, лестницы и другие конструкции Inex — на inex.su</a>
+      <div class="ftr__bot"><div style="display: flex; flex-wrap: wrap; gap: 8px 24px"><a href="#">Политика обработки персональных данных</a><a href="#">Согласие на обработку персональных данных</a></div><span>© 2026 ИП Копылов А. М.</span></div>
+    </div>
+  </footer>
+
+  <div class="m-sticky ig-sticky-cta"><a class="ig-btn ig-btn--primary ig-btn--block" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>Рассчитать стоимость</a></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":3700}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { open: 0 }; }
+  renderVals() {
+    const s = this.state;
+    const faq = [
+      { q: 'Какой толщины стекло на козырёк?', a: 'Зависит от выноса, снегового района и крепления — считаем для каждого козырька. Например, триплекс 6+6, 8+8 или 10+10 из закалённых стёкол.' },
+      { q: 'Можно ли без тяг?', a: 'Да, консольный козырёк на зажимном профиле. Триплекс для него, как правило, толще.' },
+      { q: 'Делаете ли монтаж?', a: 'Нет — комплект для вашей бригады.' }
+    ];
+    const out = {
+      faq: faq.map((f, i) => ({ q: f.q, a: f.a, open: s.open === i, cls: 'ig-acc__item' + (s.open === i ? ' is-open' : ''), toggle: () => this.setState({ open: s.open === i ? -1 : i }) }))
+    };
+
+    return out;
+  }
+}
+</script>
+</body>
+</html>

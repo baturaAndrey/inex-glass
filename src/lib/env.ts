@@ -1,117 +1,158 @@
 import { z } from "zod";
 
 /**
- * Server-side environment variables schema.
- * These variables are only available on the server.
+ * Server environment validation (zod 4).
+ *
+ * `getEnv()` parses `process.env` once and memoizes the result. Empty strings are treated
+ * as "not set" so that blank lines in `.env` (e.g. `SMTP_USER=`) fall back to defaults.
+ *
+ * The Docker image is built once in CI without any runtime secrets or database and then
+ * deployed to staging and prod with their own values. `next build` still evaluates the
+ * Payload config while collecting page data, so during the build phase (and only then):
+ * - DATABASE_URL and PAYLOAD_SECRET fall back to inert, clearly non-secret placeholders
+ *   (the build never connects to the database);
+ * - production-only requirements (SITE_URL, FORM_HMAC_SECRET, ORDER_TOKEN_SECRET) are skipped.
+ * At runtime all of them are enforced.
  */
-const serverEnvSchema = z.object({
-  // Database
-  POSTGRES_URL: z.string().url("Invalid database URL"),
 
-  // Authentication
-  BETTER_AUTH_SECRET: z
+const MIN_SECRET_LENGTH = 32;
+
+/** Dev-only placeholders; production must provide real values (see superRefine below). */
+const DEV_FORM_HMAC_SECRET = "dev-only-form-hmac-secret-change-me-0000";
+const DEV_ORDER_TOKEN_SECRET = "dev-only-order-token-secret-change-me-000";
+const DEFAULT_SITE_URL = "http://localhost:3000";
+
+/** Next.js sets this while running `next build`. */
+const NEXT_BUILD_PHASE = "phase-production-build";
+
+/**
+ * Build-phase-only placeholders. Not secrets: port 1 is never listening, so any accidental
+ * connection attempt during the build fails fast instead of reaching a real database.
+ */
+const BUILD_PLACEHOLDER_DATABASE_URL = "postgresql://build:build@127.0.0.1:1/build";
+const BUILD_PLACEHOLDER_PAYLOAD_SECRET = "build-phase-placeholder-not-a-secret-0000";
+
+const booleanString = z
+  .enum(["true", "false"])
+  .default("false")
+  .transform((value) => value === "true");
+
+const secret = (name: string) =>
+  z.string().min(MIN_SECRET_LENGTH, `${name} должна быть не короче ${MIN_SECRET_LENGTH} символов`);
+
+const envSchema = z.object({
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+
+  // Database / Payload
+  DATABASE_URL: z.url(),
+  PAYLOAD_SECRET: secret("PAYLOAD_SECRET"),
+  /** Schema push is allowed ONLY on a developer's personal throwaway database. */
+  PAYLOAD_DB_PUSH: booleanString,
+
+  // Site
+  SITE_URL: z.url().default(DEFAULT_SITE_URL),
+  /** Avoid depending on it: prefer runtime SITE_URL (NEXT_PUBLIC_* is inlined at build time). */
+  NEXT_PUBLIC_SITE_URL: z.url().optional(),
+  SITE_ENV: z.enum(["development", "staging", "production"]).default("development"),
+  STAGING_BASIC_AUTH: z
     .string()
-    .min(32, "BETTER_AUTH_SECRET must be at least 32 characters"),
+    .regex(/^[^:]+:.+$/, "STAGING_BASIC_AUTH должна иметь формат user:pass")
+    .optional(),
 
-  // OAuth
-  GOOGLE_CLIENT_ID: z.string().optional(),
-  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  // Mail (dev: mailpit on localhost:1025)
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().int().positive().optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_FROM: z.string().optional(),
+  /** Staging: all outgoing mail is redirected to this mailbox. */
+  MAIL_INTERCEPT_TO: z.email().optional(),
 
-  // AI
-  OPENROUTER_API_KEY: z.string().optional(),
-  OPENROUTER_MODEL: z.string().default("openai/gpt-5-mini"),
+  // Files
+  UPLOADS_DIR: z.string().default("./.data/lead-files"),
+  MEDIA_DIR: z.string().default("./.data/media"),
 
-  // Storage
-  BLOB_READ_WRITE_TOKEN: z.string().optional(),
+  // Secrets with dev defaults (required in production)
+  FORM_HMAC_SECRET: secret("FORM_HMAC_SECRET").default(DEV_FORM_HMAC_SECRET),
+  /**
+   * HMAC key for order-page tokens (tasks 18/33). Separate from PAYLOAD_SECRET so that
+   * rotating Payload's secret does not invalidate links already sent to clients.
+   */
+  ORDER_TOKEN_SECRET: secret("ORDER_TOKEN_SECRET").default(DEV_ORDER_TOKEN_SECRET),
 
-  // App
-  NODE_ENV: z
-    .enum(["development", "production", "test"])
-    .default("development"),
+  // Jobs / SEO
+  /** Enable the Payload Jobs runner on exactly one container. */
+  JOBS_ENABLED: booleanString,
+  INDEXNOW_KEY: z.string().optional(),
+
+  // Dev tools (scripts only; never present in prod images or prod env)
+  KIE_AI_API_KEY: z.string().optional(),
+  WORDKEEPER_API_KEY: z.string().optional(),
+  EXA_API_KEY: z.string().optional(),
+  FIRECRAWL_API_KEY: z.string().optional(),
 });
 
-/**
- * Client-side environment variables schema.
- * These variables are exposed to the browser via NEXT_PUBLIC_ prefix.
- */
-const clientEnvSchema = z.object({
-  NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
-});
+type RawEnv = Record<string, string | undefined>;
 
-export type ServerEnv = z.infer<typeof serverEnvSchema>;
-export type ClientEnv = z.infer<typeof clientEnvSchema>;
+/** Production-only requirements that cannot be expressed as plain field rules. */
+function productionIssues(raw: RawEnv): string[] {
+  const isProductionRuntime = raw.NODE_ENV === "production" && raw.NEXT_PHASE !== NEXT_BUILD_PHASE;
+  if (!isProductionRuntime) return [];
 
-/**
- * Validates and returns server-side environment variables.
- * Throws an error if validation fails.
- */
-export function getServerEnv(): ServerEnv {
-  const parsed = serverEnvSchema.safeParse(process.env);
-
-  if (!parsed.success) {
-    console.error(
-      "Invalid server environment variables:",
-      parsed.error.flatten().fieldErrors
-    );
-    throw new Error("Invalid server environment variables");
-  }
-
-  return parsed.data;
+  const required = ["SITE_URL", "FORM_HMAC_SECRET", "ORDER_TOKEN_SECRET"] as const;
+  return required.filter((name) => !raw[name]).map((name) => `${name}: обязательна в production`);
 }
 
-/**
- * Validates and returns client-side environment variables.
- * Throws an error if validation fails.
- */
-export function getClientEnv(): ClientEnv {
-  const parsed = clientEnvSchema.safeParse({
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-  });
-
-  if (!parsed.success) {
-    console.error(
-      "Invalid client environment variables:",
-      parsed.error.flatten().fieldErrors
-    );
-    throw new Error("Invalid client environment variables");
+function normalize(source: NodeJS.ProcessEnv): RawEnv {
+  const result: RawEnv = {};
+  for (const [key, value] of Object.entries(source)) {
+    result[key] = value === "" ? undefined : value;
   }
-
-  return parsed.data;
+  return result;
 }
 
-/**
- * Checks if required environment variables are set.
- * Logs warnings for missing optional variables.
- */
-export function checkEnv(): void {
-  const warnings: string[] = [];
+/** Fills build-only placeholders for runtime secrets; a no-op outside `next build`. */
+function withBuildPlaceholders(raw: RawEnv): RawEnv {
+  if (raw.NEXT_PHASE !== NEXT_BUILD_PHASE) return raw;
+  return {
+    ...raw,
+    DATABASE_URL: raw.DATABASE_URL ?? BUILD_PLACEHOLDER_DATABASE_URL,
+    PAYLOAD_SECRET: raw.PAYLOAD_SECRET ?? BUILD_PLACEHOLDER_PAYLOAD_SECRET,
+  };
+}
 
-  // Check required variables
-  if (!process.env.POSTGRES_URL) {
-    throw new Error("POSTGRES_URL is required");
+function toEnv(parsed: z.infer<typeof envSchema>) {
+  const { KIE_AI_API_KEY, WORDKEEPER_API_KEY, EXA_API_KEY, FIRECRAWL_API_KEY, ...core } = parsed;
+  return {
+    ...core,
+    devTools: { KIE_AI_API_KEY, WORDKEEPER_API_KEY, EXA_API_KEY, FIRECRAWL_API_KEY },
+  };
+}
+
+export type Env = ReturnType<typeof toEnv>;
+
+let cached: Env | undefined;
+
+/** Validated, memoized server environment. Throws a readable error listing invalid variables. */
+export function getEnv(): Env {
+  if (cached) return cached;
+
+  const raw = withBuildPlaceholders(normalize(process.env));
+  const parsed = envSchema.safeParse(raw);
+  const problems = [
+    ...(parsed.success
+      ? []
+      : parsed.error.issues.map((issue) => `${issue.path.join(".") || "(env)"}: ${issue.message}`)),
+    ...productionIssues(raw),
+  ];
+
+  if (!parsed.success || problems.length > 0) {
+    throw new Error(
+      `Некорректные переменные окружения:\n${problems.map((p) => `  - ${p}`).join("\n")}\n` +
+        "См. env.example."
+    );
   }
 
-  if (!process.env.BETTER_AUTH_SECRET) {
-    throw new Error("BETTER_AUTH_SECRET is required");
-  }
-
-  // Check optional variables and warn
-  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-    warnings.push("Google OAuth is not configured. Social login will be disabled.");
-  }
-
-  if (!process.env.OPENROUTER_API_KEY) {
-    warnings.push("OPENROUTER_API_KEY is not set. AI chat will not work.");
-  }
-
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    warnings.push("BLOB_READ_WRITE_TOKEN is not set. Using local storage for file uploads.");
-  }
-
-  // Log warnings in development
-  if (process.env.NODE_ENV === "development" && warnings.length > 0) {
-    console.warn("\n⚠️  Environment warnings:");
-    warnings.forEach((w) => console.warn(`   - ${w}`));
-    console.warn("");
-  }
+  cached = toEnv(parsed.data);
+  return cached;
 }
