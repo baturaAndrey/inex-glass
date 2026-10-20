@@ -20,7 +20,9 @@ const HTTP_SERVICE_UNAVAILABLE = 503;
 
 export async function GET() {
   try {
-    const payload = await getPayload({ config });
+    // `cron: true` is what starts the Jobs autoRun crons (Payload only does it on request);
+    // `jobs.autoRun` returns no crons unless JOBS_ENABLED=true.
+    const payload = await getPayload({ config, cron: true });
     await payload.db.drizzle.execute(sql`SELECT 1`);
     return Response.json(
       { status: "ok", release: process.env.RELEASE_SHA ?? "dev" },

@@ -187,6 +187,35 @@
     --ring: var(--ig-primary);
   }
 
+  /*
+   * Site header heights (task 14). --ig-header-h is the full header (the spacer that keeps the
+   * page from jumping): top 36 + main 72 + sections 44 = 152 at ≥1101; top 36 + main 64 at
+   * 600–1100; main 56 on phones. --ig-header-compact-h is the header after scrolling — offset for
+   * sticky sidebars: `top: calc(var(--ig-header-compact-h) + 16px)`.
+   */
+  :root {
+    --ig-header-h: 152px;
+    --ig-header-compact-h: 64px;
+  }
+
+  @media (max-width: 1100px) {
+    :root {
+      --ig-header-h: 100px;
+    }
+  }
+
+  @media (max-width: 599px) {
+    :root {
+      --ig-header-h: 56px;
+      --ig-header-compact-h: 56px;
+    }
+  }
+
+  /* Anchors (#ceny, #rekvizity) must not hide under the fixed header. */
+  main [id] {
+    scroll-margin-top: calc(var(--ig-header-compact-h) + 16px);
+  }
+
   *,
   ::before,
   ::after {

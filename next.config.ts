@@ -49,6 +49,10 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(dirname),
   },
+  experimental: {
+    // Two root layouts ((site), (payload)): unmatched URLs need src/app/global-not-found.tsx.
+    globalNotFound: true,
+  },
   async headers() {
     return [{ source: "/(.*)", headers: SECURITY_HEADERS }];
   },

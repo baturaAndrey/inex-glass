@@ -26,6 +26,13 @@ function initialOpen(type: AccordionProps["type"], defaultOpen: string[] | undef
   return type === "multiple" ? defaultOpen : defaultOpen.slice(0, 1);
 }
 
+/**
+ * Up to this many items each panel is a `region` landmark (WAI-ARIA APG). Longer lists (FAQ
+ * with 10+ questions) would flood the landmark menu of screen readers, so their panels stay
+ * plain containers labelled by their button.
+ */
+const MAX_REGION_ITEMS = 6;
+
 /** Index of the trigger to focus for a navigation key, `null` for other keys. */
 function targetIndex(key: string, current: number, count: number): number | null {
   switch (key) {
@@ -44,7 +51,7 @@ function targetIndex(key: string, current: number, count: number): number | null
 
 /**
  * Accordion / FAQ (`.ig-acc`). Buttons carry `aria-expanded` / `aria-controls`, panels are
- * `role="region"` labelled by their button. Closed panels stay in the DOM (content is indexable)
+ * `role="region"` (only for ≤ 6 items, see `MAX_REGION_ITEMS`) labelled by their button. Closed panels stay in the DOM (content is indexable)
  * but are `inert`. Height animates via `grid-template-rows: 0fr → 1fr` (200 ms), no jumps.
  * Keyboard: Enter / Space toggle (native button), ↑ / ↓ move between headers, Home / End.
  */
@@ -59,6 +66,7 @@ export function Accordion({
   const [open, setOpen] = useState<string[]>(() => initialOpen(type, defaultOpen));
   const buttonsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const Heading = `h${headingLevel}` as const;
+  const panelRole = items.length <= MAX_REGION_ITEMS ? "region" : undefined;
 
   const toggle = useCallback(
     (id: string) => {
@@ -106,7 +114,7 @@ export function Accordion({
             </Heading>
             <div
               id={panelId}
-              role="region"
+              role={panelRole}
               aria-labelledby={buttonId}
               inert={!isOpen}
               className={cn(

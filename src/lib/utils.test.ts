@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { CUSTOM_TEXT_SIZES, cn } from "./utils";
+import { CUSTOM_SHADOWS, CUSTOM_TEXT_SIZES, cn } from "./utils";
 
 describe("cn()", () => {
   it("keeps a text colour next to a custom font size", () => {
@@ -20,6 +20,23 @@ describe("cn()", () => {
     expect(cn("px-4", "px-gutter")).toBe("px-gutter");
     expect(cn("px-gutter", "px-6")).toBe("px-6");
     expect(cn("py-8 px-gutter", "pt-2")).toBe("py-8 px-gutter pt-2");
+  });
+
+  it("treats custom shadows as box-shadow sizes, not colours", () => {
+    expect(cn("shadow-sm", "shadow-card")).toBe("shadow-card");
+    expect(cn("shadow-card", "hover:shadow-card-hover", "shadow-modal")).toBe(
+      "hover:shadow-card-hover shadow-modal"
+    );
+    expect(cn("shadow-dropdown", "shadow-black/10")).toBe("shadow-dropdown shadow-black/10");
+  });
+
+  it("lists every --shadow-* declared in globals.css", () => {
+    const css = readFileSync(
+      path.resolve(import.meta.dirname, "../app/(site)/globals.css"),
+      "utf8"
+    );
+    const declared = new Set([...css.matchAll(/--shadow-([a-z0-9-]+)\s*:/g)].map((m) => m[1]));
+    expect([...declared].sort()).toEqual([...CUSTOM_SHADOWS].sort());
   });
 
   it("still merges standard utilities", () => {

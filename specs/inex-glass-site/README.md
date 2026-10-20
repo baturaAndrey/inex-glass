@@ -166,12 +166,12 @@ graph TD
 - [x] [task-13-ui-content-primitives](./tasks/task-13-ui-content-primitives.md) — Примитивы контента, cookie-баннер, sticky-CTA
 
 ### Wave 4
-- [ ] [task-14-site-header-footer](./tasks/task-14-site-header-footer.md) — Шапка, мега-меню, подвал, layout
-- [ ] [task-15-page-framework-seo](./tasks/task-15-page-framework-seo.md) — Загрузчики CMS, мета, крошки, JSON-LD, 404, CTA квиза
-- [ ] [task-16-blocks-render-miniseed](./tasks/task-16-blocks-render-miniseed.md) — Рендер блоков и Lexical с метками, seed-каркас
-- [ ] [task-17-lead-intake-uploads](./tasks/task-17-lead-intake-uploads.md) — Загрузка файлов, создание заявок, антиспам
-- [ ] [task-18-email-jobs](./tasks/task-18-email-jobs.md) — Письма (React Email) и Payload Jobs
-- [ ] [task-19-metrika-analytics](./tasks/task-19-metrika-analytics.md) — Яндекс.Метрика после согласия, цели
+- [x] [task-14-site-header-footer](./tasks/task-14-site-header-footer.md) — Шапка, мега-меню, подвал, layout
+- [x] [task-15-page-framework-seo](./tasks/task-15-page-framework-seo.md) — Загрузчики CMS, мета, крошки, JSON-LD, 404, CTA квиза
+- [x] [task-16-blocks-render-miniseed](./tasks/task-16-blocks-render-miniseed.md) — Рендер блоков и Lexical с метками, seed-каркас
+- [x] [task-17-lead-intake-uploads](./tasks/task-17-lead-intake-uploads.md) — Загрузка файлов, создание заявок, антиспам
+- [x] [task-18-email-jobs](./tasks/task-18-email-jobs.md) — Письма (React Email) и Payload Jobs
+- [x] [task-19-metrika-analytics](./tasks/task-19-metrika-analytics.md) — Яндекс.Метрика после согласия, цели
 
 ### Wave 5
 - [ ] [task-20-quiz-core](./tasks/task-20-quiz-core.md) — Квиз «Расчёт стоимости» (7 шагов)

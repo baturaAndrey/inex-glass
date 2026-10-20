@@ -75,16 +75,27 @@ git tag vX.Y.Z на тот же коммит ─► тот же digest пере�
 - `NODE_ENV=production`, `PORT=3000`, `HOSTNAME=0.0.0.0`, `RELEASE_SHA` заданы в образе. `RELEASE_SHA` (build-arg из CI = тестированный коммит) объявлен только в стадиях `runner` и `tools`: он читается в рантайме (`/api/health/`), а стадия `build` от него не зависит, поэтому слой `next build` переиспользуется из кэша при неизменных исходниках.
 - Ключи dev-инструментов (`KIE_AI_API_KEY`, `WORDKEEPER_API_KEY`, `EXA_API_KEY`, `FIRECRAWL_API_KEY`) в env staging/prod **не задаются** и в образ не попадают.
 - `NEXT_PUBLIC_*` встраиваются при сборке — в Dokploy их задавать бесполезно.
+- `ORDER_TOKEN_SECRET` — ключ HMAC ссылок `/zakaz/<токен>/` (`src/lib/orders/access-token.ts`): токен не хранится, а выводится из секрета, id заказа и `tokenCreatedAt`. Не ротировать без необходимости: после смены все выданные ссылки перестают работать — перевыпустить ссылки активных заказов (кнопка «Перевыпустить» в заказе, задача 33) и при необходимости отправить клиентам письмо повторно.
+- Почта и задания (задача 18): `MAIL_INTERCEPT_TO` перенаправляет **все** письма (включая служебные письма Payload) на один ящик, тема получает префикс `[STAGING → <исходные получатели>]`. **На staging (`SITE_ENV=staging`) без `MAIL_INTERCEPT_TO` почта заблокирована целиком**: при старте в лог пишется предупреждение «Почта на staging заблокирована…», письма не уходят ни клиентам, ни на `sale@…`, почтовые задания **отменяются без ретраев** (`MailBlockedError` = `JobCancelledError`, в админке — ошибка с `cancelled: true`), служебные письма Payload (сброс пароля) завершаются ошибкой. После того как `MAIL_INTERCEPT_TO` задан, отменённые задания не перезапускаются — это ожидаемо. Ошибки доставки SMTP пишутся в лог и журнал задания без адресов (только имя ошибки, `code`, `responseCode`, SMTP-команда). Без `SMTP_HOST` письма не отправляются, почтовые задания падают и уходят в ретраи (видны в админке: «Система → Payload Jobs»). Cron очереди стартует при первом `getPayload({ cron: true })` — его делает `/api/health/` — и только при `JOBS_ENABLED=true`.
 
 ## 4. Тома
 
 Dokploy → приложение → Advanced → Volumes, тип **Volume** (named volume):
 
-| Volume                        | Путь в контейнере  | Назначение                        |
-| ----------------------------- | ------------------ | --------------------------------- |
-| `inex-glass-<env>-media`      | `/data/media`      | медиатека Payload                 |
-| `inex-glass-<env>-lead-files` | `/data/lead-files` | приватные файлы заявок            |
-| `inex-glass-<env>-next-cache` | `/app/.next/cache` | кэш оптимизатора изображений Next |
+| Volume                         | Путь в контейнере         | Назначение                        |
+| ------------------------------ | ------------------------- | --------------------------------- |
+| `inex-glass-<env>-media`       | `/data/media`             | медиатека Payload                 |
+| `inex-glass-<env>-lead-files`  | `/data/lead-files`        | приватные файлы заявок            |
+| `inex-glass-<env>-next-images` | `/app/.next/cache/images` | кэш оптимизатора изображений Next |
+
+**Не монтировать весь `/app/.next/cache`.** Там же лежит data cache CMS (`fetch-cache`, `unstable_cache`): на volume он переживал бы редеплои вместе с записями, сделанными мимо админки (seed, импорт, SQL), и устаревшими страницами. Если на окружении уже есть volume `inex-glass-<env>-next-cache` на `/app/.next/cache` — заменить его на `next-images` (старый volume удалить, кэш изображений пересоберётся сам). См. раздел «Кэш Next».
+
+### Кэш Next
+
+- Данные CMS кэшируются `unstable_cache` по тегам (`src/lib/cms/cache.ts`) и сбрасываются хуками Payload при сохранении в админке. Поиск страницы по URL (`lookup:*`), `collection:pages` и `collection:redirects` истекают **сразу** (`{ expire: 0 }`): новая страница/редирект доступны с первого запроса после публикации.
+- «Не найдено» не кэшируется (страница по пути, документ по slug, редирект): несуществующие URL от ботов не плодят записи кэша, а страница, созданная мимо админки, не залипает в 404.
+- Записи мимо админки (seed, импорт) хуков не вызывают. Поэтому `pnpm seed` в конце сам вызывает `POST <SITE_URL>/api/revalidate/` с одноразовым токеном (HMAC от `PAYLOAD_SECRET`, живёт 5 минут; `src/lib/cms/revalidate-token.ts`) — сайт сбрасывает все теги `collection:*`, `lookup:*`, `global:*` и ISR-кэш. Новых переменных окружения не нужно: у seed и сайта должны совпадать `SITE_URL` и `PAYLOAD_SECRET`.
+- Если сайт из seed недоступен (в логе `кэш сайта НЕ сброшен …`), сбросить кэш вручную: redeploy/перезапуск контейнера (data cache не на volume, новый контейнер стартует с пустым кэшем); локально — перезапуск `pnpm dev`. Свои скрипты импорта должны так же завершаться вызовом `revalidateSite()` из `src/seed/context.ts`.
 
 Контейнер работает от `node` (uid 1000). Каталоги созданы в образе и принадлежат `node`; новый **named volume** при первом монтировании наследует владельца из образа, поэтому entrypoint с `chown` не нужен (проверено локально, см. «Результаты спайка»).
 
@@ -188,6 +199,7 @@ docker run --rm --env-file /root/inex-glass-staging.env \
 - Медиа пишутся в `/data/media` — монтировать тот же volume, что у приложения.
 - Альтернатива: SSH-туннель к Postgres (`ssh -L 5433:<ip контейнера БД>:5432 root@vds`) и запуск `pnpm seed` локально с `DATABASE_URL=…@localhost:5433/…` (медиафайлы тогда окажутся локально — для импорта с медиа предпочтителен запуск на VDS).
 - `JOBS_ENABLED` в tools не задавать.
+- После записи seed вызывает `POST <SITE_URL>/api/revalidate/` (сброс кэша CMS сайта, см. «Кэш Next»). `SITE_URL` и `PAYLOAD_SECRET` в env-файле должны совпадать с приложением; публичный `SITE_URL` из контейнера в `dokploy-network` обычно доступен. Если нет — в логе будет `кэш сайта НЕ сброшен`, тогда перезапустить приложение.
 
 ## 10. Секреты GitHub Actions и первый запуск staging
 
@@ -246,5 +258,5 @@ Variables: `STAGING_URL` (`https://dev.inexglass.ru`), `PROD_URL` (`https://inex
 - Payload сам создаёт базу из `DATABASE_URL`, если её нет (`autoDatabaseCreate`), — в Dokploy базу всё равно лучше создавать вместе с сервисом Postgres.
 - `/api/health` без слеша → 308; `/admin/` → 200 (статика `/_next/static` отдаётся); на staging `/` без basic auth → 401, с ним → 200. Первый администратор создаётся через `/admin/`.
 - sharp 0.35 (`@img/sharp-linux-x64`) работает внутри `output: "standalone"` (ресайз/кодирование проверены) без `serverExternalPackages`/`outputFileTracingIncludes`.
-- Запись в `/data/media`, `/data/lead-files`, `/app/.next/cache` от `node` проходит. `scripts/docker-entrypoint.sh` не нужен: named volumes наследуют владельца из образа.
+- Запись в `/data/media`, `/data/lead-files`, `/app/.next/cache` от `node` проходит (volume теперь монтируется только на `/app/.next/cache/images`, см. «Тома»). `scripts/docker-entrypoint.sh` не нужен: named volumes наследуют владельца из образа.
 - `tools`: `pnpm` (corepack) запускается от `node` без повторной загрузки, `pnpm migrate:status` работает.

@@ -13,6 +13,7 @@ export * from "./plural";
 export * from "./prices";
 export * from "./promo";
 export * from "./quiz-flags";
+export * from "./quiz-src";
 export * from "./quiz-schema";
 export * from "./stop-words";
 export * from "./types";

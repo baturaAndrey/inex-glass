@@ -1,5 +1,6 @@
 import { revalidateTag } from "next/cache";
 import { collectionTag, docTag, globalTag } from "@/lib/cache-tags";
+import { lookupTag } from "@/lib/cms/tags";
 import type {
   CollectionAfterChangeHook,
   CollectionAfterDeleteHook,
@@ -11,6 +12,13 @@ import type {
  * immediately instead of stale-while-revalidate.
  */
 const IMMEDIATE_GLOBALS: ReadonlySet<string> = new Set(["prices", "promo", "contacts"]);
+
+/**
+ * Collections whose `collection:<slug>` tag expires immediately: the catch-all route's ISR
+ * entries (including cached 404 pages) carry these tags, and a new page / redirect must be
+ * reachable on the first request after publish, not one request later.
+ */
+const IMMEDIATE_COLLECTIONS: ReadonlySet<string> = new Set(["pages", "redirects"]);
 
 /** Expire the tag right away (next request waits for fresh data). */
 const IMMEDIATE_PROFILE = { expire: 0 } as const;
@@ -28,7 +36,10 @@ function safeRevalidate(tag: string, immediate: boolean): void {
 }
 
 function revalidateDoc(slug: string, doc: DocLike): void {
-  safeRevalidate(collectionTag(slug), false);
+  // URL → document lookups (`@/lib/cms/tags`) are always expired right away: a stale lookup is a
+  // 404 for a just-published path or a still-resolving removed one.
+  safeRevalidate(lookupTag(slug), true);
+  safeRevalidate(collectionTag(slug), IMMEDIATE_COLLECTIONS.has(slug));
   if (doc?.id !== undefined && doc.id !== null && doc.id !== "") {
     safeRevalidate(docTag(slug, String(doc.id)), false);
   }

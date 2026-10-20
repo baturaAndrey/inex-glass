@@ -36,6 +36,12 @@ describe("checkUpload (lead files)", () => {
     ["plan.dxf", "", ascii("  0\r\nSECTION\r\n"), "image/vnd.dxf"],
     ["plan.dxf", "text/plain", ascii("999\nmade by CAD\n  0\nSECTION"), "image/vnd.dxf"],
     ["plan.dxf", "application/dxf", ascii("AutoCAD Binary DXF\r\n"), "image/vnd.dxf"],
+    [
+      "plan.dxf",
+      "",
+      Uint8Array.from([0xef, 0xbb, 0xbf, ...ascii("0\nSECTION\n")]),
+      "image/vnd.dxf",
+    ],
   ])("accepts %s (%s) and stores the canonical type", (filename, mimeType, head, expected) => {
     expect(checkUpload(LEAD_FILE_POLICY, { filename, mimeType, head })).toEqual({
       ok: true,
@@ -49,6 +55,12 @@ describe("checkUpload (lead files)", () => {
     ["a mismatching MIME type", "plan.pdf", "text/html", PDF_HEAD],
     ["SVG under a PNG name", "photo.png", "image/svg+xml", ascii("<svg/>")],
     ["HTML under a DXF name", "plan.dxf", "text/plain", HTML_HEAD],
+    [
+      "HTML after a BOM under a DXF name",
+      "plan.dxf",
+      "text/plain",
+      Uint8Array.from([0xef, 0xbb, 0xbf, ...HTML_HEAD]),
+    ],
     ["HTML under a PDF name", "plan.pdf", "application/pdf", HTML_HEAD],
     ["a non-DWG under a DWG name", "plan.dwg", "application/octet-stream", PNG_HEAD],
     ["webp (orders only)", "photo.webp", "image/webp", ascii("RIFF\0\0\0\0WEBP")],

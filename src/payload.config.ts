@@ -5,12 +5,15 @@ import { ru } from "@payloadcms/translations/languages/ru";
 import { buildConfig } from "payload";
 import sharp from "sharp";
 import { getEnv } from "@/lib/env";
+import { isJobsRunnerEnabled, JOB_AUTORUN, jobTasks } from "./jobs";
 import { migrations } from "./migrations";
+import { getRole, isAdmin } from "./payload/access";
 import { catalogCollections } from "./payload/collections/catalog";
 import { contentCollections } from "./payload/collections/content";
 import { crmCollections } from "./payload/collections/crm";
 import { Users } from "./payload/collections/users";
 import { richTextEditor } from "./payload/editor";
+import { createEmailAdapter, isSmtpConfigured } from "./payload/email";
 import { globals } from "./payload/globals";
 import { dbSchemaHooks, plugins } from "./payload/plugins";
 
@@ -66,6 +69,33 @@ export default buildConfig({
   upload: {
     limits: { fileSize: MAX_FILE_SIZE },
     requestSizeLimit: MAX_REQUEST_SIZE,
+  },
+  // SMTP via nodemailer with staging interception (task 18). Without SMTP_HOST Payload uses its
+  // console adapter and `sendMail` refuses to send, so mail jobs fail visibly.
+  ...(isSmtpConfigured() ? { email: createEmailAdapter() } : {}),
+  // Payload Jobs (task 18): the task list is frozen with the `add_jobs_queue` migration.
+  jobs: {
+    tasks: jobTasks,
+    // Runner and scheduler crons exist only on the jobs container (JOBS_ENABLED=true); other
+    // containers only queue jobs. Crons start on the first `getPayload({ cron: true })`.
+    autoRun: () => (isJobsRunnerEnabled() ? [...JOB_AUTORUN] : []),
+    shouldAutoRun: () => isJobsRunnerEnabled(),
+    deleteJobOnComplete: true,
+    access: {
+      queue: ({ req }) => getRole(req.user) !== null,
+      run: ({ req }) => getRole(req.user) === "admin",
+      cancel: ({ req }) => getRole(req.user) === "admin",
+    },
+    jobsCollectionOverrides: ({ defaultJobsCollection }) => ({
+      ...defaultJobsCollection,
+      admin: {
+        ...defaultJobsCollection.admin,
+        group: "Система",
+        // Failed jobs (e.g. no lead recipients) stay visible to admins.
+        hidden: ({ user }) => getRole(user) !== "admin",
+      },
+      access: { read: isAdmin, update: isAdmin, delete: isAdmin, create: () => false },
+    }),
   },
   graphQL: { disablePlaygroundInProduction: true },
   typescript: { outputFile: path.resolve(dirname, "payload-types.ts") },

@@ -1,20 +1,17 @@
-import Link from "next/link";
-import { FileQuestion } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { NotFoundContent, NOT_FOUND_TITLE } from "@/components/page/not-found-content";
+import { TITLE_BRAND_SUFFIX } from "@/lib/seo/metadata";
+import type { Metadata } from "next";
+
+/**
+ * 404 boundary inside the site layout. It renders in the BROWSER only (client navigation, and
+ * hydration of `<NotFoundResponse />`): React has no error boundaries during SSR, so a server
+ * render never reaches it — pages return `<NotFoundResponse />` instead of throwing
+ * `notFound()` (see `@/components/page/not-found-response`). Next adds the robots noindex tag.
+ */
+export const metadata: Metadata = {
+  title: { absolute: `${NOT_FOUND_TITLE}${TITLE_BRAND_SUFFIX}` },
+};
 
 export default function NotFound() {
-  return (
-    <div className="container mx-auto px-4 py-16">
-      <div className="mx-auto max-w-md text-center">
-        <div className="mb-6 flex justify-center">
-          <FileQuestion className="text-muted-foreground h-16 w-16" aria-hidden="true" />
-        </div>
-        <h1 className="mb-4 text-4xl font-bold">Страница не найдена</h1>
-        <p className="text-muted-foreground mb-6">Такой страницы нет или она была перемещена.</p>
-        <Button asChild>
-          <Link href="/">На главную</Link>
-        </Button>
-      </div>
-    </div>
-  );
+  return <NotFoundContent />;
 }

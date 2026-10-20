@@ -86,7 +86,8 @@ COPY --from=build --chown=node:node /app/.next/standalone ./
 COPY --from=build --chown=node:node /app/.next/static ./.next/static
 # Named volumes inherit ownership from the image, so `node` can write to them.
 # (Bind mounts owned by root would not — see docs/deploy.md, "Тома".)
-RUN mkdir -p /data/media /data/lead-files /app/.next/cache \
+# Only `.next/cache/images` goes on a volume; the data/ISR cache stays per container.
+RUN mkdir -p /data/media /data/lead-files /app/.next/cache/images \
  && chown -R node:node /data /app/.next/cache
 USER node
 EXPOSE 3000

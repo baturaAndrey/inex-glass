@@ -6,8 +6,10 @@ import { defineConfig } from "vitest/config";
  * - `unit` (node): pure domain logic, `src/**\/*.test.ts` (incl. `src/lib/domain/*.test.ts`).
  * - `dom` (jsdom): React components, `src/**\/*.test.tsx` and `src/**\/*.dom.test.ts`.
  *
- * Tests must not import `payload` / `@payload-config`: domain functions are pure. The
- * `@payload-config` alias exists only for rare integration cases.
+ * Tests must not boot Payload (`getPayload`, the Local API, a database): domain functions are
+ * pure. Importing schema modules (`src/payload/**` field/collection configs, their validators)
+ * without running Payload is allowed. The `@payload-config` alias exists only for rare
+ * integration cases.
  * `passWithNoTests` is intentionally off: `src/lib/sanity.test.ts` must always run.
  */
 const alias = {

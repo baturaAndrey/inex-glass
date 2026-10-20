@@ -28,10 +28,18 @@ export const CUSTOM_TEXT_SIZES = [
   "hero-stat",
 ] as const;
 
+/**
+ * Custom box shadows declared as `--shadow-*` in globals.css (`shadow-card`, `shadow-modal`, …).
+ * Without them tailwind-merge reads `shadow-card` as a shadow *colour*, so `cn("shadow-sm",
+ * "shadow-card")` would keep both. Keep in sync with globals.css (checked in utils.test.ts).
+ */
+export const CUSTOM_SHADOWS = ["card", "card-hover", "dropdown", "modal"] as const;
+
 const twMerge = extendTailwindMerge({
   extend: {
     // `text` theme feeds the `font-size` class group.
-    theme: { text: [...CUSTOM_TEXT_SIZES] },
+    // `shadow` theme feeds the box-shadow size group (not `shadow-color`).
+    theme: { text: [...CUSTOM_TEXT_SIZES], shadow: [...CUSTOM_SHADOWS] },
     // `px-gutter` (@utility in globals.css) is horizontal padding: it must replace `px-4` etc.
     classGroups: { px: [{ px: ["gutter"] }] },
   },

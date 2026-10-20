@@ -52,10 +52,15 @@ const BINARY_DXF_SENTINEL = "AutoCAD Binary DXF";
 /** ASCII DXF starts with a group code line: `0` (SECTION) or `999` (comment). */
 const ASCII_DXF_START = /^(?:0|999)\r?\n/;
 
+/** UTF-8 byte order mark some CAD tools write before an ASCII DXF. */
+const UTF8_BOM = [0xef, 0xbb, 0xbf] as const;
+
 /** DXF is plain text: accept the binary sentinel or a leading group code, never markup. */
 const isDxf = (head: Uint8Array) => {
   if (startsWithBytes(head, asciiBytes(BINARY_DXF_SENTINEL))) return true;
-  const text = new TextDecoder("latin1").decode(head).replace(/^﻿/, "").trimStart();
+  // Strip the BOM as bytes: decoded as latin1 it becomes "ï»¿", never U+FEFF.
+  const body = startsWithBytes(head, UTF8_BOM) ? head.subarray(UTF8_BOM.length) : head;
+  const text = new TextDecoder("latin1").decode(body).trimStart();
   return ASCII_DXF_START.test(text);
 };
 

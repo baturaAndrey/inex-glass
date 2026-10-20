@@ -56,6 +56,8 @@ const EXPECTED_GLOBALS = [
   "site-settings",
   "navigation",
   "snippets",
+  // Payload's own jobs global (stats of scheduled tasks), present once any task has a `schedule`.
+  "payload-jobs-stats",
 ] as const satisfies readonly GlobalSlug[];
 
 /** Collections whose documents must never be readable without a staff session. */

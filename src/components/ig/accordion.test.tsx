@@ -40,6 +40,20 @@ describe("Accordion", () => {
     expect(first.closest("h3")).not.toBeNull();
   });
 
+  it("drops the region landmark from panels of long lists (> 6 items)", () => {
+    const many = Array.from({ length: 7 }, (_, index) => ({
+      id: `q${index}`,
+      title: `Вопрос ${index}`,
+      content: <p>Ответ {index}</p>,
+    }));
+    render(<Accordion items={many} />);
+    const [first] = screen.getAllByRole("button");
+    if (!first) throw new Error("button missing");
+    expect(panelOf(first)).not.toHaveAttribute("role");
+    expect(panelOf(first)).toHaveAttribute("aria-labelledby", first.id);
+    expect(screen.queryAllByRole("region")).toHaveLength(0);
+  });
+
   it("type=single keeps one item open; clicking the open one closes it", async () => {
     const user = userEvent.setup();
     render(<Accordion items={ITEMS} defaultOpen={["a", "b"]} />);

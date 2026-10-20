@@ -56,12 +56,29 @@ describe("revalidateCollection", () => {
     revalidateTagMock.mockReset();
   });
 
-  it("revalidates collection and document tags on change", () => {
+  it("revalidates lookup, collection and document tags on change", () => {
     const doc = { id: "abc", _status: "published" };
-    const result = revalidateCollection("pages").afterChange(args(doc));
+    const result = revalidateCollection("articles").afterChange(args(doc));
     expect(result).toBe(doc);
-    expect(revalidateTagMock).toHaveBeenCalledWith("collection:pages", "max");
-    expect(revalidateTagMock).toHaveBeenCalledWith("doc:pages:abc", "max");
+    expect(revalidateTagMock).toHaveBeenCalledWith("lookup:articles", { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledWith("collection:articles", "max");
+    expect(revalidateTagMock).toHaveBeenCalledWith("doc:articles:abc", "max");
+  });
+
+  it.each(["pages", "redirects"])(
+    "expires collection:%s immediately (path lookups, cached 404 pages)",
+    (slug) => {
+      revalidateCollection(slug).afterChange(args({ id: "abc", _status: "published" }));
+      expect(revalidateTagMock).toHaveBeenCalledWith(`collection:${slug}`, { expire: 0 });
+      expect(revalidateTagMock).toHaveBeenCalledWith(`lookup:${slug}`, { expire: 0 });
+      expect(revalidateTagMock).toHaveBeenCalledWith(`doc:${slug}:abc`, "max");
+    }
+  );
+
+  it("expires the path lookup immediately on delete", () => {
+    revalidateCollection("pages").afterDelete(args({ id: "abc" }));
+    expect(revalidateTagMock).toHaveBeenCalledWith("lookup:pages", { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledWith("collection:pages", { expire: 0 });
   });
 
   it("does not revalidate a draft without a published version", () => {
@@ -75,7 +92,7 @@ describe("revalidateCollection", () => {
     revalidateCollection("pages").afterChange(
       args({ id: "abc", _status: "draft" }, {}, { _status: "published" })
     );
-    expect(revalidateTagMock).toHaveBeenCalledWith("collection:pages", "max");
+    expect(revalidateTagMock).toHaveBeenCalledWith("collection:pages", { expire: 0 });
   });
 
   it("revalidates collections without drafts", () => {
