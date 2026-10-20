@@ -1,4 +1,5 @@
 import { rel } from "../slugs";
+import { CARD_MAX_DEPTH } from "./populate";
 import type { Field, GroupField, TextFieldSingleValidation } from "payload";
 
 /** Collections an internal link may point to (resolved to URLs by task 15, `resolveLink`). */
@@ -60,6 +61,7 @@ export function linkField(opts: LinkFieldOptions = {}): GroupField {
       type: "relationship",
       label: "Документ",
       relationTo: LINKABLE_COLLECTIONS,
+      maxDepth: CARD_MAX_DEPTH,
       required,
       admin: { condition: (_, sibling) => sibling?.type !== "custom" },
     },

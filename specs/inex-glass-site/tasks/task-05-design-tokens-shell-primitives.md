@@ -2,7 +2,7 @@
 
 ## Status
 
-pending
+complete
 
 ## Wave
 
@@ -23,7 +23,7 @@ pending
 
 - `src/styles/ig-tokens.css` — копия `res/inex-glass-handoff/design-system/colors_and_type.css` с правками (см. ниже).
 - `src/styles/ig-components.css` — копия `res/inex-glass-handoff/design-system/components.css` с правками.
-- `src/app/fonts/Rubik-Light.woff2`, `Rubik-Regular.woff2`, `Rubik-Medium.woff2`, `Rubik-SemiBold.woff2`, `Rubik-Bold.woff2` — subset latin + cyrillic.
+- `Rubik-Regular.woff2`, `Rubik-Medium.woff2`, `Rubik-SemiBold.woff2`, `Rubik-Bold.woff2` — subset latin + cyrillic. (вес 300 не используется — удалён по ревью волны 2)
 - `src/app/(site)/fonts.ts` — `next/font/local` (`export const rubik`).
 - `scripts/fonts/build-fonts.mjs` — скрипт конвертации TTF → woff2 (запускается вручную, см. ниже).
 - `src/components/ig/container.tsx` — `Container`.
@@ -60,7 +60,6 @@ export const rubik = localFont({
   variable: "--font-rubik",
   display: "swap",
   src: [
-    { path: "../fonts/Rubik-Light.woff2", weight: "300", style: "normal" },
     { path: "../fonts/Rubik-Regular.woff2", weight: "400", style: "normal" },
     { path: "../fonts/Rubik-Medium.woff2", weight: "500", style: "normal" },
     { path: "../fonts/Rubik-SemiBold.woff2", weight: "600", style: "normal" },

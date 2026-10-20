@@ -18,16 +18,16 @@ pending
 **Blocks:** task-20-quiz-core.md, task-21-forms-modals.md, task-32-admin-leads.md, task-33-orders.md
 
 **Context from dependencies:**
-- **task-10**: схема заморожена. Нужны коллекции CRM (task-08): `leads` (formType quiz/drawing/callback/sample/load/contacts/full; sourceLabel; entryPage; utm-группа; metrikaClientId; company, inn, name, phone, email, role, city, area, productType, comment; `answers` JSON; `flags` multi-select; `files` rel many → `lead-files`; `status` rel → `lead-statuses`; `refuseReason`; `assignee`; `internalComments`; `isDuplicate`/`duplicateOf` — вычисляются в `beforeChange` по телефону/e-mail; versions включены), `lead-files` (upload, приватная, `staticDir` = `UPLOADS_DIR`, `access.read` только admin/manager), `lead-statuses` (первый по `order` = «Новая»), `consent-log` (lead, ip, userAgent, consentVersion, policyVersion, createdAt), `rate-limits` (key unique, count, windowStart; скрытая). **Точные имена полей — только из `src/payload/collections/crm/*.ts` и `src/payload-types.ts`**; схему не менять. Если нужного поля нет — остановиться и сообщить координатору.
+- **task-10**: схема заморожена. Нужны коллекции CRM (task-08): `leads` (formType quiz/drawing/callback/sample/load/contacts/full; sourceLabel; entryPage; utm-группа; metrikaClientId; company, inn, name, phone, email, role, city, area, productType, comment; `answers` JSON; `flags` multi-select; `files` rel many → `lead-files`; `status` rel → `lead-statuses`; `refuseReason`; `assignee`; `internalComments`; `isDuplicate`/`duplicateOf` — вычисляются в `beforeChange` по телефону/e-mail; versions включены), `lead-files` (upload, приватная, `staticDir` = `UPLOADS_DIR`, `access.read` только admin/manager), `lead-statuses` (первый по `order` = «Новая»), `consent-log` (lead, ip, userAgent, consentVersion, policyVersion, createdAt), `rate-limits` (key unique, count, windowStart; скрытая). **Точные имена полей — только из `src/payload/collections/crm/*.ts` и `src/payload-types.ts`**; схему не менять. Если нужного поля нет — остановиться и сообщить координатору. Для `consent-log.phoneHash`/`emailHash` (по хэшу на контакт) вызывать хелперы HMAC из `src/payload/utils/normalize.ts` (ключ `FORM_HMAC_SECRET`; точные имена — в коде); файлы проверяются также хуком `upload-hooks.ts` коллекции `lead-files` (расширение + MIME + сигнатура) — переиспользовать `src/payload/collections/crm/upload-policy.ts`, а не дублировать.
 - **task-11**: `@/lib/domain` — `leadSubmitSchema` / `LeadSubmit` / `FORM_TYPES` / `normalizePhone` / `normalizeEmail` / `computeQuizFlags` / `QUIZ_FLAG_LABELS` (`lead-schemas.ts`, `quiz-schema.ts`, `quiz-flags.ts`).
-- Из task-01: `src/lib/env.ts` (zod; переменные `UPLOADS_DIR` = `/data/lead-files`, `FORM_HMAC_SECRET`, `SITE_URL`), `proxy.ts` исключает `/api` из matcher (иначе тело запроса усекается на 10 МБ). `trailingSlash: true` — клиенты должны вызывать `/api/upload/` и `/api/leads/` **со слешем**.
+- Из task-01: `src/lib/env.ts` (zod; переменные `UPLOADS_DIR` = `/data/lead-files`, `FORM_HMAC_SECRET`, `SITE_URL`), `proxy.ts` исключает `/api` из matcher (иначе тело запроса усекается на 10 МБ). `trailingSlash: true` — клиенты должны вызывать `/api/upload/` и `/api/forms/lead/` **со слешем**.
 - Same-wave (task-18): очередь заданий Payload и задача `notify-new-lead` с входом `{ leadId: string }` (slug задания строго `notify-new-lead`); в момент реализации этой задачи типы заданий могут быть ещё не сгенерированы — см. «Постановка задания».
 - В `package.json` уже предустановлены `busboy` и `@types/busboy` (task-10). Если нет — сообщить координатору, не запускать `pnpm add` параллельно с другими агентами.
 
 ## Files to Create
 
 - `src/app/api/upload/route.ts` — `POST /api/upload/`
-- `src/app/api/leads/route.ts` — `POST /api/leads/`
+- `src/app/api/forms/lead/route.ts` — `POST /api/forms/lead/`
 - `src/app/api/form-token/route.ts` — `POST /api/form-token/`
 - `src/app/api/lead-files/[id]/download/route.ts` — `GET /api/lead-files/<id>/download/`
 - `src/lib/uploads/stream.ts` — потоковый приём multipart (busboy), санитизация имён
@@ -113,7 +113,7 @@ JPG/PNG допустимы только для `purpose: 'quiz'` (эскиз в 
 - Токен загрузки (`tokens.ts`): `signUploadToken({ id, ext, name, originalName, size, purpose }, now)` → `base64url(JSON{ ...meta, exp: now + 2ч })` + `.` + HMAC; `verifyUploadToken(token, now) → meta | null` (подпись, срок). При создании заявки сервер дополнительно проверяет, что файл `${UPLOADS_DIR}/tmp/<id>.<ext>` существует.
 - Тесты: `sanitizeFilename('Чертёж перегородки №3 (v2).DWG')` → `chertezh-peregorodki-3-v2.dwg` (допускается эквивалентный по правилам вариант; зафиксируйте ожидаемое в тесте); длинное имя усекается до ≤ 100; токены подписаны/просрочены.
 
-### 6. Заявка — `POST /api/leads/` и `create-lead.ts`
+### 6. Заявка — `POST /api/forms/lead/` и `create-lead.ts`
 
 Порядок обработки:
 1. Лимит тела 200 КБ; JSON parse (ошибка → 400 `bad_request`).
@@ -150,14 +150,14 @@ JPG/PNG допустимы только для `purpose: 'quiz'` (эскиз в 
 
 - `POST /api/form-token/` → `{ ok, token }`.
 - `POST /api/upload/` (multipart: `file`, `purpose`; заголовок `X-Form-Token`) → `{ ok, token, name, size, ext }` | ошибка.
-- `POST /api/leads/` (JSON по `leadSubmitSchema`) → `{ ok, leadId }` | ошибка.
+- `POST /api/forms/lead/` (JSON по `leadSubmitSchema`) → `{ ok, leadId }` | ошибка.
 - `GET /api/lead-files/:id/download/` (сессия admin/manager) → файл.
 
 ## Acceptance Criteria
 
 - [ ] `pnpm lint`, `pnpm typecheck`, `pnpm test` проходят (unit: сигнатуры, токены, санитизация имён, IP, антиспам-метка).
 - [ ] Ручная проверка через `curl`/скрипт на запущенном dev-сервере с мигрированной БД (приложить команды в отчёт): загрузка валидного PDF → 200 и токен; файл 51 МБ → 413 «Файл больше 50 МБ…»; `.exe`/`.pdf` с чужой сигнатурой → 400 «Подойдут DWG, DXF, PDF, JPG или PNG»; JPG при `purpose=form` → 400; поток 50 МБ не раздувает память (процесс не держит файл целиком в RAM).
-- [ ] `POST /api/leads/` с валидным квизом → 200, в БД есть `leads` (+ `lead-files`, `consent-log`, статус «Новая», флаги), файл физически лежит в `UPLOADS_DIR`, tmp-файл удалён.
+- [ ] `POST /api/forms/lead/` с валидным квизом → 200, в БД есть `leads` (+ `lead-files`, `consent-log`, статус «Новая», флаги), файл физически лежит в `UPLOADS_DIR`, tmp-файл удалён.
 - [ ] Honeypot → 200 без записи; тело без согласия → 400 `validation` с текстом согласия; токен <3 с → `too_fast`, >2 ч → `expired`; 6-я заявка с одного IP за 10 минут → 429; повторная заявка с тем же телефоном выставляет дубль (через хук task-08), в ответе клиенту это не раскрывается.
 - [ ] Задание `notify-new-lead` ставится в очередь (проверка по таблице `payload_jobs` после слияния с task-18; до этого — вызов обёртки не падает); ошибка очереди не мешает созданию заявки.
 - [ ] `GET /api/lead-files/:id/download/` без сессии → 401, под ролью без прав → 403, под admin/manager → файл с `Content-Disposition: attachment` и `Cache-Control: private, no-store`; traversal (`../`) невозможен.

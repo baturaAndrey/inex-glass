@@ -1,175 +1,217 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+/* Design system Inex Glass. Layers matter: Tailwind utilities always override .ig-* classes. */
+@import "../../styles/ig-tokens.css" layer(base);
+@import "../../styles/ig-components.css" layer(components);
 
+/*
+ * Breakpoints of the design system (min-width). The prototypes are written desktop-first,
+ * so the `max-*` variants map 1:1 to their media queries:
+ *   max-sm: ≤599 · max-md: ≤1100 · max-lg: ≤1365 · xl: ≥1536 · 2xl: ≥1920
+ */
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 1101px;
+  --breakpoint-lg: 1366px;
+  --breakpoint-xl: 1536px;
+  --breakpoint-2xl: 1920px;
+}
+
+/* Bridge --ig-* tokens (and the shadcn variables below) into Tailwind utilities. */
 @theme inline {
+  --font-sans: var(--ig-font);
+
+  /* Brand. `primary` is the contrast-safe button fill (#267D70, 4.9:1 with white text);
+     the brand teal #2B8C7E is `brand` (borders, focus, icons). */
+  --color-primary: var(--ig-btn-primary-bg);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--ig-btn-primary-bg-hover);
+  --color-primary-pressed: var(--ig-primary-pressed);
+  --color-primary-dark: var(--ig-primary-dark);
+  --color-primary-light: var(--ig-primary-light);
+  --color-brand: var(--ig-primary);
+  --color-navy: var(--ig-navy);
+  --color-on-navy: var(--ig-on-navy);
+  --color-on-navy-2: var(--ig-on-navy-2);
+
+  /* Neutrals */
+  --color-bg: var(--ig-bg);
+  --color-surface: var(--ig-surface);
+  --color-well: var(--ig-well);
+  --color-line: var(--ig-line);
+  --color-hairline: var(--ig-hairline);
+  --color-text: var(--ig-text);
+  --color-text-2: var(--ig-text-2);
+  /* NB: `muted` is the design-system "placeholder/disabled" text colour, not a shadcn surface. */
+  --color-muted: var(--ig-text-muted);
+
+  /* Extra colours of the prototypes */
+  --color-tint-green: var(--ig-tint-green);
+  --color-ink-2: var(--ig-ink-2);
+  --color-ink-3: var(--ig-ink-3);
+  --color-line-teal: var(--ig-line-teal);
+  --color-gray-1: var(--ig-gray-1);
+  --color-gray-2: var(--ig-gray-2);
+  --color-teal-wash: var(--ig-teal-wash);
+  --color-slate-blue: var(--ig-slate-blue);
+
+  /* Semantic */
+  --color-success: var(--ig-success);
+  --color-success-bg: var(--ig-success-bg);
+  --color-success-text: var(--ig-success-text);
+  --color-warning: var(--ig-warning);
+  --color-warning-bg: var(--ig-warning-bg);
+  --color-warning-text: var(--ig-warning-text);
+  --color-danger: var(--ig-danger);
+  --color-danger-bg: var(--ig-danger-bg);
+  --color-danger-text: var(--ig-danger-text);
+  --color-info: var(--ig-info);
+  --color-info-bg: var(--ig-info-bg);
+  --color-info-text: var(--ig-info-text);
+
+  /* shadcn/ui names (src/components/ui/*), values come from :root below */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --animate-fade-in: fade-in 0.3s ease-out;
-  --animate-fade-up: fade-up 0.4s ease-out;
-  --animate-scale-in: scale-in 0.2s ease-out;
+
+  /* Radii: 6 chips/badges · 10 inputs/buttons · 16 cards/dialogs · 24 hero/large panels */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Shadows (soft only) */
+  --shadow-card: var(--ig-shadow-card);
+  --shadow-card-hover: var(--ig-shadow-card-hover);
+  --shadow-dropdown: var(--ig-shadow-dropdown);
+  --shadow-modal: var(--ig-shadow-modal);
+
+  /* Motion */
+  --ease-ig: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+
+  /* Type scale: size + line-height (+ weight) as separate variables, responsive via --ig-* */
+  --text-h1: var(--ig-h1-size);
+  --text-h1--line-height: var(--ig-h1-lh);
+  --text-h1--font-weight: 700;
+  --text-h2: var(--ig-h2-size);
+  --text-h2--line-height: var(--ig-h2-lh);
+  --text-h2--font-weight: 700;
+  --text-h3: var(--ig-h3-size);
+  --text-h3--line-height: var(--ig-h3-lh);
+  --text-h3--font-weight: 700;
+  --text-h4: var(--ig-h4-size);
+  --text-h4--line-height: var(--ig-h4-lh);
+  --text-h4--font-weight: 600;
+  --text-h5: var(--ig-h5-size);
+  --text-h5--line-height: var(--ig-h5-lh);
+  --text-h5--font-weight: 600;
+  --text-h6: var(--ig-h6-size);
+  --text-h6--line-height: var(--ig-h6-lh);
+  --text-h6--font-weight: 600;
+  --text-body: var(--ig-body-size);
+  --text-body--line-height: var(--ig-body-lh);
+  --text-small: var(--ig-small-size);
+  --text-small--line-height: var(--ig-small-lh);
+  --text-micro: var(--ig-micro-size);
+  --text-micro--line-height: var(--ig-micro-lh);
+  --text-micro--font-weight: 500;
+  --text-price-l: var(--ig-price-l-size);
+  --text-price-l--line-height: var(--ig-price-l-lh);
+  --text-price-l--font-weight: 700;
+  --text-price-m: var(--ig-price-m-size);
+  --text-price-m--line-height: var(--ig-price-m-lh);
+  --text-price-m--font-weight: 700;
+  --text-price-s: var(--ig-price-s-size);
+  --text-price-s--line-height: var(--ig-price-s-lh);
+  --text-price-s--font-weight: 700;
+  --text-stat: var(--ig-stat-size);
+  --text-stat--line-height: var(--ig-stat-lh);
+  --text-stat--font-weight: 700;
+  --text-lead-l: var(--ig-lead-l-size);
+  --text-lead-l--line-height: var(--ig-lead-l-lh);
+  --text-lead-m: var(--ig-lead-m-size);
+  --text-lead-m--line-height: var(--ig-lead-m-lh);
+  --text-lead: var(--ig-lead-size);
+  --text-lead--line-height: var(--ig-lead-lh);
+  --text-caption: var(--ig-caption-size);
+  --text-caption--line-height: var(--ig-caption-lh);
+  --text-hero-stat: var(--ig-hero-stat-size);
+  --text-hero-stat--line-height: var(--ig-hero-stat-lh);
+  --text-hero-stat--font-weight: 700;
 }
 
-:root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.21 0.034 270);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.96 0.012 270);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.705 0.06 270);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.21 0.006 285.885);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.705 0.015 286.067);
-}
-
-.dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.92 0.02 270);
-  --primary-foreground: oklch(0.21 0.006 285.885);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.28 0.018 270);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.552 0.05 270);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.552 0.016 285.938);
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+/* Horizontal page gutter: 70 / 40 / 24 / 16 px (see --ig-gutter in ig-tokens.css). */
+@utility px-gutter {
+  padding-inline: var(--ig-gutter);
 }
 
 @layer base {
-  * {
-    @apply border-border;
+  /* shadcn/ui variables, re-pointed to the Inex Glass palette (light theme only). */
+  :root {
+    --radius: 10px;
+    --background: var(--ig-bg);
+    --foreground: var(--ig-text);
+    --card: var(--ig-surface);
+    --card-foreground: var(--ig-text);
+    --popover: var(--ig-surface);
+    --popover-foreground: var(--ig-text);
+    --primary: var(--ig-btn-primary-bg);
+    --primary-foreground: #fff;
+    --secondary: var(--ig-well);
+    --secondary-foreground: var(--ig-text);
+    --muted: var(--ig-well);
+    --muted-foreground: var(--ig-text-2);
+    --accent: var(--ig-primary-light);
+    --accent-foreground: var(--ig-text);
+    --destructive: var(--ig-danger-text);
+    --destructive-foreground: #fff;
+    --border: var(--ig-line);
+    --input: var(--ig-line);
+    --ring: var(--ig-primary);
   }
+
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
+  }
+
   html {
     scroll-behavior: smooth;
   }
-  body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
-  }
-  :focus-visible {
-    @apply outline-2 outline-offset-2 outline-ring;
-  }
-}
 
-@layer utilities {
-  .card-interactive {
-    @apply transition-all duration-200 ease-out;
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
-  .card-interactive:hover {
-    @apply shadow-md -translate-y-0.5;
+
+  body {
+    font-feature-settings:
+      "kern" 1,
+      "liga" 1;
   }
-  .auth-bg {
-    background-image: radial-gradient(
-      circle at 50% 0%,
-      var(--accent) 0%,
-      transparent 50%
-    );
+
+  /* Fallback focus style for elements without their own (.ig-* define a softer ring). */
+  :focus-visible {
+    outline: 2px solid var(--ig-primary);
+    outline-offset: 2px;
   }
 }

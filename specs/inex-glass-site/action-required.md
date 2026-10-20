@@ -8,13 +8,14 @@
 - [ ] **Создать GitHub-репозиторий и добавить remote.** От этого зависят CI, GHCR и деплой.
 - [ ] **Проверить ключи в `.env`:** `KIE_AI_API_KEY`, `WORDKEEPER_API_KEY`, `EXA_API_KEY`, `FIRECRAWL_API_KEY`. Проверено 20.10: все заданы.
 - [ ] **Пополнить баланс kie.ai и Firecrawl, если нужно.** Генерация примерно 60 изображений и обход inex.su (около 450 URL) расходуют кредиты.
+- [ ] **kie.ai: баланс исчерпан (осталось 3 кредита после задачи 09).** Пополнить ~56 кредитов и перегенерировать: `pnpm tsx --env-file=.env scripts/gen-images.ts --only-redo` (лишний текст на картинках / не по ТЗ; записи помечены `needsRedo` в `public/generated/manifest.json`). Итого ~56 кредитов.
 
 ## During Implementation
 
 - [ ] **Dokploy: создать проект и подключить GHCR registry** (pull-секрет). Нужно для задачи 03: деплой staging.
 - [ ] **Dokploy: создать сервис Postgres для staging** и передать `DATABASE_URL` в env приложения. Задача 03.
 - [ ] **DNS: добавить A-запись поддомена staging** (например, `dev.inexglass.ru`) на IP VDS. Задача 03.
-- [ ] **GitHub: добавить секреты Actions:** webhook или токен Dokploy для staging и prod. При необходимости — `GHCR_TOKEN`. Задачи 03 и 41.
+- [ ] **GitHub: добавить секреты Actions** (задача 03, см. `docs/deploy.md`): `DOKPLOY_URL`, `DOKPLOY_API_KEY`, `DOKPLOY_STAGING_APP_ID`, `DOKPLOY_PROD_APP_ID`, `GHCR_PULL_USERNAME`, `GHCR_PULL_TOKEN` (classic PAT с `read:packages` — Dokploy `saveDockerProvider` требует креды registry при каждом вызове); variables `STAGING_URL`, `PROD_URL`; environments `staging` и `production`. Задачи 03 и 41.
 - [ ] **Выдать агенту env staging:** `PAYLOAD_SECRET`, `FORM_HMAC_SECRET`, `ORDER_TOKEN_SECRET` (каждый — случайная строка ≥ 32 символов, например `openssl rand -base64 48`), логин и пароль basic auth, `MAIL_INTERCEPT_TO`. Задача 03. Секреты staging и prod разные. `ORDER_TOKEN_SECRET` после запуска не менять: при смене секрета все ссылки `/zakaz/…` перестанут работать.
 - [ ] **Dokploy: сверить API деплоя в Swagger своей инсталляции** (`<DOKPLOY_URL>/swagger`): процедуры обновления образа и redeploy. Либо выдать webhook приложения. Задачи 03 и 41.
 - [ ] **Создать первого администратора в `/admin/`** после первого деплоя или передать учётные данные для seed. Задачи 01 и 03.

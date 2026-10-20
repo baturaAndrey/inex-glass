@@ -68,14 +68,68 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    media: Media;
+    pages: Page;
+    articles: Article;
+    objects: Object;
+    team: Team;
+    thicknesses: Thickness;
+    'thickness-groups': ThicknessGroup;
+    'glass-types': GlassType;
+    'processing-services': ProcessingService;
+    constructions: Construction;
+    'shower-configs': ShowerConfig;
+    products: Product;
+    'object-types': ObjectType;
+    cities: City;
+    'lead-files': LeadFile;
+    'lead-statuses': LeadStatus;
+    leads: Lead;
+    orders: Order;
+    'order-files': OrderFile;
+    'consent-log': ConsentLog;
+    redirects: Redirect;
+    'rate-limits': RateLimit;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    'thickness-groups': {
+      thicknesses: 'thicknesses';
+    };
+    constructions: {
+      children: 'constructions';
+    };
+    leads: {
+      orders: 'orders';
+    };
+  };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    articles: ArticlesSelect<false> | ArticlesSelect<true>;
+    objects: ObjectsSelect<false> | ObjectsSelect<true>;
+    team: TeamSelect<false> | TeamSelect<true>;
+    thicknesses: ThicknessesSelect<false> | ThicknessesSelect<true>;
+    'thickness-groups': ThicknessGroupsSelect<false> | ThicknessGroupsSelect<true>;
+    'glass-types': GlassTypesSelect<false> | GlassTypesSelect<true>;
+    'processing-services': ProcessingServicesSelect<false> | ProcessingServicesSelect<true>;
+    constructions: ConstructionsSelect<false> | ConstructionsSelect<true>;
+    'shower-configs': ShowerConfigsSelect<false> | ShowerConfigsSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    'object-types': ObjectTypesSelect<false> | ObjectTypesSelect<true>;
+    cities: CitiesSelect<false> | CitiesSelect<true>;
+    'lead-files': LeadFilesSelect<false> | LeadFilesSelect<true>;
+    'lead-statuses': LeadStatusesSelect<false> | LeadStatusesSelect<true>;
+    leads: LeadsSelect<false> | LeadsSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    'order-files': OrderFilesSelect<false> | OrderFilesSelect<true>;
+    'consent-log': ConsentLogSelect<false> | ConsentLogSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    'rate-limits': RateLimitsSelect<false> | RateLimitsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -85,8 +139,28 @@ export interface Config {
     defaultIDType: string;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    prices: Price;
+    promo: Promo;
+    conditions: Condition;
+    contacts: Contact;
+    requisites: Requisite;
+    'tech-params': TechParam;
+    'site-settings': SiteSetting;
+    navigation: Navigation;
+    snippets: Snippet;
+  };
+  globalsSelect: {
+    prices: PricesSelect<false> | PricesSelect<true>;
+    promo: PromoSelect<false> | PromoSelect<true>;
+    conditions: ConditionsSelect<false> | ConditionsSelect<true>;
+    contacts: ContactsSelect<false> | ContactsSelect<true>;
+    requisites: RequisitesSelect<false> | RequisitesSelect<true>;
+    'tech-params': TechParamsSelect<false> | TechParamsSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    navigation: NavigationSelect<false> | NavigationSelect<true>;
+    snippets: SnippetsSelect<false> | SnippetsSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -123,6 +197,15 @@ export interface User {
   id: string;
   name: string;
   role: 'admin' | 'manager';
+  phone?: string | null;
+  position?: string | null;
+  /**
+   * https://t.me/…, https://wa.me/… или tg://…
+   */
+  messengerUrl?: string | null;
+  messengerType?: ('telegram' | 'whatsapp' | 'max' | 'viber' | 'other') | null;
+  photo?: (string | null) | Media;
+  notifyNewLeads?: boolean | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -142,6 +225,3733 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: string;
+  /**
+   * Обязателен для изображений: что изображено, без «фото…».
+   */
+  alt?: string | null;
+  caption?: string | null;
+  kind?: ('photo' | 'illustration' | 'background' | 'scheme' | 'document') | null;
+  /**
+   * Сгенерированная заглушка — заменить реальным фото.
+   */
+  isPlaceholder?: boolean | null;
+  generatedId?: string | null;
+  credit?: string | null;
+  /**
+   * Откуда файл импортирован.
+   */
+  sourceUrl?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    og?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: string;
+  title: string;
+  template: 'home' | 'hub' | 'service' | 'segment' | 'company' | 'contacts' | 'legal' | 'listing' | 'tool' | 'generic';
+  /**
+   * Адрес «/». Может быть только одна.
+   */
+  isHome?: boolean | null;
+  parent?: (string | null) | Page;
+  /**
+   * Если родитель не задан, напр. /instrumenty/.
+   */
+  pathPrefix?: string | null;
+  /**
+   * Латиница в kebab-case. Если оставить пустым — сформируется из названия.
+   */
+  slug: string;
+  /**
+   * Вычисляется автоматически из слага и раздела.
+   */
+  path?: string | null;
+  breadcrumbLabel?: string | null;
+  publishedAt?: string | null;
+  layout?:
+    | (
+        | HeroBlock
+        | RichTextBlock
+        | TableBlock
+        | StepsBlock
+        | CalloutBlock
+        | TermsBlock
+        | CardsBlock
+        | CollectionCardsBlock
+        | PricesTableBlock
+        | FaqBlock
+        | CtaBlock
+        | CompareBlock
+        | DownloadBlock
+        | HolesCalculatorBlock
+        | WeightCalculatorBlock
+        | FormBlock
+        | SnippetBlock
+        | StatsBlock
+        | ObjectsFeedBlock
+        | ArticlesFeedBlock
+        | WhoDoesWhatBlock
+        | SystemsBlock
+        | GalleryBlock
+        | TwoColumnsBlock
+        | LinkListBlock
+        | ContactsMapBlock
+        | RequisitesBlock
+        | TeamGridBlock
+        | QuizCtaBlock
+      )[]
+    | null;
+  faq?:
+    | {
+        question: string;
+        answer: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  seo?: {
+    /**
+     * Если пусто — используется название документа.
+     */
+    h1?: string | null;
+    /**
+     * Рекомендуется до 70 знаков (длиннее — допустимо). Метки {N}, {цена} подставляются при выводе.
+     */
+    title?: string | null;
+    /**
+     * Рекомендуется до 170 знаков (длиннее — допустимо).
+     */
+    description?: string | null;
+    noindex?: boolean | null;
+    /**
+     * Если пусто — canonical указывает на сам адрес страницы.
+     */
+    canonical?: string | null;
+    ogImage?: (string | null) | Media;
+  };
+  /**
+   * Значения подставляются в квиз «Расчёт стоимости» при переходе с этой страницы (?type=…&vid=…).
+   */
+  quizPrefill?: {
+    type?:
+      | (
+          | 'tempered'
+          | 'triplex'
+          | 'partitions'
+          | 'railings'
+          | 'shower'
+          | 'canopies'
+          | 'facade'
+          | 'shopfronts'
+          | 'verandas'
+          | 'mirrors'
+          | 'other'
+        )
+      | null;
+    thickness?: ('4' | '5' | '6' | '8' | '10' | '12' | '15' | '19') | null;
+    kind?: ('clear' | 'low-iron' | 'matte' | 'tinted' | 'painted' | 'ribbed' | 'bent') | null;
+    ctaLabel?: string | null;
+    secondaryForm?: ('drawing' | 'load' | 'sample' | 'none') | null;
+    /**
+     * Напр. «Отправить проект», «Отправить планировку».
+     */
+    secondaryLabel?: string | null;
+  };
+  hideConditions?: boolean | null;
+  hideQuizCta?: boolean | null;
+  /**
+   * Для юридических документов (политика ПДн, согласие).
+   */
+  documentVersion?: string | null;
+  /**
+   * Адреса на inex.su, которые ведут на эту страницу.
+   */
+  legacyUrls?:
+    | {
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroBlock".
+ */
+export interface HeroBlock {
+  variant: 'ctHero' | 'p5Top' | 'home';
+  eyebrow?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Если пусто — H1 документа.
+   */
+  titleOverride?: string | null;
+  lead?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Допускает метки, напр. {условия}.
+   */
+  facts?: string | null;
+  strong?: string | null;
+  buttons?:
+    | {
+        label: string;
+        kind?: ('quiz' | 'form' | 'link' | 'download') | null;
+        variant?: ('primary' | 'secondary' | 'ghost') | null;
+        /**
+         * Имя иконки Lucide.
+         */
+        icon?: string | null;
+        formKey?: ('drawing' | 'callback' | 'sample' | 'load' | 'contacts' | 'full') | null;
+        /**
+         * Для формы чертежа: { "label": "Отправить проект", "sourceLabel": "…", "accept": ".dwg,.pdf" }
+         */
+        formParams?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        link?: {
+          type?: ('doc' | 'custom') | null;
+          doc?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'glass-types';
+                value: string | GlassType;
+              } | null)
+            | ({
+                relationTo: 'thicknesses';
+                value: string | Thickness;
+              } | null)
+            | ({
+                relationTo: 'processing-services';
+                value: string | ProcessingService;
+              } | null)
+            | ({
+                relationTo: 'constructions';
+                value: string | Construction;
+              } | null)
+            | ({
+                relationTo: 'articles';
+                value: string | Article;
+              } | null)
+            | ({
+                relationTo: 'objects';
+                value: string | Object;
+              } | null);
+          /**
+           * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+           */
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        file?: (string | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  showTerms?: boolean | null;
+  termsMode?: ('full' | 'short') | null;
+  image?: (string | null) | Media;
+  imageAlt?: string | null;
+  photos?:
+    | {
+        image: string | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Напр. «10» — единица «мм» добавляется при выводе.
+   */
+  bigNumber?: string | null;
+  stats?:
+    | {
+        value: string;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'hero';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "glass-types".
+ */
+export interface GlassType {
+  id: string;
+  title: string;
+  /**
+   * matovoe, okrashennoe, osvetlennoe, tonirovannoe, dlya-mebeli, riflenoe, mollirovannoe, tripleks
+   */
+  slug: string;
+  urlBase?: ('zakalennoe-steklo' | 'root') | null;
+  /**
+   * Вычисляется автоматически из слага и раздела.
+   */
+  path?: string | null;
+  breadcrumbLabel?: string | null;
+  order?: number | null;
+  showInHub?: boolean | null;
+  /**
+   * Как документ выглядит в хабах, мега-меню и блоке «Читать также».
+   */
+  card?: {
+    /**
+     * Если пусто — заголовок документа.
+     */
+    title?: string | null;
+    /**
+     * Напр. «приватность без потери света».
+     */
+    text?: string | null;
+    image?: (string | null) | Media;
+    /**
+     * Имя иконки Lucide, напр. Layers.
+     */
+    icon?: string | null;
+    /**
+     * Статичная подсказка, напр. «от 700 ₽/м²*». Цены толщин берутся из справочника «Цены».
+     */
+    priceHint?: string | null;
+  };
+  heroImage?: (string | null) | Media;
+  /**
+   * Допускает метку {условия}.
+   */
+  intro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  heroPhotos?:
+    | {
+        image: string | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  variantsHeading?: string | null;
+  variants?:
+    | {
+        key?: string | null;
+        name: string;
+        description?: string | null;
+        application?: string | null;
+        swatchKind?: ('color' | 'image' | 'pattern') | null;
+        swatchColor?: string | null;
+        /**
+         * Напр. moru.
+         */
+        patternKey?: string | null;
+        swatchImage?: (string | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  variantsNote?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  variantsCallout?: {
+    title?: string | null;
+    body?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+  };
+  tables?:
+    | {
+        heading?: string | null;
+        lead?: string | null;
+        role?: ('parameters' | 'comparison' | 'schemes' | 'other') | null;
+        mobileMode?: ('cards' | 'pairs') | null;
+        columns?:
+          | {
+              label: string;
+              align?: ('left' | 'center' | 'right') | null;
+              numeric?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        rows?:
+          | {
+              cells?:
+                | {
+                    value?: string | null;
+                    /**
+                     * Подсветка ct-pos.
+                     */
+                    positive?: boolean | null;
+                    /**
+                     * /путь/ или https://…
+                     */
+                    href?: string | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              /**
+               * Вся строка ведёт по этой ссылке (напр. на карточку толщины).
+               */
+              rowHref?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        footnote?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  importantTitle?: string | null;
+  importantItems?:
+    | {
+        lead?: string | null;
+        text?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
+  limits?: {
+    thickMin?: number | null;
+    thickMax?: number | null;
+    /**
+     * Напр. рифлёное: 4, 6, 8.
+     */
+    allowedThicknesses?: number[] | null;
+    sizeMinW?: number | null;
+    sizeMinH?: number | null;
+    sizeMaxW?: number | null;
+    sizeMaxH?: number | null;
+    radius?:
+      | {
+          thicknessFrom?: number | null;
+          thicknessTo?: number | null;
+          minRadius?: number | null;
+          id?: string | null;
+        }[]
+      | null;
+    notes?: string | null;
+  };
+  applications?:
+    | {
+        text: string;
+        description?: string | null;
+        link?: {
+          type?: ('doc' | 'custom') | null;
+          doc?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'glass-types';
+                value: string | GlassType;
+              } | null)
+            | ({
+                relationTo: 'thicknesses';
+                value: string | Thickness;
+              } | null)
+            | ({
+                relationTo: 'processing-services';
+                value: string | ProcessingService;
+              } | null)
+            | ({
+                relationTo: 'constructions';
+                value: string | Construction;
+              } | null)
+            | ({
+                relationTo: 'articles';
+                value: string | Article;
+              } | null)
+            | ({
+                relationTo: 'objects';
+                value: string | Object;
+              } | null);
+          /**
+           * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+           */
+          url?: string | null;
+          label?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  relatedLinks?:
+    | {
+        link?: {
+          type?: ('doc' | 'custom') | null;
+          doc?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'glass-types';
+                value: string | GlassType;
+              } | null)
+            | ({
+                relationTo: 'thicknesses';
+                value: string | Thickness;
+              } | null)
+            | ({
+                relationTo: 'processing-services';
+                value: string | ProcessingService;
+              } | null)
+            | ({
+                relationTo: 'constructions';
+                value: string | Construction;
+              } | null)
+            | ({
+                relationTo: 'articles';
+                value: string | Article;
+              } | null)
+            | ({
+                relationTo: 'objects';
+                value: string | Object;
+              } | null);
+          /**
+           * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+           */
+          url?: string | null;
+          label?: string | null;
+          newTab?: boolean | null;
+        };
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  showSamples?: boolean | null;
+  samplesSnippetKey?: string | null;
+  showObjects?: boolean | null;
+  objectsProduct?: (string | null) | Product;
+  faq?:
+    | {
+        question: string;
+        answer: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  layout?:
+    | (
+        | HeroBlock
+        | RichTextBlock
+        | TableBlock
+        | StepsBlock
+        | CalloutBlock
+        | TermsBlock
+        | CardsBlock
+        | CollectionCardsBlock
+        | PricesTableBlock
+        | FaqBlock
+        | CtaBlock
+        | CompareBlock
+        | DownloadBlock
+        | HolesCalculatorBlock
+        | WeightCalculatorBlock
+        | FormBlock
+        | SnippetBlock
+        | StatsBlock
+        | ObjectsFeedBlock
+        | ArticlesFeedBlock
+        | WhoDoesWhatBlock
+        | SystemsBlock
+        | GalleryBlock
+        | TwoColumnsBlock
+        | LinkListBlock
+        | ContactsMapBlock
+        | RequisitesBlock
+        | TeamGridBlock
+        | QuizCtaBlock
+      )[]
+    | null;
+  seo?: {
+    /**
+     * Если пусто — используется название документа.
+     */
+    h1?: string | null;
+    /**
+     * Рекомендуется до 70 знаков (длиннее — допустимо). Метки {N}, {цена} подставляются при выводе.
+     */
+    title?: string | null;
+    /**
+     * Рекомендуется до 170 знаков (длиннее — допустимо).
+     */
+    description?: string | null;
+    noindex?: boolean | null;
+    /**
+     * Если пусто — canonical указывает на сам адрес страницы.
+     */
+    canonical?: string | null;
+    ogImage?: (string | null) | Media;
+  };
+  /**
+   * Значения подставляются в квиз «Расчёт стоимости» при переходе с этой страницы (?type=…&vid=…).
+   */
+  quizPrefill?: {
+    type?:
+      | (
+          | 'tempered'
+          | 'triplex'
+          | 'partitions'
+          | 'railings'
+          | 'shower'
+          | 'canopies'
+          | 'facade'
+          | 'shopfronts'
+          | 'verandas'
+          | 'mirrors'
+          | 'other'
+        )
+      | null;
+    thickness?: ('4' | '5' | '6' | '8' | '10' | '12' | '15' | '19') | null;
+    kind?: ('clear' | 'low-iron' | 'matte' | 'tinted' | 'painted' | 'ribbed' | 'bent') | null;
+    ctaLabel?: string | null;
+    secondaryForm?: ('drawing' | 'load' | 'sample' | 'none') | null;
+    /**
+     * Напр. «Отправить проект», «Отправить планировку».
+     */
+    secondaryLabel?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "thicknesses".
+ */
+export interface Thickness {
+  id: string;
+  /**
+   * 4, 5, 6, 8, 10, 12, 15, 19
+   */
+  n: number;
+  group: string | ThicknessGroup;
+  /**
+   * = N-mm
+   */
+  slug?: string | null;
+  /**
+   * = /zakalennoe-steklo/N-mm/
+   */
+  path?: string | null;
+  /**
+   * = N × 2,5
+   */
+  weightPerM2?: number | null;
+  /**
+   * Если не задано при создании: включено, кроме 5, 15, 19 мм. Итог: noindex = !индексировать || seo.noindex.
+   */
+  indexable?: boolean | null;
+  /**
+   * Напр. «все, включая крашеное и гнутое».
+   */
+  kindsText: string;
+  /**
+   * По умолчанию — до 15 мм.
+   */
+  canPaint?: boolean | null;
+  /**
+   * По умолчанию — 4–12 мм.
+   */
+  canBend?: boolean | null;
+  /**
+   * По умолчанию — из «Техпараметров».
+   */
+  sizeText?: string | null;
+  leadTimeText?: string | null;
+  podborOverride?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  obrabotkaOverride?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  faqOverride?:
+    | {
+        question: string;
+        answer: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Не публикуется — колонка «применения» из структуры карточек.
+   */
+  internalApplications?: string | null;
+  /**
+   * Как документ выглядит в хабах, мега-меню и блоке «Читать также».
+   */
+  card?: {
+    /**
+     * Если пусто — заголовок документа.
+     */
+    title?: string | null;
+    /**
+     * Напр. «приватность без потери света».
+     */
+    text?: string | null;
+    image?: (string | null) | Media;
+    /**
+     * Имя иконки Lucide, напр. Layers.
+     */
+    icon?: string | null;
+    /**
+     * Статичная подсказка, напр. «от 700 ₽/м²*». Цены толщин берутся из справочника «Цены».
+     */
+    priceHint?: string | null;
+  };
+  layout?:
+    | (
+        | HeroBlock
+        | RichTextBlock
+        | TableBlock
+        | StepsBlock
+        | CalloutBlock
+        | TermsBlock
+        | CardsBlock
+        | CollectionCardsBlock
+        | PricesTableBlock
+        | FaqBlock
+        | CtaBlock
+        | CompareBlock
+        | DownloadBlock
+        | HolesCalculatorBlock
+        | WeightCalculatorBlock
+        | FormBlock
+        | SnippetBlock
+        | StatsBlock
+        | ObjectsFeedBlock
+        | ArticlesFeedBlock
+        | WhoDoesWhatBlock
+        | SystemsBlock
+        | GalleryBlock
+        | TwoColumnsBlock
+        | LinkListBlock
+        | ContactsMapBlock
+        | RequisitesBlock
+        | TeamGridBlock
+        | QuizCtaBlock
+      )[]
+    | null;
+  seo?: {
+    /**
+     * Если пусто — используется название документа.
+     */
+    h1?: string | null;
+    /**
+     * Рекомендуется до 70 знаков (длиннее — допустимо). Метки {N}, {цена} подставляются при выводе.
+     */
+    title?: string | null;
+    /**
+     * Используется для 15/19 мм и когда цена старше 45 дней («Цена по расчёту»).
+     */
+    titleNoPrice?: string | null;
+    /**
+     * Рекомендуется до 170 знаков (длиннее — допустимо).
+     */
+    description?: string | null;
+    noindex?: boolean | null;
+    /**
+     * Если пусто — canonical указывает на сам адрес страницы.
+     */
+    canonical?: string | null;
+    ogImage?: (string | null) | Media;
+  };
+  /**
+   * Значения подставляются в квиз «Расчёт стоимости» при переходе с этой страницы (?type=…&vid=…).
+   */
+  quizPrefill?: {
+    type?:
+      | (
+          | 'tempered'
+          | 'triplex'
+          | 'partitions'
+          | 'railings'
+          | 'shower'
+          | 'canopies'
+          | 'facade'
+          | 'shopfronts'
+          | 'verandas'
+          | 'mirrors'
+          | 'other'
+        )
+      | null;
+    thickness?: ('4' | '5' | '6' | '8' | '10' | '12' | '15' | '19') | null;
+    kind?: ('clear' | 'low-iron' | 'matte' | 'tinted' | 'painted' | 'ribbed' | 'bent') | null;
+    ctaLabel?: string | null;
+    secondaryForm?: ('drawing' | 'load' | 'sample' | 'none') | null;
+    /**
+     * Напр. «Отправить проект», «Отправить планировку».
+     */
+    secondaryLabel?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "thickness-groups".
+ */
+export interface ThicknessGroup {
+  id: string;
+  label: string;
+  order?: number | null;
+  /**
+   * Латиница в kebab-case. Если оставить пустым — сформируется из названия.
+   */
+  slug: string;
+  thicknesses?: {
+    docs?: (string | Thickness)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
+   * Метки {N}, {2N} подставляются для каждой толщины.
+   */
+  podborText: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  obrabotkaText: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  faq?:
+    | {
+        question: string;
+        answer: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RichTextBlock".
+ */
+export interface RichTextBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  width?: ('narrow' | 'normal' | 'wide') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'richText';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TableBlock".
+ */
+export interface TableBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  table?: {
+    caption?: string | null;
+    role?: ('parameters' | 'comparison' | 'schemes' | 'other') | null;
+    mobileMode?: ('cards' | 'pairs') | null;
+    columns?:
+      | {
+          label: string;
+          align?: ('left' | 'center' | 'right') | null;
+          numeric?: boolean | null;
+          id?: string | null;
+        }[]
+      | null;
+    rows?:
+      | {
+          cells?:
+            | {
+                value?: string | null;
+                /**
+                 * Подсветка ct-pos.
+                 */
+                positive?: boolean | null;
+                /**
+                 * /путь/ или https://…
+                 */
+                href?: string | null;
+                id?: string | null;
+              }[]
+            | null;
+          /**
+           * Вся строка ведёт по этой ссылке (напр. на карточку толщины).
+           */
+          rowHref?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    footnote?: string | null;
+    /**
+     * Номер столбца (с 1), который подсвечивается.
+     */
+    highlightColumn?: number | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'table';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StepsBlock".
+ */
+export interface StepsBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  variant?: ('horizontal' | 'vertical') | null;
+  items?:
+    | {
+        title: string;
+        text?: string | null;
+        linkLabel?: string | null;
+        link?: {
+          type?: ('doc' | 'custom') | null;
+          doc?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'glass-types';
+                value: string | GlassType;
+              } | null)
+            | ({
+                relationTo: 'thicknesses';
+                value: string | Thickness;
+              } | null)
+            | ({
+                relationTo: 'processing-services';
+                value: string | ProcessingService;
+              } | null)
+            | ({
+                relationTo: 'constructions';
+                value: string | Construction;
+              } | null)
+            | ({
+                relationTo: 'articles';
+                value: string | Article;
+              } | null)
+            | ({
+                relationTo: 'objects';
+                value: string | Object;
+              } | null);
+          /**
+           * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+           */
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  footnote?: string | null;
+  buttons?:
+    | {
+        label: string;
+        kind?: ('quiz' | 'form' | 'link' | 'download') | null;
+        variant?: ('primary' | 'secondary' | 'ghost') | null;
+        /**
+         * Имя иконки Lucide.
+         */
+        icon?: string | null;
+        formKey?: ('drawing' | 'callback' | 'sample' | 'load' | 'contacts' | 'full') | null;
+        /**
+         * Для формы чертежа: { "label": "Отправить проект", "sourceLabel": "…", "accept": ".dwg,.pdf" }
+         */
+        formParams?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        link?: {
+          type?: ('doc' | 'custom') | null;
+          doc?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'glass-types';
+                value: string | GlassType;
+              } | null)
+            | ({
+                relationTo: 'thicknesses';
+                value: string | Thickness;
+              } | null)
+            | ({
+                relationTo: 'processing-services';
+                value: string | ProcessingService;
+              } | null)
+            | ({
+                relationTo: 'constructions';
+                value: string | Construction;
+              } | null)
+            | ({
+                relationTo: 'articles';
+                value: string | Article;
+              } | null)
+            | ({
+                relationTo: 'objects';
+                value: string | Object;
+              } | null);
+          /**
+           * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+           */
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        file?: (string | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'steps';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "processing-services".
+ */
+export interface ProcessingService {
+  id: string;
+  title: string;
+  /**
+   * kromka, otverstiya-i-vyrezy, facet, matirovanie, plenki, pechat
+   */
+  slug: string;
+  /**
+   * Вычисляется автоматически из слага и раздела.
+   */
+  path?: string | null;
+  order?: number | null;
+  /**
+   * Как документ выглядит в хабах, мега-меню и блоке «Читать также».
+   */
+  card?: {
+    /**
+     * Если пусто — заголовок документа.
+     */
+    title?: string | null;
+    /**
+     * Напр. «приватность без потери света».
+     */
+    text?: string | null;
+    image?: (string | null) | Media;
+    /**
+     * Имя иконки Lucide, напр. Layers.
+     */
+    icon?: string | null;
+    /**
+     * Статичная подсказка, напр. «от 700 ₽/м²*». Цены толщин берутся из справочника «Цены».
+     */
+    priceHint?: string | null;
+  };
+  /**
+   * Напр. «Ø 4–130 мм».
+   */
+  keyLimit?: string | null;
+  heroImage?: (string | null) | Media;
+  intro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  tables?:
+    | {
+        heading?: string | null;
+        lead?: string | null;
+        role?: ('parameters' | 'comparison' | 'schemes' | 'other') | null;
+        mobileMode?: ('cards' | 'pairs') | null;
+        columns?:
+          | {
+              label: string;
+              align?: ('left' | 'center' | 'right') | null;
+              numeric?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        rows?:
+          | {
+              cells?:
+                | {
+                    value?: string | null;
+                    /**
+                     * Подсветка ct-pos.
+                     */
+                    positive?: boolean | null;
+                    /**
+                     * /путь/ или https://…
+                     */
+                    href?: string | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              /**
+               * Вся строка ведёт по этой ссылке (напр. на карточку толщины).
+               */
+              rowHref?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        footnote?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  howToSpecify?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  importantTitle?: string | null;
+  importantItems?:
+    | {
+        lead?: string | null;
+        text?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
+  callouts?:
+    | {
+        tone?: ('warning' | 'info') | null;
+        title?: string | null;
+        body?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
+  hasHoleCalculator?: boolean | null;
+  ctaPrimaryLabel?: string | null;
+  ctaSecondaryLabel?: string | null;
+  relatedLinks?:
+    | {
+        link?: {
+          type?: ('doc' | 'custom') | null;
+          doc?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'glass-types';
+                value: string | GlassType;
+              } | null)
+            | ({
+                relationTo: 'thicknesses';
+                value: string | Thickness;
+              } | null)
+            | ({
+                relationTo: 'processing-services';
+                value: string | ProcessingService;
+              } | null)
+            | ({
+                relationTo: 'constructions';
+                value: string | Construction;
+              } | null)
+            | ({
+                relationTo: 'articles';
+                value: string | Article;
+              } | null)
+            | ({
+                relationTo: 'objects';
+                value: string | Object;
+              } | null);
+          /**
+           * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+           */
+          url?: string | null;
+          label?: string | null;
+          newTab?: boolean | null;
+        };
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  faq?:
+    | {
+        question: string;
+        answer: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  layout?:
+    | (
+        | HeroBlock
+        | RichTextBlock
+        | TableBlock
+        | StepsBlock
+        | CalloutBlock
+        | TermsBlock
+        | CardsBlock
+        | CollectionCardsBlock
+        | PricesTableBlock
+        | FaqBlock
+        | CtaBlock
+        | CompareBlock
+        | DownloadBlock
+        | HolesCalculatorBlock
+        | WeightCalculatorBlock
+        | FormBlock
+        | SnippetBlock
+        | StatsBlock
+        | ObjectsFeedBlock
+        | ArticlesFeedBlock
+        | WhoDoesWhatBlock
+        | SystemsBlock
+        | GalleryBlock
+        | TwoColumnsBlock
+        | LinkListBlock
+        | ContactsMapBlock
+        | RequisitesBlock
+        | TeamGridBlock
+        | QuizCtaBlock
+      )[]
+    | null;
+  seo?: {
+    /**
+     * Если пусто — используется название документа.
+     */
+    h1?: string | null;
+    /**
+     * Рекомендуется до 70 знаков (длиннее — допустимо). Метки {N}, {цена} подставляются при выводе.
+     */
+    title?: string | null;
+    /**
+     * Рекомендуется до 170 знаков (длиннее — допустимо).
+     */
+    description?: string | null;
+    noindex?: boolean | null;
+    /**
+     * Если пусто — canonical указывает на сам адрес страницы.
+     */
+    canonical?: string | null;
+    ogImage?: (string | null) | Media;
+  };
+  /**
+   * Значения подставляются в квиз «Расчёт стоимости» при переходе с этой страницы (?type=…&vid=…).
+   */
+  quizPrefill?: {
+    type?:
+      | (
+          | 'tempered'
+          | 'triplex'
+          | 'partitions'
+          | 'railings'
+          | 'shower'
+          | 'canopies'
+          | 'facade'
+          | 'shopfronts'
+          | 'verandas'
+          | 'mirrors'
+          | 'other'
+        )
+      | null;
+    thickness?: ('4' | '5' | '6' | '8' | '10' | '12' | '15' | '19') | null;
+    kind?: ('clear' | 'low-iron' | 'matte' | 'tinted' | 'painted' | 'ribbed' | 'bent') | null;
+    ctaLabel?: string | null;
+    secondaryForm?: ('drawing' | 'load' | 'sample' | 'none') | null;
+    /**
+     * Напр. «Отправить проект», «Отправить планировку».
+     */
+    secondaryLabel?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "constructions".
+ */
+export interface Construction {
+  id: string;
+  title: string;
+  kind: 'hub' | 'construction';
+  group: 'constructions' | 'glazing' | 'mirrors' | 'hardware';
+  parent?: (string | null) | Construction;
+  /**
+   * Латиница в kebab-case. Если оставить пустым — сформируется из названия.
+   */
+  slug: string;
+  /**
+   * Вычисляется: адрес родителя + слаг.
+   */
+  path?: string | null;
+  breadcrumbLabel?: string | null;
+  order?: number | null;
+  productTag?: (string | null) | Product;
+  children?: {
+    docs?: (string | Construction)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
+   * Как документ выглядит в хабах, мега-меню и блоке «Читать также».
+   */
+  card?: {
+    /**
+     * Если пусто — заголовок документа.
+     */
+    title?: string | null;
+    /**
+     * Напр. «приватность без потери света».
+     */
+    text?: string | null;
+    image?: (string | null) | Media;
+    /**
+     * Имя иконки Lucide, напр. Layers.
+     */
+    icon?: string | null;
+    /**
+     * Статичная подсказка, напр. «от 700 ₽/м²*». Цены толщин берутся из справочника «Цены».
+     */
+    priceHint?: string | null;
+  };
+  heroImage?: (string | null) | Media;
+  intro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Напр. «Рассчитать комплект».
+   */
+  ctaPrimaryLabel?: string | null;
+  ctaSecondaryLabel?: string | null;
+  secondaryFormKey?: ('drawing' | 'load' | 'none') | null;
+  systemsHeading?: string | null;
+  systemsLayout?: ('cards' | 'table') | null;
+  systems?:
+    | {
+        name: string;
+        subtitle?: string | null;
+        whereFits?: string | null;
+        important?: string | null;
+        howHeld?: string | null;
+        requiresInGlass?: string | null;
+        image?: (string | null) | Media;
+        /**
+         * Код <svg>…</svg>; выводится после санитизации.
+         */
+        schemeSvg?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Алютех, СИАЛ, Loft-Gratec, Доксал, Татпроф, Фристайл…
+   */
+  profileSystems?:
+    | {
+        name: string;
+        note?: string | null;
+        url?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  glassHeading?: string | null;
+  glassBullets?:
+    | {
+        body?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
+  tables?:
+    | {
+        heading?: string | null;
+        lead?: string | null;
+        role?: ('parameters' | 'comparison' | 'schemes' | 'other') | null;
+        mobileMode?: ('cards' | 'pairs') | null;
+        columns?:
+          | {
+              label: string;
+              align?: ('left' | 'center' | 'right') | null;
+              numeric?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        rows?:
+          | {
+              cells?:
+                | {
+                    value?: string | null;
+                    /**
+                     * Подсветка ct-pos.
+                     */
+                    positive?: boolean | null;
+                    /**
+                     * /путь/ или https://…
+                     */
+                    href?: string | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              /**
+               * Вся строка ведёт по этой ссылке (напр. на карточку толщины).
+               */
+              rowHref?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        footnote?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  riskCallout?: {
+    enabled?: boolean | null;
+    title?: string | null;
+    body?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+  };
+  documents?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  objectsHeading?: string | null;
+  whoDoesWhat?: {
+    enabled?: boolean | null;
+    leftItems?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    rightItems?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  inexSuBridge?: {
+    enabled?: boolean | null;
+    title?: string | null;
+    text?: string | null;
+    buttonLabel?: string | null;
+    url?: string | null;
+  };
+  snowCalcBlock?: {
+    enabled?: boolean | null;
+    title?: string | null;
+    body?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    sideText?: string | null;
+    ctaLabel?: string | null;
+    /**
+     * Напр. { "label": "Отправить проект" }
+     */
+    formParams?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  showShowerConfigs?: boolean | null;
+  faq?:
+    | {
+        question: string;
+        answer: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  layout?:
+    | (
+        | HeroBlock
+        | RichTextBlock
+        | TableBlock
+        | StepsBlock
+        | CalloutBlock
+        | TermsBlock
+        | CardsBlock
+        | CollectionCardsBlock
+        | PricesTableBlock
+        | FaqBlock
+        | CtaBlock
+        | CompareBlock
+        | DownloadBlock
+        | HolesCalculatorBlock
+        | WeightCalculatorBlock
+        | FormBlock
+        | SnippetBlock
+        | StatsBlock
+        | ObjectsFeedBlock
+        | ArticlesFeedBlock
+        | WhoDoesWhatBlock
+        | SystemsBlock
+        | GalleryBlock
+        | TwoColumnsBlock
+        | LinkListBlock
+        | ContactsMapBlock
+        | RequisitesBlock
+        | TeamGridBlock
+        | QuizCtaBlock
+      )[]
+    | null;
+  /**
+   * Адреса на inex.su, которые ведут на эту страницу.
+   */
+  legacyUrls?:
+    | {
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  seo?: {
+    /**
+     * Если пусто — используется название документа.
+     */
+    h1?: string | null;
+    /**
+     * Рекомендуется до 70 знаков (длиннее — допустимо). Метки {N}, {цена} подставляются при выводе.
+     */
+    title?: string | null;
+    /**
+     * Рекомендуется до 170 знаков (длиннее — допустимо).
+     */
+    description?: string | null;
+    noindex?: boolean | null;
+    /**
+     * Если пусто — canonical указывает на сам адрес страницы.
+     */
+    canonical?: string | null;
+    ogImage?: (string | null) | Media;
+  };
+  /**
+   * Значения подставляются в квиз «Расчёт стоимости» при переходе с этой страницы (?type=…&vid=…).
+   */
+  quizPrefill?: {
+    type?:
+      | (
+          | 'tempered'
+          | 'triplex'
+          | 'partitions'
+          | 'railings'
+          | 'shower'
+          | 'canopies'
+          | 'facade'
+          | 'shopfronts'
+          | 'verandas'
+          | 'mirrors'
+          | 'other'
+        )
+      | null;
+    thickness?: ('4' | '5' | '6' | '8' | '10' | '12' | '15' | '19') | null;
+    kind?: ('clear' | 'low-iron' | 'matte' | 'tinted' | 'painted' | 'ribbed' | 'bent') | null;
+    ctaLabel?: string | null;
+    secondaryForm?: ('drawing' | 'load' | 'sample' | 'none') | null;
+    /**
+     * Напр. «Отправить проект», «Отправить планировку».
+     */
+    secondaryLabel?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: string;
+  name: string;
+  /**
+   * Латиница в kebab-case. Если оставить пустым — сформируется из названия.
+   */
+  slug: string;
+  order?: number | null;
+  quizType?:
+    | (
+        | 'tempered'
+        | 'triplex'
+        | 'partitions'
+        | 'railings'
+        | 'shower'
+        | 'canopies'
+        | 'facade'
+        | 'shopfronts'
+        | 'verandas'
+        | 'mirrors'
+        | 'other'
+      )
+    | null;
+  construction?: (string | null) | Construction;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CalloutBlock".
+ */
+export interface CalloutBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  tone?: ('warning' | 'info') | null;
+  /**
+   * Имя иконки Lucide.
+   */
+  icon?: string | null;
+  title?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Маркированный список, напр. «Что важно знать до заказа».
+   */
+  items?:
+    | {
+        lead?: string | null;
+        text?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'callout';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TermsBlock".
+ */
+export interface TermsBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  mode?: ('global' | 'globalShort' | 'custom') | null;
+  variant?: ('bar' | 'plain') | null;
+  items?:
+    | {
+        text: string;
+        icon?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'terms';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CardsBlock".
+ */
+export interface CardsBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  layout?: ('g3' | 'g4' | 'ctCards' | 'p5Cards' | 'seg') | null;
+  items?:
+    | {
+        title: string;
+        text?: string | null;
+        link?: {
+          type?: ('doc' | 'custom') | null;
+          doc?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'glass-types';
+                value: string | GlassType;
+              } | null)
+            | ({
+                relationTo: 'thicknesses';
+                value: string | Thickness;
+              } | null)
+            | ({
+                relationTo: 'processing-services';
+                value: string | ProcessingService;
+              } | null)
+            | ({
+                relationTo: 'constructions';
+                value: string | Construction;
+              } | null)
+            | ({
+                relationTo: 'articles';
+                value: string | Article;
+              } | null)
+            | ({
+                relationTo: 'objects';
+                value: string | Object;
+              } | null);
+          /**
+           * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+           */
+          url?: string | null;
+          label?: string | null;
+          newTab?: boolean | null;
+        };
+        image?: (string | null) | Media;
+        icon?: string | null;
+        priceHint?: string | null;
+        /**
+         * «Отрицательная» — плашка вида «физические шаблоны не принимаем».
+         */
+        tone?: ('default' | 'negative' | 'accent') | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles".
+ */
+export interface Article {
+  id: string;
+  title: string;
+  /**
+   * Латиница в kebab-case. Если оставить пустым — сформируется из названия.
+   */
+  slug: string;
+  /**
+   * Вычисляется автоматически из слага и раздела.
+   */
+  path?: string | null;
+  datePublished?: string | null;
+  /**
+   * Обновляется автоматически при сохранении опубликованной статьи.
+   */
+  dateModified?: string | null;
+  /**
+   * Если пусто — считается по тексту (180 слов/мин).
+   */
+  readingTimeMinutes?: number | null;
+  featuredOnHome?: boolean | null;
+  homeOrder?: number | null;
+  /**
+   * Плашка «Коротко» в начале статьи.
+   */
+  lead?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Оглавление строится из заголовков H2.
+   */
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  heroImage?: (string | null) | Media;
+  author?: (string | null) | Team;
+  /**
+   * Если автор не выбран.
+   */
+  authorName?: string | null;
+  /**
+   * Как документ выглядит в хабах, мега-меню и блоке «Читать также».
+   */
+  card?: {
+    /**
+     * Если пусто — заголовок документа.
+     */
+    title?: string | null;
+    /**
+     * Напр. «приватность без потери света».
+     */
+    text?: string | null;
+    image?: (string | null) | Media;
+    /**
+     * Имя иконки Lucide, напр. Layers.
+     */
+    icon?: string | null;
+    /**
+     * Статичная подсказка, напр. «от 700 ₽/м²*». Цены толщин берутся из справочника «Цены».
+     */
+    priceHint?: string | null;
+  };
+  commercialLink?: {
+    label?: string | null;
+    link?: {
+      type?: ('doc' | 'custom') | null;
+      doc?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'glass-types';
+            value: string | GlassType;
+          } | null)
+        | ({
+            relationTo: 'thicknesses';
+            value: string | Thickness;
+          } | null)
+        | ({
+            relationTo: 'processing-services';
+            value: string | ProcessingService;
+          } | null)
+        | ({
+            relationTo: 'constructions';
+            value: string | Construction;
+          } | null)
+        | ({
+            relationTo: 'articles';
+            value: string | Article;
+          } | null)
+        | ({
+            relationTo: 'objects';
+            value: string | Object;
+          } | null);
+      /**
+       * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+       */
+      url?: string | null;
+      newTab?: boolean | null;
+    };
+  };
+  ctaCard?: {
+    title?: string | null;
+    text?: string | null;
+    buttonLabel?: string | null;
+    formKey?: ('drawing' | 'load' | 'callback') | null;
+  };
+  related?: (string | Article)[] | null;
+  tools?:
+    | {
+        label: string;
+        link?: {
+          type?: ('doc' | 'custom') | null;
+          doc?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'glass-types';
+                value: string | GlassType;
+              } | null)
+            | ({
+                relationTo: 'thicknesses';
+                value: string | Thickness;
+              } | null)
+            | ({
+                relationTo: 'processing-services';
+                value: string | ProcessingService;
+              } | null)
+            | ({
+                relationTo: 'constructions';
+                value: string | Construction;
+              } | null)
+            | ({
+                relationTo: 'articles';
+                value: string | Article;
+              } | null)
+            | ({
+                relationTo: 'objects';
+                value: string | Object;
+              } | null);
+          /**
+           * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+           */
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  seo?: {
+    /**
+     * Если пусто — используется название документа.
+     */
+    h1?: string | null;
+    /**
+     * Рекомендуется до 70 знаков (длиннее — допустимо). Метки {N}, {цена} подставляются при выводе.
+     */
+    title?: string | null;
+    /**
+     * Рекомендуется до 170 знаков (длиннее — допустимо).
+     */
+    description?: string | null;
+    noindex?: boolean | null;
+    /**
+     * Если пусто — canonical указывает на сам адрес страницы.
+     */
+    canonical?: string | null;
+    ogImage?: (string | null) | Media;
+  };
+  /**
+   * Значения подставляются в квиз «Расчёт стоимости» при переходе с этой страницы (?type=…&vid=…).
+   */
+  quizPrefill?: {
+    type?:
+      | (
+          | 'tempered'
+          | 'triplex'
+          | 'partitions'
+          | 'railings'
+          | 'shower'
+          | 'canopies'
+          | 'facade'
+          | 'shopfronts'
+          | 'verandas'
+          | 'mirrors'
+          | 'other'
+        )
+      | null;
+    thickness?: ('4' | '5' | '6' | '8' | '10' | '12' | '15' | '19') | null;
+    kind?: ('clear' | 'low-iron' | 'matte' | 'tinted' | 'painted' | 'ribbed' | 'bent') | null;
+    ctaLabel?: string | null;
+    secondaryForm?: ('drawing' | 'load' | 'sample' | 'none') | null;
+    /**
+     * Напр. «Отправить проект», «Отправить планировку».
+     */
+    secondaryLabel?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team".
+ */
+export interface Team {
+  id: string;
+  name: string;
+  role?: string | null;
+  area?: string | null;
+  photo?: (string | null) | Media;
+  email?: string | null;
+  phone?: string | null;
+  order?: number | null;
+  hidden?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "objects".
+ */
+export interface Object {
+  id: string;
+  name: string;
+  /**
+   * Латиница в kebab-case. Если оставить пустым — сформируется из названия.
+   */
+  slug: string;
+  /**
+   * Вычисляется автоматически из слага и раздела.
+   */
+  path?: string | null;
+  featured?: boolean | null;
+  /**
+   * Для сортировки «Сначала новые».
+   */
+  sortDate?: string | null;
+  city?: (string | null) | City;
+  objectType?: (string | null) | ObjectType;
+  year?: number | null;
+  products?: (string | Product)[] | null;
+  task?: string | null;
+  spec?:
+    | {
+        product?: string | null;
+        /**
+         * «10», «8+8»
+         */
+        thickness?: string | null;
+        kind?: string | null;
+        triplexFormula?: string | null;
+        processing?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * До трёх, напр. «закалённый триплекс 8+8».
+   */
+  chips?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  photos?:
+    | {
+        image: string | Media;
+        alt: string;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  related?: (string | Object)[] | null;
+  /**
+   * Адреса на inex.su, которые ведут на эту страницу.
+   */
+  legacyUrls?:
+    | {
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  legacyId?: string | null;
+  sourceUrl?: string | null;
+  importNotes?: string | null;
+  seo?: {
+    /**
+     * Если пусто — используется название документа.
+     */
+    h1?: string | null;
+    /**
+     * Рекомендуется до 70 знаков (длиннее — допустимо). Метки {N}, {цена} подставляются при выводе.
+     */
+    title?: string | null;
+    /**
+     * Рекомендуется до 170 знаков (длиннее — допустимо).
+     */
+    description?: string | null;
+    noindex?: boolean | null;
+    /**
+     * Если пусто — canonical указывает на сам адрес страницы.
+     */
+    canonical?: string | null;
+    ogImage?: (string | null) | Media;
+  };
+  /**
+   * Значения подставляются в квиз «Расчёт стоимости» при переходе с этой страницы (?type=…&vid=…).
+   */
+  quizPrefill?: {
+    type?:
+      | (
+          | 'tempered'
+          | 'triplex'
+          | 'partitions'
+          | 'railings'
+          | 'shower'
+          | 'canopies'
+          | 'facade'
+          | 'shopfronts'
+          | 'verandas'
+          | 'mirrors'
+          | 'other'
+        )
+      | null;
+    thickness?: ('4' | '5' | '6' | '8' | '10' | '12' | '15' | '19') | null;
+    kind?: ('clear' | 'low-iron' | 'matte' | 'tinted' | 'painted' | 'ribbed' | 'bent') | null;
+    ctaLabel?: string | null;
+    secondaryForm?: ('drawing' | 'load' | 'sample' | 'none') | null;
+    /**
+     * Напр. «Отправить проект», «Отправить планировку».
+     */
+    secondaryLabel?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cities".
+ */
+export interface City {
+  id: string;
+  name: string;
+  /**
+   * Латиница в kebab-case. Если оставить пустым — сформируется из названия.
+   */
+  slug: string;
+  region?: string | null;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "object-types".
+ */
+export interface ObjectType {
+  id: string;
+  name: string;
+  /**
+   * Латиница в kebab-case. Если оставить пустым — сформируется из названия.
+   */
+  slug: string;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CollectionCardsBlock".
+ */
+export interface CollectionCardsBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  source: 'glassTypes' | 'processingServices' | 'constructions' | 'thicknesses' | 'articles';
+  mode?: ('all' | 'manual' | 'group') | null;
+  group?: ('constructions' | 'glazing' | 'mirrors' | 'hardware') | null;
+  columns?: ('3' | '4') | null;
+  items?:
+    | (
+        | {
+            relationTo: 'glass-types';
+            value: string | GlassType;
+          }
+        | {
+            relationTo: 'processing-services';
+            value: string | ProcessingService;
+          }
+        | {
+            relationTo: 'constructions';
+            value: string | Construction;
+          }
+        | {
+            relationTo: 'thicknesses';
+            value: string | Thickness;
+          }
+        | {
+            relationTo: 'articles';
+            value: string | Article;
+          }
+      )[]
+    | null;
+  /**
+   * Для толщин: цена и вес из справочника «Цены».
+   */
+  showPrices?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'collectionCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PricesTableBlock".
+ */
+export interface PricesTableBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  variant?: ('table' | 'cards' | 'both') | null;
+  showIncluded?: boolean | null;
+  showCaption?: boolean | null;
+  showPromo?: boolean | null;
+  showWeight?: boolean | null;
+  calloutFromConditions?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'pricesTable';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqBlock".
+ */
+export interface FaqBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  mode?: ('doc' | 'inline') | null;
+  items?:
+    | {
+        question: string;
+        answer: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaBlock".
+ */
+export interface CtaBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  variant?: ('buttons' | 'banner' | 'strip' | 'split') | null;
+  tone?: ('light' | 'primaryDark') | null;
+  title?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  sideText?: string | null;
+  buttons?:
+    | {
+        label: string;
+        kind?: ('quiz' | 'form' | 'link' | 'download') | null;
+        variant?: ('primary' | 'secondary' | 'ghost') | null;
+        /**
+         * Имя иконки Lucide.
+         */
+        icon?: string | null;
+        formKey?: ('drawing' | 'callback' | 'sample' | 'load' | 'contacts' | 'full') | null;
+        /**
+         * Для формы чертежа: { "label": "Отправить проект", "sourceLabel": "…", "accept": ".dwg,.pdf" }
+         */
+        formParams?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        link?: {
+          type?: ('doc' | 'custom') | null;
+          doc?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'glass-types';
+                value: string | GlassType;
+              } | null)
+            | ({
+                relationTo: 'thicknesses';
+                value: string | Thickness;
+              } | null)
+            | ({
+                relationTo: 'processing-services';
+                value: string | ProcessingService;
+              } | null)
+            | ({
+                relationTo: 'constructions';
+                value: string | Construction;
+              } | null)
+            | ({
+                relationTo: 'articles';
+                value: string | Article;
+              } | null)
+            | ({
+                relationTo: 'objects';
+                value: string | Object;
+              } | null);
+          /**
+           * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+           */
+          url?: string | null;
+          newTab?: boolean | null;
+        };
+        file?: (string | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Напр. «inex.su».
+   */
+  link?: {
+    type?: ('doc' | 'custom') | null;
+    doc?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'glass-types';
+          value: string | GlassType;
+        } | null)
+      | ({
+          relationTo: 'thicknesses';
+          value: string | Thickness;
+        } | null)
+      | ({
+          relationTo: 'processing-services';
+          value: string | ProcessingService;
+        } | null)
+      | ({
+          relationTo: 'constructions';
+          value: string | Construction;
+        } | null)
+      | ({
+          relationTo: 'articles';
+          value: string | Article;
+        } | null)
+      | ({
+          relationTo: 'objects';
+          value: string | Object;
+        } | null);
+    /**
+     * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+     */
+    url?: string | null;
+    label?: string | null;
+    newTab?: boolean | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cta';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CompareBlock".
+ */
+export interface CompareBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  topicTitle?: string | null;
+  leftTitle?: string | null;
+  rightTitle?: string | null;
+  rows?:
+    | {
+        topic: string;
+        left?: string | null;
+        right?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  footLink?: {
+    type?: ('doc' | 'custom') | null;
+    doc?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'glass-types';
+          value: string | GlassType;
+        } | null)
+      | ({
+          relationTo: 'thicknesses';
+          value: string | Thickness;
+        } | null)
+      | ({
+          relationTo: 'processing-services';
+          value: string | ProcessingService;
+        } | null)
+      | ({
+          relationTo: 'constructions';
+          value: string | Construction;
+        } | null)
+      | ({
+          relationTo: 'articles';
+          value: string | Article;
+        } | null)
+      | ({
+          relationTo: 'objects';
+          value: string | Object;
+        } | null);
+    /**
+     * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+     */
+    url?: string | null;
+    label?: string | null;
+    newTab?: boolean | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'compare';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DownloadBlock".
+ */
+export interface DownloadBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  variant?: ('list' | 'card') | null;
+  items?:
+    | {
+        title: string;
+        description?: string | null;
+        file?: (string | null) | Media;
+        /**
+         * Показывать «файл будет добавлен» вместо ссылки.
+         */
+        fileMissing?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'download';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HolesCalculatorBlock".
+ */
+export interface HolesCalculatorBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  defaultThickness?: ('4' | '5' | '6' | '8' | '10' | '12' | '15' | '19') | null;
+  showScheme?: boolean | null;
+  note?: string | null;
+  ctaLabel?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'holesCalculator';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WeightCalculatorBlock".
+ */
+export interface WeightCalculatorBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  defaultMode?: ('single' | 'triplex') | null;
+  showTable?: boolean | null;
+  showFormula?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'weightCalculator';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FormBlock".
+ */
+export interface FormBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  formKey: 'drawing' | 'callback' | 'sample' | 'load' | 'contacts' | 'full';
+  variant?: ('card' | 'inline' | 'page') | null;
+  showContacts?: boolean | null;
+  bullets?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  submitLabel?: string | null;
+  fileLabel?: string | null;
+  /**
+   * Метка, с которой заявка придёт менеджеру.
+   */
+  sourceLabel?: string | null;
+  /**
+   * Напр. { "label": "Отправить проект", "accept": ".dwg,.dxf,.pdf" }
+   */
+  params?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'form';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SnippetBlock".
+ */
+export interface SnippetBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  /**
+   * Ключ из справочника «Фрагменты», напр. samples.
+   */
+  snippetKey: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'snippet';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsBlock".
+ */
+export interface StatsBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  variant?: ('glass' | 'tiles' | 'plain') | null;
+  items?:
+    | {
+        value: string;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'stats';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ObjectsFeedBlock".
+ */
+export interface ObjectsFeedBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  mode?: ('featured' | 'byProduct' | 'manual') | null;
+  limit?: number | null;
+  product?: (string | null) | Product;
+  objects?: (string | Object)[] | null;
+  showAllLink?: boolean | null;
+  allLinkLabel?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'objectsFeed';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ArticlesFeedBlock".
+ */
+export interface ArticlesFeedBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  mode?: ('featured' | 'latest' | 'manual') | null;
+  limit?: number | null;
+  articles?: (string | Article)[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'articlesFeed';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WhoDoesWhatBlock".
+ */
+export interface WhoDoesWhatBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  leftTitle?: string | null;
+  rightTitle?: string | null;
+  leftItems?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  rightItems?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  strip?: {
+    enabled?: boolean | null;
+    title?: string | null;
+    text?: string | null;
+    buttonLabel?: string | null;
+    url?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'whoDoesWhat';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SystemsBlock".
+ */
+export interface SystemsBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  source?: ('doc' | 'inline') | null;
+  layout?: ('cards' | 'table') | null;
+  items?:
+    | {
+        name: string;
+        subtitle?: string | null;
+        whereFits?: string | null;
+        important?: string | null;
+        howHeld?: string | null;
+        requiresInGlass?: string | null;
+        image?: (string | null) | Media;
+        /**
+         * Код <svg>…</svg>; выводится после санитизации.
+         */
+        schemeSvg?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'systems';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GalleryBlock".
+ */
+export interface GalleryBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  layout?: ('grid' | 'slider') | null;
+  images?:
+    | {
+        image: string | Media;
+        alt: string;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'gallery';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TwoColumnsBlock".
+ */
+export interface TwoColumnsBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  left?: {
+    heading?: string | null;
+    body?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+  };
+  right?: {
+    heading?: string | null;
+    body?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'twoColumns';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LinkListBlock".
+ */
+export interface LinkListBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  variant?: ('chips' | 'bridge' | 'buttons') | null;
+  /**
+   * Напр. «Рядом:».
+   */
+  label?: string | null;
+  items?:
+    | {
+        link?: {
+          type?: ('doc' | 'custom') | null;
+          doc?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'glass-types';
+                value: string | GlassType;
+              } | null)
+            | ({
+                relationTo: 'thicknesses';
+                value: string | Thickness;
+              } | null)
+            | ({
+                relationTo: 'processing-services';
+                value: string | ProcessingService;
+              } | null)
+            | ({
+                relationTo: 'constructions';
+                value: string | Construction;
+              } | null)
+            | ({
+                relationTo: 'articles';
+                value: string | Article;
+              } | null)
+            | ({
+                relationTo: 'objects';
+                value: string | Object;
+              } | null);
+          /**
+           * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+           */
+          url?: string | null;
+          label?: string | null;
+          newTab?: boolean | null;
+        };
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'linkList';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContactsMapBlock".
+ */
+export interface ContactsMapBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  showMap?: boolean | null;
+  showLocations?: boolean | null;
+  showHours?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'contactsMap';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RequisitesBlock".
+ */
+export interface RequisitesBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  showDownload?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'requisites';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TeamGridBlock".
+ */
+export interface TeamGridBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  /**
+   * Пусто — все.
+   */
+  limit?: number | null;
+  emptyBehavior?: ('hide' | 'message') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'teamGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "QuizCtaBlock".
+ */
+export interface QuizCtaBlock {
+  heading?: string | null;
+  headingLevel?: ('h2' | 'h3') | null;
+  sub?: string | null;
+  /**
+   * Для ссылок вида #ceny.
+   */
+  anchorId?: string | null;
+  background?: ('auto' | 'bg' | 'sf' | 'dark' | 'primaryDark') | null;
+  text?: string | null;
+  buttonLabel?: string | null;
+  /**
+   * Значения подставляются в квиз «Расчёт стоимости» при переходе с этой страницы (?type=…&vid=…).
+   */
+  prefill?: {
+    type?:
+      | (
+          | 'tempered'
+          | 'triplex'
+          | 'partitions'
+          | 'railings'
+          | 'shower'
+          | 'canopies'
+          | 'facade'
+          | 'shopfronts'
+          | 'verandas'
+          | 'mirrors'
+          | 'other'
+        )
+      | null;
+    thickness?: ('4' | '5' | '6' | '8' | '10' | '12' | '15' | '19') | null;
+    kind?: ('clear' | 'low-iron' | 'matte' | 'tinted' | 'painted' | 'ribbed' | 'bent') | null;
+    ctaLabel?: string | null;
+    secondaryForm?: ('drawing' | 'load' | 'sample' | 'none') | null;
+    /**
+     * Напр. «Отправить проект», «Отправить планировку».
+     */
+    secondaryLabel?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'quizCta';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shower-configs".
+ */
+export interface ShowerConfig {
+  id: string;
+  name: string;
+  /**
+   * Латиница в kebab-case. Если оставить пустым — сформируется из названия.
+   */
+  slug: string;
+  construction?: (string | null) | Construction;
+  configType?: ('straight-door' | 'corner' | 'trapezoid' | 'walk-in' | 'sliding' | 'other') | null;
+  glassThicknesses?: ('8' | '10')[] | null;
+  image?: (string | null) | Media;
+  gallery?:
+    | {
+        image: string | Media;
+        alt?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  description?: string | null;
+  order?: number | null;
+  legacyUrl?: string | null;
+  legacyId?: string | null;
+  sourceUrl?: string | null;
+  importNotes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-files".
+ */
+export interface LeadFile {
+  id: string;
+  lead?: (string | null) | Lead;
+  originalName?: string | null;
+  kind?: ('dwg' | 'dxf' | 'pdf' | 'png' | 'jpeg') | null;
+  source?: ('quiz' | 'form') | null;
+  sha256?: string | null;
+  sizeBytes?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads".
+ */
+export interface Lead {
+  id: string;
+  formType: 'quiz' | 'drawing' | 'callback' | 'sample' | 'load' | 'contacts' | 'full';
+  /**
+   * «Квиз», «Форма: Отправить чертёж», «Форма: Заказать звонок» …
+   */
+  sourceLabel?: string | null;
+  /**
+   * Путь страницы, с которой открыт квиз или форма.
+   */
+  entryPage?: string | null;
+  pageUrl?: string | null;
+  referrer?: string | null;
+  utm?: {
+    source?: string | null;
+    medium?: string | null;
+    campaign?: string | null;
+    term?: string | null;
+    content?: string | null;
+    yclid?: string | null;
+    gclid?: string | null;
+    openstat?: string | null;
+  };
+  /**
+   * Пусто, если посетитель не дал согласие на аналитику.
+   */
+  metrikaClientId?: string | null;
+  company?: string | null;
+  inn?: string | null;
+  name: string;
+  /**
+   * Хранится в формате +7XXXXXXXXXX.
+   */
+  phone: string;
+  phoneRaw?: string | null;
+  email?: string | null;
+  role?: ('contractor' | 'manufacturer' | 'developer' | 'designer' | 'other') | null;
+  city?: string | null;
+  area?: number | null;
+  productType?:
+    | (
+        | 'tempered'
+        | 'triplex'
+        | 'partitions'
+        | 'railings'
+        | 'shower'
+        | 'canopies'
+        | 'facade'
+        | 'shopfronts'
+        | 'verandas'
+        | 'mirrors'
+        | 'other'
+      )
+    | null;
+  comment?: string | null;
+  /**
+   * Все ответы квиза или формы без преобразования.
+   */
+  answers?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  answersSummary?: string | null;
+  estimate?: {
+    from?: number | null;
+    priceDate?: string | null;
+    shown?: boolean | null;
+  };
+  flags?: ('small_volume' | 'nonstandard_size' | 'urgent' | 'no_file' | 'needs_docs')[] | null;
+  files?: (string | LeadFile)[] | null;
+  status?: (string | null) | LeadStatus;
+  statusChangedAt?: string | null;
+  refuseReason?: string | null;
+  assignee?: (string | null) | User;
+  internalComments?:
+    | {
+        author?: (string | null) | User;
+        text: string;
+        date?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  isDuplicate?: boolean | null;
+  duplicateOf?: (string | null) | Lead;
+  duplicateReason?: ('phone' | 'email' | 'both') | null;
+  consent?: (string | null) | ConsentLog;
+  orders?: {
+    docs?: (string | Order)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  newLeadNotifiedAt?: string | null;
+  assigneeNotifiedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-statuses".
+ */
+export interface LeadStatus {
+  id: string;
+  name: string;
+  /**
+   * Латиница, цифры и дефис: new, in-progress, kp-sent, contract, refused.
+   */
+  slug: string;
+  order: number;
+  /**
+   * HEX (#2563eb) или токен дизайн-системы.
+   */
+  color?: string | null;
+  /**
+   * Может быть только один: при сохранении флаг снимается с остальных.
+   */
+  isDefault?: boolean | null;
+  isFinal?: boolean | null;
+  /**
+   * Заявку в этом статусе нельзя сохранить без причины отказа.
+   */
+  requiresReason?: boolean | null;
+  /**
+   * При переводе заявки в этот статус создаётся заказ.
+   */
+  isContract?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "consent-log".
+ */
+export interface ConsentLog {
+  id: string;
+  lead?: (string | null) | Lead;
+  formType?: string | null;
+  consentVersion?: string | null;
+  policyVersion?: string | null;
+  consentText?: string | null;
+  ip?: string | null;
+  userAgent?: string | null;
+  pageUrl?: string | null;
+  givenAt?: string | null;
+  /**
+   * HMAC-SHA256 нормализованного телефона: поиск записей после удаления заявки.
+   */
+  phoneHash?: string | null;
+  /**
+   * HMAC-SHA256 нормализованного e-mail: поиск записей после удаления заявки.
+   */
+  emailHash?: string | null;
+  anonymizedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: string;
+  /**
+   * ГГГГ-NNNN, присваивается автоматически.
+   */
+  number?: string | null;
+  lead?: (string | null) | Lead;
+  company?: string | null;
+  /**
+   * Например: «Закалённое стекло 10 мм, 86 м², 42 позиции».
+   */
+  composition?: string | null;
+  clientName?: string | null;
+  /**
+   * Без адреса письма клиенту не отправляются.
+   */
+  clientEmail?: string | null;
+  clientPhone?: string | null;
+  notifyClient?: boolean | null;
+  /**
+   * Карточка «Ваш менеджер» на странице заказа. Пусто — карточка не выводится.
+   */
+  manager?: (string | null) | User;
+  /**
+   * Каждый этап — один раз; записи упорядочиваются по этапам.
+   */
+  statusHistory: {
+    status: 'spec_agreed' | 'in_production' | 'packed' | 'shipped' | 'received';
+    date: string;
+    plannedDate?: string | null;
+    note?: string | null;
+    id?: string | null;
+  }[];
+  currentStatus?: ('spec_agreed' | 'in_production' | 'packed' | 'shipped' | 'received') | null;
+  clientComment?: {
+    text?: string | null;
+    updatedAt?: string | null;
+  };
+  packPhotos?:
+    | {
+        photo: string | OrderFile;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  shipment?: {
+    carrier?: string | null;
+    waybill?: string | null;
+    trackingUrl?: string | null;
+  };
+  documents?:
+    | {
+        title: string;
+        kind?: ('spec' | 'passport' | 'certificate' | 'other') | null;
+        file: string | OrderFile;
+        id?: string | null;
+      }[]
+    | null;
+  tokenHash?: string | null;
+  tokenCreatedAt?: string | null;
+  tokenReissueCount?: number | null;
+  revoked?: boolean | null;
+  receivedAt?: string | null;
+  /**
+   * Дата получения + срок из настроек сайта.
+   */
+  expiresAt?: string | null;
+  lastNotifiedStatus?: string | null;
+  lastNotifiedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "order-files".
+ */
+export interface OrderFile {
+  id: string;
+  kind?: ('photo' | 'document') | null;
+  caption?: string | null;
+  uploadedBy?: (string | null) | User;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    preview?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: string;
+  /**
+   * Путь со слешем на конце, в нижнем регистре: /old-page/.
+   */
+  from: string;
+  /**
+   * Путь на сайте (/catalog/) или абсолютная ссылка.
+   */
+  to: string;
+  /**
+   * Справочно: сайт всегда отвечает постоянным редиректом 308.
+   */
+  code?: ('301' | '308') | null;
+  active?: boolean | null;
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rate-limits".
+ */
+export interface RateLimit {
+  id: string;
+  /**
+   * Например: lead:ip:1.2.3.4
+   */
+  key: string;
+  count: number;
+  windowStart: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -166,10 +3976,99 @@ export interface PayloadKv {
  */
 export interface PayloadLockedDocument {
   id: string;
-  document?: {
-    relationTo: 'users';
-    value: string | User;
-  } | null;
+  document?:
+    | ({
+        relationTo: 'users';
+        value: string | User;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: string | Page;
+      } | null)
+    | ({
+        relationTo: 'articles';
+        value: string | Article;
+      } | null)
+    | ({
+        relationTo: 'objects';
+        value: string | Object;
+      } | null)
+    | ({
+        relationTo: 'team';
+        value: string | Team;
+      } | null)
+    | ({
+        relationTo: 'thicknesses';
+        value: string | Thickness;
+      } | null)
+    | ({
+        relationTo: 'thickness-groups';
+        value: string | ThicknessGroup;
+      } | null)
+    | ({
+        relationTo: 'glass-types';
+        value: string | GlassType;
+      } | null)
+    | ({
+        relationTo: 'processing-services';
+        value: string | ProcessingService;
+      } | null)
+    | ({
+        relationTo: 'constructions';
+        value: string | Construction;
+      } | null)
+    | ({
+        relationTo: 'shower-configs';
+        value: string | ShowerConfig;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: string | Product;
+      } | null)
+    | ({
+        relationTo: 'object-types';
+        value: string | ObjectType;
+      } | null)
+    | ({
+        relationTo: 'cities';
+        value: string | City;
+      } | null)
+    | ({
+        relationTo: 'lead-files';
+        value: string | LeadFile;
+      } | null)
+    | ({
+        relationTo: 'lead-statuses';
+        value: string | LeadStatus;
+      } | null)
+    | ({
+        relationTo: 'leads';
+        value: string | Lead;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: string | Order;
+      } | null)
+    | ({
+        relationTo: 'order-files';
+        value: string | OrderFile;
+      } | null)
+    | ({
+        relationTo: 'consent-log';
+        value: string | ConsentLog;
+      } | null)
+    | ({
+        relationTo: 'redirects';
+        value: string | Redirect;
+      } | null)
+    | ({
+        relationTo: 'rate-limits';
+        value: string | RateLimit;
+      } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
@@ -219,6 +4118,12 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
   role?: T;
+  phone?: T;
+  position?: T;
+  messengerUrl?: T;
+  messengerType?: T;
+  photo?: T;
+  notifyNewLeads?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -236,6 +4141,2089 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  kind?: T;
+  isPlaceholder?: T;
+  generatedId?: T;
+  credit?: T;
+  sourceUrl?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        og?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  template?: T;
+  isHome?: T;
+  parent?: T;
+  pathPrefix?: T;
+  slug?: T;
+  path?: T;
+  breadcrumbLabel?: T;
+  publishedAt?: T;
+  layout?:
+    | T
+    | {
+        hero?: T | HeroBlockSelect<T>;
+        richText?: T | RichTextBlockSelect<T>;
+        table?: T | TableBlockSelect<T>;
+        steps?: T | StepsBlockSelect<T>;
+        callout?: T | CalloutBlockSelect<T>;
+        terms?: T | TermsBlockSelect<T>;
+        cards?: T | CardsBlockSelect<T>;
+        collectionCards?: T | CollectionCardsBlockSelect<T>;
+        pricesTable?: T | PricesTableBlockSelect<T>;
+        faq?: T | FaqBlockSelect<T>;
+        cta?: T | CtaBlockSelect<T>;
+        compare?: T | CompareBlockSelect<T>;
+        download?: T | DownloadBlockSelect<T>;
+        holesCalculator?: T | HolesCalculatorBlockSelect<T>;
+        weightCalculator?: T | WeightCalculatorBlockSelect<T>;
+        form?: T | FormBlockSelect<T>;
+        snippet?: T | SnippetBlockSelect<T>;
+        stats?: T | StatsBlockSelect<T>;
+        objectsFeed?: T | ObjectsFeedBlockSelect<T>;
+        articlesFeed?: T | ArticlesFeedBlockSelect<T>;
+        whoDoesWhat?: T | WhoDoesWhatBlockSelect<T>;
+        systems?: T | SystemsBlockSelect<T>;
+        gallery?: T | GalleryBlockSelect<T>;
+        twoColumns?: T | TwoColumnsBlockSelect<T>;
+        linkList?: T | LinkListBlockSelect<T>;
+        contactsMap?: T | ContactsMapBlockSelect<T>;
+        requisites?: T | RequisitesBlockSelect<T>;
+        teamGrid?: T | TeamGridBlockSelect<T>;
+        quizCta?: T | QuizCtaBlockSelect<T>;
+      };
+  faq?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        h1?: T;
+        title?: T;
+        description?: T;
+        noindex?: T;
+        canonical?: T;
+        ogImage?: T;
+      };
+  quizPrefill?:
+    | T
+    | {
+        type?: T;
+        thickness?: T;
+        kind?: T;
+        ctaLabel?: T;
+        secondaryForm?: T;
+        secondaryLabel?: T;
+      };
+  hideConditions?: T;
+  hideQuizCta?: T;
+  documentVersion?: T;
+  legacyUrls?:
+    | T
+    | {
+        url?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroBlock_select".
+ */
+export interface HeroBlockSelect<T extends boolean = true> {
+  variant?: T;
+  eyebrow?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  titleOverride?: T;
+  lead?: T;
+  facts?: T;
+  strong?: T;
+  buttons?:
+    | T
+    | {
+        label?: T;
+        kind?: T;
+        variant?: T;
+        icon?: T;
+        formKey?: T;
+        formParams?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              doc?: T;
+              url?: T;
+              newTab?: T;
+            };
+        file?: T;
+        id?: T;
+      };
+  showTerms?: T;
+  termsMode?: T;
+  image?: T;
+  imageAlt?: T;
+  photos?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  bigNumber?: T;
+  stats?:
+    | T
+    | {
+        value?: T;
+        text?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RichTextBlock_select".
+ */
+export interface RichTextBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  content?: T;
+  width?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TableBlock_select".
+ */
+export interface TableBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  table?:
+    | T
+    | {
+        caption?: T;
+        role?: T;
+        mobileMode?: T;
+        columns?:
+          | T
+          | {
+              label?: T;
+              align?: T;
+              numeric?: T;
+              id?: T;
+            };
+        rows?:
+          | T
+          | {
+              cells?:
+                | T
+                | {
+                    value?: T;
+                    positive?: T;
+                    href?: T;
+                    id?: T;
+                  };
+              rowHref?: T;
+              id?: T;
+            };
+        footnote?: T;
+        highlightColumn?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StepsBlock_select".
+ */
+export interface StepsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  variant?: T;
+  items?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        linkLabel?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              doc?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  footnote?: T;
+  buttons?:
+    | T
+    | {
+        label?: T;
+        kind?: T;
+        variant?: T;
+        icon?: T;
+        formKey?: T;
+        formParams?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              doc?: T;
+              url?: T;
+              newTab?: T;
+            };
+        file?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CalloutBlock_select".
+ */
+export interface CalloutBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  tone?: T;
+  icon?: T;
+  title?: T;
+  body?: T;
+  items?:
+    | T
+    | {
+        lead?: T;
+        text?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TermsBlock_select".
+ */
+export interface TermsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  mode?: T;
+  variant?: T;
+  items?:
+    | T
+    | {
+        text?: T;
+        icon?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CardsBlock_select".
+ */
+export interface CardsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  layout?: T;
+  items?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              doc?: T;
+              url?: T;
+              label?: T;
+              newTab?: T;
+            };
+        image?: T;
+        icon?: T;
+        priceHint?: T;
+        tone?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CollectionCardsBlock_select".
+ */
+export interface CollectionCardsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  source?: T;
+  mode?: T;
+  group?: T;
+  columns?: T;
+  items?: T;
+  showPrices?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PricesTableBlock_select".
+ */
+export interface PricesTableBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  variant?: T;
+  showIncluded?: T;
+  showCaption?: T;
+  showPromo?: T;
+  showWeight?: T;
+  calloutFromConditions?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqBlock_select".
+ */
+export interface FaqBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  mode?: T;
+  items?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaBlock_select".
+ */
+export interface CtaBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  variant?: T;
+  tone?: T;
+  title?: T;
+  body?: T;
+  sideText?: T;
+  buttons?:
+    | T
+    | {
+        label?: T;
+        kind?: T;
+        variant?: T;
+        icon?: T;
+        formKey?: T;
+        formParams?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              doc?: T;
+              url?: T;
+              newTab?: T;
+            };
+        file?: T;
+        id?: T;
+      };
+  link?:
+    | T
+    | {
+        type?: T;
+        doc?: T;
+        url?: T;
+        label?: T;
+        newTab?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CompareBlock_select".
+ */
+export interface CompareBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  topicTitle?: T;
+  leftTitle?: T;
+  rightTitle?: T;
+  rows?:
+    | T
+    | {
+        topic?: T;
+        left?: T;
+        right?: T;
+        id?: T;
+      };
+  footLink?:
+    | T
+    | {
+        type?: T;
+        doc?: T;
+        url?: T;
+        label?: T;
+        newTab?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DownloadBlock_select".
+ */
+export interface DownloadBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  variant?: T;
+  items?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        file?: T;
+        fileMissing?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HolesCalculatorBlock_select".
+ */
+export interface HolesCalculatorBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  defaultThickness?: T;
+  showScheme?: T;
+  note?: T;
+  ctaLabel?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WeightCalculatorBlock_select".
+ */
+export interface WeightCalculatorBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  defaultMode?: T;
+  showTable?: T;
+  showFormula?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FormBlock_select".
+ */
+export interface FormBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  formKey?: T;
+  variant?: T;
+  showContacts?: T;
+  bullets?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  submitLabel?: T;
+  fileLabel?: T;
+  sourceLabel?: T;
+  params?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SnippetBlock_select".
+ */
+export interface SnippetBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  snippetKey?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsBlock_select".
+ */
+export interface StatsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  variant?: T;
+  items?:
+    | T
+    | {
+        value?: T;
+        text?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ObjectsFeedBlock_select".
+ */
+export interface ObjectsFeedBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  mode?: T;
+  limit?: T;
+  product?: T;
+  objects?: T;
+  showAllLink?: T;
+  allLinkLabel?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ArticlesFeedBlock_select".
+ */
+export interface ArticlesFeedBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  mode?: T;
+  limit?: T;
+  articles?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WhoDoesWhatBlock_select".
+ */
+export interface WhoDoesWhatBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  leftTitle?: T;
+  rightTitle?: T;
+  leftItems?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  rightItems?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  strip?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        text?: T;
+        buttonLabel?: T;
+        url?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SystemsBlock_select".
+ */
+export interface SystemsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  source?: T;
+  layout?: T;
+  items?:
+    | T
+    | {
+        name?: T;
+        subtitle?: T;
+        whereFits?: T;
+        important?: T;
+        howHeld?: T;
+        requiresInGlass?: T;
+        image?: T;
+        schemeSvg?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GalleryBlock_select".
+ */
+export interface GalleryBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  layout?: T;
+  images?:
+    | T
+    | {
+        image?: T;
+        alt?: T;
+        caption?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TwoColumnsBlock_select".
+ */
+export interface TwoColumnsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  left?:
+    | T
+    | {
+        heading?: T;
+        body?: T;
+      };
+  right?:
+    | T
+    | {
+        heading?: T;
+        body?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LinkListBlock_select".
+ */
+export interface LinkListBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  variant?: T;
+  label?: T;
+  items?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              doc?: T;
+              url?: T;
+              label?: T;
+              newTab?: T;
+            };
+        description?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContactsMapBlock_select".
+ */
+export interface ContactsMapBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  showMap?: T;
+  showLocations?: T;
+  showHours?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RequisitesBlock_select".
+ */
+export interface RequisitesBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  showDownload?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TeamGridBlock_select".
+ */
+export interface TeamGridBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  limit?: T;
+  emptyBehavior?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "QuizCtaBlock_select".
+ */
+export interface QuizCtaBlockSelect<T extends boolean = true> {
+  heading?: T;
+  headingLevel?: T;
+  sub?: T;
+  anchorId?: T;
+  background?: T;
+  text?: T;
+  buttonLabel?: T;
+  prefill?:
+    | T
+    | {
+        type?: T;
+        thickness?: T;
+        kind?: T;
+        ctaLabel?: T;
+        secondaryForm?: T;
+        secondaryLabel?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles_select".
+ */
+export interface ArticlesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  path?: T;
+  datePublished?: T;
+  dateModified?: T;
+  readingTimeMinutes?: T;
+  featuredOnHome?: T;
+  homeOrder?: T;
+  lead?: T;
+  body?: T;
+  heroImage?: T;
+  author?: T;
+  authorName?: T;
+  card?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        image?: T;
+        icon?: T;
+        priceHint?: T;
+      };
+  commercialLink?:
+    | T
+    | {
+        label?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              doc?: T;
+              url?: T;
+              newTab?: T;
+            };
+      };
+  ctaCard?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        buttonLabel?: T;
+        formKey?: T;
+      };
+  related?: T;
+  tools?:
+    | T
+    | {
+        label?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              doc?: T;
+              url?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        h1?: T;
+        title?: T;
+        description?: T;
+        noindex?: T;
+        canonical?: T;
+        ogImage?: T;
+      };
+  quizPrefill?:
+    | T
+    | {
+        type?: T;
+        thickness?: T;
+        kind?: T;
+        ctaLabel?: T;
+        secondaryForm?: T;
+        secondaryLabel?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "objects_select".
+ */
+export interface ObjectsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  path?: T;
+  featured?: T;
+  sortDate?: T;
+  city?: T;
+  objectType?: T;
+  year?: T;
+  products?: T;
+  task?: T;
+  spec?:
+    | T
+    | {
+        product?: T;
+        thickness?: T;
+        kind?: T;
+        triplexFormula?: T;
+        processing?: T;
+        id?: T;
+      };
+  chips?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  photos?:
+    | T
+    | {
+        image?: T;
+        alt?: T;
+        caption?: T;
+        id?: T;
+      };
+  related?: T;
+  legacyUrls?:
+    | T
+    | {
+        url?: T;
+        id?: T;
+      };
+  legacyId?: T;
+  sourceUrl?: T;
+  importNotes?: T;
+  seo?:
+    | T
+    | {
+        h1?: T;
+        title?: T;
+        description?: T;
+        noindex?: T;
+        canonical?: T;
+        ogImage?: T;
+      };
+  quizPrefill?:
+    | T
+    | {
+        type?: T;
+        thickness?: T;
+        kind?: T;
+        ctaLabel?: T;
+        secondaryForm?: T;
+        secondaryLabel?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team_select".
+ */
+export interface TeamSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  area?: T;
+  photo?: T;
+  email?: T;
+  phone?: T;
+  order?: T;
+  hidden?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "thicknesses_select".
+ */
+export interface ThicknessesSelect<T extends boolean = true> {
+  n?: T;
+  group?: T;
+  slug?: T;
+  path?: T;
+  weightPerM2?: T;
+  indexable?: T;
+  kindsText?: T;
+  canPaint?: T;
+  canBend?: T;
+  sizeText?: T;
+  leadTimeText?: T;
+  podborOverride?: T;
+  obrabotkaOverride?: T;
+  faqOverride?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  internalApplications?: T;
+  card?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        image?: T;
+        icon?: T;
+        priceHint?: T;
+      };
+  layout?:
+    | T
+    | {
+        hero?: T | HeroBlockSelect<T>;
+        richText?: T | RichTextBlockSelect<T>;
+        table?: T | TableBlockSelect<T>;
+        steps?: T | StepsBlockSelect<T>;
+        callout?: T | CalloutBlockSelect<T>;
+        terms?: T | TermsBlockSelect<T>;
+        cards?: T | CardsBlockSelect<T>;
+        collectionCards?: T | CollectionCardsBlockSelect<T>;
+        pricesTable?: T | PricesTableBlockSelect<T>;
+        faq?: T | FaqBlockSelect<T>;
+        cta?: T | CtaBlockSelect<T>;
+        compare?: T | CompareBlockSelect<T>;
+        download?: T | DownloadBlockSelect<T>;
+        holesCalculator?: T | HolesCalculatorBlockSelect<T>;
+        weightCalculator?: T | WeightCalculatorBlockSelect<T>;
+        form?: T | FormBlockSelect<T>;
+        snippet?: T | SnippetBlockSelect<T>;
+        stats?: T | StatsBlockSelect<T>;
+        objectsFeed?: T | ObjectsFeedBlockSelect<T>;
+        articlesFeed?: T | ArticlesFeedBlockSelect<T>;
+        whoDoesWhat?: T | WhoDoesWhatBlockSelect<T>;
+        systems?: T | SystemsBlockSelect<T>;
+        gallery?: T | GalleryBlockSelect<T>;
+        twoColumns?: T | TwoColumnsBlockSelect<T>;
+        linkList?: T | LinkListBlockSelect<T>;
+        contactsMap?: T | ContactsMapBlockSelect<T>;
+        requisites?: T | RequisitesBlockSelect<T>;
+        teamGrid?: T | TeamGridBlockSelect<T>;
+        quizCta?: T | QuizCtaBlockSelect<T>;
+      };
+  seo?:
+    | T
+    | {
+        h1?: T;
+        title?: T;
+        titleNoPrice?: T;
+        description?: T;
+        noindex?: T;
+        canonical?: T;
+        ogImage?: T;
+      };
+  quizPrefill?:
+    | T
+    | {
+        type?: T;
+        thickness?: T;
+        kind?: T;
+        ctaLabel?: T;
+        secondaryForm?: T;
+        secondaryLabel?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "thickness-groups_select".
+ */
+export interface ThicknessGroupsSelect<T extends boolean = true> {
+  label?: T;
+  order?: T;
+  slug?: T;
+  thicknesses?: T;
+  podborText?: T;
+  obrabotkaText?: T;
+  faq?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "glass-types_select".
+ */
+export interface GlassTypesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  urlBase?: T;
+  path?: T;
+  breadcrumbLabel?: T;
+  order?: T;
+  showInHub?: T;
+  card?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        image?: T;
+        icon?: T;
+        priceHint?: T;
+      };
+  heroImage?: T;
+  intro?: T;
+  heroPhotos?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  variantsHeading?: T;
+  variants?:
+    | T
+    | {
+        key?: T;
+        name?: T;
+        description?: T;
+        application?: T;
+        swatchKind?: T;
+        swatchColor?: T;
+        patternKey?: T;
+        swatchImage?: T;
+        id?: T;
+      };
+  variantsNote?: T;
+  variantsCallout?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+      };
+  tables?:
+    | T
+    | {
+        heading?: T;
+        lead?: T;
+        role?: T;
+        mobileMode?: T;
+        columns?:
+          | T
+          | {
+              label?: T;
+              align?: T;
+              numeric?: T;
+              id?: T;
+            };
+        rows?:
+          | T
+          | {
+              cells?:
+                | T
+                | {
+                    value?: T;
+                    positive?: T;
+                    href?: T;
+                    id?: T;
+                  };
+              rowHref?: T;
+              id?: T;
+            };
+        footnote?: T;
+        id?: T;
+      };
+  importantTitle?: T;
+  importantItems?:
+    | T
+    | {
+        lead?: T;
+        text?: T;
+        id?: T;
+      };
+  limits?:
+    | T
+    | {
+        thickMin?: T;
+        thickMax?: T;
+        allowedThicknesses?: T;
+        sizeMinW?: T;
+        sizeMinH?: T;
+        sizeMaxW?: T;
+        sizeMaxH?: T;
+        radius?:
+          | T
+          | {
+              thicknessFrom?: T;
+              thicknessTo?: T;
+              minRadius?: T;
+              id?: T;
+            };
+        notes?: T;
+      };
+  applications?:
+    | T
+    | {
+        text?: T;
+        description?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              doc?: T;
+              url?: T;
+              label?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  relatedLinks?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              doc?: T;
+              url?: T;
+              label?: T;
+              newTab?: T;
+            };
+        description?: T;
+        id?: T;
+      };
+  showSamples?: T;
+  samplesSnippetKey?: T;
+  showObjects?: T;
+  objectsProduct?: T;
+  faq?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  layout?:
+    | T
+    | {
+        hero?: T | HeroBlockSelect<T>;
+        richText?: T | RichTextBlockSelect<T>;
+        table?: T | TableBlockSelect<T>;
+        steps?: T | StepsBlockSelect<T>;
+        callout?: T | CalloutBlockSelect<T>;
+        terms?: T | TermsBlockSelect<T>;
+        cards?: T | CardsBlockSelect<T>;
+        collectionCards?: T | CollectionCardsBlockSelect<T>;
+        pricesTable?: T | PricesTableBlockSelect<T>;
+        faq?: T | FaqBlockSelect<T>;
+        cta?: T | CtaBlockSelect<T>;
+        compare?: T | CompareBlockSelect<T>;
+        download?: T | DownloadBlockSelect<T>;
+        holesCalculator?: T | HolesCalculatorBlockSelect<T>;
+        weightCalculator?: T | WeightCalculatorBlockSelect<T>;
+        form?: T | FormBlockSelect<T>;
+        snippet?: T | SnippetBlockSelect<T>;
+        stats?: T | StatsBlockSelect<T>;
+        objectsFeed?: T | ObjectsFeedBlockSelect<T>;
+        articlesFeed?: T | ArticlesFeedBlockSelect<T>;
+        whoDoesWhat?: T | WhoDoesWhatBlockSelect<T>;
+        systems?: T | SystemsBlockSelect<T>;
+        gallery?: T | GalleryBlockSelect<T>;
+        twoColumns?: T | TwoColumnsBlockSelect<T>;
+        linkList?: T | LinkListBlockSelect<T>;
+        contactsMap?: T | ContactsMapBlockSelect<T>;
+        requisites?: T | RequisitesBlockSelect<T>;
+        teamGrid?: T | TeamGridBlockSelect<T>;
+        quizCta?: T | QuizCtaBlockSelect<T>;
+      };
+  seo?:
+    | T
+    | {
+        h1?: T;
+        title?: T;
+        description?: T;
+        noindex?: T;
+        canonical?: T;
+        ogImage?: T;
+      };
+  quizPrefill?:
+    | T
+    | {
+        type?: T;
+        thickness?: T;
+        kind?: T;
+        ctaLabel?: T;
+        secondaryForm?: T;
+        secondaryLabel?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "processing-services_select".
+ */
+export interface ProcessingServicesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  path?: T;
+  order?: T;
+  card?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        image?: T;
+        icon?: T;
+        priceHint?: T;
+      };
+  keyLimit?: T;
+  heroImage?: T;
+  intro?: T;
+  tables?:
+    | T
+    | {
+        heading?: T;
+        lead?: T;
+        role?: T;
+        mobileMode?: T;
+        columns?:
+          | T
+          | {
+              label?: T;
+              align?: T;
+              numeric?: T;
+              id?: T;
+            };
+        rows?:
+          | T
+          | {
+              cells?:
+                | T
+                | {
+                    value?: T;
+                    positive?: T;
+                    href?: T;
+                    id?: T;
+                  };
+              rowHref?: T;
+              id?: T;
+            };
+        footnote?: T;
+        id?: T;
+      };
+  howToSpecify?: T;
+  importantTitle?: T;
+  importantItems?:
+    | T
+    | {
+        lead?: T;
+        text?: T;
+        id?: T;
+      };
+  callouts?:
+    | T
+    | {
+        tone?: T;
+        title?: T;
+        body?: T;
+        id?: T;
+      };
+  hasHoleCalculator?: T;
+  ctaPrimaryLabel?: T;
+  ctaSecondaryLabel?: T;
+  relatedLinks?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              doc?: T;
+              url?: T;
+              label?: T;
+              newTab?: T;
+            };
+        description?: T;
+        id?: T;
+      };
+  faq?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  layout?:
+    | T
+    | {
+        hero?: T | HeroBlockSelect<T>;
+        richText?: T | RichTextBlockSelect<T>;
+        table?: T | TableBlockSelect<T>;
+        steps?: T | StepsBlockSelect<T>;
+        callout?: T | CalloutBlockSelect<T>;
+        terms?: T | TermsBlockSelect<T>;
+        cards?: T | CardsBlockSelect<T>;
+        collectionCards?: T | CollectionCardsBlockSelect<T>;
+        pricesTable?: T | PricesTableBlockSelect<T>;
+        faq?: T | FaqBlockSelect<T>;
+        cta?: T | CtaBlockSelect<T>;
+        compare?: T | CompareBlockSelect<T>;
+        download?: T | DownloadBlockSelect<T>;
+        holesCalculator?: T | HolesCalculatorBlockSelect<T>;
+        weightCalculator?: T | WeightCalculatorBlockSelect<T>;
+        form?: T | FormBlockSelect<T>;
+        snippet?: T | SnippetBlockSelect<T>;
+        stats?: T | StatsBlockSelect<T>;
+        objectsFeed?: T | ObjectsFeedBlockSelect<T>;
+        articlesFeed?: T | ArticlesFeedBlockSelect<T>;
+        whoDoesWhat?: T | WhoDoesWhatBlockSelect<T>;
+        systems?: T | SystemsBlockSelect<T>;
+        gallery?: T | GalleryBlockSelect<T>;
+        twoColumns?: T | TwoColumnsBlockSelect<T>;
+        linkList?: T | LinkListBlockSelect<T>;
+        contactsMap?: T | ContactsMapBlockSelect<T>;
+        requisites?: T | RequisitesBlockSelect<T>;
+        teamGrid?: T | TeamGridBlockSelect<T>;
+        quizCta?: T | QuizCtaBlockSelect<T>;
+      };
+  seo?:
+    | T
+    | {
+        h1?: T;
+        title?: T;
+        description?: T;
+        noindex?: T;
+        canonical?: T;
+        ogImage?: T;
+      };
+  quizPrefill?:
+    | T
+    | {
+        type?: T;
+        thickness?: T;
+        kind?: T;
+        ctaLabel?: T;
+        secondaryForm?: T;
+        secondaryLabel?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "constructions_select".
+ */
+export interface ConstructionsSelect<T extends boolean = true> {
+  title?: T;
+  kind?: T;
+  group?: T;
+  parent?: T;
+  slug?: T;
+  path?: T;
+  breadcrumbLabel?: T;
+  order?: T;
+  productTag?: T;
+  children?: T;
+  card?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        image?: T;
+        icon?: T;
+        priceHint?: T;
+      };
+  heroImage?: T;
+  intro?: T;
+  ctaPrimaryLabel?: T;
+  ctaSecondaryLabel?: T;
+  secondaryFormKey?: T;
+  systemsHeading?: T;
+  systemsLayout?: T;
+  systems?:
+    | T
+    | {
+        name?: T;
+        subtitle?: T;
+        whereFits?: T;
+        important?: T;
+        howHeld?: T;
+        requiresInGlass?: T;
+        image?: T;
+        schemeSvg?: T;
+        id?: T;
+      };
+  profileSystems?:
+    | T
+    | {
+        name?: T;
+        note?: T;
+        url?: T;
+        id?: T;
+      };
+  glassHeading?: T;
+  glassBullets?:
+    | T
+    | {
+        body?: T;
+        id?: T;
+      };
+  tables?:
+    | T
+    | {
+        heading?: T;
+        lead?: T;
+        role?: T;
+        mobileMode?: T;
+        columns?:
+          | T
+          | {
+              label?: T;
+              align?: T;
+              numeric?: T;
+              id?: T;
+            };
+        rows?:
+          | T
+          | {
+              cells?:
+                | T
+                | {
+                    value?: T;
+                    positive?: T;
+                    href?: T;
+                    id?: T;
+                  };
+              rowHref?: T;
+              id?: T;
+            };
+        footnote?: T;
+        id?: T;
+      };
+  riskCallout?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        body?: T;
+      };
+  documents?: T;
+  objectsHeading?: T;
+  whoDoesWhat?:
+    | T
+    | {
+        enabled?: T;
+        leftItems?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        rightItems?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+      };
+  inexSuBridge?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        text?: T;
+        buttonLabel?: T;
+        url?: T;
+      };
+  snowCalcBlock?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        body?: T;
+        sideText?: T;
+        ctaLabel?: T;
+        formParams?: T;
+      };
+  showShowerConfigs?: T;
+  faq?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  layout?:
+    | T
+    | {
+        hero?: T | HeroBlockSelect<T>;
+        richText?: T | RichTextBlockSelect<T>;
+        table?: T | TableBlockSelect<T>;
+        steps?: T | StepsBlockSelect<T>;
+        callout?: T | CalloutBlockSelect<T>;
+        terms?: T | TermsBlockSelect<T>;
+        cards?: T | CardsBlockSelect<T>;
+        collectionCards?: T | CollectionCardsBlockSelect<T>;
+        pricesTable?: T | PricesTableBlockSelect<T>;
+        faq?: T | FaqBlockSelect<T>;
+        cta?: T | CtaBlockSelect<T>;
+        compare?: T | CompareBlockSelect<T>;
+        download?: T | DownloadBlockSelect<T>;
+        holesCalculator?: T | HolesCalculatorBlockSelect<T>;
+        weightCalculator?: T | WeightCalculatorBlockSelect<T>;
+        form?: T | FormBlockSelect<T>;
+        snippet?: T | SnippetBlockSelect<T>;
+        stats?: T | StatsBlockSelect<T>;
+        objectsFeed?: T | ObjectsFeedBlockSelect<T>;
+        articlesFeed?: T | ArticlesFeedBlockSelect<T>;
+        whoDoesWhat?: T | WhoDoesWhatBlockSelect<T>;
+        systems?: T | SystemsBlockSelect<T>;
+        gallery?: T | GalleryBlockSelect<T>;
+        twoColumns?: T | TwoColumnsBlockSelect<T>;
+        linkList?: T | LinkListBlockSelect<T>;
+        contactsMap?: T | ContactsMapBlockSelect<T>;
+        requisites?: T | RequisitesBlockSelect<T>;
+        teamGrid?: T | TeamGridBlockSelect<T>;
+        quizCta?: T | QuizCtaBlockSelect<T>;
+      };
+  legacyUrls?:
+    | T
+    | {
+        url?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        h1?: T;
+        title?: T;
+        description?: T;
+        noindex?: T;
+        canonical?: T;
+        ogImage?: T;
+      };
+  quizPrefill?:
+    | T
+    | {
+        type?: T;
+        thickness?: T;
+        kind?: T;
+        ctaLabel?: T;
+        secondaryForm?: T;
+        secondaryLabel?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shower-configs_select".
+ */
+export interface ShowerConfigsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  construction?: T;
+  configType?: T;
+  glassThicknesses?: T;
+  image?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        alt?: T;
+        id?: T;
+      };
+  description?: T;
+  order?: T;
+  legacyUrl?: T;
+  legacyId?: T;
+  sourceUrl?: T;
+  importNotes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  order?: T;
+  quizType?: T;
+  construction?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "object-types_select".
+ */
+export interface ObjectTypesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cities_select".
+ */
+export interface CitiesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  region?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-files_select".
+ */
+export interface LeadFilesSelect<T extends boolean = true> {
+  lead?: T;
+  originalName?: T;
+  kind?: T;
+  source?: T;
+  sha256?: T;
+  sizeBytes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-statuses_select".
+ */
+export interface LeadStatusesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  order?: T;
+  color?: T;
+  isDefault?: T;
+  isFinal?: T;
+  requiresReason?: T;
+  isContract?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads_select".
+ */
+export interface LeadsSelect<T extends boolean = true> {
+  formType?: T;
+  sourceLabel?: T;
+  entryPage?: T;
+  pageUrl?: T;
+  referrer?: T;
+  utm?:
+    | T
+    | {
+        source?: T;
+        medium?: T;
+        campaign?: T;
+        term?: T;
+        content?: T;
+        yclid?: T;
+        gclid?: T;
+        openstat?: T;
+      };
+  metrikaClientId?: T;
+  company?: T;
+  inn?: T;
+  name?: T;
+  phone?: T;
+  phoneRaw?: T;
+  email?: T;
+  role?: T;
+  city?: T;
+  area?: T;
+  productType?: T;
+  comment?: T;
+  answers?: T;
+  answersSummary?: T;
+  estimate?:
+    | T
+    | {
+        from?: T;
+        priceDate?: T;
+        shown?: T;
+      };
+  flags?: T;
+  files?: T;
+  status?: T;
+  statusChangedAt?: T;
+  refuseReason?: T;
+  assignee?: T;
+  internalComments?:
+    | T
+    | {
+        author?: T;
+        text?: T;
+        date?: T;
+        id?: T;
+      };
+  isDuplicate?: T;
+  duplicateOf?: T;
+  duplicateReason?: T;
+  consent?: T;
+  orders?: T;
+  newLeadNotifiedAt?: T;
+  assigneeNotifiedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  number?: T;
+  lead?: T;
+  company?: T;
+  composition?: T;
+  clientName?: T;
+  clientEmail?: T;
+  clientPhone?: T;
+  notifyClient?: T;
+  manager?: T;
+  statusHistory?:
+    | T
+    | {
+        status?: T;
+        date?: T;
+        plannedDate?: T;
+        note?: T;
+        id?: T;
+      };
+  currentStatus?: T;
+  clientComment?:
+    | T
+    | {
+        text?: T;
+        updatedAt?: T;
+      };
+  packPhotos?:
+    | T
+    | {
+        photo?: T;
+        caption?: T;
+        id?: T;
+      };
+  shipment?:
+    | T
+    | {
+        carrier?: T;
+        waybill?: T;
+        trackingUrl?: T;
+      };
+  documents?:
+    | T
+    | {
+        title?: T;
+        kind?: T;
+        file?: T;
+        id?: T;
+      };
+  tokenHash?: T;
+  tokenCreatedAt?: T;
+  tokenReissueCount?: T;
+  revoked?: T;
+  receivedAt?: T;
+  expiresAt?: T;
+  lastNotifiedStatus?: T;
+  lastNotifiedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "order-files_select".
+ */
+export interface OrderFilesSelect<T extends boolean = true> {
+  kind?: T;
+  caption?: T;
+  uploadedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        preview?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "consent-log_select".
+ */
+export interface ConsentLogSelect<T extends boolean = true> {
+  lead?: T;
+  formType?: T;
+  consentVersion?: T;
+  policyVersion?: T;
+  consentText?: T;
+  ip?: T;
+  userAgent?: T;
+  pageUrl?: T;
+  givenAt?: T;
+  phoneHash?: T;
+  emailHash?: T;
+  anonymizedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  to?: T;
+  code?: T;
+  active?: T;
+  note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rate-limits_select".
+ */
+export interface RateLimitsSelect<T extends boolean = true> {
+  key?: T;
+  count?: T;
+  windowStart?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -276,6 +6264,1825 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * Цены «от» за м² по толщинам. Если дата цен старше порога, на сайте вместо цифры выводится «Цена по расчёту».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "prices".
+ */
+export interface Price {
+  id: string;
+  /**
+   * Ровно 8 строк — по одной на толщину 4, 5, 6, 8, 10, 12, 15, 19 мм.
+   */
+  rows: {
+    thickness: number;
+    priceFrom?: number | null;
+    onRequest?: boolean | null;
+    /**
+     * Например: «закалка по согласованию»
+     */
+    note?: string | null;
+    id?: string | null;
+  }[];
+  /**
+   * От этой даты считается правило «Цена по расчёту».
+   */
+  priceDate: string;
+  staleAfterDays: number;
+  /**
+   * {дата_цен} подставляется в формате ДД.ММ.ГГГГ.
+   */
+  caption: string;
+  onRequestLabel: string;
+  staleLabel: string;
+  includedTitle: string;
+  included: {
+    text: string;
+    id?: string | null;
+  }[];
+  extraTitle: string;
+  /**
+   * Фацет здесь не указывается: фацет делается только на зеркалах.
+   */
+  extra: {
+    text: string;
+    id?: string | null;
+  }[];
+  footnote?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Плашка в шапке, подпись под ценами и подсказка в квизе. После даты окончания скрываются автоматически.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promo".
+ */
+export interface Promo {
+  id: string;
+  active: boolean;
+  /**
+   * Метка {акция_текст}. Обязателен, если акция включена.
+   */
+  text?: string | null;
+  /**
+   * Если пусто — используется текст акции.
+   */
+  badgeText?: string | null;
+  startDate?: string | null;
+  /**
+   * Обязательна для активной акции. После этой даты акция скрывается на сайте.
+   */
+  endDate?: string | null;
+  /**
+   * С этой площади в квизе показывается подсказка об акции.
+   */
+  thresholdArea: number;
+  /**
+   * Справочно.
+   */
+  discountPercent?: number | null;
+  /**
+   * Куда ведут пункт «Акции» и плашка.
+   */
+  linkUrl: string;
+  /**
+   * Если пусто — используется текст акции ({акция_текст}).
+   */
+  quizHint?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Метка {условия}, полоса условий и блок «Что нужно учесть».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "conditions".
+ */
+export interface Condition {
+  id: string;
+  /**
+   * Порог флага «малый объём» в квизе.
+   */
+  minOrderM2: number;
+  minOrderText: string;
+  minOrderFaqText: string;
+  /**
+   * Порог флага «срочно» в квизе.
+   */
+  leadTimeDays: number;
+  triplexLeadTimeDays: number;
+  leadTimeText: string;
+  triplexLeadTimeText: string;
+  kpDaysMin: number;
+  kpDaysMax: number;
+  kpText: string;
+  priceFixedText: string;
+  noUrgentText: string;
+  noInstallText: string;
+  inlineText: string;
+  termsBar: {
+    text: string;
+    /**
+     * Имя иконки Lucide, например check.
+     */
+    icon?: string | null;
+    id?: string | null;
+  }[];
+  /**
+   * Для страниц видов стекла — без «Цена в договоре фиксируется».
+   */
+  termsBarShort?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  calloutTitle: string;
+  callout?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Телефоны, e-mail, адреса и мессенджеры. Метки {контакты} и {телефон} (основной телефон).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts".
+ */
+export interface Contact {
+  id: string;
+  brandName: string;
+  copyrightHolder: string;
+  /**
+   * Ссылка tel: строится из цифр номера.
+   */
+  phones: {
+    /**
+     * В формате отображения: +7 (351) 247-05-57
+     */
+    number: string;
+    label?: string | null;
+    isPrimary?: boolean | null;
+    id?: string | null;
+  }[];
+  emails: {
+    address: string;
+    label?: string | null;
+    isPrimary?: boolean | null;
+    id?: string | null;
+  }[];
+  workHours: {
+    full: string;
+    short: string;
+  };
+  callPrompt: string;
+  locations: {
+    /**
+     * Например: chelyabinsk-office
+     */
+    key: string;
+    type: 'office' | 'warehouse';
+    title: string;
+    city: string;
+    address: string;
+    postalCode?: string | null;
+    region?: string | null;
+    phones?:
+      | {
+          number: string;
+          id?: string | null;
+        }[]
+      | null;
+    email?: string | null;
+    hours: string;
+    lat?: number | null;
+    lng?: number | null;
+    mapUrl?: string | null;
+    localBusiness?: boolean | null;
+    id?: string | null;
+  }[];
+  /**
+   * Выпадающий список «Связаться с нами» в шапке.
+   */
+  messengers?:
+    | {
+        name: string;
+        url: string;
+        icon: 'telegram' | 'whatsapp' | 'max' | 'viber' | 'vk' | 'other';
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Профили компании для JSON-LD Organization.
+   */
+  sameAs?:
+    | {
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  inlineText: string;
+  inexSuUrl: string;
+  inexSuFooterLabel: string;
+  inexSuBridgeLabel: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Метка {реквизиты}, блок реквизитов на странице контактов, тексты ПДн.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "requisites".
+ */
+export interface Requisite {
+  id: string;
+  legalName?: string | null;
+  shortName?: string | null;
+  inn?: string | null;
+  ogrnip?: string | null;
+  ogrn?: string | null;
+  kpp?: string | null;
+  actualAddress?: string | null;
+  legalAddress?: string | null;
+  /**
+   * Юридический адрес — жилое помещение: не публиковать без решения Inex.
+   */
+  publishLegalAddress?: boolean | null;
+  /**
+   * Если пусто — берётся из «Контактов».
+   */
+  phone?: string | null;
+  /**
+   * Если пусто — берётся из «Контактов».
+   */
+  email?: string | null;
+  bank?: {
+    name?: string | null;
+    bik?: string | null;
+    account?: string | null;
+    corrAccount?: string | null;
+  };
+  cardPdf?: (string | null) | Media;
+  cardLabel?: string | null;
+  inlineText?: string | null;
+  pdContactEmail?: string | null;
+  pdPostalAddress?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Единый источник ограничений для квиза, калькуляторов и шаблонов страниц. Размеры — в мм.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tech-params".
+ */
+export interface TechParam {
+  id: string;
+  thicknesses: number[];
+  /**
+   * Нестандартный размер: меньшая сторона < мин. ширины, большая < мин. высоты, большая > макс. ширины или меньшая > макс. высоты.
+   */
+  flat: {
+    minW: number;
+    minH: number;
+    maxW: number;
+    maxH: number;
+  };
+  painted: {
+    thickMin: number;
+    thickMax: number;
+    minW: number;
+    minH: number;
+    maxW: number;
+    maxH: number;
+  };
+  bent: {
+    thickMin: number;
+    thickMax: number;
+    minW: number;
+    minH: number;
+    maxW: number;
+    maxH: number;
+    radius: {
+      thicknessFrom: number;
+      thicknessTo: number;
+      minRadius: number;
+      id?: string | null;
+    }[];
+  };
+  print: {
+    thickMin: number;
+    thickMax: number;
+    maxW: number;
+    maxH: number;
+  };
+  /**
+   * Ключ (латиница) меняет только разработчик: он совпадает с id в коде квиза, URL и заявках.
+   */
+  tintColors: {
+    key: 'bronze' | 'graphite' | 'grey';
+    name: string;
+    id?: string | null;
+  }[];
+  ribbed: {
+    thicknesses: number[];
+  };
+  facet: {
+    mirrorsOnly: boolean;
+    widths: number[];
+    minGlassThickness: number;
+  };
+  mirrors: {
+    /**
+     * Зеркала для залов — максимум 2,8 м.
+     */
+    maxSizeMm: number;
+  };
+  triplex: {
+    rawMaxW: number;
+    rawMaxH: number;
+    temperedMaxW: number;
+    temperedMaxH: number;
+  };
+  clampProfileThicknesses: number[];
+  holes: {
+    diameterMin: number;
+    diameterMax: number;
+    diameterMaxOneSide: number;
+    glassMinW: number;
+    glassMinH: number;
+    glassMaxW: number;
+    glassMaxH: number;
+    glassThicknessMin: number;
+    glassThicknessMaxTwoSides: number;
+    glassThicknessMaxOneSide: number;
+    edgeFactor: number;
+    betweenFactor: number;
+    cornerFactor: number;
+    minDiameterFactor: number;
+    cutoutInnerRadiusMin: number;
+    toleranceRanges: {
+      from: number;
+      /**
+       * Пусто — без верхней границы.
+       */
+      to?: number | null;
+      /**
+       * Пусто — «по согласованию».
+       */
+      tolerance?: number | null;
+      label?: string | null;
+      id?: string | null;
+    }[];
+  };
+  weight: {
+    kgPerM2PerMm: number;
+    filmUnitThickness: number;
+    filmUnitWeight: number;
+    filmLayers: number[];
+  };
+  /**
+   * По весу одного стекла. Тексты — дословно из teksty/10-blog-kalkulyator.md §1.
+   */
+  carryHints?:
+    | {
+        /**
+         * Пусто — «больше».
+         */
+        upToKg?: number | null;
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Значения таблицы 2 ГОСТ 30698-2014 (плоскостность) сверить с оригиналом стандарта.
+   */
+  gost: {
+    tempered: string;
+    triplex: string;
+    sizeTolerance: {
+      sizeRange: string;
+      upTo12: string;
+      over12: string;
+      id?: string | null;
+    }[];
+    flatness: {
+      thicknessRange: string;
+      general: string;
+      local: string;
+      id?: string | null;
+    }[];
+  };
+  deliveryCities: {
+    name: string;
+    kind: 'city' | 'other' | 'pickup';
+    id?: string | null;
+  }[];
+  /**
+   * Ключ (латиница) меняет только разработчик: он совпадает с id в коде квиза, URL и заявках.
+   */
+  quizOptions: {
+    /**
+     * Ключ (латиница) меняет только разработчик: он совпадает с id в коде квиза, URL и заявках.
+     */
+    productTypes: {
+      key: string;
+      label: string;
+      /**
+       * Имя иконки Lucide.
+       */
+      icon?: string | null;
+      id?: string | null;
+    }[];
+    /**
+     * Ключ (латиница) меняет только разработчик: он совпадает с id в коде квиза, URL и заявках.
+     */
+    kinds: {
+      key: string;
+      label: string;
+      id?: string | null;
+    }[];
+    /**
+     * Ключ (латиница) меняет только разработчик: он совпадает с id в коде квиза, URL и заявках.
+     */
+    edges: {
+      key: string;
+      label: string;
+      /**
+       * Пусто — для всех типов.
+       */
+      onlyForTypes?:
+        | (
+            | 'tempered'
+            | 'triplex'
+            | 'partitions'
+            | 'railings'
+            | 'shower'
+            | 'canopies'
+            | 'facade'
+            | 'shopfronts'
+            | 'verandas'
+            | 'mirrors'
+            | 'other'
+          )[]
+        | null;
+      id?: string | null;
+    }[];
+    /**
+     * Ключ (латиница) меняет только разработчик: он совпадает с id в коде квиза, URL и заявках.
+     */
+    decor: {
+      key: string;
+      label: string;
+      id?: string | null;
+    }[];
+    /**
+     * Ключ (латиница) меняет только разработчик: он совпадает с id в коде квиза, URL и заявках.
+     */
+    stamp: {
+      key: string;
+      label: string;
+      id?: string | null;
+    }[];
+    /**
+     * Ключ (латиница) меняет только разработчик: он совпадает с id в коде квиза, URL и заявках.
+     */
+    packaging: {
+      key: string;
+      label: string;
+      id?: string | null;
+    }[];
+    /**
+     * Ключ (латиница) меняет только разработчик: он совпадает с id в коде квиза, URL и заявках.
+     */
+    roles: {
+      key: string;
+      label: string;
+      id?: string | null;
+    }[];
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: string;
+  /**
+   * Единственно допустимая формулировка: «За 21 год специалисты Inex выполнили более 1500 проектов». Меняйте только по согласованию с Inex.
+   */
+  experienceText: string;
+  experienceYears: number;
+  /**
+   * Отсчитывается от статуса «Получено».
+   */
+  orderLinkTtlDays: number;
+  /**
+   * Праздники РФ для расчёта рабочих дней. «Рабочий день» — перенесённый рабочий день (выходной, ставший рабочим).
+   */
+  holidays?:
+    | {
+        date: string;
+        name?: string | null;
+        isWorkday?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Для аудита контента (ТЗ §11). «Завод» — названия заводов-партнёров (задаёт заказчик).
+   */
+  stopWords?:
+    | {
+        word: string;
+        kind: 'stem' | 'phrase' | 'factory';
+        id?: string | null;
+      }[]
+    | null;
+  analytics?: {
+    metrikaId?: string | null;
+    webvisor?: boolean | null;
+    yandexVerification?: string | null;
+    googleVerification?: string | null;
+  };
+  indexNow?: {
+    enabled?: boolean | null;
+  };
+  branding?: {
+    logoDark?: (string | null) | Media;
+    logoLight?: (string | null) | Media;
+    /**
+     * @2x
+     */
+    logoPng?: (string | null) | Media;
+    favicon?: (string | null) | Media;
+    defaultOgImage?: (string | null) | Media;
+  };
+  notifications?: {
+    /**
+     * Общий ящик (несколько адресов).
+     */
+    leadNotifyEmails?:
+      | {
+          email: string;
+          id?: string | null;
+        }[]
+      | null;
+    fromName?: string | null;
+    replyTo?: string | null;
+    ccAssignee?: boolean | null;
+  };
+  /**
+   * Ровно 5 статусов. Тексты писем задаёт seed.
+   */
+  orderStatuses: {
+    key: 'spec_agreed' | 'in_production' | 'packed' | 'shipped' | 'received';
+    label: string;
+    emailText?: string | null;
+    id?: string | null;
+  }[];
+  orderPage?: {
+    expiredTitle?: string | null;
+    emptyPhotosText?: string | null;
+    copyLabel?: string | null;
+    copiedLabel?: string | null;
+    /**
+     * Метки: {номер}, {статус}.
+     */
+    emailSubject?: string | null;
+    emailButton?: string | null;
+    emailSignatureTitle?: string | null;
+    emailFooterNote?: string | null;
+  };
+  forms: {
+    thankYouTitle?: string | null;
+    thankYouText?: string | null;
+    submitErrorText?: string | null;
+    antispamMinSeconds: number;
+    antispamMaxHours: number;
+  };
+  consent?: {
+    /**
+     * Например: 2026-10-20. Пишется в журнал согласий.
+     */
+    consentVersion?: string | null;
+    policyVersion?: string | null;
+    errorText?: string | null;
+  };
+  cookieBanner?: {
+    /**
+     * Слова в {фигурных скобках} — ссылка на политику.
+     */
+    text?: string | null;
+    acceptLabel?: string | null;
+    necessaryLabel?: string | null;
+  };
+  notFound?: {
+    title?: string | null;
+    text?: string | null;
+    linksTitle?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Меню шапки и подвала.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "navigation".
+ */
+export interface Navigation {
+  id: string;
+  topBar: {
+    companyLabel: string;
+    companyItems?:
+      | {
+          link: {
+            type?: ('doc' | 'custom') | null;
+            doc?:
+              | ({
+                  relationTo: 'pages';
+                  value: string | Page;
+                } | null)
+              | ({
+                  relationTo: 'glass-types';
+                  value: string | GlassType;
+                } | null)
+              | ({
+                  relationTo: 'thicknesses';
+                  value: string | Thickness;
+                } | null)
+              | ({
+                  relationTo: 'processing-services';
+                  value: string | ProcessingService;
+                } | null)
+              | ({
+                  relationTo: 'constructions';
+                  value: string | Construction;
+                } | null)
+              | ({
+                  relationTo: 'articles';
+                  value: string | Article;
+                } | null)
+              | ({
+                  relationTo: 'objects';
+                  value: string | Object;
+                } | null);
+            /**
+             * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+             */
+            url?: string | null;
+            label: string;
+            newTab?: boolean | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    contactLabel: string;
+    showPhone?: boolean | null;
+    showEmail?: boolean | null;
+    showMessengers?: boolean | null;
+    callbackLabel: string;
+    segments?:
+      | {
+          link: {
+            type?: ('doc' | 'custom') | null;
+            doc?:
+              | ({
+                  relationTo: 'pages';
+                  value: string | Page;
+                } | null)
+              | ({
+                  relationTo: 'glass-types';
+                  value: string | GlassType;
+                } | null)
+              | ({
+                  relationTo: 'thicknesses';
+                  value: string | Thickness;
+                } | null)
+              | ({
+                  relationTo: 'processing-services';
+                  value: string | ProcessingService;
+                } | null)
+              | ({
+                  relationTo: 'constructions';
+                  value: string | Construction;
+                } | null)
+              | ({
+                  relationTo: 'articles';
+                  value: string | Article;
+                } | null)
+              | ({
+                  relationTo: 'objects';
+                  value: string | Object;
+                } | null);
+            /**
+             * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+             */
+            url?: string | null;
+            label: string;
+            newTab?: boolean | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Показывается только при активной акции.
+   */
+  actionsLink: {
+    label: string;
+    url: string;
+  };
+  mainRow: {
+    pills?:
+      | {
+          key: 'catalog' | 'services';
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+    links?:
+      | {
+          link: {
+            type?: ('doc' | 'custom') | null;
+            doc?:
+              | ({
+                  relationTo: 'pages';
+                  value: string | Page;
+                } | null)
+              | ({
+                  relationTo: 'glass-types';
+                  value: string | GlassType;
+                } | null)
+              | ({
+                  relationTo: 'thicknesses';
+                  value: string | Thickness;
+                } | null)
+              | ({
+                  relationTo: 'processing-services';
+                  value: string | ProcessingService;
+                } | null)
+              | ({
+                  relationTo: 'constructions';
+                  value: string | Construction;
+                } | null)
+              | ({
+                  relationTo: 'articles';
+                  value: string | Article;
+                } | null)
+              | ({
+                  relationTo: 'objects';
+                  value: string | Object;
+                } | null);
+            /**
+             * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+             */
+            url?: string | null;
+            label: string;
+            newTab?: boolean | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    searchLabel: string;
+    searchPlaceholder: string;
+    ctaLabel: string;
+    callbackLabel: string;
+    myCalcLabel: string;
+    myCalcUrl: string;
+  };
+  sectionRow: {
+    items?:
+      | {
+          link: {
+            type?: ('doc' | 'custom') | null;
+            doc?:
+              | ({
+                  relationTo: 'pages';
+                  value: string | Page;
+                } | null)
+              | ({
+                  relationTo: 'glass-types';
+                  value: string | GlassType;
+                } | null)
+              | ({
+                  relationTo: 'thicknesses';
+                  value: string | Thickness;
+                } | null)
+              | ({
+                  relationTo: 'processing-services';
+                  value: string | ProcessingService;
+                } | null)
+              | ({
+                  relationTo: 'constructions';
+                  value: string | Construction;
+                } | null)
+              | ({
+                  relationTo: 'articles';
+                  value: string | Article;
+                } | null)
+              | ({
+                  relationTo: 'objects';
+                  value: string | Object;
+                } | null);
+            /**
+             * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+             */
+            url?: string | null;
+            label: string;
+            newTab?: boolean | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Остальные разделы — под «Ещё».
+     */
+    laptopVisibleCount: number;
+    moreLabel: string;
+  };
+  megaMenus?:
+    | {
+        key: 'catalog' | 'services';
+        label: string;
+        columns?:
+          | {
+              title: string;
+              links?:
+                | {
+                    link: {
+                      type?: ('doc' | 'custom') | null;
+                      doc?:
+                        | ({
+                            relationTo: 'pages';
+                            value: string | Page;
+                          } | null)
+                        | ({
+                            relationTo: 'glass-types';
+                            value: string | GlassType;
+                          } | null)
+                        | ({
+                            relationTo: 'thicknesses';
+                            value: string | Thickness;
+                          } | null)
+                        | ({
+                            relationTo: 'processing-services';
+                            value: string | ProcessingService;
+                          } | null)
+                        | ({
+                            relationTo: 'constructions';
+                            value: string | Construction;
+                          } | null)
+                        | ({
+                            relationTo: 'articles';
+                            value: string | Article;
+                          } | null)
+                        | ({
+                            relationTo: 'objects';
+                            value: string | Object;
+                          } | null);
+                      /**
+                       * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+                       */
+                      url?: string | null;
+                      label: string;
+                      newTab?: boolean | null;
+                    };
+                    hint?: string | null;
+                    /**
+                     * Например, толщины: 4, 6, 8, 10, 12 мм.
+                     */
+                    subLinks?:
+                      | {
+                          label: string;
+                          url: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+        promoCard: {
+          enabled?: boolean | null;
+          title: string;
+          text?: string | null;
+          buttonLabel: string;
+          buttonKind: 'quiz' | 'link';
+          url?: string | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  footer?: {
+    /**
+     * «Каталог», «Услуги», «Компания». Колонка «Контакты» строится из справочника «Контакты».
+     */
+    columns?:
+      | {
+          title: string;
+          links?:
+            | {
+                link: {
+                  type?: ('doc' | 'custom') | null;
+                  doc?:
+                    | ({
+                        relationTo: 'pages';
+                        value: string | Page;
+                      } | null)
+                    | ({
+                        relationTo: 'glass-types';
+                        value: string | GlassType;
+                      } | null)
+                    | ({
+                        relationTo: 'thicknesses';
+                        value: string | Thickness;
+                      } | null)
+                    | ({
+                        relationTo: 'processing-services';
+                        value: string | ProcessingService;
+                      } | null)
+                    | ({
+                        relationTo: 'constructions';
+                        value: string | Construction;
+                      } | null)
+                    | ({
+                        relationTo: 'articles';
+                        value: string | Article;
+                      } | null)
+                    | ({
+                        relationTo: 'objects';
+                        value: string | Object;
+                      } | null);
+                  /**
+                   * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+                   */
+                  url?: string | null;
+                  label: string;
+                  newTab?: boolean | null;
+                };
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+    bottomLinks?:
+      | {
+          link: {
+            type?: ('doc' | 'custom') | null;
+            doc?:
+              | ({
+                  relationTo: 'pages';
+                  value: string | Page;
+                } | null)
+              | ({
+                  relationTo: 'glass-types';
+                  value: string | GlassType;
+                } | null)
+              | ({
+                  relationTo: 'thicknesses';
+                  value: string | Thickness;
+                } | null)
+              | ({
+                  relationTo: 'processing-services';
+                  value: string | ProcessingService;
+                } | null)
+              | ({
+                  relationTo: 'constructions';
+                  value: string | Construction;
+                } | null)
+              | ({
+                  relationTo: 'articles';
+                  value: string | Article;
+                } | null)
+              | ({
+                  relationTo: 'objects';
+                  value: string | Object;
+                } | null);
+            /**
+             * /путь/ со слешем на конце, #якорь, https://…, tel: или mailto:
+             */
+            url?: string | null;
+            label: string;
+            newTab?: boolean | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    showContactsColumn?: boolean | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Переиспользуемые блоки, которые вставляются на страницы по ключу.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "snippets".
+ */
+export interface Snippet {
+  id: string;
+  items?:
+    | {
+        /**
+         * kebab-case, например samples. Меняет разработчик.
+         */
+        key: string;
+        title?: string | null;
+        content?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        ctaLabel?: string | null;
+        ctaFormKey?: ('sample' | 'drawing' | 'callback' | 'load' | 'contacts' | 'none') | null;
+        /**
+         * Для параметризуемой формы чертежа, например { "label": "Отправить проект" }.
+         */
+        ctaFormParams?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        usageNote?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "prices_select".
+ */
+export interface PricesSelect<T extends boolean = true> {
+  rows?:
+    | T
+    | {
+        thickness?: T;
+        priceFrom?: T;
+        onRequest?: T;
+        note?: T;
+        id?: T;
+      };
+  priceDate?: T;
+  staleAfterDays?: T;
+  caption?: T;
+  onRequestLabel?: T;
+  staleLabel?: T;
+  includedTitle?: T;
+  included?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  extraTitle?: T;
+  extra?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  footnote?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promo_select".
+ */
+export interface PromoSelect<T extends boolean = true> {
+  active?: T;
+  text?: T;
+  badgeText?: T;
+  startDate?: T;
+  endDate?: T;
+  thresholdArea?: T;
+  discountPercent?: T;
+  linkUrl?: T;
+  quizHint?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "conditions_select".
+ */
+export interface ConditionsSelect<T extends boolean = true> {
+  minOrderM2?: T;
+  minOrderText?: T;
+  minOrderFaqText?: T;
+  leadTimeDays?: T;
+  triplexLeadTimeDays?: T;
+  leadTimeText?: T;
+  triplexLeadTimeText?: T;
+  kpDaysMin?: T;
+  kpDaysMax?: T;
+  kpText?: T;
+  priceFixedText?: T;
+  noUrgentText?: T;
+  noInstallText?: T;
+  inlineText?: T;
+  termsBar?:
+    | T
+    | {
+        text?: T;
+        icon?: T;
+        id?: T;
+      };
+  termsBarShort?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  calloutTitle?: T;
+  callout?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts_select".
+ */
+export interface ContactsSelect<T extends boolean = true> {
+  brandName?: T;
+  copyrightHolder?: T;
+  phones?:
+    | T
+    | {
+        number?: T;
+        label?: T;
+        isPrimary?: T;
+        id?: T;
+      };
+  emails?:
+    | T
+    | {
+        address?: T;
+        label?: T;
+        isPrimary?: T;
+        id?: T;
+      };
+  workHours?:
+    | T
+    | {
+        full?: T;
+        short?: T;
+      };
+  callPrompt?: T;
+  locations?:
+    | T
+    | {
+        key?: T;
+        type?: T;
+        title?: T;
+        city?: T;
+        address?: T;
+        postalCode?: T;
+        region?: T;
+        phones?:
+          | T
+          | {
+              number?: T;
+              id?: T;
+            };
+        email?: T;
+        hours?: T;
+        lat?: T;
+        lng?: T;
+        mapUrl?: T;
+        localBusiness?: T;
+        id?: T;
+      };
+  messengers?:
+    | T
+    | {
+        name?: T;
+        url?: T;
+        icon?: T;
+        id?: T;
+      };
+  sameAs?:
+    | T
+    | {
+        url?: T;
+        id?: T;
+      };
+  inlineText?: T;
+  inexSuUrl?: T;
+  inexSuFooterLabel?: T;
+  inexSuBridgeLabel?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "requisites_select".
+ */
+export interface RequisitesSelect<T extends boolean = true> {
+  legalName?: T;
+  shortName?: T;
+  inn?: T;
+  ogrnip?: T;
+  ogrn?: T;
+  kpp?: T;
+  actualAddress?: T;
+  legalAddress?: T;
+  publishLegalAddress?: T;
+  phone?: T;
+  email?: T;
+  bank?:
+    | T
+    | {
+        name?: T;
+        bik?: T;
+        account?: T;
+        corrAccount?: T;
+      };
+  cardPdf?: T;
+  cardLabel?: T;
+  inlineText?: T;
+  pdContactEmail?: T;
+  pdPostalAddress?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tech-params_select".
+ */
+export interface TechParamsSelect<T extends boolean = true> {
+  thicknesses?: T;
+  flat?:
+    | T
+    | {
+        minW?: T;
+        minH?: T;
+        maxW?: T;
+        maxH?: T;
+      };
+  painted?:
+    | T
+    | {
+        thickMin?: T;
+        thickMax?: T;
+        minW?: T;
+        minH?: T;
+        maxW?: T;
+        maxH?: T;
+      };
+  bent?:
+    | T
+    | {
+        thickMin?: T;
+        thickMax?: T;
+        minW?: T;
+        minH?: T;
+        maxW?: T;
+        maxH?: T;
+        radius?:
+          | T
+          | {
+              thicknessFrom?: T;
+              thicknessTo?: T;
+              minRadius?: T;
+              id?: T;
+            };
+      };
+  print?:
+    | T
+    | {
+        thickMin?: T;
+        thickMax?: T;
+        maxW?: T;
+        maxH?: T;
+      };
+  tintColors?:
+    | T
+    | {
+        key?: T;
+        name?: T;
+        id?: T;
+      };
+  ribbed?:
+    | T
+    | {
+        thicknesses?: T;
+      };
+  facet?:
+    | T
+    | {
+        mirrorsOnly?: T;
+        widths?: T;
+        minGlassThickness?: T;
+      };
+  mirrors?:
+    | T
+    | {
+        maxSizeMm?: T;
+      };
+  triplex?:
+    | T
+    | {
+        rawMaxW?: T;
+        rawMaxH?: T;
+        temperedMaxW?: T;
+        temperedMaxH?: T;
+      };
+  clampProfileThicknesses?: T;
+  holes?:
+    | T
+    | {
+        diameterMin?: T;
+        diameterMax?: T;
+        diameterMaxOneSide?: T;
+        glassMinW?: T;
+        glassMinH?: T;
+        glassMaxW?: T;
+        glassMaxH?: T;
+        glassThicknessMin?: T;
+        glassThicknessMaxTwoSides?: T;
+        glassThicknessMaxOneSide?: T;
+        edgeFactor?: T;
+        betweenFactor?: T;
+        cornerFactor?: T;
+        minDiameterFactor?: T;
+        cutoutInnerRadiusMin?: T;
+        toleranceRanges?:
+          | T
+          | {
+              from?: T;
+              to?: T;
+              tolerance?: T;
+              label?: T;
+              id?: T;
+            };
+      };
+  weight?:
+    | T
+    | {
+        kgPerM2PerMm?: T;
+        filmUnitThickness?: T;
+        filmUnitWeight?: T;
+        filmLayers?: T;
+      };
+  carryHints?:
+    | T
+    | {
+        upToKg?: T;
+        text?: T;
+        id?: T;
+      };
+  gost?:
+    | T
+    | {
+        tempered?: T;
+        triplex?: T;
+        sizeTolerance?:
+          | T
+          | {
+              sizeRange?: T;
+              upTo12?: T;
+              over12?: T;
+              id?: T;
+            };
+        flatness?:
+          | T
+          | {
+              thicknessRange?: T;
+              general?: T;
+              local?: T;
+              id?: T;
+            };
+      };
+  deliveryCities?:
+    | T
+    | {
+        name?: T;
+        kind?: T;
+        id?: T;
+      };
+  quizOptions?:
+    | T
+    | {
+        productTypes?:
+          | T
+          | {
+              key?: T;
+              label?: T;
+              icon?: T;
+              id?: T;
+            };
+        kinds?:
+          | T
+          | {
+              key?: T;
+              label?: T;
+              id?: T;
+            };
+        edges?:
+          | T
+          | {
+              key?: T;
+              label?: T;
+              onlyForTypes?: T;
+              id?: T;
+            };
+        decor?:
+          | T
+          | {
+              key?: T;
+              label?: T;
+              id?: T;
+            };
+        stamp?:
+          | T
+          | {
+              key?: T;
+              label?: T;
+              id?: T;
+            };
+        packaging?:
+          | T
+          | {
+              key?: T;
+              label?: T;
+              id?: T;
+            };
+        roles?:
+          | T
+          | {
+              key?: T;
+              label?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  experienceText?: T;
+  experienceYears?: T;
+  orderLinkTtlDays?: T;
+  holidays?:
+    | T
+    | {
+        date?: T;
+        name?: T;
+        isWorkday?: T;
+        id?: T;
+      };
+  stopWords?:
+    | T
+    | {
+        word?: T;
+        kind?: T;
+        id?: T;
+      };
+  analytics?:
+    | T
+    | {
+        metrikaId?: T;
+        webvisor?: T;
+        yandexVerification?: T;
+        googleVerification?: T;
+      };
+  indexNow?:
+    | T
+    | {
+        enabled?: T;
+      };
+  branding?:
+    | T
+    | {
+        logoDark?: T;
+        logoLight?: T;
+        logoPng?: T;
+        favicon?: T;
+        defaultOgImage?: T;
+      };
+  notifications?:
+    | T
+    | {
+        leadNotifyEmails?:
+          | T
+          | {
+              email?: T;
+              id?: T;
+            };
+        fromName?: T;
+        replyTo?: T;
+        ccAssignee?: T;
+      };
+  orderStatuses?:
+    | T
+    | {
+        key?: T;
+        label?: T;
+        emailText?: T;
+        id?: T;
+      };
+  orderPage?:
+    | T
+    | {
+        expiredTitle?: T;
+        emptyPhotosText?: T;
+        copyLabel?: T;
+        copiedLabel?: T;
+        emailSubject?: T;
+        emailButton?: T;
+        emailSignatureTitle?: T;
+        emailFooterNote?: T;
+      };
+  forms?:
+    | T
+    | {
+        thankYouTitle?: T;
+        thankYouText?: T;
+        submitErrorText?: T;
+        antispamMinSeconds?: T;
+        antispamMaxHours?: T;
+      };
+  consent?:
+    | T
+    | {
+        consentVersion?: T;
+        policyVersion?: T;
+        errorText?: T;
+      };
+  cookieBanner?:
+    | T
+    | {
+        text?: T;
+        acceptLabel?: T;
+        necessaryLabel?: T;
+      };
+  notFound?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        linksTitle?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "navigation_select".
+ */
+export interface NavigationSelect<T extends boolean = true> {
+  topBar?:
+    | T
+    | {
+        companyLabel?: T;
+        companyItems?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    doc?: T;
+                    url?: T;
+                    label?: T;
+                    newTab?: T;
+                  };
+              id?: T;
+            };
+        contactLabel?: T;
+        showPhone?: T;
+        showEmail?: T;
+        showMessengers?: T;
+        callbackLabel?: T;
+        segments?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    doc?: T;
+                    url?: T;
+                    label?: T;
+                    newTab?: T;
+                  };
+              id?: T;
+            };
+      };
+  actionsLink?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+      };
+  mainRow?:
+    | T
+    | {
+        pills?:
+          | T
+          | {
+              key?: T;
+              label?: T;
+              id?: T;
+            };
+        links?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    doc?: T;
+                    url?: T;
+                    label?: T;
+                    newTab?: T;
+                  };
+              id?: T;
+            };
+        searchLabel?: T;
+        searchPlaceholder?: T;
+        ctaLabel?: T;
+        callbackLabel?: T;
+        myCalcLabel?: T;
+        myCalcUrl?: T;
+      };
+  sectionRow?:
+    | T
+    | {
+        items?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    doc?: T;
+                    url?: T;
+                    label?: T;
+                    newTab?: T;
+                  };
+              id?: T;
+            };
+        laptopVisibleCount?: T;
+        moreLabel?: T;
+      };
+  megaMenus?:
+    | T
+    | {
+        key?: T;
+        label?: T;
+        columns?:
+          | T
+          | {
+              title?: T;
+              links?:
+                | T
+                | {
+                    link?:
+                      | T
+                      | {
+                          type?: T;
+                          doc?: T;
+                          url?: T;
+                          label?: T;
+                          newTab?: T;
+                        };
+                    hint?: T;
+                    subLinks?:
+                      | T
+                      | {
+                          label?: T;
+                          url?: T;
+                          id?: T;
+                        };
+                    id?: T;
+                  };
+              id?: T;
+            };
+        promoCard?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              buttonLabel?: T;
+              buttonKind?: T;
+              url?: T;
+            };
+        id?: T;
+      };
+  footer?:
+    | T
+    | {
+        columns?:
+          | T
+          | {
+              title?: T;
+              links?:
+                | T
+                | {
+                    link?:
+                      | T
+                      | {
+                          type?: T;
+                          doc?: T;
+                          url?: T;
+                          label?: T;
+                          newTab?: T;
+                        };
+                    id?: T;
+                  };
+              id?: T;
+            };
+        bottomLinks?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    doc?: T;
+                    url?: T;
+                    label?: T;
+                    newTab?: T;
+                  };
+              id?: T;
+            };
+        showContactsColumn?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "snippets_select".
+ */
+export interface SnippetsSelect<T extends boolean = true> {
+  items?:
+    | T
+    | {
+        key?: T;
+        title?: T;
+        content?: T;
+        ctaLabel?: T;
+        ctaFormKey?: T;
+        ctaFormParams?: T;
+        usageNote?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

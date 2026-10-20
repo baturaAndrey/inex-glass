@@ -1,7 +1,9 @@
 import { getEnv } from "@/lib/env";
 import { adminFieldAccess, getRole, isAdmin, isAdminOrSelf, isLoggedIn } from "../access";
+import { rel } from "../slugs";
+import { MESSENGER_TYPES, toOptions } from "./crm/constants";
 import type { Role } from "../access";
-import type { CollectionBeforeValidateHook, CollectionConfig } from "payload";
+import type { CollectionBeforeValidateHook, CollectionConfig, TextFieldValidation } from "payload";
 
 const ONE_WEEK_SECONDS = 60 * 60 * 24 * 7;
 const LOCK_TIME_MS = 10 * 60 * 1000;
@@ -26,6 +28,24 @@ const forceAdminForFirstUser: CollectionBeforeValidateHook = async ({ data, oper
   });
   if (totalDocs === 0) return { ...data, role: "admin" satisfies Role };
   return data;
+};
+
+/** Schemes allowed in `messengerUrl`: it is rendered as a link on the public order page. */
+const MESSENGER_URL_PROTOCOLS: ReadonlySet<string> = new Set(["https:", "tg:"]);
+const MESSENGER_URL_MESSAGE = "Нужна ссылка https://… или tg://…";
+
+/**
+ * Optional; when set, an absolute `https:` or `tg:` URL. Blocks `javascript:`/`data:` links
+ * (XSS on the order page, task 33) and plain-HTTP links.
+ */
+export const validateMessengerUrl: TextFieldValidation = (value) => {
+  if (value === null || value === undefined || value.trim() === "") return true;
+  try {
+    const { protocol } = new URL(value.trim());
+    return MESSENGER_URL_PROTOCOLS.has(protocol) ? true : MESSENGER_URL_MESSAGE;
+  } catch {
+    return MESSENGER_URL_MESSAGE;
+  }
 };
 
 const env = getEnv();
@@ -81,6 +101,34 @@ export const Users: CollectionConfig = {
         create: adminFieldAccess,
         update: adminFieldAccess,
       },
+    },
+    // Manager card: «Ваш менеджер» on the order page (task 33), contacts in lead e-mails (task 18).
+    { name: "phone", type: "text", label: "Телефон" },
+    {
+      name: "position",
+      type: "text",
+      label: "Должность",
+      admin: { placeholder: "Менеджер по заказам" },
+    },
+    {
+      name: "messengerUrl",
+      type: "text",
+      label: "Ссылка на мессенджер",
+      validate: validateMessengerUrl,
+      admin: { description: "https://t.me/…, https://wa.me/… или tg://…" },
+    },
+    {
+      name: "messengerType",
+      type: "select",
+      label: "Мессенджер",
+      options: toOptions(MESSENGER_TYPES),
+    },
+    { name: "photo", type: "upload", label: "Фото", relationTo: rel("media") },
+    {
+      name: "notifyNewLeads",
+      type: "checkbox",
+      label: "Получать письма о новых заявках",
+      defaultValue: false,
     },
   ],
 };

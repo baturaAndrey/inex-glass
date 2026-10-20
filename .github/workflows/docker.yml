@@ -1,0 +1,319 @@
+# Build the image once → push to GHCR → deploy to staging (main, after green CI) → promote
+# the SAME image to prod (tag v*). Runbook: docs/deploy.md.
+#
+# Triggers:
+#   workflow_run (CI completed on main) — build + deploy to staging, only when CI succeeded
+#                                          for a push to main of this repository.
+#   push tag v*                         — reuse the sha-<commit> image built from main,
+#                                          tag it :vX.Y.Z and deploy it to prod.
+#
+# Required secrets (deploy jobs are skipped while DOKPLOY_API_KEY is empty):
+#   DOKPLOY_URL               https://dokploy.example.ru (no trailing slash)
+#   DOKPLOY_API_KEY           Dokploy → Settings → Profile → API/CLI
+#   DOKPLOY_STAGING_APP_ID    applicationId of inex-glass-staging
+#   DOKPLOY_PROD_APP_ID       applicationId of inex-glass-prod (environment "production")
+#   GHCR_PULL_USERNAME        GitHub user owning the pull PAT
+#   GHCR_PULL_TOKEN           classic PAT with read:packages (Dokploy pulls with it)
+# Variables:
+#   STAGING_URL               https://dev.inexglass.ru (smoke test)
+#   PROD_URL                  https://inexglass.ru     (smoke test)
+
+name: Docker
+
+on:
+  # Must match `name:` in .github/workflows/ci.yml. workflow_run always uses the workflow
+  # file from the default branch, and runs in the base repository context (with secrets),
+  # so the build job additionally checks that the CI run was a push to this repository.
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  push:
+    tags: ["v*"]
+
+# Least privilege by default; jobs that need more declare it themselves.
+permissions:
+  contents: read
+
+# Never run two deploys of the same ref at once; do not cancel a running deploy.
+# (workflow_run runs on the default branch ref, so all staging deploys share one group.)
+concurrency:
+  group: docker-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: inex-glass
+  # The commit being shipped: the CI-tested commit for workflow_run (github.sha there is the
+  # latest commit on main, which may be newer and untested), the tagged commit for tags.
+  RELEASE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+jobs:
+  build:
+    name: Build & push image
+    # Staging: only after a successful CI run for a push to main of this repository
+    # (a fork PR whose branch is also called "main" must never trigger a deploy).
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # The only job that writes to GHCR (build/push, and the :vX.Y.Z tag on releases).
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.vars.outputs.image }}
+      sha_tag: ${{ steps.vars.outputs.sha_tag }}
+      digest: ${{ steps.digest.outputs.digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.RELEASE_SHA }}
+
+      - name: Compute image name and tags
+        id: vars
+        run: |
+          owner="${GITHUB_REPOSITORY_OWNER,,}"   # GHCR requires lowercase
+          echo "image=${REGISTRY}/${owner}/${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "sha_tag=sha-${RELEASE_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      # A release tag must point at a commit that was already built (and deployed to staging)
+      # from main. Reuse that image instead of rebuilding: a rebuild would yield a new digest.
+      - name: Reuse image already built for this commit (tags only)
+        id: existing
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          REF: ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.sha_tag }}
+        run: |
+          if ! digest="$(docker buildx imagetools inspect "$REF" --format '{{json .Manifest}}' | jq -r .digest)" \
+             || [ -z "$digest" ] || [ "$digest" = "null" ]; then
+            echo "::error::$REF not found. Push this commit to main, wait for CI + staging, then tag it."
+            exit 1
+          fi
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+
+      # Promote, do not rebuild. Done here (not in deploy-prod) so that packages: write stays
+      # scoped to this job; the registry tag alone deploys nothing — Dokploy is switched only
+      # after the "production" environment approval.
+      - name: Tag image with release version (tags only)
+        if: steps.existing.outcome == 'success'
+        env:
+          IMAGE: ${{ steps.vars.outputs.image }}
+          DIGEST: ${{ steps.existing.outputs.digest }}
+        run: docker buildx imagetools create -t "$IMAGE:$GITHUB_REF_NAME" "$IMAGE@$DIGEST"
+
+      - name: Image metadata
+        id: meta
+        if: steps.existing.outcome == 'skipped'
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ steps.vars.outputs.image }}
+          tags: |
+            type=raw,value=${{ steps.vars.outputs.sha_tag }}
+          labels: |
+            org.opencontainers.image.revision=${{ env.RELEASE_SHA }}
+
+      - name: Build & push runner
+        id: build_runner
+        if: steps.existing.outcome == 'skipped'
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: runner
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: RELEASE_SHA=${{ env.RELEASE_SHA }}
+          cache-from: type=gha,scope=runner
+          cache-to: type=gha,scope=runner,mode=max
+
+      # Shares the deps/build stages with the runner via the cache; not deployed anywhere.
+      - name: Build & push tools
+        if: steps.existing.outcome == 'skipped'
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: tools
+          push: true
+          tags: ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.sha_tag }}-tools
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: RELEASE_SHA=${{ env.RELEASE_SHA }}
+          cache-from: |
+            type=gha,scope=runner
+            type=gha,scope=tools
+          cache-to: type=gha,scope=tools,mode=max
+
+      - name: Resolve digest
+        id: digest
+        env:
+          BUILT: ${{ steps.build_runner.outputs.digest }}
+          EXISTING: ${{ steps.existing.outputs.digest }}
+        run: |
+          digest="${BUILT:-$EXISTING}"
+          [ -n "$digest" ] || { echo "::error::No image digest"; exit 1; }
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "Commit \`$RELEASE_SHA\` → image digest \`$digest\`" >> "$GITHUB_STEP_SUMMARY"
+
+  deploy-staging:
+    name: Deploy to staging
+    needs: build
+    if: github.event_name == 'workflow_run'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions: {}
+    environment:
+      name: staging
+      url: ${{ vars.STAGING_URL }}
+    # Secrets cannot be used in `if:` directly, so they are exposed via env and checked per step.
+    env:
+      DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+      DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+      APP_ID: ${{ secrets.DOKPLOY_STAGING_APP_ID }}
+      PULL_USER: ${{ secrets.GHCR_PULL_USERNAME }}
+      PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
+      # Immutable per-commit tag (not `latest`): Dokploy rollback shows which commit runs.
+      DEPLOY_IMAGE: ${{ needs.build.outputs.image }}:${{ needs.build.outputs.sha_tag }}
+      DIGEST: ${{ needs.build.outputs.digest }}
+      SITE: ${{ vars.STAGING_URL }}
+    steps:
+      - name: Dokploy not configured — skipping
+        if: env.DOKPLOY_API_KEY == ''
+        run: echo "::notice::DOKPLOY_API_KEY is not set; staging deploy skipped (see docs/deploy.md)."
+
+      - name: Point Dokploy app at the new image
+        if: env.DOKPLOY_API_KEY != ''
+        run: |
+          body="$(jq -n --arg id "$APP_ID" --arg img "$DEPLOY_IMAGE" \
+            --arg u "$PULL_USER" --arg p "$PULL_TOKEN" \
+            '{applicationId:$id, dockerImage:$img, username:$u, password:$p, registryUrl:"ghcr.io"}')"
+          curl -fsS --retry 3 -X POST "$DOKPLOY_URL/api/application.saveDockerProvider" \
+            -H "x-api-key: $DOKPLOY_API_KEY" -H "Content-Type: application/json" \
+            -d "$body" > /dev/null
+          echo "Staging: \`$DEPLOY_IMAGE\` (digest \`$DIGEST\`)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Trigger deploy
+        if: env.DOKPLOY_API_KEY != ''
+        run: |
+          body="$(jq -n --arg id "$APP_ID" --arg t "staging ${RELEASE_SHA::7}" \
+            '{applicationId:$id, title:$t}')"
+          curl -fsS --retry 3 -X POST "$DOKPLOY_URL/api/application.deploy" \
+            -H "x-api-key: $DOKPLOY_API_KEY" -H "Content-Type: application/json" \
+            -d "$body" > /dev/null
+
+      # /api is not behind staging basic auth. Wait until the NEW release answers.
+      - name: Smoke test /api/health/
+        if: env.DOKPLOY_API_KEY != '' && env.SITE != ''
+        run: |
+          # Up to ~5 min: pull + stop-first swap + migrations (start_period) + first health call.
+          for attempt in $(seq 1 30); do
+            release="$(curl -fsS --max-time 10 "$SITE/api/health/" | jq -r .release || true)"
+            if [ "$release" = "$RELEASE_SHA" ]; then echo "Healthy: $release"; exit 0; fi
+            echo "Attempt $attempt: release='${release:-none}', waiting..."
+            sleep 10
+          done
+          echo "::error::$SITE/api/health/ did not report release $RELEASE_SHA"
+          exit 1
+
+  deploy-prod:
+    name: Deploy to production
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Read-only registry access: verify what the release tag resolves to before deploying.
+    permissions:
+      packages: read
+    environment:
+      name: production # required reviewers are configured on the environment in GitHub
+      url: ${{ vars.PROD_URL }}
+    env:
+      DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+      DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+      APP_ID: ${{ secrets.DOKPLOY_PROD_APP_ID }}
+      PULL_USER: ${{ secrets.GHCR_PULL_USERNAME }}
+      PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
+      IMAGE: ${{ needs.build.outputs.image }}
+      DIGEST: ${{ needs.build.outputs.digest }}
+      SITE: ${{ vars.PROD_URL }}
+    steps:
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      # Dokploy is pointed at the human-readable :vX.Y.Z tag (not image@digest) so its
+      # deployment history and rollback list show release versions. The tag is created once
+      # from the staging digest; here we fail if it was moved since, and record the digest.
+      - name: Verify release tag digest
+        run: |
+          resolved="$(docker buildx imagetools inspect "$IMAGE:$GITHUB_REF_NAME" --format '{{json .Manifest}}' | jq -r .digest)"
+          if [ "$resolved" != "$DIGEST" ]; then
+            echo "::error::$IMAGE:$GITHUB_REF_NAME resolves to $resolved, expected $DIGEST"
+            exit 1
+          fi
+          {
+            echo "### Production release \`$GITHUB_REF_NAME\`"
+            echo "- Image: \`$IMAGE:$GITHUB_REF_NAME\`"
+            echo "- Digest: \`$resolved\`"
+            echo "- Commit: \`$RELEASE_SHA\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # - name: Pre-deploy pg_dump
+      #   # TODO(task-41): dump the prod DB to S3 (RU) before switching the image.
+      #   run: ./scripts/predeploy-backup.sh
+
+      - name: Dokploy not configured — skipping
+        if: env.DOKPLOY_API_KEY == ''
+        run: echo "::notice::DOKPLOY_API_KEY is not set; prod deploy skipped (see docs/deploy.md)."
+
+      - name: Point Dokploy app at the release image
+        if: env.DOKPLOY_API_KEY != ''
+        run: |
+          body="$(jq -n --arg id "$APP_ID" --arg img "$IMAGE:$GITHUB_REF_NAME" \
+            --arg u "$PULL_USER" --arg p "$PULL_TOKEN" \
+            '{applicationId:$id, dockerImage:$img, username:$u, password:$p, registryUrl:"ghcr.io"}')"
+          curl -fsS --retry 3 -X POST "$DOKPLOY_URL/api/application.saveDockerProvider" \
+            -H "x-api-key: $DOKPLOY_API_KEY" -H "Content-Type: application/json" \
+            -d "$body" > /dev/null
+
+      - name: Trigger deploy
+        if: env.DOKPLOY_API_KEY != ''
+        run: |
+          body="$(jq -n --arg id "$APP_ID" --arg t "prod $GITHUB_REF_NAME" \
+            '{applicationId:$id, title:$t}')"
+          curl -fsS --retry 3 -X POST "$DOKPLOY_URL/api/application.deploy" \
+            -H "x-api-key: $DOKPLOY_API_KEY" -H "Content-Type: application/json" \
+            -d "$body" > /dev/null
+
+      - name: Smoke test /api/health/
+        if: env.DOKPLOY_API_KEY != '' && env.SITE != ''
+        run: |
+          # Prod health reports the same RELEASE_SHA baked into the promoted image.
+          for attempt in $(seq 1 30); do
+            release="$(curl -fsS --max-time 10 "$SITE/api/health/" | jq -r .release || true)"
+            if [ "$release" = "$RELEASE_SHA" ]; then echo "Healthy: $release"; exit 0; fi
+            echo "Attempt $attempt: release='${release:-none}', waiting..."
+            sleep 10
+          done
+          echo "::error::$SITE/api/health/ did not report release $RELEASE_SHA"
+          exit 1

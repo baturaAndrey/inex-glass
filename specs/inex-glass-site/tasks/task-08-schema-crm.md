@@ -2,7 +2,7 @@
 
 ## Status
 
-pending
+complete
 
 ## Wave
 
@@ -104,7 +104,7 @@ pending
 | `statusChangedAt` | date | авто | обновляется хуком при смене статуса |
 | `refuseReason` | textarea | если статус `requiresReason` | `validate`: при выбранном статусе с `requiresReason` пусто → «Укажите причину отказа» |
 | `assignee` | relationship | нет | → `users`, index; `filterOptions`: пользователи с ролью admin/manager |
-| `internalComments` | array | нет | `{ author (rel users, default текущий пользователь), text (textarea, required), createdAt (date, default now) }` — виден только в админке |
+| `internalComments` | array | нет | `{ author (rel users, default текущий пользователь), text (textarea, required), date (date, default now; имя `date` — контракт с task-32) }` — виден только в админке |
 | `isDuplicate` | checkbox | авто | readOnly, index |
 | `duplicateOf` | relationship | авто | → `leads` (самая ранняя заявка с тем же телефоном/e-mail), readOnly |
 | `duplicateReason` | select | авто | `phone|email|both` |
@@ -123,7 +123,7 @@ pending
 
 ### 4. `consent-log` — «Журнал согласий» (иммутабельный)
 
-Поля: `lead` (rel `leads`, index; допускает пустое после удаления заявки), `formType` (text), `consentVersion` (text), `policyVersion` (text), `consentText` (textarea — снимок текста чекбокса), `ip` (text), `userAgent` (text), `pageUrl` (text), `givenAt` (date, default now), `subjectHash` (text, index — SHA-256 нормализованных телефона/e-mail, чтобы находить записи после удаления заявки), `anonymizedAt` (date). Права: `read` — admin/manager; `create` — admin (фактически Local API); `update` — запрещено всем (`() => false`), кроме полей анонимизации через Local API; `delete` — admin.
+Поля: `lead` (rel `leads`, index; допускает пустое после удаления заявки), `formType` (text), `consentVersion` (text), `policyVersion` (text), `consentText` (textarea — снимок текста чекбокса), `ip` (text), `userAgent` (text), `pageUrl` (text), `givenAt` (date, default now), `phoneHash`, `emailHash` (text, index — по отдельному HMAC-SHA256 (`FORM_HMAC_SECRET`, хелперы в `src/payload/utils/normalize.ts`) на нормализованный телефон и e-mail, чтобы находить записи после удаления заявки), `anonymizedAt` (date). Права: `read` — admin/manager; `create` — admin (фактически Local API); `update` — запрещено всем (`() => false`), кроме полей анонимизации через Local API; `delete` — admin.
 
 ### 5. `orders` — «Заказы»
 

@@ -118,7 +118,7 @@ pnpm add -D -E eslint-config-next@16.4.2
 
 - `src/app/(site)/…` — публичный сайт со своим root layout (`<html lang="ru"><body>`; шрифты Rubik и стили дизайн-системы подключит задача 05, сейчас системный шрифт и существующий `globals.css`). **Не** подключать Geist через `next/font/google`.
 - `src/app/(payload)/…` — админка Payload и REST/GraphQL из официального шаблона. В Payload-группе root layout — `RootLayout` из `@payloadcms/next/layouts`.
-- Каталог `src/app/api/` вне групп допустим для route handlers без layout (позже: `api/health`, `api/upload`, `api/leads`, `api/form-token`) — статический сегмент в приоритете над `[...slug]` Payload.
+- Каталог `src/app/api/` вне групп допустим для route handlers без layout (позже: `api/health`, `api/upload`, `api/forms/lead` (не `api/leads`: этот путь занят REST-API Payload коллекции `leads`), `api/form-token`) — статический сегмент в приоритете над `[...slug]` Payload.
 - Т. к. root layout'ов два, обычный `not-found.tsx` не поймает неизвестные URL — это решает задача 15 (`global-not-found` + catch-all). Здесь только временный `(site)/not-found.tsx`.
 - Ссылки на `/admin` в UI сайта — `<a>`, не `<Link>`.
 

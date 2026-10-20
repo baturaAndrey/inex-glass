@@ -167,7 +167,7 @@ pnpm payload generate:importmap
 
 - [ ] `pnpm lint`, `pnpm typecheck`, `pnpm test` проходят (тесты `applyIntercept`, `access-token`, рендер трёх писем).
 - [ ] Миграция `add_jobs_queue` сгенерирована и применяется на чистой БД; типы заданий и `payload-jobs` присутствуют в `payload-types.ts`; `payload.config.ts` изменён только по ключам `email` и `jobs`.
-- [ ] Dev: при `JOBS_ENABLED=true` заявка, созданная через `POST /api/leads/` (task-17), порождает задание `notify-new-lead`, и за ≤ 1–2 минуты в Mailpit (`localhost:8025`) появляется письмо «Новая заявка…» с корректными данными, флагами и кнопкой в админку; при пустых `notifyEmails` и без ответственного задание падает с понятной ошибкой и уходит в ретраи.
+- [ ] Dev: при `JOBS_ENABLED=true` заявка, созданная через `POST /api/forms/lead/` (task-17), порождает задание `notify-new-lead`, и за ≤ 1–2 минуты в Mailpit (`localhost:8025`) появляется письмо «Новая заявка…» с корректными данными, флагами и кнопкой в админку; при пустых `notifyEmails` и без ответственного задание падает с понятной ошибкой и уходит в ретраи.
 - [ ] Письмо статуса заказа для `in_production` и `shipped` визуально соответствует `Email.dc.html` в Mailpit (HTML и текстовая версии); ссылка в кнопке ведёт на `${SITE_URL}/zakaz/<токен>/` и совпадает с токеном, выведенным `deriveOrderToken`; тема «Заказ № … : …».
 - [ ] При `MAIL_INTERCEPT_TO=qa@example.test` все письма уходят только на этот адрес, тема начинается с `[STAGING → …]`.
 - [ ] Письма не содержат `display:flex|grid`, внешних CSS/шрифтов, кроме логотипа; проверка в Outlook/Gmail — вручную по возможности (скриншоты Mailpit в отчёт).

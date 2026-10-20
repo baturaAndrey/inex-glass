@@ -97,7 +97,7 @@ getPlaceholderContext(opts?: { thickness?: number; now?: Date }): Promise<Placeh
 getPageByPath(path: string): Promise<Page | null>              // по полному пути '/o-kompanii/'; только опубликованные; tags: ['collection:pages', `doc:pages:${id}`]
 getDocBySlug<C extends CollectionSlug>(collection: C, slug: string, opts?: { depth?: number }): Promise<TypeWithID | null>
 listPublished<C>(collection: C, opts: { limit?: number; page?: number; sort?: string; where?: Where; depth?: number }): Promise<PaginatedDocs>
-getRedirect(path: string): Promise<{ to: string; code: 301 | 308 } | null>   // из коллекции redirects (active), tags: ['collection:redirects']
+getRedirect(path: string): Promise<{ to: string; code: 301 | 308 } | null>   // из коллекции redirects (active), tags: ['collection:redirects']  // path сравнивать в нормализованном виде как `redirects.from` (task-08): percent-decode, нижний регистр, слеш на конце, без origin/query
 redirectOrNotFound(path: string): Promise<never>                // getRedirect → permanentRedirect(to), иначе notFound()
 getThicknessByN(n: number), getThicknessGroups()                // для task-23
 ```
@@ -243,3 +243,5 @@ export interface FormComponentProps { params: FormParams; onClose(): void; onSuc
 - Контракт загрузчиков (`getNavigation`, `getContacts`, `getPromo`, `getSiteSettings`) используется task-14 в этой же волне — имена не менять.
 - `generateStaticParams → []` и ISR: после правки документа хук (`revalidateTag(..., 'max')`) обновит страницу при следующем заходе.
 - Canonical для страниц фильтров/поиска задаётся потребителями через `canonicalOverride` / `forceNoindex`.
+- (Ревью волны 2) **Время, а не правка, меняет цену и акцию.** Правило 45 дней и окончание акции зависят от текущей даты, а хуки сбрасывают кэш только при правке. Загрузчики `getPrices`/`getPromo` кэшируют сырые данные, а «устарела ли цена» и «активна ли акция» вычисляются при рендере через `now`. Поэтому любая страница, которая выводит цену, акцию или мету с ценой (включая фиксированные URL и шапку/layout), должна иметь временную ревалидацию (`export const revalidate = 3600` или эквивалент) — иначе статическая страница покажет устаревшую цену бессрочно. Зафиксировать правило в комментарии `cache.ts` и проверить в e2e/юнит-тесте с подменой даты.
+- (Ревью волны 2) `metadataBase` в `(site)/layout.tsx` (task-05) для статических страниц вычисляется при сборке (`SITE_URL` по умолчанию `localhost`). Canonical, OG и JSON-LD строить абсолютными URL от рантайм-`SITE_URL` (в `buildMetadata`/JSON-LD), не полагаться на `metadataBase` статических страниц; исправить вводящий в заблуждение комментарий в layout.

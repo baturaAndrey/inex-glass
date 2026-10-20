@@ -150,14 +150,14 @@ graph TD
 - [x] [task-01-foundation-payload-setup](./tasks/task-01-foundation-payload-setup.md) — Фундамент: Next 16.4 + Payload 3.91, чистка стартера
 
 ### Wave 2
-- [ ] [task-02-testing-ci](./tasks/task-02-testing-ci.md) — Vitest, Playwright, GitHub Actions CI
-- [ ] [task-03-docker-deploy-spike](./tasks/task-03-docker-deploy-spike.md) — Dockerfile, healthcheck, GHCR, staging в Dokploy
-- [ ] [task-04-design-docs](./tasks/task-04-design-docs.md) — Новые DESIGN.md и AGENTS.md
-- [ ] [task-05-design-tokens-shell-primitives](./tasks/task-05-design-tokens-shell-primitives.md) — Rubik, токены --ig-*, слои CSS, Container/Section/Hero/Button
-- [ ] [task-06-schema-globals](./tasks/task-06-schema-globals.md) — Globals: цены, акция, условия, контакты, техпараметры, настройки, навигация
-- [ ] [task-07-schema-content-catalog](./tasks/task-07-schema-content-catalog.md) — Коллекции контента и каталога, библиотека блоков
-- [ ] [task-08-schema-crm](./tasks/task-08-schema-crm.md) — Заявки, статусы, файлы, заказы, consent-log, redirects
-- [ ] [task-09-kie-image-generator](./tasks/task-09-kie-image-generator.md) — Генерация фонов и временных иллюстраций (kie.ai)
+- [x] [task-02-testing-ci](./tasks/task-02-testing-ci.md) — Vitest, Playwright, GitHub Actions CI
+- [x] [task-03-docker-deploy-spike](./tasks/task-03-docker-deploy-spike.md) — Dockerfile, healthcheck, GHCR, staging в Dokploy
+- [x] [task-04-design-docs](./tasks/task-04-design-docs.md) — Новые DESIGN.md и AGENTS.md
+- [x] [task-05-design-tokens-shell-primitives](./tasks/task-05-design-tokens-shell-primitives.md) — Rubik, токены --ig-*, слои CSS, Container/Section/Hero/Button
+- [x] [task-06-schema-globals](./tasks/task-06-schema-globals.md) — Globals: цены, акция, условия, контакты, техпараметры, настройки, навигация
+- [x] [task-07-schema-content-catalog](./tasks/task-07-schema-content-catalog.md) — Коллекции контента и каталога, библиотека блоков
+- [x] [task-08-schema-crm](./tasks/task-08-schema-crm.md) — Заявки, статусы, файлы, заказы, consent-log, redirects
+- [x] [task-09-kie-image-generator](./tasks/task-09-kie-image-generator.md) — Генерация фонов и временных иллюстраций (kie.ai)
 
 ### Wave 3
 - [ ] [task-10-schema-freeze](./tasks/task-10-schema-freeze.md) — Единственная миграция, payload-types, importMap

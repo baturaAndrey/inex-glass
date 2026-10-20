@@ -2,7 +2,7 @@
 
 ## Status
 
-pending
+complete
 
 ## Wave
 
@@ -133,14 +133,14 @@ export const docTag = (slug: string, id: string) => `doc:${slug}:${id}`;
 | `active` | checkbox | да | default `false` — ручной переключатель |
 | `text` | text | да, если `active` | default «−5% на закалённое стекло при заказе от 100 м²» (знак минус U+2212) |
 | `badgeText` | text | нет | если пусто — берётся `text` (плашка в шапке) |
-| `startsAt` | date | нет | |
-| `endsAt` | date | да, если `active` | не раньше `startsAt`; **после этой даты плашка, подпись под ценами и подсказка в квизе скрываются автоматически** (логика `promoActive = active && now >= startsAt && now <= endsAt` — в задаче 11) |
-| `areaThreshold` | number | да | default 100 (м², порог подсказки в квизе) |
+| `startDate` | date | нет | |
+| `endDate` | date | да, если `active` | не раньше `startDate`; **после этой даты плашка, подпись под ценами и подсказка в квизе скрываются автоматически** (логика `promoActive = active && now >= startDate && now <= endDate` — в задаче 11) |
+| `thresholdArea` | number | да | default 100 (м², порог подсказки в квизе) |
 | `discountPercent` | number | нет | default 5, информативно |
 | `linkUrl` | text | да | default `/zakalennoe-steklo/#ceny` (куда ведёт пункт «Акции» и плашка) |
 | `quizHint` | text | нет | override подсказки в квизе; по умолчанию используется `{акция_текст}` |
 
-Права: manager может править. Валидатор `endsAt`: ошибка, если `active` и дата пуста.
+Права: manager может править. Валидатор `endDate`: ошибка, если `active` и дата пуста.
 
 ### 3. `conditions` — «Условия» (блок `{условия}` и полоса `.ig-terms`)
 
@@ -228,7 +228,7 @@ export const docTag = (slug: string, id: string) => `doc:${slug}:${id}`;
 | `bent` | group `{ thickMin, thickMax, minW, minH, maxW, maxH, radius[] }` | 4 / 12 / 150 / 350 / 1200 / 2000; `radius`: array `{ thicknessFrom, thicknessTo, minRadius }` = [4–6 → 1000], [8–12 → 1500] |
 | `holes` | group | `diameterMin` 4, `diameterMax` 130, `diameterMaxOneSide` 220, `glassMinW` 250, `glassMinH` 100, `glassMaxW` 3000, `glassMaxH` 1600, `glassThicknessMin` 4, `glassThicknessMaxTwoSides` 25, `glassThicknessMaxOneSide` 50, `edgeFactor` 2, `betweenFactor` 2, `cornerFactor` 6, `minDiameterFactor` 1, `cutoutInnerRadiusMin` 10, `toleranceRanges` array `{ from, to (number, пусто = без верхней границы), tolerance (number, пусто = «по согласованию»), label }` = [4–20 → 1.0], [20–100 → 2.0], [100–∞ → пусто, «по согласованию»] |
 | `print` | group `{ thickMin, thickMax, maxW, maxH }` | 4 / 15 / 1100 / 700 |
-| `tintColors` | array(text) | бронза, графит, серое |
+| `tintColors` | array `{ key (select bronze/graphite/grey — id из task-11 `TINT_COLORS`), name }` | bronze/бронза, graphite/графит, grey/серое |
 | `ribbed` | group `{ thicknesses (number hasMany) }` | [4, 6, 8] |
 | `facet` | group `{ mirrorsOnly (checkbox), widths (number hasMany), minGlassThickness }` | true / [30, 50] / 4 |
 | `mirrors` | group `{ maxSizeMm }` | 2800 (зеркала для залов, максимум 2,8 м) |
