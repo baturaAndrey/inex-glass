@@ -12,6 +12,7 @@ import { crmCollections } from "./payload/collections/crm";
 import { Users } from "./payload/collections/users";
 import { richTextEditor } from "./payload/editor";
 import { globals } from "./payload/globals";
+import { dbSchemaHooks, plugins } from "./payload/plugins";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const env = getEnv();
@@ -44,6 +45,8 @@ export default buildConfig({
   },
   collections: [Users, ...contentCollections, ...catalogCollections, ...crmCollections],
   globals,
+  // Registry (task 10): tasks 35/36 replace only `src/payload/plugins/{search,indexnow}.ts`.
+  plugins,
   editor: richTextEditor,
   secret: env.PAYLOAD_SECRET,
   serverURL: SERVER_ORIGIN,
@@ -57,6 +60,8 @@ export default buildConfig({
     // Applied on Payload init in production. Migrations are expand/contract only.
     prodMigrations: migrations,
     migrationDir: path.resolve(dirname, "migrations"),
+    // Drizzle hooks from the plugin registry (e.g. FTS column + GIN index, task 35).
+    afterSchemaInit: dbSchemaHooks,
   }),
   upload: {
     limits: { fileSize: MAX_FILE_SIZE },

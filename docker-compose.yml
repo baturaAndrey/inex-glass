@@ -8,6 +8,10 @@ services:
       POSTGRES_USER: dev_user
       POSTGRES_PASSWORD: dev_password
     ports: ["5432:5432"]
+    # The content schema has ~600 tables; rolling it back (`payload migrate:down`) or
+    # `payload migrate:fresh` drops them in ONE transaction, which exceeds the default lock
+    # table (64 per connection) with "out of shared memory". Applying migrations is unaffected.
+    command: ["postgres", "-c", "max_locks_per_transaction=256"]
     volumes:
       - pgdata:/var/lib/postgresql # postgres:18 keeps data in /var/lib/postgresql/18/docker
       - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro

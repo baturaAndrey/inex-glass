@@ -208,3 +208,4 @@ export default function SiteLayout({ children, modal }: { children: ReactNode; m
 - Логотип временный; финальный SVG от Inex — подмена файлов в `public/brand/`.
 - Строка «разделов» — те же 9 ссылок, что в ТЗ §3.2; «Ещё ▾» выпадает как простое меню (не мега).
 - Хуки Radix требуют `'use client'`; серверные компоненты передают данные клиентским через сериализуемые пропсы.
+- (Ревью волны 3) `cn()` (`src/lib/utils.ts`) не знает кастомные тени `shadow-card`, `shadow-card-hover`, `shadow-dropdown`, `shadow-modal` — tailwind-merge считает их цветом тени. Добавить их в группу `shadow` в `extendTailwindMerge` (правка `utils.ts` разрешена этой задаче), а в `vitest.config.ts` поправить комментарий «Tests must not import payload» → разрешён импорт модулей схемы без запуска Payload.

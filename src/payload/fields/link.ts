@@ -2,8 +2,12 @@ import { rel } from "../slugs";
 import { CARD_MAX_DEPTH } from "./populate";
 import type { Field, GroupField, TextFieldSingleValidation } from "payload";
 
-/** Collections an internal link may point to (resolved to URLs by task 15, `resolveLink`). */
-const LINKABLE_COLLECTIONS = [
+/**
+ * Collections an internal link may point to (resolved to URLs by task 15, `resolveLink`).
+ * Shared with the rich-text `LinkFeature` (`src/payload/editor.ts`), so both link UIs offer the
+ * same documents and never expose private collections (`users`, CRM).
+ */
+export const LINKABLE_COLLECTIONS = [
   "pages",
   "glass-types",
   "thicknesses",

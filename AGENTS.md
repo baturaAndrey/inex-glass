@@ -56,6 +56,9 @@
 - Forbidden wording: `docs/inex/16-tz-razrabotka.md` section 11
 - Links to `/admin` are a plain `<a>`, not `next/link`
 - `cacheComponents` is off; CMS data is read through the Local API + `unstable_cache` with tags
+- Scripts run via `payload run <file>` must use top-level `await` — otherwise the command exits silently with code 0 before the script finishes
+- Running Payload outside production (dev server, `payload run`, integration tests) regenerates `src/payload-types.ts`; revert it unless your task owns generated files this wave
+- Postgres needs `max_locks_per_transaction=256` for migration rollbacks (~600 tables in one transaction); set in `docker-compose.yml`
 
 <!-- BEGIN:nextjs-agent-rules -->
 

@@ -189,3 +189,4 @@ LIMIT $3 OFFSET $4;
 - Премиум-модель (SQL/Payload internals). Для актуальных опций `plugin-search` и `afterSchemaInit` используй context7/Exa (Payload 3.91).
 - Если Payload в `afterSchemaInit` меняет API (3.9x) — сверься с примером в `payload/packages/db-postgres` tests; при неустранимой проблеме запасной путь — обычная колонка `tsv` + триггер в SQL-миграции (+ запись `// custom` в миграции), но оставить тот же интерфейс `searchSite`.
 - Эта задача — исключение из «schema freeze»: об изменении схемы сообщить координатору явно (список добавленных таблиц/колонок/индексов).
+- (Ревью волны 3) `scripts/verify-schema.ts` (task-10) сверяет точный список slug коллекций — добавить в него `search`. Контракт реестра плагинов: заменить `src/payload/plugins/search.ts`, сохранив экспорты `searchPluginEntry: Plugin` и `searchSchemaHooks` (массив хуков `afterSchemaInit`); `index.ts` и `payload.config.ts` не трогать.

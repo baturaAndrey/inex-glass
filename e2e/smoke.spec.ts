@@ -22,10 +22,7 @@ test.describe("smoke", () => {
     expect(critical.map((violation) => violation.id)).toEqual([]);
   });
 
-  // TODO(task-10): enable after content_schema migration
-  // The wave 2 schema (e.g. `users.phone`) has no migration until task 10, so the admin
-  // fails with `column users.phone does not exist`. Never fall back to `drizzle push`.
-  test.fixme("admin shows the Payload login or first-user form", async ({ page }) => {
+  test("admin shows the Payload login or first-user form", async ({ page }) => {
     // With an empty users table Payload redirects to /admin/create-first-user/; with users
     // it redirects to /admin/login/. Both are asserted by their Russian (admin i18n) content.
     const response = await page.goto("/admin/");

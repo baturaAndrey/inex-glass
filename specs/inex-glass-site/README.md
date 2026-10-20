@@ -116,7 +116,7 @@ graph TD
 - **Контракт той же волны.** В «Depends on» есть задачи той же волны с пометкой «контракт той же волны». Это не порядок выполнения: задачи идут параллельно, потребитель импортирует экспорт по оговорённому имени, а typecheck сходится после слияния волны.
 - **Владение файлами.** В одной волне две задачи не правят один файл. Общие точки расширения создаются заранее как реестр или заглушка, позже меняется только файл-заглушка (см. таблицу ниже).
 - **Генерируемые файлы** (`src/payload-types.ts`, `src/app/(payload)/admin/importMap.js`, `src/migrations/index.ts`) коммитит только владелец волны: 3 — task-10, 4 — task-18, 5 — task-32, 6 — task-35. Остальные задачи волны запускают генераторы только локально, для проверки. После слияния волны координатор выполняет `pnpm generate:types && pnpm generate:importmap` и проверяет diff.
-- `package.json` и `pnpm-lock.yaml`: зависимости для волн 4–7 заранее ставит task-10. В волнах 4–6 `package.json` не меняется: task-37 использует предустановленные `cheerio` и `csv-parse`. В волне 7 файл правит только task-40 — она добавляет все script-алиасы волны, в том числе `perf:*`, `analyze` для task-39 и `smoke:prod` для task-41.
+- `package.json` и `pnpm-lock.yaml`: зависимости для волн 4–7 заранее ставит task-10. В волнах 4–6 `package.json` не меняется (исключение: task-18 может заменить `@react-email/components` на `react-email`, см. её Notes): task-37 использует предустановленные `cheerio` и `csv-parse`. В волне 7 файл правит только task-40 — она добавляет все script-алиасы волны, в том числе `perf:*`, `analyze` для task-39 и `smoke:prod` для task-41.
 - CI (task-02) перед Playwright выполняет `pnpm seed --full`. Пока срезы — заглушки, команда всё равно завершается с кодом 0. E2E срезов волны 5 рассчитаны на полный сид.
 - После каждой волны выполняются `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` и код-ревью.
 
@@ -160,10 +160,10 @@ graph TD
 - [x] [task-09-kie-image-generator](./tasks/task-09-kie-image-generator.md) — Генерация фонов и временных иллюстраций (kie.ai)
 
 ### Wave 3
-- [ ] [task-10-schema-freeze](./tasks/task-10-schema-freeze.md) — Единственная миграция, payload-types, importMap
-- [ ] [task-11-domain-lib](./tasks/task-11-domain-lib.md) — Доменная логика с тестами (цены, отверстия, вес, рабочие дни, квиз)
-- [ ] [task-12-ui-form-primitives](./tasks/task-12-ui-form-primitives.md) — Примитивы форм
-- [ ] [task-13-ui-content-primitives](./tasks/task-13-ui-content-primitives.md) — Примитивы контента, cookie-баннер, sticky-CTA
+- [x] [task-10-schema-freeze](./tasks/task-10-schema-freeze.md) — Единственная миграция, payload-types, importMap
+- [x] [task-11-domain-lib](./tasks/task-11-domain-lib.md) — Доменная логика с тестами (цены, отверстия, вес, рабочие дни, квиз)
+- [x] [task-12-ui-form-primitives](./tasks/task-12-ui-form-primitives.md) — Примитивы форм
+- [x] [task-13-ui-content-primitives](./tasks/task-13-ui-content-primitives.md) — Примитивы контента, cookie-баннер, sticky-CTA
 
 ### Wave 4
 - [ ] [task-14-site-header-footer](./tasks/task-14-site-header-footer.md) — Шапка, мега-меню, подвал, layout

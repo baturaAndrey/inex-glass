@@ -19,7 +19,9 @@ export const ConsentLog: CollectionConfig = {
   defaultSort: "-givenAt",
   access: {
     read: isAdminOrManager,
-    create: isAdmin,
+    // Never through REST/GraphQL/admin: intake writes records via the Local API with
+    // `overrideAccess` (task 17), so a consent record cannot be forged from outside.
+    create: () => false,
     update: () => false,
     delete: isAdmin,
   },
