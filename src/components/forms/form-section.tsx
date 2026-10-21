@@ -160,7 +160,7 @@ export async function FormSection(props: FormSectionProps) {
             {showContacts && (config.workHours || config.phone || config.email) ? (
               <div className="flex flex-col gap-1">
                 {config.workHours ? (
-                  <span className="ig-small text-muted">{config.workHours}</span>
+                  <span className="ig-small text-text-2">{config.workHours}</span>
                 ) : null}
                 {config.phone ? (
                   <a

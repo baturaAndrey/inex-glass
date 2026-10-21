@@ -143,7 +143,7 @@ function renderTable(node: LexicalChild, nodesToJSX: NodesToJSX): ReactNode {
       mobile={hasHeader ? "cards" : "scroll"}
       // The first column names the row («Прочность…», «Жилые дома…»): medium weight in the table.
       // Without a header row the empty label strip is hidden.
-      className={cn("[&_tbody_td:first-child]:font-medium", !hasHeader && "[&_thead]:hidden")}
+      className="[&_tbody_td:first-child]:font-medium"
     />
   );
 }

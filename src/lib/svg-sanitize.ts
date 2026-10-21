@@ -19,6 +19,15 @@ import { load } from "cheerio";
  * `aria-label`, e.g. the wide canopy schemes) keeps both; any other scheme is decorative next to
  * its text description and gets `aria-hidden="true"` + `focusable="false"`.
  * `decorative: true` forces the latter.
+ *
+ * Ids are namespaced: every `id` gets a per-scheme prefix and every local reference
+ * (`url(#id)` — the only reference form that survives, `href` / `style` are dropped) is rewritten
+ * to it. A scheme's `<linearGradient id="g">` can then collide neither with an element id of the
+ * page nor with another scheme, and a reference to an id the scheme does not define cannot reach
+ * into the page. The prefix is a hash of the input (deterministic: server and client render the
+ * same markup) unless the caller passes `idPrefix`. Two identical schemes on one page share the
+ * prefix — harmless, their definitions are identical too. Because of the prefix, sanitizing an
+ * already sanitized scheme that has ids is not a no-op (the ids get a second prefix).
  */
 
 const ALLOWED_ELEMENTS: ReadonlySet<string> = new Set([
@@ -126,6 +135,10 @@ const DANGEROUS_VALUE =
 const ANY_URL = /url\s*\(/i;
 /** The only `url()` form allowed: a whole-value same-document reference, `url(#grad)`. */
 const LOCAL_REFERENCE = /^\s*url\(\s*(['"]?)#[\w.-]+\1\s*\)\s*$/i;
+/** The `#id` part of a local reference (applied only to values that passed `isSafeValue`). */
+const REFERENCE_TARGET = /(url\(\s*['"]?#)([\w.-]+)/gi;
+/** A caller-supplied prefix must start like an XML name so the prefixed id stays valid. */
+const VALID_ID_PREFIX = /^[A-Za-z][\w-]*$/;
 
 /**
  * Structural view of the `domhandler` nodes cheerio builds (`domhandler` is not a direct
@@ -143,6 +156,11 @@ interface XmlNode {
 export interface SanitizeSvgOptions {
   /** Always hide the scheme from assistive technology (drops `role` / `aria-label`). */
   decorative?: boolean;
+  /**
+   * Namespace for the scheme's ids (`[A-Za-z][\w-]*`, e.g. `"sys-3-"`). Defaults to a hash of
+   * the markup; an invalid value falls back to the default.
+   */
+  idPrefix?: string;
 }
 
 const escapeText = (value: string): string =>
@@ -156,20 +174,36 @@ function isSafeValue(value: string): boolean {
   return !ANY_URL.test(value) || LOCAL_REFERENCE.test(value);
 }
 
-function serializeAttributes(attribs: Record<string, string>): string {
+/** 32-bit FNV-1a of the input in base 36: short, stable, no crypto dependency in the bundle. */
+function hashPrefix(input: string): string {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < input.length; index += 1) {
+    hash ^= input.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return `svg${(hash >>> 0).toString(36)}-`;
+}
+
+/** Prefixes an `id` value, or the targets of the local references inside any other value. */
+function namespaceValue(name: string, value: string, prefix: string): string {
+  if (name.toLowerCase() === "id") return prefix + value;
+  return value.replace(REFERENCE_TARGET, (_, head: string, id: string) => head + prefix + id);
+}
+
+function serializeAttributes(attribs: Record<string, string>, prefix: string): string {
   return Object.entries(attribs)
     .filter(([name, value]) => ALLOWED_ATTRIBUTES.has(name.toLowerCase()) && isSafeValue(value))
-    .map(([name, value]) => ` ${name}="${escapeAttribute(value)}"`)
+    .map(([name, value]) => ` ${name}="${escapeAttribute(namespaceValue(name, value, prefix))}"`)
     .join("");
 }
 
-function serialize(node: XmlNode, extraAttributes = ""): string {
+function serialize(node: XmlNode, prefix: string, extraAttributes = ""): string {
   if (node.type === "text") return escapeText(node.data ?? "");
   if (node.type !== "tag" || !node.name || !ALLOWED_ELEMENTS.has(node.name.toLowerCase())) {
     return "";
   }
-  const attributes = serializeAttributes(node.attribs ?? {}) + extraAttributes;
-  const children = (node.children ?? []).map((child) => serialize(child)).join("");
+  const attributes = serializeAttributes(node.attribs ?? {}, prefix) + extraAttributes;
+  const children = (node.children ?? []).map((child) => serialize(child, prefix)).join("");
   return children
     ? `<${node.name}${attributes}>${children}</${node.name}>`
     : `<${node.name}${attributes}/>`;
@@ -208,5 +242,11 @@ export function sanitizeSvg(
   const attribs = Object.fromEntries(
     Object.entries(root.attribs ?? {}).filter(([name]) => !A11Y_ATTRIBUTES.has(name.toLowerCase()))
   );
-  return serialize({ ...root, attribs }, rootAccessibility(root.attribs ?? {}, !!opts.decorative));
+  const prefix =
+    opts.idPrefix && VALID_ID_PREFIX.test(opts.idPrefix) ? opts.idPrefix : hashPrefix(markup);
+  return serialize(
+    { ...root, attribs },
+    prefix,
+    rootAccessibility(root.attribs ?? {}, !!opts.decorative)
+  );
 }

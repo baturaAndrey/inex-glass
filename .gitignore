@@ -74,3 +74,6 @@ nul
 
 # audits (task 40)
 /scripts/audit/out/
+
+# final acceptance (task 42): run-staging.sh logs and screenshots
+/scripts/acceptance/out/

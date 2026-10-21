@@ -61,7 +61,8 @@ async function runSearch(
     });
     return { result, failed: false };
   } catch (error) {
-    console.error("poisk: search failed", error);
+    // Name only: driver errors quote the failed SQL with its parameters (the visitor's query).
+    console.error("poisk: search failed", error instanceof Error ? error.name : "unknown");
     return { result: EMPTY, failed: true };
   }
 }

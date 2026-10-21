@@ -1,4 +1,5 @@
 import { expect as baseExpect, test } from "@playwright/test";
+import { clientIpHeaders, uniqueTestIp } from "./helpers/test-ip";
 import { VIEWPORTS } from "./helpers/viewports";
 import type { Locator, Page, TestInfo } from "@playwright/test";
 
@@ -35,17 +36,10 @@ declare global {
 
 const isMobile = (testInfo: TestInfo) => testInfo.project.name === VIEWPORTS.mobile.name;
 
-let ipCounter = 0;
-/** A unique documentation-range client IP: the form-token API is rate-limited per IP. */
-function uniqueIp(testInfo: TestInfo): string {
-  ipCounter += 1;
-  const seed = (Date.now() + testInfo.workerIndex * 97 + ipCounter * 13) % 250;
-  return `198.51.100.${seed + 1}`;
-}
-
 /** Consent `all` + a recording Metrika stub; the cookie banner never covers the CTAs. */
 async function prepare(page: Page, testInfo: TestInfo) {
-  await page.setExtraHTTPHeaders({ "x-forwarded-for": uniqueIp(testInfo) });
+  // The form-token API is rate-limited per IP: a fresh documentation-range client per test.
+  await page.setExtraHTTPHeaders(clientIpHeaders(uniqueTestIp(testInfo)));
   await page.addInitScript((consentKey) => {
     try {
       window.localStorage.setItem(consentKey, "all");
@@ -402,6 +396,163 @@ test.describe("quiz routing", () => {
     await expect(stepHeading(page, "Что нужно рассчитать?")).toBeVisible();
     await expect(page.locator("[data-slot=quiz-resumed]")).toHaveCount(0);
     expect(errors.filter((text) => !/favicon|Download the React DevTools/i.test(text))).toEqual([]);
+  });
+
+  test("«Мой расчёт» on the quiz page itself reloads it as the full page with the draft", async ({
+    page,
+  }, testInfo) => {
+    // Phones have no «Мой расчёт» in the header (the menu holds it); the reload logic is the same.
+    test.skip(isMobile(testInfo), "header «Мой расчёт» is ≥600 px only");
+    const token = page.waitForResponse((r) => r.url().includes("/api/form-token/"), {
+      timeout: 120_000,
+    });
+    await page.goto(QUIZ, { waitUntil: "load" });
+    await token;
+    await page.evaluate((key) => window.localStorage.removeItem(key), DRAFT_KEY);
+    // A draft on step 3, made on the page quiz itself.
+    await quiz(page).getByRole("radio", { name: "Закалённое стекло" }).click();
+    await quiz(page).getByRole("button", { name: "Далее", exact: true }).click();
+    await quiz(page)
+      .getByRole("radiogroup", { name: "Толщина" })
+      .getByRole("radio", { name: /^8 мм/ })
+      .click();
+    await quiz(page).getByRole("button", { name: "Далее", exact: true }).click();
+    await expect(stepHeading(page, "Объём и размеры")).toBeVisible();
+    await expect
+      .poll(() => page.evaluate((key) => window.localStorage.getItem(key), DRAFT_KEY))
+      .toContain('"step":3');
+    await page.evaluate(() => {
+      window.__pageMarker = "before-reload";
+    });
+
+    // The modal shell sees the page quiz under it and calls `window.location.reload()`.
+    const reloaded = page.waitForEvent("load", { timeout: 120_000 });
+    await page.locator(`header a[href="${QUIZ}?resume=1"]:visible`).first().click();
+    await reloaded;
+    await expect(page).toHaveURL(new RegExp(`${QUIZ}\\?resume=1$`));
+    // A new document (not a client transition), the full page, the draft restored.
+    expect(await page.evaluate(() => window.__pageMarker)).toBeUndefined();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(quiz(page)).toHaveCount(1);
+    await expect(page.locator("[data-slot=quiz-resumed]")).toBeVisible();
+    await expect(stepHeading(page, "Объём и размеры")).toBeVisible();
+    await page.evaluate((key) => window.localStorage.removeItem(key), DRAFT_KEY);
+  });
+
+  test("browser Back closes the modal and keeps the page below", async ({ page }, testInfo) => {
+    await openSourcePage(page);
+    await page.evaluate(() => {
+      window.__pageMarker = "kept";
+    });
+    await openModal(page, testInfo);
+    await page.goBack();
+    await expect(dialog(page)).toBeHidden();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page).toHaveURL(new RegExp(`${SOURCE_PAGE}$`));
+    // Same document: Back is a client transition, not a reload of the source page.
+    expect(await page.evaluate(() => window.__pageMarker)).toBe("kept");
+    await expect(page.locator("main h1").first()).toBeVisible();
+    // Forward re-opens the quiz (the intercepted route is in the history).
+    await page.goForward();
+    await expect(page).toHaveURL(/\/raschet-stoimosti\/\?src=/);
+    await expect(quiz(page)).toBeVisible();
+  });
+
+  test("the page below does not scroll while the modal is open", async ({ page }, testInfo) => {
+    await openSourcePage(page);
+    await page.evaluate(() => window.scrollTo({ top: 400, behavior: "instant" }));
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(400);
+
+    await openModal(page, testInfo);
+    // Radix (react-remove-scroll) locks the body.
+    await expect
+      .poll(() => page.evaluate(() => getComputedStyle(document.body).overflow))
+      .toBe("hidden");
+    // Wheel over the overlay (desktop) / over the full-screen window (phones): the page stays.
+    const viewport = page.viewportSize()!;
+    if (isMobile(testInfo)) await page.mouse.move(viewport.width / 2, viewport.height / 2);
+    else await page.mouse.move(5, viewport.height / 2);
+    await page.mouse.wheel(0, 800);
+    await page.keyboard.press("End");
+    await page.waitForTimeout(300);
+    expect(await page.evaluate(() => window.scrollY)).toBe(400);
+
+    await page.keyboard.press("Escape");
+    await expect(dialog(page)).toBeHidden();
+    // Unlocked again: the page scrolls.
+    await expect
+      .poll(() => page.evaluate(() => getComputedStyle(document.body).overflow))
+      .not.toBe("hidden");
+    await page.mouse.wheel(0, 300);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(400);
+  });
+
+  test("Tab and Shift+Tab keep the focus inside the modal", async ({ page }, testInfo) => {
+    await openSourcePage(page);
+    await openModal(page, testInfo);
+    const focusInside = () =>
+      page.evaluate(() => {
+        const modal = document.querySelector("[data-slot=quiz-modal]");
+        const active = document.activeElement;
+        return Boolean(modal && active && active !== document.body && modal.contains(active));
+      });
+    await expect.poll(focusInside).toBe(true);
+
+    // More presses than the modal has tab stops: the focus must wrap, never leave.
+    const seen = new Set<string>();
+    for (let press = 0; press < 30; press += 1) {
+      await page.keyboard.press("Tab");
+      expect(await focusInside(), `Tab #${press + 1}`).toBe(true);
+      seen.add(
+        await page.evaluate(() => {
+          const el = document.activeElement as HTMLElement | null;
+          return `${el?.tagName}|${el?.getAttribute("aria-label") ?? el?.textContent?.trim() ?? ""}`;
+        })
+      );
+    }
+    // The walk really moved through several controls (close button, options, «Далее»).
+    expect(seen.size).toBeGreaterThan(2);
+    for (let press = 0; press < 10; press += 1) {
+      await page.keyboard.press("Shift+Tab");
+      expect(await focusInside(), `Shift+Tab #${press + 1}`).toBe(true);
+    }
+  });
+
+  test("a QuizLink CTA of a content page opens the modal with its pre-fill", async ({
+    page,
+  }, testInfo) => {
+    const source = "/zakalennoe-steklo/10-mm/";
+    await openSourcePage(page, source);
+    await page.evaluate((key) => window.localStorage.removeItem(key), DRAFT_KEY);
+    // «Паспорт толщины» button: `QuizLink` with `type=tempered&thick=10&src=<page>`.
+    const cta = page
+      .locator('main a[data-quiz-cta][href*="type=tempered"][href*="thick=10"]:visible')
+      .first();
+    await expect(cta).toBeVisible();
+    await cta.scrollIntoViewIfNeeded();
+    await cta.click();
+
+    const modal = dialog(page);
+    await expect(modal).toBeVisible({ timeout: 90_000 });
+    await expect(page).toHaveURL(/\/raschet-stoimosti\/\?type=tempered&thick=10&src=/);
+    await expect(modal.locator("[data-slot=quiz-prefill]")).toContainText("Закалённое стекло");
+    await expect(modal.getByRole("radio", { name: "Закалённое стекло" })).toHaveAttribute(
+      "aria-checked",
+      "true"
+    );
+    await modal.getByRole("button", { name: "Далее", exact: true }).click();
+    await expect(
+      modal.getByRole("radiogroup", { name: "Толщина" }).getByRole("radio", { name: /^10 мм/ })
+    ).toHaveAttribute("aria-checked", "true");
+
+    await expect.poll(async () => (await goals(page, "quiz_start")).length).toBe(1);
+    const [start] = await goals(page, "quiz_start");
+    expect(start?.[3]).toMatchObject({ entry_page: source, variant: "modal" });
+
+    await page.keyboard.press("Escape");
+    await expect(modal).toBeHidden();
+    await expect(page).toHaveURL(new RegExp(`${source}$`));
+    await page.evaluate((key) => window.localStorage.removeItem(key), DRAFT_KEY);
   });
 
   test("phones: full-screen modal, footer visible without scrolling", async ({

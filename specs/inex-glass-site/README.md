@@ -202,4 +202,4 @@ graph TD
 - [x] [task-41-prod-deploy](./tasks/task-41-prod-deploy.md) — Prod в Dokploy, домены, бэкапы
 
 ### Wave 8
-- [ ] [task-42-final-acceptance](./tasks/task-42-final-acceptance.md) — Финальная приёмка и выпуск
+- [x] [task-42-final-acceptance](./tasks/task-42-final-acceptance.md) — Финальная приёмка и выпуск

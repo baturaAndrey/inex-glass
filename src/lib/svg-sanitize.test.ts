@@ -33,8 +33,59 @@ describe("sanitizeSvg", () => {
         '<rect fill="url(#g) url(https://evil/y)"/></svg>'
     );
     expect(out).not.toContain("evil");
-    expect(out).toContain('fill="url(#g)"');
-    expect(out).toContain("fill=\"url('#g')\"");
+    expect(out).toMatch(/fill="url\(#svg[0-9a-z]+-g\)"/);
+    expect(out).toMatch(/fill="url\('#svg[0-9a-z]+-g'\)"/);
+  });
+
+  describe("id namespacing", () => {
+    const SCHEME =
+      '<svg viewBox="0 0 10 10"><defs><linearGradient id="g"><stop offset="0"/></linearGradient>' +
+      '<clipPath id="c"><rect width="5" height="5"/></clipPath>' +
+      '<marker id="m.end"><path d="M0 0"/></marker></defs>' +
+      '<rect id="main-content" fill="url(#g)" clip-path="url( \'#c\' )" marker-end="url(&quot;#m.end&quot;)"/>' +
+      '<path stroke="url(#missing)" mask="url(#g)"/></svg>';
+
+    const idsOf = (out: string) => [...out.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
+
+    it("prefixes every id and rewrites every local url() reference to the same prefix", () => {
+      const out = sanitizeSvg(SCHEME);
+      const prefix = /\sid="(svg[0-9a-z]+-)g"/.exec(out)?.[1];
+      expect(prefix).toBeDefined();
+      expect(idsOf(out)).toEqual([
+        `${prefix}g`,
+        `${prefix}c`,
+        `${prefix}m.end`,
+        `${prefix}main-content`,
+      ]);
+      expect(out).toContain(`fill="url(#${prefix}g)"`);
+      expect(out).toContain(`clip-path="url( '#${prefix}c' )"`);
+      expect(out).toContain(`marker-end="url(&quot;#${prefix}m.end&quot;)"`);
+      expect(out).toContain(`mask="url(#${prefix}g)"`);
+      // A dangling reference is namespaced too, so it cannot resolve to an element of the page.
+      expect(out).toContain(`stroke="url(#${prefix}missing)"`);
+      expect(out).not.toMatch(/url\(\s*['"]?#(?!svg)/);
+    });
+
+    it("is deterministic per input and differs between schemes", () => {
+      expect(sanitizeSvg(SCHEME)).toBe(sanitizeSvg(SCHEME));
+      const other = sanitizeSvg(SCHEME.replace('viewBox="0 0 10 10"', 'viewBox="0 0 20 20"'));
+      expect(idsOf(other)[0]).not.toBe(idsOf(sanitizeSvg(SCHEME))[0]);
+    });
+
+    it("uses a valid caller-supplied prefix and ignores an invalid one", () => {
+      const own = sanitizeSvg(SCHEME, { idPrefix: "sys-2-" });
+      expect(idsOf(own)[0]).toBe("sys-2-g");
+      expect(own).toContain('fill="url(#sys-2-g)"');
+
+      const invalid = sanitizeSvg(SCHEME, { idPrefix: '1"><script>' });
+      expect(invalid).not.toContain("script");
+      expect(idsOf(invalid)[0]).toMatch(/^svg[0-9a-z]+-g$/);
+    });
+
+    it("does not touch values without local references", () => {
+      const out = sanitizeSvg('<svg><rect fill="#D9DCDE" stroke="currentColor"/></svg>');
+      expect(out).toContain('<rect fill="#D9DCDE" stroke="currentColor"/>');
+    });
   });
 
   it("drops style and class attributes entirely", () => {

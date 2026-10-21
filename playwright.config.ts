@@ -23,6 +23,21 @@ import { E2E_BASE_URL, E2E_PORT, e2eServerEnv } from "./e2e/helpers/env";
 import { VIEWPORTS } from "./e2e/helpers/viewports";
 
 const isCI = !!process.env.CI;
+
+/**
+ * Staging basic auth (`STAGING_BASIC_AUTH=user:pass`, split at the first colon). Playwright sends
+ * the credentials only in answer to a 401 challenge, so the JWT `Authorization` headers of the
+ * admin API calls (`/api` is outside the basic auth of `proxy.ts`) stay untouched.
+ */
+const basicAuth = process.env.STAGING_BASIC_AUTH;
+const basicAuthColon = basicAuth?.indexOf(":") ?? -1;
+const httpCredentials =
+  basicAuth && basicAuthColon > 0
+    ? {
+        username: basicAuth.slice(0, basicAuthColon),
+        password: basicAuth.slice(basicAuthColon + 1),
+      }
+    : undefined;
 const localURL = `http://localhost:${E2E_PORT}`;
 const startCommand = `pnpm exec next start -p ${E2E_PORT}`;
 
@@ -47,6 +62,7 @@ export default defineConfig({
     locale: "ru-RU",
     timezoneId: "Asia/Yekaterinburg",
     trace: "retain-on-failure",
+    ...(httpCredentials ? { httpCredentials } : {}),
   },
   projects: [
     {

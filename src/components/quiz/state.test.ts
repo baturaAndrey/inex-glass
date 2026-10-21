@@ -208,3 +208,37 @@ describe("nextEdges", () => {
     expect(nextEdges(["ground"], ["ground", "polished"])).toEqual(["ground", "polished"]);
   });
 });
+
+describe("type change (manual setType vs. a link's type)", () => {
+  // Intentional asymmetry, see the `setType` case in `./state.ts`.
+  const glass: QuizAction[] = [
+    { type: "setType", value: "tempered" },
+    { type: "setThickness", value: "custom" },
+    { type: "patch", patch: { customNote: "Ограждение, ветровая нагрузка" } },
+  ];
+
+  it("manual setType keeps the thickness and the «подберите» note", () => {
+    const state = play([...glass, { type: "setType", value: "partitions" }]);
+    expect(state.answers).toMatchObject({
+      type: "partitions",
+      thickness: "custom",
+      customNote: "Ограждение, ветровая нагрузка",
+    });
+  });
+
+  it("a link with another type resets them over the draft", () => {
+    const base = play(glass);
+    const state = createInitialState({ type: "partitions" }, base);
+    expect(state.answers.type).toBe("partitions");
+    expect(state.answers.thickness).toBeUndefined();
+    expect(state.answers.customNote).toBeUndefined();
+  });
+
+  it("a link with the same type keeps them", () => {
+    const state = createInitialState({ type: "tempered" }, play(glass));
+    expect(state.answers).toMatchObject({
+      thickness: "custom",
+      customNote: "Ограждение, ветровая нагрузка",
+    });
+  });
+});

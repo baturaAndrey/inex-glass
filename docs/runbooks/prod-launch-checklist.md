@@ -50,6 +50,19 @@
   - `/data/lead-files` не отдаётся статикой: том лежит вне `public/`; файлы выдаются только маршрутами с проверкой доступа — `/api/lead-files/<id>/download/` (админка), Payload REST коллекции (анонимно 403); файлы заказов (`order-files`) — `/zakaz/<token>/docs/<id>/` только с валидным токеном. Проверено чтением кода и smoke `private-api`; скачивание файла анонимно на стенде не проверялось.
 - [x] `[AGENT]` `docs/deploy.md` (§1–§16) и этот чек-лист.
 
+### Приёмка (задача 42)
+
+- [x] `[AGENT]` Единая точка запуска приёмки `scripts/acceptance/run-staging.sh` (`BASE_URL`, `STAGING_BASIC_AUTH`, `EXPECT_ENV`, `MAILPIT_URL`): vitest, lint, typecheck, `all-urls`, `e2e/acceptance/*`, `audit:content`, `audit:seo` (только `EXPECT_ENV=production`), Lighthouse mobile (медиана 3, basic auth через `--extra-headers`), `smoke:prod`. Локальный стенд — `scripts/acceptance/local-stand.sh`.
+- [x] `[AGENT]` Прогон на локальной production-подобной сборке (21.10.2026) в режимах `SITE_ENV=production` и `SITE_ENV=staging` (basic auth, noindex, перехват почты): все шаги PASS после исправлений. Результаты — `docs/reports/acceptance.md`.
+- [x] `[AGENT]` Security-аудит OWASP Top 10:2025: нет открытых Critical/High (`docs/reports/security-audit.md`); fix list — `docs/reports/fix-list.md`.
+- [x] `[AGENT]` Фиксированные CMS-маршруты переведены в ISR (сборка без БД, `s-maxage=3600`) — FL-01.
+- [ ] `[ЧЕЛОВЕК]` Staging поднят (Dokploy, поддомен, basic auth **на весь хост в Traefik**, включая `/api` и `/admin` — FL-13), затем полный прогон против него:
+      `BASE_URL=https://<staging> STAGING_BASIC_AUTH=user:pass EXPECT_ENV=staging MAIL_INTERCEPT_TO=<ящик перехвата> PERF_LIGHTHOUSE_DOCKER_IMAGE=inex-lighthouse:13.5.0 PERF_OBJECT_SLUG=<slug> scripts/acceptance/run-staging.sh`
+      — все шаги PASS; Lighthouse mobile: LCP < 2,5 с, CLS < 0,1, TBT ≤ 200 мс на шаблонах-гейтах (FL-27). Результат приложить к `acceptance.md`.
+- [ ] `[ЧЕЛОВЕК]` Письма о новой заявке и о смене статуса заказа просмотрены в Gmail, Outlook и Яндекс.Почте (вёрстка 600 px, ссылки) — на staging через ящик перехвата.
+- [ ] `[ЧЕЛОВЕК]` Визуальная сверка скриншотов `visual.spec.ts` (каталог `screenshots/` в выводе `run-staging.sh`) с `res/inex-glass-handoff/prototypes/*.dc.html`; расхождения — в `fix-list.md`.
+- [ ] `[ЧЕЛОВЕК]` Решения по отклонениям: FL-05 (менеджер видит список сотрудников), FL-16 (GraphQL), FL-26 (потолок JS 245 КБ).
+
 ### DNS и домены
 
 - [ ] `[ЧЕЛОВЕК]` DNS `inexglass.ru` (§5):
@@ -158,7 +171,7 @@
   - `IMPORT_PROD_GUARD_HOSTS` задан;
   - запуск с `--i-know-this-is-prod`;
   - затем `fix-csv --check-db`.
-- [ ] `[ЧЕЛОВЕК]` После импорта — `reindex-search.ts` ночью (не атомарен, сбрасывает кэш), затем smoke.
+- [ ] `[ЧЕЛОВЕК]` После импорта — `reindex-search.ts` ночью (не атомарен, сбрасывает кэш), затем smoke. То же — после массовой публикации объектов портфолио или любой записи в обход админки (скрипты, SQL): поисковый индекс обновляется хуками только при сохранении через Payload.
 - [ ] `[ЧЕЛОВЕК]` Админка → «Настройки сайта»:
   - ID Метрики, верификации Вебмастера и Search Console;
   - e-mail уведомлений, праздники, «21 год»;

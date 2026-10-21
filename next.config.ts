@@ -38,7 +38,9 @@ const nextConfig: NextConfig = {
   // messages) from every 400 response. One external copy keeps error classes identical.
   serverExternalPackages: ["payload"],
   // Image optimizer (task 39). Widths follow the site grid: 375 (phones) … 1920 (the design's
-  // max width); imageSizes serve thumbnails and cards (all below the smallest device size).
+  // max width); imageSizes add narrower candidates for thumbnails and cards. Next merges both
+  // lists into one srcset for images with `sizes`, so 384 is not below the smallest deviceSize
+  // (375): it is kept on purpose as an extra step before 640 for card-width images.
   // qualities: 75 default, 60 for large hero photos (`quality={60}`) — any other value is
   // rejected by Next 16. minimumCacheTTL 14 days: replaced media get a new file name, so stale
   // optimized copies are not a risk (Payload renames uploads, placeholder ids are versioned).
@@ -71,7 +73,13 @@ const nextConfig: NextConfig = {
     globalNotFound: true,
   },
   async headers() {
-    return [{ source: "/(.*)", headers: SECURITY_HEADERS }];
+    return [
+      { source: "/(.*)", headers: SECURITY_HEADERS },
+      // The client order page and its files carry the secret token in the URL (task 33): no
+      // Referer at all. Must come AFTER the catch-all: the last matching rule wins per header, and
+      // these headers override the ones a route handler sets itself.
+      { source: "/zakaz/:path*", headers: [{ key: "Referrer-Policy", value: "no-referrer" }] },
+    ];
   },
   async rewrites() {
     return [

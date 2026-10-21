@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 import { CtaButtons } from "@/components/blocks/cta-buttons";
 import { FaqBlock, faqBlockItems } from "@/components/blocks/faq-block";
 import { FormBlock } from "@/components/blocks/form-block";
 import { PricesTableBlock } from "@/components/blocks/prices-table-block";
 import { RenderBlocks } from "@/components/blocks/render-blocks";
-import { fill, hasText } from "@/components/blocks/shared";
+import { asMedia, fill, hasText, mediaSrc } from "@/components/blocks/shared";
 import type {
   BlockBackground,
   BlockOf,
@@ -151,6 +152,10 @@ function TimingSection({
  * First screen (`.ct-hero` of `ZakHub.dc.html`): one column — the hub has no photo / passport
  * column, so the generic hero (which always reserves the 520 px aside) is not used. H1 from the
  * document, facts, the strong line, the CMS buttons and the terms strip of `conditions`.
+ *
+ * The hero block's `image` is a decorative background illustration on the right, the same
+ * treatment as the one-column glass-type hero (`GlassTypeHero`): faded into the page colour,
+ * hidden ≤1100 px where the hero is a narrow text column.
  */
 async function HubHero({
   block,
@@ -167,9 +172,12 @@ async function HubHero({
       ? conditions.termsBarShort
       : (conditions?.termsBar ?? []);
   const terms = termItems.map((item) => fill(item.text, ctx)).filter(Boolean);
-  return (
+  const background = asMedia(block.image);
+  const backgroundSrc = background ? mediaSrc(background, "hero") : null;
+  const hero = (
     <PageHero
       variant="ct-hero"
+      className={backgroundSrc ? "bg-transparent" : undefined}
       title={fill(block.titleOverride, ctx) || page.title || ""}
       facts={fill(block.facts, ctx) || undefined}
       strong={fill(block.strong, ctx) || undefined}
@@ -180,6 +188,28 @@ async function HubHero({
           : undefined
       }
     />
+  );
+
+  if (!backgroundSrc) return hero;
+  return (
+    <div className="bg-bg relative isolate overflow-hidden">
+      <div
+        aria-hidden="true"
+        className="absolute inset-y-0 right-0 -z-10 w-[45%] [mask-image:linear-gradient(90deg,transparent_0%,black_55%)] max-md:hidden"
+      >
+        {/* The only priority image of the hub (above the fold on desktop). Hidden ≤1100 px: the
+            1px slot makes the phone preload pick the smallest candidate (task 39). */}
+        <Image
+          src={backgroundSrc}
+          alt=""
+          fill
+          preload
+          sizes="(max-width: 1100px) 1px, 45vw"
+          className="object-cover"
+        />
+      </div>
+      {hero}
+    </div>
   );
 }
 

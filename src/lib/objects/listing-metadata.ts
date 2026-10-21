@@ -1,16 +1,15 @@
 import { getPlaceholderContext } from "@/lib/cms/globals";
 import { getPageByPath } from "@/lib/cms/queries";
 import { absoluteUrl, buildMetadata } from "@/lib/seo/metadata";
-import type { Media, Page } from "@/payload-types";
+import { pickOgImage } from "@/lib/seo/og-image";
+import type { Page } from "@/payload-types";
 import { OBJECTS_BASE_PATH } from "./filters";
 import { LISTING_DESCRIPTION, LISTING_TITLE, listingSeo } from "./seo";
 import type { Metadata } from "next";
 
 function ogImageOf(doc: Page | null): { url: string; alt?: string | null } | null {
-  const image = doc?.seo?.ogImage;
-  if (!image || typeof image === "string") return null;
-  const media = image as Media;
-  return media.url ? { url: media.url, alt: media.alt ?? null } : null;
+  // Generated placeholders (`gen-*`) never become og:image (task-38, `pickOgImage`).
+  return pickOgImage([doc?.seo?.ogImage]);
 }
 
 export interface ListingMetadataInput {

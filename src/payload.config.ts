@@ -29,8 +29,12 @@ const env = getEnv();
 const SERVER_ORIGIN = new URL(env.SITE_URL).origin;
 
 const MIB = 1024 * 1024;
-/** Max single file in the admin (public uploads use a separate route handler, limit 50 MB). */
-const MAX_FILE_SIZE = 52 * MIB;
+/**
+ * Max single file in the admin (public uploads use a separate route handler, limit 50 MB).
+ * Inclusive: busboy rejects a file that REACHES the limit, so «до 52 МиБ» needs `+ 1` for a file
+ * of exactly 52 MiB to pass (task-42 acceptance, scenario 11).
+ */
+const MAX_FILE_SIZE = 52 * MIB + 1;
 /**
  * Payload also limits the whole multipart request (default 50 MiB), which would reject a
  * 52 MiB file. Leave 1 MiB for form fields, headers and boundaries.

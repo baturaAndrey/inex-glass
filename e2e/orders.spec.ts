@@ -149,6 +149,13 @@ test("2. the page shows each of the 5 statuses", async ({ page }, testInfo) => {
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth
   );
   expect(overflow).toBeLessThanOrEqual(0);
+
+  // Minimal footer (`.od-foot` of Order.dc.html): contacts only, no site navigation columns.
+  const footer = page.getByRole("contentinfo");
+  await expect(footer).toHaveCount(1);
+  await expect(footer.getByRole("navigation")).toHaveCount(0);
+  await expect(footer.locator('a[href^="tel:"]')).toHaveCount(1);
+  await expect(footer.locator('a[href^="mailto:"]')).toHaveCount(1);
 });
 
 test("3. photos, lightbox, shipment and copy", async ({ page, context, browserName }) => {

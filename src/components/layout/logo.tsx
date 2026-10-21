@@ -34,6 +34,10 @@ export function Logo({ variant = "dark", href = "/", className, eager = false }:
       height={LOGO_HEIGHT}
       unoptimized
       loading={eager ? "eager" : "lazy"}
+      // React's SSR adds `<link rel="preload" as="image">` for every non-lazy <img> of a page
+      // rendered in one pass (ISR / prerender) unless its priority is low. The eager header logo
+      // must not compete with the LCP hero preload: a few-KB SVG, still fetched without delay.
+      fetchPriority={eager ? "low" : "auto"}
       className={cn("block h-11 w-auto", className)}
     />
   );

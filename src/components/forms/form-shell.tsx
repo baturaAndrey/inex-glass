@@ -397,7 +397,7 @@ export function LeadFormShell({
         >
           {submitLabel}
         </Button>
-        {note ? <span className="ig-small text-muted">{note}</span> : null}
+        {note ? <span className="ig-small text-text-2">{note}</span> : null}
       </div>
     </form>
   );

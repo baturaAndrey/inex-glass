@@ -39,9 +39,10 @@ import type { PlaceholderContext } from "@/lib/domain";
 import { buildBreadcrumbs } from "@/lib/seo/breadcrumbs";
 import { JsonLd, faqLd } from "@/lib/seo/jsonld";
 import { buildMetadata, resolveH1, resolveSeoText } from "@/lib/seo/metadata";
+import { pickOgImage } from "@/lib/seo/og-image";
 import { cn } from "@/lib/utils";
 import { lexicalToPlainText } from "@/payload/utils/lexical-text";
-import type { Construction, Media, Object as PortfolioObject, ShowerConfig } from "@/payload-types";
+import type { Construction, Object as PortfolioObject, ShowerConfig } from "@/payload-types";
 import type { Metadata } from "next";
 
 /**
@@ -79,10 +80,8 @@ const relationId = (value: unknown): string | null =>
       : null;
 
 function ogImageOf(doc: Construction): { url: string; alt?: string | null } | null {
-  const image = doc.seo?.ogImage ?? doc.heroImage;
-  if (!image || typeof image === "string") return null;
-  const media = image as Media;
-  return media.url ? { url: media.url, alt: media.alt ?? null } : null;
+  // Generated placeholders (`gen-*`) never become og:image (task-38, `pickOgImage`).
+  return pickOgImage([doc.seo?.ogImage, doc.heroImage]);
 }
 
 /** `generateMetadata` of a construction route: SEO group of the document, or the 404 metadata. */

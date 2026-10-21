@@ -35,7 +35,8 @@ export async function GET(request: NextRequest): Promise<Response> {
     const { hits } = await searchSite({ q, limit: parseLimit(params.get("limit")) });
     return Response.json({ hits }, { headers: { "Cache-Control": PUBLIC_CACHE } });
   } catch (error) {
-    console.error("site-search: query failed", error);
+    // Name only: driver errors quote the failed SQL with its parameters (the visitor's query).
+    console.error("site-search: query failed", error instanceof Error ? error.name : "unknown");
     return Response.json({ hits: [] }, { headers: { "Cache-Control": NO_STORE } });
   }
 }

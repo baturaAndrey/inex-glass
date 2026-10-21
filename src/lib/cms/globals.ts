@@ -312,14 +312,21 @@ export async function getTechLimits(): Promise<TechLimits> {
   return toTechLimits(tech, conditions);
 }
 
+/**
+ * Calendar adapters for callers that already hold `site-settings` (e.g. `getQuizConfig`), so the
+ * global is not read once per helper.
+ */
+export const toHolidays = (settings: SiteSetting | null): string[] => holidayKeys(settings, false);
+export const toWorkdays = (settings: SiteSetting | null): string[] => holidayKeys(settings, true);
+
 /** Non-working weekdays (public holidays, moved days off) from `site-settings`, `YYYY-MM-DD`. */
 export async function getHolidays(): Promise<string[]> {
-  return holidayKeys(await getSiteSettings(), false);
+  return toHolidays(await getSiteSettings());
 }
 
 /** Weekend days made working by a transfer (`isWorkday`), `YYYY-MM-DD`. */
 export async function getWorkdays(): Promise<string[]> {
-  return holidayKeys(await getSiteSettings(), true);
+  return toWorkdays(await getSiteSettings());
 }
 
 /**

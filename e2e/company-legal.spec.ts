@@ -379,19 +379,26 @@ test.describe("team section", () => {
       created.push(((await res.json()) as { doc: { id: string } }).doc.id);
     }
 
-    await page.goto("/o-kompanii/");
+    // ISR + stale-while-revalidate (`collection:team` expires with the "max" profile, see
+    // src/payload/hooks/revalidate.ts): the first request after the edit may still get the cached
+    // page while it regenerates in the background — reload until the fresh one is served.
     const teaser = page.getByTestId("team-teaser");
-    await expect(teaser).toBeVisible();
+    await expect(async () => {
+      await page.goto("/o-kompanii/");
+      await expect(teaser).toBeVisible({ timeout: 1_000 });
+    }).toPass({ timeout: 30_000 });
     await expect(teaser.getByRole("link", { name: /Сотрудники/ })).toHaveAttribute(
       "href",
       TEAM_PATH
     );
 
-    await page.goto(TEAM_PATH);
-    await expect(page.getByTestId("team-grid").locator("h2")).toHaveText([
-      "[e2e] Первый",
-      "[e2e] Второй",
-    ]);
+    await expect(async () => {
+      await page.goto(TEAM_PATH);
+      await expect(page.getByTestId("team-grid").locator("h2")).toHaveText(
+        ["[e2e] Первый", "[e2e] Второй"],
+        { timeout: 1_000 }
+      );
+    }).toPass({ timeout: 30_000 });
     // Private contact fields never reach the page.
     await expect(page.locator("main")).not.toContainText("@");
     if (await isIndexableEnv(page.request)) {

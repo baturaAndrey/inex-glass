@@ -21,6 +21,7 @@ import { getDocBySlug, getPageByPath, listPublished, redirectIfExists } from "@/
 import type { PlaceholderContext } from "@/lib/domain";
 import { buildBreadcrumbs } from "@/lib/seo/breadcrumbs";
 import { buildMetadata, resolveH1, resolveSeoText } from "@/lib/seo/metadata";
+import { pickOgImage } from "@/lib/seo/og-image";
 import { cn } from "@/lib/utils";
 import type { Media, ProcessingService } from "@/payload-types";
 import type { Metadata } from "next";
@@ -87,8 +88,8 @@ const servicePath = (slug: string, doc?: ServiceDoc | null) =>
   doc?.path || `${PROCESSING_HUB_PATH}${slug}/`;
 
 function ogImageOf(seo: { ogImage?: string | Media | null } | null | undefined) {
-  const media = asMedia(seo?.ogImage);
-  return media?.url ? { url: media.url, alt: media.alt ?? null } : null;
+  // Generated placeholders (`gen-*`) never become og:image (task-38, `pickOgImage`).
+  return pickOgImage([seo?.ogImage]);
 }
 
 // ---------------------------------------------------------------------------------------------

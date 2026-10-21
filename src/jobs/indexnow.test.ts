@@ -62,10 +62,37 @@ describe("indexnow-submit job", () => {
     expect(logger.error).toHaveBeenCalledWith(expect.objectContaining({ status: 422 }));
   });
 
-  it.each([429, 500])("%i: throws so that Payload retries the job", async (status) => {
+  it("202: accepted counts as done", async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 202 }));
+    const { req, logger } = makeReq();
+    await expect(run(URLS, req)).resolves.toEqual({ output: { submitted: 2 } });
+    expect(logger.info).toHaveBeenCalledWith(expect.objectContaining({ submitted: 2 }));
+    expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  it.each([429, 500, 503])("%i: throws so that Payload retries the job", async (status) => {
     fetchMock.mockResolvedValue(new Response(null, { status }));
-    const { req } = makeReq();
+    const { req, logger } = makeReq();
     await expect(run(URLS, req)).rejects.toThrow(String(status));
+    // A transient failure is not a configuration error: no error log, only the thrown retry.
+    expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.info).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("network error / timeout: throws so that Payload retries the job", async () => {
+    fetchMock.mockRejectedValue(new DOMException("The operation timed out.", "TimeoutError"));
+    const { req, logger } = makeReq();
+    await expect(run(URLS, req)).rejects.toThrow("TimeoutError");
+    expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  it("no URL of the site's host: completes without a request", async () => {
+    const { req } = makeReq();
+    await expect(run(["https://example.com/foreign/"], req)).resolves.toEqual({
+      output: { submitted: 0 },
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("does nothing outside production or without a key", async () => {

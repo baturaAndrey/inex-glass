@@ -50,6 +50,14 @@ function columnStyle(column: DataTableColumn): CSSProperties | undefined {
 }
 
 /**
+ * `true` when no column has a visible label. CMS tables mark «no header» with no-break spaces
+ * (U+00A0); `String#trim` strips those as well as ordinary whitespace.
+ */
+export function hasBlankHeader(columns: DataTableColumn[]): boolean {
+  return columns.every((column) => column.label.trim() === "");
+}
+
+/**
  * Facts table (`.ig-table`, zebra rows). On phones (≤599 px) the same data is rendered as
  * `.ig-mcard` cards. Both views are in the HTML and switched by CSS — no JS, no layout shift.
  */
@@ -64,31 +72,46 @@ export function DataTable({
   mobile = "cards",
   className,
 }: DataTableProps) {
-  const cards = mobile === "cards";
+  // Without labels the header row would be an empty band, and phone cards would have no labels
+  // before their values — so the header row is dropped and the table scrolls on phones instead.
+  const headerless = hasBlankHeader(columns);
+  const cards = mobile === "cards" && !headerless;
   const titleKey = mobileTitleKey ?? columns[0]?.key;
+  const hasWidths = columns.some((column) => column.width);
 
   return (
     <div className={className}>
       <div className={cn("ig-table-wrap", cards && "max-sm:hidden")}>
         <table className={cn("ig-table", !cards && "max-sm:w-max max-sm:min-w-full")}>
           {caption ? <caption className="sr-only">{caption}</caption> : null}
-          <thead>
-            <tr>
-              {columns.map((column) => (
-                <th
-                  key={column.key}
-                  scope="col"
-                  style={columnStyle(column)}
-                  className={cn(
-                    ALIGN_CLASS[column.align ?? "left"],
-                    column.key === highlightColumn && "bg-primary-light text-primary-dark"
-                  )}
-                >
-                  {column.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
+          {headerless ? (
+            // Column widths normally sit on the `<th>`s; keep them when there is no header row.
+            hasWidths ? (
+              <colgroup>
+                {columns.map((column) => (
+                  <col key={column.key} style={columnStyle(column)} />
+                ))}
+              </colgroup>
+            ) : null
+          ) : (
+            <thead>
+              <tr>
+                {columns.map((column) => (
+                  <th
+                    key={column.key}
+                    scope="col"
+                    style={columnStyle(column)}
+                    className={cn(
+                      ALIGN_CLASS[column.align ?? "left"],
+                      column.key === highlightColumn && "bg-primary-light text-primary-dark"
+                    )}
+                  >
+                    {column.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+          )}
           <tbody>
             {rows.map((row, rowIndex) => {
               const href = rowHref?.(row, rowIndex);

@@ -1,9 +1,11 @@
 import { Container } from "@/components/ig/container";
 import { getContacts, getNavigation } from "@/lib/cms/globals";
+import { FooterShell } from "./footer-shell";
 import { loadOrNull } from "./load-global";
 import { Logo } from "./logo";
 import { NavAnchor } from "./nav-anchor";
 import { toContactsData, toFooterNav } from "./nav-data";
+import { OrderFooter } from "./order-footer";
 import type { ContactsData, FooterColumn } from "./nav-defaults";
 
 const LINK_CLASS = "text-on-navy-2 hover:text-on-navy no-underline hover:underline";
@@ -48,6 +50,9 @@ function FooterContacts({ contacts }: { contacts: ContactsData }) {
  * global) + «Контакты» (contacts global) — 4 / 2 / 1 columns at ≥1101 / ≤1100 / ≤599 px, the
  * bridge link to inex.su, legal links and «© {year} {holder}». Extra bottom padding on phones
  * keeps the content clear of the sticky CTA.
+ *
+ * On the client order page `/zakaz/<token>/` the minimal `OrderFooter` replaces it
+ * (`FooterShell` picks by pathname, like `HeaderShell` for the header).
  */
 export async function SiteFooter() {
   const [navigation, contactsGlobal] = await Promise.all([
@@ -58,7 +63,7 @@ export async function SiteFooter() {
   const contacts = toContactsData(contactsGlobal);
   const year = new Date().getFullYear();
 
-  return (
+  const full = (
     <footer className="bg-navy text-on-navy-2 [--ig-focus-outline:var(--ig-focus-outline-on-dark)] [&_:focus-visible]:outline-(--ig-focus-outline-on-dark)">
       <Container className="flex flex-col gap-10 pt-14 pb-8 max-sm:pb-[104px]">
         <Logo variant="light" href="/" className="h-11" />
@@ -91,4 +96,6 @@ export async function SiteFooter() {
       </Container>
     </footer>
   );
+
+  return <FooterShell full={full} order={<OrderFooter contacts={contacts} />} />;
 }

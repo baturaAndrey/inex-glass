@@ -5,16 +5,16 @@ import { FALLBACK_PHONE, submitErrorMessage } from "@/lib/leads/responses";
 import {
   getConditions,
   getContacts,
-  getHolidays,
   getPrices,
   getPromo,
   getSiteSettings,
   getTechParams,
-  getWorkdays,
   primaryPhone,
+  toHolidays,
   toPricesInput,
   toPromoInput,
   toTechLimits,
+  toWorkdays,
 } from "./globals";
 
 /**
@@ -43,17 +43,18 @@ const nonEmpty = (value: string | null | undefined, fallback: string): string =>
   value?.trim() ? value.trim() : fallback;
 
 export async function getQuizConfig(): Promise<QuizConfig> {
-  const [prices, promo, tech, conditions, settings, contacts, holidays, workdays] =
-    await Promise.all([
-      getPrices(),
-      getPromo(),
-      getTechParams(),
-      getConditions(),
-      getSiteSettings(),
-      getContacts(),
-      getHolidays(),
-      getWorkdays(),
-    ]);
+  // `site-settings` is read once: the production calendar is derived from the same document
+  // (`getHolidays()` / `getWorkdays()` would each read it again — three queries on a cold cache).
+  const [prices, promo, tech, conditions, settings, contacts] = await Promise.all([
+    getPrices(),
+    getPromo(),
+    getTechParams(),
+    getConditions(),
+    getSiteSettings(),
+    getContacts(),
+  ]);
+  const holidays = toHolidays(settings);
+  const workdays = toWorkdays(settings);
 
   const cmsCities = (tech?.deliveryCities ?? [])
     .filter((city) => city.name?.trim())

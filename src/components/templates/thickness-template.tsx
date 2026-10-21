@@ -18,9 +18,10 @@ import { priceState, replacePlaceholders, THICKNESSES } from "@/lib/domain";
 import type { PlaceholderContext } from "@/lib/domain";
 import { faqLd, JsonLd, thicknessProductLd } from "@/lib/seo/jsonld";
 import { buildMetadata, resolveH1 } from "@/lib/seo/metadata";
+import { pickOgImage } from "@/lib/seo/og-image";
 import { buildThicknessView, thicknessHref, thicknessLabel } from "@/lib/thickness-view";
 import { lexicalToPlainText } from "@/payload/utils/lexical-text";
-import type { Media, Thickness, ThicknessGroup } from "@/payload-types";
+import type { Thickness, ThicknessGroup } from "@/payload-types";
 import { HolesRules } from "./thickness/holes-rules";
 import { Neighbors } from "./thickness/neighbors";
 import { Passport } from "./thickness/passport";
@@ -79,10 +80,8 @@ const loadThickness = cache(async (n: number) => {
 });
 
 function ogImageOf(doc: Thickness): { url: string; alt?: string | null } | null {
-  const image = doc.seo?.ogImage;
-  if (!image || typeof image === "string") return null;
-  const media = image as Media;
-  return media.url ? { url: media.url, alt: media.alt ?? null } : null;
+  // Generated placeholders (`gen-*`) never become og:image (task-38, `pickOgImage`).
+  return pickOgImage([doc.seo?.ogImage]);
 }
 
 export async function generateThicknessMetadata(n: number): Promise<Metadata> {

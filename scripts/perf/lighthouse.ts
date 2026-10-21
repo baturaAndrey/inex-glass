@@ -17,6 +17,9 @@
  *   traffic (uncompressed HTML, injected scripts) — the authoritative numbers of the report.
  * Profile: default mobile form factor and screen emulation, simulated throttling (slow 4G, 4× CPU).
  *
+ * Staging basic auth: `PERF_BASIC_AUTH=user:pass` (falls back to `STAGING_BASIC_AUTH`) is sent as
+ * `Authorization: Basic …` with the warm-up request and to Lighthouse via `--extra-headers`.
+ *
  * Routes answering a non-200 status (the 404 page) are skipped: Lighthouse refuses to audit an
  * error document. Exit code 1 when a CWV-gated template misses LCP/CLS/TBT targets.
  */
@@ -42,6 +45,13 @@ const DOCKER_IMAGE = process.env.PERF_LIGHTHOUSE_DOCKER_IMAGE;
 /** How a container reaches the server listening on the host. */
 const DOCKER_HOST_ALIAS = "host.docker.internal";
 const LABEL = process.env.PERF_LABEL ?? "latest";
+/** `user:pass` of the staging basic auth (task 42). */
+const BASIC_AUTH = process.env.PERF_BASIC_AUTH || process.env.STAGING_BASIC_AUTH || undefined;
+const EXTRA_HEADERS: Record<string, string> | null = BASIC_AUTH
+  ? { Authorization: `Basic ${Buffer.from(BASIC_AUTH).toString("base64")}` }
+  : null;
+/** The local runner reads the headers from a file (no JSON quoting through `shell: true`). */
+const EXTRA_HEADERS_FILE = path.join(OUT_DIR, "extra-headers.json");
 
 type CategoryId = (typeof CATEGORIES)[number];
 
@@ -182,6 +192,11 @@ function runLighthouseInDocker(url: string, outFile: string, image: string): LhR
     image,
     `"${target.toString()}"`,
     ...LIGHTHOUSE_FLAGS,
+    // Inline JSON (the container cannot read a host file); base64 needs no further escaping and
+    // \" survives both cmd.exe and sh.
+    ...(EXTRA_HEADERS
+      ? [`--extra-headers="${JSON.stringify(EXTRA_HEADERS).replaceAll('"', '\\"')}"`]
+      : []),
     "--output-path=stdout",
   ];
   const result = spawnSync("docker", args, {
@@ -205,6 +220,7 @@ function runLighthouse(url: string, outFile: string, chromePath: string): LhRepo
     `lighthouse@${LIGHTHOUSE_VERSION}`,
     `"${url}"`,
     ...LIGHTHOUSE_FLAGS,
+    ...(EXTRA_HEADERS ? [`--extra-headers="${EXTRA_HEADERS_FILE}"`] : []),
     `--output-path="${outFile}"`,
   ];
   // `shell: true`: `pnpm` is a .cmd shim on Windows.
@@ -277,6 +293,7 @@ for (const route of routes.filter((item) => !audited.includes(item))) {
 for (const item of skipped) console.warn(`пропущен ${item.id}: ${item.reason}`);
 
 mkdirSync(RAW_DIR, { recursive: true });
+if (EXTRA_HEADERS) writeFileSync(EXTRA_HEADERS_FILE, JSON.stringify(EXTRA_HEADERS));
 const chromePath = process.env.CHROME_PATH ?? chromium.executablePath();
 const summaries: RouteSummary[] = [];
 const failures: string[] = [];
@@ -284,7 +301,7 @@ const failures: string[] = [];
 for (const route of audited) {
   const url = new URL(route.path, baseUrl).toString();
   // Warm-up request: the first hit of an ISR route renders it on the server.
-  if (!SUMMARIZE_ONLY) await fetch(url).catch(() => undefined);
+  if (!SUMMARIZE_ONLY) await fetch(url, { headers: EXTRA_HEADERS ?? {} }).catch(() => undefined);
   const runs: RunMetrics[] = [];
   for (let run = 1; run <= RUNS; run += 1) {
     const outFile = path.join(RAW_DIR, `${LABEL}-${route.id}-${run}.json`);

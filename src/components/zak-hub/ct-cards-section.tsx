@@ -1,10 +1,19 @@
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import Link from "next/link";
-import { fill, hasText, isExternalHref, resolveLink } from "@/components/blocks/shared";
+import {
+  asMedia,
+  BlockImage,
+  fill,
+  hasText,
+  isExternalHref,
+  resolveLink,
+} from "@/components/blocks/shared";
 import type { BlockOf, BlockSectionInfo } from "@/components/blocks/types";
+import { Placeholder } from "@/components/ig/placeholder";
 import { Section, type SectionVariant } from "@/components/ig/section";
 import type { PlaceholderContext } from "@/lib/domain";
 import { cn } from "@/lib/utils";
+import type { Media } from "@/payload-types";
 
 /**
  * Building blocks of the catalog pages (`ct-*` of `ZakHub.dc.html` / `Thick10.dc.html`), shared
@@ -78,18 +87,62 @@ export interface CtCardItem {
   /** Link cards are `<a>` with hover lift; others are plain cards. */
   href?: string | undefined;
   newTab?: boolean | undefined;
+  /** Card image (`cards` item `image`), shown edge to edge above the text. */
+  image?: Media | undefined;
 }
 
 const CARD_CLASS =
   "bg-surface shadow-card flex h-full flex-col gap-2 rounded-lg p-6 text-inherit no-underline max-sm:p-5";
+/** A card with a media strip: the padding moves to the text so the image runs edge to edge. */
+const MEDIA_CARD_CLASS = "gap-0 overflow-hidden p-0 max-sm:p-0";
+const MEDIA_BODY_CLASS = "flex flex-col gap-2 p-6 max-sm:p-5";
 const LINK_CARD_CLASS =
   "transition-[transform,box-shadow] duration-(--ig-dur-base) hover:-translate-y-0.5 hover:shadow-card-hover hover:text-inherit focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--ig-focus-outline)";
+/** Compact strip (the prototype's wide placeholder `.ph-wide`), not the 4:3 of `.ig-card`. */
+const MEDIA_FRAME_CLASS = "aspect-[16/10]";
+/**
+ * Column width of the auto-fit grid (min 300 px, gap 20): one column on phones, two on tablets,
+ * three up to ~1400 px (1366: 3 × ≈400 px), four and more beyond (1920: 5 × ≈340 px).
+ */
+const MEDIA_SIZES =
+  "(max-width: 659px) 100vw, (max-width: 1100px) 50vw, (max-width: 1400px) 33vw, 25vw";
 
-function CardBody({ title, text }: Pick<CtCardItem, "title" | "text">) {
-  return (
+/**
+ * Media of a card in a grid that has images: the image, or — for a card without one (e.g.
+ * «Прозрачное», which has no page of its own) — a neutral `ig-ph` strip of the same height, so
+ * the text of neighbouring cards stays aligned.
+ */
+function CardMediaStrip({ image }: { image: Media | undefined }) {
+  if (image) {
+    return (
+      <BlockImage
+        media={image}
+        size="card"
+        sizes={MEDIA_SIZES}
+        frameClassName={MEDIA_FRAME_CLASS}
+      />
+    );
+  }
+  return <Placeholder ratio="16/10" label="" />;
+}
+
+interface CardBodyProps extends Pick<CtCardItem, "title" | "text" | "image"> {
+  /** Some card of the grid has an image: every card gets a media strip. */
+  withMedia: boolean;
+}
+
+function CardBody({ title, text, image, withMedia }: CardBodyProps) {
+  const content = (
     <>
       <h3 className="text-primary-dark m-0 text-lg leading-[1.35] font-semibold">{title}</h3>
       {text ? <p className="text-ink-2 m-0 text-[15px] leading-[1.55]">{text}</p> : null}
+    </>
+  );
+  if (!withMedia) return content;
+  return (
+    <>
+      <CardMediaStrip image={image} />
+      <div className={MEDIA_BODY_CLASS}>{content}</div>
     </>
   );
 }
@@ -97,6 +150,7 @@ function CardBody({ title, text }: Pick<CtCardItem, "title" | "text">) {
 /** Grid of `ct-card`s: `repeat(auto-fit, minmax(min(300px, 100%), 1fr))`, gap 20. */
 export function CtCards({ items, className }: { items: CtCardItem[]; className?: string }) {
   if (items.length === 0) return null;
+  const withMedia = items.some((item) => item.image);
   return (
     <ul
       className={cn(
@@ -108,10 +162,15 @@ export function CtCards({ items, className }: { items: CtCardItem[]; className?:
       {items.map((item) => (
         <li key={item.key} className="flex">
           {item.href ? (
-            <CardLink item={item} />
+            <CardLink item={item} withMedia={withMedia} />
           ) : (
-            <div className={cn(CARD_CLASS, "w-full")}>
-              <CardBody title={item.title} text={item.text} />
+            <div className={cn(CARD_CLASS, withMedia && MEDIA_CARD_CLASS, "w-full")}>
+              <CardBody
+                title={item.title}
+                text={item.text}
+                image={item.image}
+                withMedia={withMedia}
+              />
             </div>
           )}
         </li>
@@ -120,10 +179,12 @@ export function CtCards({ items, className }: { items: CtCardItem[]; className?:
   );
 }
 
-function CardLink({ item }: { item: CtCardItem }) {
+function CardLink({ item, withMedia }: { item: CtCardItem; withMedia: boolean }) {
   const href = item.href ?? "";
-  const className = cn(CARD_CLASS, LINK_CARD_CLASS, "w-full");
-  const body = <CardBody title={item.title} text={item.text} />;
+  const className = cn(CARD_CLASS, withMedia && MEDIA_CARD_CLASS, LINK_CARD_CLASS, "w-full");
+  const body = (
+    <CardBody title={item.title} text={item.text} image={item.image} withMedia={withMedia} />
+  );
   if (isExternalHref(href) || item.newTab) {
     return (
       <a
@@ -150,11 +211,13 @@ export function cardsBlockItems(block: BlockOf<"cards">, ctx: PlaceholderContext
     .map((item, index) => {
       const link = resolveLink(item.link);
       const text = fill(item.text, ctx);
+      const image = asMedia(item.image);
       return {
         key: item.id ?? `card-${index}`,
         title: fill(item.title, ctx),
         ...(text ? { text } : {}),
         ...(link ? { href: link.href, newTab: link.newTab } : {}),
+        ...(image ? { image } : {}),
       };
     });
 }

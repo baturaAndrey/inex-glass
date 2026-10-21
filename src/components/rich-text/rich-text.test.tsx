@@ -234,8 +234,8 @@ describe("RichText", () => {
         />
       );
       expect(container.querySelectorAll("tbody tr")).toHaveLength(2);
-      // DataTable always has a <thead>; without labels it is hidden.
-      expect(container.querySelector('[class*="[&_thead]:hidden"] thead')).not.toBeNull();
+      // Without labels DataTable renders no header row at all (no empty header band).
+      expect(container.querySelector("thead")).toBeNull();
       expect(container.querySelector(".ig-mcard")).toBeNull();
       // A short row is padded to the table width.
       expect(container.querySelectorAll("tbody tr")[1]?.querySelectorAll("td")).toHaveLength(2);

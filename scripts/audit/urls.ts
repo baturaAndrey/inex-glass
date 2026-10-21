@@ -135,13 +135,23 @@ export function orderPath(): string | null {
 const MAX_LISTING_PAGES = 50;
 
 /**
+ * One-segment detail paths of a listing (`/blog/<slug>/`). `page` is the pagination segment
+ * (`/blog/page/N/`), never a slug, so a bare `/blog/page/` link is not a detail page.
+ */
+export function listingDetailPattern(listing: "/obekty/" | "/blog/"): RegExp {
+  return listing === "/obekty/"
+    ? /^\/obekty\/(?!page\/)[a-z0-9-]+\/$/
+    : /^\/blog\/(?!page\/)[a-z0-9-]+\/$/;
+}
+
+/**
  * Detail pages linked from a listing (objects / articles), across ALL its pagination pages:
  * page 1 is fetched, then every `/<listing>/page/N/` link found in `<main>` (a visited set +
  * `MAX_LISTING_PAGES` bound the walk). Unfiltered listing pages only — no query strings.
  */
 export async function discoverListing(baseUrl: string, listing: "/obekty/" | "/blog/") {
   const origin = new URL(baseUrl).origin;
-  const detail = listing === "/obekty/" ? /^\/obekty\/[a-z0-9-]+\/$/ : /^\/blog\/[a-z0-9-]+\/$/;
+  const detail = listingDetailPattern(listing);
   const paginationPage = new RegExp(`^${listing}page/\\d+/$`);
   const found = new Set<string>();
   const queue: string[] = [listing];

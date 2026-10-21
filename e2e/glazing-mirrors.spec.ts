@@ -176,11 +176,18 @@ test.describe("glazing & mirrors pages", () => {
       const text = await page.locator("main").innerText();
       expect(text).not.toMatch(/[{}]/);
 
-      // Tables: cards on phones, the table on desktop.
+      // Tables: cards on phones, the table on desktop. A table without column labels (no
+      // <thead>, e.g. «Отверстия — главный узел» on /osteklenie/spajdernoe/) scrolls sideways on
+      // phones instead (DataTable, task-42 FL-02).
       if (expected.hasTable) {
-        const table = page.locator("main table.ig-table").first();
+        const labelled = page.locator("main table.ig-table:has(thead)");
         const card = page.locator("main .ig-mcard").first();
-        if (isMobile(page)) {
+        const table = (await labelled.count()) > 0 ? labelled.first() : null;
+        if (!table) {
+          // Only label-less tables: the table itself on every width, never empty cards.
+          await expect(page.locator("main table.ig-table").first()).toBeVisible();
+          await expect(card).toHaveCount(0);
+        } else if (isMobile(page)) {
           await expect(card).toBeVisible();
           await expect(table).toBeHidden();
         } else {

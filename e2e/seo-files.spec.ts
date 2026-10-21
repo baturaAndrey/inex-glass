@@ -22,6 +22,69 @@ const YANDEX_TOKEN = process.env.E2E_YANDEX_VERIFICATION;
 const GOOGLE_TOKEN = process.env.E2E_GOOGLE_VERIFICATION;
 const UNKNOWN_KEY = "00000000000000000000000000000000";
 
+/**
+ * Order pages are secret links `/zakaz/<token>/` (task 33). A token-shaped sample: the robots and
+ * sitemap checks need only the path shape, not a real order.
+ */
+const SAMPLE_ORDER_PATHS = [
+  "/zakaz/",
+  "/zakaz/eyJvIjoiMTIzIiwiZSI6MTc5OTk5OTk5OX0.c2lnbmF0dXJlLXNhbXBsZQ/",
+  "/zakaz/abc123/?utm_source=mail",
+];
+
+/** Rules of one `User-agent` group of a robots.txt (Google / Yandex semantics). */
+interface RobotsRule {
+  allow: boolean;
+  pattern: string;
+}
+
+/** `Allow` / `Disallow` lines of the group named exactly `userAgent`. */
+function robotsGroup(body: string, userAgent: string): RobotsRule[] {
+  const rules: RobotsRule[] = [];
+  let inGroup = false;
+  for (const raw of body.split("\n")) {
+    const line = raw.replace(/#.*/, "").trim();
+    const match = /^([A-Za-z-]+):\s*(.*)$/.exec(line);
+    if (!match) continue;
+    const field = match[1]!.toLowerCase();
+    const value = match[2]!.trim();
+    if (field === "user-agent") inGroup = value === userAgent;
+    else if (inGroup && (field === "allow" || field === "disallow") && value) {
+      rules.push({ allow: field === "allow", pattern: value });
+    }
+  }
+  return rules;
+}
+
+/** Robots pattern → RegExp: prefix match, `*` = any run of characters, `$` = end of URL. */
+function patternRegExp(pattern: string): RegExp {
+  const anchored = pattern.endsWith("$");
+  const body = (anchored ? pattern.slice(0, -1) : pattern)
+    .split("*")
+    .map((part) => part.replace(/[.+?^${}()|[\]\\]/g, "\\$&"))
+    .join(".*");
+  return new RegExp(`^${body}${anchored ? "$" : ""}`);
+}
+
+/**
+ * Whether `pathAndQuery` is crawlable for the group: the longest matching rule wins, `Allow`
+ * wins a tie (RFC 9309 §2.2.2; Yandex sorts by length the same way).
+ */
+function isAllowed(rules: RobotsRule[], pathAndQuery: string): boolean {
+  let best: RobotsRule | null = null;
+  for (const rule of rules) {
+    if (!patternRegExp(rule.pattern).test(pathAndQuery)) continue;
+    if (
+      !best ||
+      rule.pattern.length > best.pattern.length ||
+      (rule.pattern.length === best.pattern.length && rule.allow)
+    ) {
+      best = rule;
+    }
+  }
+  return best ? best.allow : true;
+}
+
 /** Production robots.txt carries the Yandex `Clean-param`; closed stands only `Disallow: /`. */
 async function isProductionStand(request: APIRequestContext): Promise<boolean> {
   const body = await (await request.get("/robots.txt", { maxRedirects: 0 })).text();
@@ -53,6 +116,29 @@ test.describe("SEO files", () => {
       expect(body).not.toMatch(/^Disallow: \/$/m);
     } else {
       expect(body).toBe("User-agent: *\nDisallow: /\n");
+    }
+  });
+
+  test("order links /zakaz/<token>/ are closed in robots.txt and absent from the sitemap", async ({
+    request,
+  }) => {
+    const robots = await (await request.get("/robots.txt", { maxRedirects: 0 })).text();
+    const xml = await (await request.get("/sitemap.xml", { maxRedirects: 0 })).text();
+    const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1] ?? "");
+    // No order URL at all — neither the bare section nor a tokenised link.
+    expect(locs.filter((loc) => new URL(loc).pathname.startsWith("/zakaz/"))).toEqual([]);
+
+    // `*` and the Yandex group (which replaces `*` for Yandex) must both close every order path.
+    const production = await isProductionStand(request);
+    const groups = production ? ["*", "Yandex"] : ["*"];
+    for (const agent of groups) {
+      const rules = robotsGroup(robots, agent);
+      expect(rules.length, `robots group «${agent}»`).toBeGreaterThan(0);
+      for (const orderPath of SAMPLE_ORDER_PATHS) {
+        expect(isAllowed(rules, orderPath), `${agent}: ${orderPath}`).toBe(false);
+      }
+      // Sanity of the evaluator: a public page is open on production (closed stands: `Disallow: /`).
+      expect(isAllowed(rules, "/zakalennoe-steklo/"), `${agent}: public page`).toBe(production);
     }
   });
 

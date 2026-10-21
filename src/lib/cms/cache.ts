@@ -57,17 +57,23 @@ import { connection } from "next/server";
  *   'phase-production-build'`) it awaits `connection()`, which tells Next "this route needs a
  *   request": the route is excluded from build-time prerendering. CAVEAT: Next 16 then marks
  *   the route DYNAMIC for good (`ƒ` in the build output) — it is rendered on every request and is
- *   NOT ISR'd later; a fixed-URL page's `revalidate` export does not cache its HTML. Only the
- *   `unstable_cache` data layer keeps the per-request cost down. Restoring ISR for these routes
- *   without a build-time database is deferred to task-42. Outside the build it is a no-op.
+ *   NOT ISR'd later; a static route's `revalidate` export does not cache its HTML. Therefore no
+ *   CMS page may be a static route (a folder without a dynamic segment): the fixed URLs (`/`,
+ *   `/kontakty/`, hubs, constructions, …) are served by the root optional catch-all
+ *   `src/app/(site)/[[...slug]]/` (`generateStaticParams → []`, ISR), which picks their template
+ *   from `src/app/(site)/_fixed/` by path (`fixed-routes.ts`; task-42). Routes that read
+ *   `searchParams` (`/obekty/`, `/poisk/`, `/raschet-stoimosti/`) are dynamic anyway. Outside the
+ *   build it is a no-op.
  * - `buildMetadata` (`@/lib/seo/metadata`) bails out the same way, so absolute URLs are always
  *   built from the RUNTIME `SITE_URL`, never baked in at build time.
  * - Dynamic segments (`[slug]`, `[...slug]`): `generateStaticParams() { return []; }`,
  *   `dynamicParams` stays `true` → rendered on first request, then ISR.
  *
- * Pattern for page tasks: fixed URLs — read data via the loaders of `@/lib/cms/*`; dynamic URLs —
- * `generateStaticParams → []`; pages whose output depends on the date (price, promo) —
- * `export const revalidate = 3600` (effective only where the route is not dynamic, see CAVEAT).
+ * Pattern for page tasks: read data via the loaders of `@/lib/cms/*`; fixed URLs — a template in
+ * `src/app/(site)/_fixed/<path>/page.tsx` registered in `[[...slug]]/fixed-paths.ts` +
+ * `fixed-routes.ts` (not a route folder, see CAVEAT); dynamic URLs — `generateStaticParams → []`;
+ * pages whose output depends on the date (price, promo) — `export const revalidate = 3600` in the
+ * route file (effective only where the route is not dynamic, see CAVEAT).
  */
 
 /** Next.js sets this while running `next build` (same constant as in `@/lib/env`). */

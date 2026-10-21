@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { clientIpHeaders, uniqueTestIp } from "./helpers/test-ip";
 import { VIEWPORTS } from "./helpers/viewports";
 import type { Locator, Page } from "@playwright/test";
 
@@ -40,9 +41,6 @@ interface FormsConfigBody {
   submitErrorText: string;
 }
 
-const randomOctet = () => 1 + Math.floor(Math.random() * 250);
-/** TEST-NET-3 (203.0.113.0/24) is public for the server's trusted-proxy check. */
-const randomIp = () => `203.0.113.${randomOctet()}`;
 /** 10 national digits starting with 9 (mobile), unique enough per test. */
 const randomPhone = () => `9${String(Math.floor(Math.random() * 1e9)).padStart(9, "0")}`;
 
@@ -50,8 +48,8 @@ type Goal = { name: string; params?: Record<string, unknown> };
 
 test.describe.configure({ timeout: 150_000 });
 
-test.beforeEach(async ({ page }) => {
-  await page.setExtraHTTPHeaders({ "X-Forwarded-For": randomIp() });
+test.beforeEach(async ({ page }, testInfo) => {
+  await page.setExtraHTTPHeaders(clientIpHeaders(uniqueTestIp(testInfo)));
   // A real tag.js would replace the stub below.
   await page.route("https://mc.yandex.ru/**", (route) => route.abort());
   // Analytics consent (hides the cookie banner) + a Metrika stub that records goals.

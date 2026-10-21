@@ -33,6 +33,7 @@ import { getConditions, getPlaceholderContext, getSnippets } from "@/lib/cms/glo
 import { getDocBySlug, listPublished, redirectIfExists } from "@/lib/cms/queries";
 import { replacePlaceholders, type PlaceholderContext } from "@/lib/domain";
 import { buildMetadata, resolveH1, resolveSeoText } from "@/lib/seo/metadata";
+import { pickOgImage } from "@/lib/seo/og-image";
 import type { Condition, GlassType } from "@/payload-types";
 import type { Metadata } from "next";
 
@@ -97,13 +98,13 @@ async function loadGlassType(slug: string): Promise<GlassType | null> {
 export async function generateGlassTypeMetadata(slug: string): Promise<Metadata> {
   const doc = await loadGlassType(slug);
   if (!doc) return NOT_FOUND_METADATA;
-  const ogMedia = asMedia(doc.seo?.ogImage);
   return buildMetadata({
     seo: doc.seo,
     path: glassTypePath(slug),
     fallbackTitle: doc.title,
     placeholders: await getPlaceholderContext(),
-    image: ogMedia?.url ? { url: ogMedia.url, alt: ogMedia.alt ?? null } : null,
+    // Generated placeholders (`gen-*`) never become og:image (task-38).
+    image: pickOgImage([doc.seo?.ogImage]),
   });
 }
 

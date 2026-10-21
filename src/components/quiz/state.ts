@@ -141,6 +141,12 @@ export function quizReducer(state: QuizUiState, action: QuizAction): QuizUiState
   const { answers } = state;
   switch (action.type) {
     case "setType":
+      // Deliberately NOT the reset `createInitialState` applies to a link's type: here the user
+      // switches the type in the same session, sees the kept thickness / «подберите» note on
+      // step 2 and can change them, so toggling the type back and forth loses no input. A link's
+      // type meets a draft from another visit, whose glass the user no longer sees — that one is
+      // reset. Answers invalid for the new type (triplex layers, mirrors-only edges) are still
+      // dropped by `sanitizeQuizAnswers`. Pinned by `state.test.ts` («type change»).
       return withAnswers(state, { ...answers, type: action.value });
     case "setThickness":
       return withAnswers(state, { ...answers, thickness: action.value });

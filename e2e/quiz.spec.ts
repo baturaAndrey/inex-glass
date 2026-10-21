@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import AxeBuilder from "@axe-core/playwright";
 import { expect as baseExpect, test } from "@playwright/test";
+import { clientIpHeaders, uniqueTestIp } from "./helpers/test-ip";
 import { VIEWPORTS } from "./helpers/viewports";
 import type { Locator, Page, Request, TestInfo } from "@playwright/test";
 
@@ -35,21 +36,13 @@ const DWG = Buffer.concat([Buffer.from("AC1015"), Buffer.alloc(2048)]);
 /** NBSP → space, for text comparisons. */
 const plain = (text: string | null) => (text ?? "").replace(/ /g, " ");
 
-let ipCounter = 0;
-/** A unique public (TEST-NET-3) client address for the per-IP limits of the intake API. */
-function uniqueIp(testInfo: TestInfo): string {
-  ipCounter += 1;
-  const seed = (Date.now() + testInfo.workerIndex * 97 + ipCounter * 13) % 250;
-  return `203.0.113.${seed + 1}`;
-}
-
 /** Random mobile number (per-phone lead limit). */
 function randomPhoneDigits(): string {
   return `9${String(Math.floor(Math.random() * 1e9)).padStart(9, "0")}`;
 }
 
 async function prepare(page: Page, testInfo: TestInfo, consent: "necessary" | "all" = "necessary") {
-  await page.setExtraHTTPHeaders({ "x-forwarded-for": uniqueIp(testInfo) });
+  await page.setExtraHTTPHeaders(clientIpHeaders(uniqueTestIp(testInfo)));
   await page.addInitScript(
     ([key, value]) => {
       try {

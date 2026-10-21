@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { DataTable } from "./data-table";
+import { DataTable, type DataTableColumn } from "./data-table";
 
 const COLUMNS = [
   { key: "name", label: "Название" },
@@ -39,5 +39,49 @@ describe("DataTable", () => {
     expect(title?.querySelector("a")?.getAttribute("href")).toMatch(/^\/zakalennoe-steklo\/?$/);
     expect(title?.textContent).toBe("Закалённое стекло");
     expect(cards[1]?.firstElementChild?.textContent).toBe("Триплекс");
+  });
+
+  describe("blank header labels", () => {
+    // Seed tables mark «no header» with no-break spaces (e.g. «Отверстия — главный узел»).
+    const NBSP = String.fromCharCode(0xa0);
+    const BLANK: DataTableColumn[] = [
+      { key: "name", label: NBSP },
+      { key: "value", label: ` ${NBSP} `, width: "40%" },
+    ];
+
+    function render(columns: DataTableColumn[], mobile?: "cards" | "scroll") {
+      const container = document.createElement("div");
+      container.innerHTML = renderToStaticMarkup(
+        <DataTable columns={columns} rows={ROWS} {...(mobile ? { mobile } : {})} />
+      );
+      return container;
+    }
+
+    it("drops the empty header band and keeps column widths in a colgroup", () => {
+      const container = render(BLANK);
+      expect(container.querySelector("thead")).toBeNull();
+      expect(container.querySelectorAll("tbody tr")).toHaveLength(2);
+      const cols = container.querySelectorAll("colgroup col");
+      expect(cols).toHaveLength(2);
+      expect(cols[1]?.getAttribute("style")).toContain("width:40%");
+    });
+
+    it("scrolls horizontally on phones instead of rendering label-less cards", () => {
+      const container = render(BLANK, "cards");
+      expect(container.querySelector(".ig-mcard")).toBeNull();
+      const wrap = container.querySelector(".ig-table-wrap");
+      expect(wrap?.className).not.toContain("max-sm:hidden");
+      expect(container.querySelector("table")?.className).toContain("max-sm:w-max");
+    });
+
+    it("keeps the header when at least one label is visible", () => {
+      const container = render([
+        { key: "name", label: NBSP },
+        { key: "value", label: "Цена" },
+      ]);
+      expect(container.querySelectorAll("thead th")).toHaveLength(2);
+      expect(container.querySelector("colgroup")).toBeNull();
+      expect(container.querySelectorAll(".ig-mcard")).toHaveLength(2);
+    });
   });
 });

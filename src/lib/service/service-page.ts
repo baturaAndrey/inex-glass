@@ -6,7 +6,8 @@ import { getPageByPath } from "@/lib/cms/queries";
 import type { PlaceholderContext } from "@/lib/domain";
 import { buildBreadcrumbs, type Crumb } from "@/lib/seo/breadcrumbs";
 import { buildMetadata, resolveSeoText } from "@/lib/seo/metadata";
-import type { Media, Page } from "@/payload-types";
+import { pickOgImage } from "@/lib/seo/og-image";
+import type { Page } from "@/payload-types";
 import type { Metadata } from "next";
 
 /**
@@ -48,10 +49,8 @@ export async function loadServicePage(path: string): Promise<ServicePageData | n
 }
 
 function ogImageOf(page: Page): { url: string; alt?: string | null } | null {
-  const image = page.seo?.ogImage;
-  if (!image || typeof image === "string") return null;
-  const media = image as Media;
-  return media.url ? { url: media.url, alt: media.alt ?? null } : null;
+  // Generated placeholders (`gen-*`) never become og:image (task-38, `pickOgImage`).
+  return pickOgImage([page.seo?.ogImage]);
 }
 
 /** `generateMetadata` of the explicit service routes (404 metadata for a missing document). */
