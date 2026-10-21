@@ -11,6 +11,7 @@ import {
   uniquePhone,
   uploadLeadPdf,
 } from "./helpers/admin-api";
+import { clientIpHeaders, uniqueTestIp } from "./helpers/test-ip";
 import { VIEWPORTS } from "./helpers/viewports";
 import {
   FOREIGN_COMMENT_MESSAGE,
@@ -401,15 +402,19 @@ test("erasure: lead, versions and files go away; consent stays anonymized", asyn
   page,
   baseURL,
   request,
-}) => {
+}, testInfo) => {
   const origin = new URL(baseURL!).origin;
 
-  // A public lead (with its consent record) through the real intake API.
-  const tokenResponse = await request.post("/api/form-token/");
+  // A public lead (with its consent record) through the real intake API. Token and lead are
+  // rate-limited per client IP: a per-test documentation-range IP, not the shared `unknown`.
+  const ipHeaders = clientIpHeaders(uniqueTestIp(testInfo));
+  const tokenResponse = await request.post("/api/form-token/", { headers: ipHeaders });
+  expect(tokenResponse.status(), await tokenResponse.text()).toBe(200);
   const { token } = (await tokenResponse.json()) as { token: string };
   await page.waitForTimeout(3_100); // the form token has a 3-second minimum age
   const email = `${RUN}-erase@example.com`;
   const submitted = await request.post("/api/forms/lead/", {
+    headers: ipHeaders,
     data: {
       formType: "contacts",
       name: "Удаляемый",

@@ -7,7 +7,6 @@ import { StickyCta } from "@/components/ig/sticky-cta";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { PathTracker } from "@/components/quiz/path-tracker";
-import { Toaster } from "@/components/ui/sonner";
 import { getEnv } from "@/lib/env";
 import { rubik } from "./fonts";
 import type { Metadata } from "next";
@@ -32,6 +31,9 @@ export function generateMetadata(): Metadata {
  * form modals provider · `{modal}` slot of the quiz intercepting route (`@modal`, task 34) ·
  * `PathTracker` (last visited path → entry page of the quiz modal, task 34) · Yandex Metrika
  * (consent-gated; also captures UTM attribution on every page).
+ * No sonner `<Toaster />`: the public site never calls `toast()` (forms report inline), and the
+ * mounted toaster cost ~12 KB gzip of JS on every page (task 39). Mount it lazily if a site
+ * feature ever needs toasts.
  * Must stay static/ISR: no `headers()` / `cookies()` here — the header picks the order-page
  * variant on the client by pathname.
  */
@@ -61,7 +63,6 @@ export default function SiteLayout({
             <PathTracker />
           </Suspense>
         </FormDialogProvider>
-        <Toaster />
         <Metrika />
       </body>
     </html>

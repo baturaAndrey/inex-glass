@@ -27,8 +27,11 @@ export interface LegalPage {
   slug: string;
   title: string;
   breadcrumbLabel: string;
-  /** H1 and Title; legal pages have no description (17-meta / teksty give none). */
-  seo: { h1: string; title: string };
+  /**
+   * H1, Title and Description. 17-meta / teksty give no description for the legal pages: the
+   * descriptions are neutral factual sentences (Wave 7), to be approved by Inex.
+   */
+  seo: { h1: string; title: string; description: string };
 }
 
 export const POLICY = {
@@ -40,6 +43,8 @@ export const POLICY = {
     seo: {
       h1: "Политика обработки персональных данных",
       title: "Политика обработки персональных данных | Inex Glass",
+      description:
+        "Политика обработки персональных данных пользователей сайта inexglass.ru: цели, состав данных, сроки хранения, права субъекта и меры защиты.",
     },
   } satisfies LegalPage,
   /** Introduction, sections 1–2 (before the purposes table). */
@@ -174,6 +179,8 @@ export const CONSENT = {
     seo: {
       h1: "Согласие на обработку персональных данных",
       title: "Согласие на обработку персональных данных | Inex Glass",
+      description:
+        "Текст согласия на обработку персональных данных при отправке форм на сайте inexglass.ru: цели, перечень данных, срок действия и порядок отзыва.",
     },
   } satisfies LegalPage,
   body: [

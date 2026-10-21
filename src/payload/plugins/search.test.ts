@@ -8,12 +8,21 @@ describe("isExcludedFromSearch", () => {
     expect(isExcludedFromSearch("pages", { path: "/x/", seo: { noindex: true } })).toBe(true);
   });
 
-  it("keeps other pages and every other collection", () => {
+  it("keeps other pages and the 5/15/19 mm thicknesses", () => {
     expect(isExcludedFromSearch("pages", { template: "hub", path: "/obrabotka-stekla/" })).toBe(
       false
     );
-    // 5/15/19 mm are noindex for search engines but still searchable on the site.
-    expect(isExcludedFromSearch("thicknesses", { n: 15, seo: { noindex: true } })).toBe(false);
+    // 5/15/19 mm are noindex for search engines (`indexable: false`) but searchable on the site.
+    expect(isExcludedFromSearch("thicknesses", { n: 15, indexable: false })).toBe(false);
+  });
+
+  it("applies seo.noindex and service paths to every collection (same rule as the sitemap)", () => {
+    expect(isExcludedFromSearch("thicknesses", { n: 10, seo: { noindex: true } })).toBe(true);
+    expect(isExcludedFromSearch("articles", { slug: "x", seo: { noindex: true } })).toBe(true);
+    expect(isExcludedFromSearch("constructions", { path: "/zakaz/x/" })).toBe(true);
+    expect(isExcludedFromSearch("pages", { path: "/politika-konfidencialnosti/" })).toBe(true);
+    expect(isExcludedFromSearch("pages", { path: "/poisk/" })).toBe(true);
+    expect(isExcludedFromSearch("leads", { seo: { noindex: true } })).toBe(false);
   });
 });
 

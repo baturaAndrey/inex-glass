@@ -8,6 +8,8 @@
  * teksty/01-glavnaya.md («Подвал (ссылка-мост)»).
  */
 
+import { isRouterHref, MY_CALC_URL, ORDER_PATH_PREFIX, QUIZ_PATH, SEARCH_PATH } from "./nav-paths";
+
 /* ------------------------------------------------------------------------------------------ */
 /* Serialisable view models (server → client props)                                           */
 /* ------------------------------------------------------------------------------------------ */
@@ -128,10 +130,8 @@ export interface PromoBadgeData {
 /* URL table                                                                                   */
 /* ------------------------------------------------------------------------------------------ */
 
-export const QUIZ_PATH = "/raschet-stoimosti/";
-export const MY_CALC_URL = "/raschet-stoimosti/?resume=1";
-export const SEARCH_PATH = "/poisk/";
-export const ORDER_PATH_PREFIX = "/zakaz/";
+// Client components import these from `./nav-paths` directly (keeps this table out of their JS).
+export { isRouterHref, MY_CALC_URL, ORDER_PATH_PREFIX, QUIZ_PATH, SEARCH_PATH };
 
 export const URLS = {
   home: "/",
@@ -190,17 +190,6 @@ export const URLS = {
   privacy: "/politika-konfidencialnosti/",
   consent: "/soglasie-na-obrabotku-personalnyh-dannyh/",
 } as const;
-
-/**
- * Hrefs that must bypass the Next router (same rule as `ig/text-link`): protocol links
- * (`https:`, `tel:`, `mailto:`), protocol-relative `//`, the Payload admin (separate root
- * layout — never `next/link`) and `/api/*` route handlers.
- */
-const NON_ROUTER_HREF = /^(?:[a-z][a-z\d+.-]*:|\/\/|\/(?:admin|api)(?:[/?#]|$))/i;
-
-export function isRouterHref(href: string): boolean {
-  return !NON_ROUTER_HREF.test(href);
-}
 
 /* ------------------------------------------------------------------------------------------ */
 /* Defaults                                                                                    */

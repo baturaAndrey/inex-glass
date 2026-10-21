@@ -3,9 +3,11 @@ import type { NextRequest } from "next/server";
 import { createHash, timingSafeEqual } from "node:crypto";
 
 /**
- * Site proxy. Does exactly two things:
- * 1. Basic auth on staging (`SITE_ENV=staging` and `STAGING_BASIC_AUTH=user:pass`).
- * 2. 301 from a path with uppercase letters to its lowercase form (query preserved); for
+ * Site proxy. Does exactly three things:
+ * 1. Plain 404 for vulnerability-scanner paths (`/wp-login.php`, `/.env`, …) — see
+ *    `isScannerPath`.
+ * 2. Basic auth on staging (`SITE_ENV=staging` and `STAGING_BASIC_AUTH=user:pass`).
+ * 3. 301 from a path with uppercase letters to its lowercase form (query preserved); for
  *    `/zakaz/<token>/` only the prefix is lowercased.
  *
  * "No trailing slash -> slash" is done by Next itself (`trailingSlash: true`, status 308).
@@ -85,13 +87,105 @@ function lowercaseRedirect(request: NextRequest): NextResponse | null {
   return NextResponse.redirect(target, 301);
 }
 
+/**
+ * File extensions that never exist on this site but are probed by vulnerability scanners
+ * (`/wp-login.php`, `/backup.sql`, `/.env`, `/.git/config`). Keep in sync with the second
+ * `config.matcher` entry, which lets such dotted paths reach the proxy at all.
+ */
+const SCANNER_EXTENSIONS = new Set([
+  "php",
+  "php3",
+  "php4",
+  "php5",
+  "php7",
+  "phtml",
+  "asp",
+  "aspx",
+  "jsp",
+  "cgi",
+  "env",
+  "ini",
+  "sql",
+  "bak",
+  "git",
+  "svn",
+  "htaccess",
+  "htpasswd",
+]);
+
+/** Directory names of other CMSs / admin tools probed by scanners (whole segments only). */
+const SCANNER_SEGMENTS = new Set([
+  "wp-admin",
+  "wp-content",
+  "wp-includes",
+  "wp-json",
+  "phpmyadmin",
+  "cgi-bin",
+]);
+
+/** ACME HTTP-01 challenges (Let's Encrypt via Traefik) and other RFC 8615 URIs. */
+const WELL_KNOWN_PREFIX = "/.well-known/";
+
+/**
+ * Whether the path is an obvious vulnerability-scanner probe. Such URLs are answered with a
+ * bare 404 before rendering: the ISR catch-all `(site)/[...slug]` would otherwise render and
+ * store a ~186 KB page on disk for EVERY probed URL, growing the container's cache without bound
+ * (task 41). Conservative on purpose: every real route is lowercase translit without these
+ * extensions or segments. Exported for unit tests.
+ */
+export function isScannerPath(pathname: string): boolean {
+  let decoded = pathname;
+  try {
+    decoded = decodeURIComponent(pathname);
+  } catch {
+    // Malformed encoding: inspect the raw path.
+  }
+  const lowered = decoded.toLowerCase();
+  if (lowered.startsWith(WELL_KNOWN_PREFIX)) return false;
+
+  return lowered.split("/").some((segment) => {
+    if (SCANNER_SEGMENTS.has(segment)) return true;
+    // Every dot-separated suffix counts: `.env.local`, `backup.sql.gz`, `.git`.
+    return segment
+      .split(".")
+      .slice(1)
+      .some((extension) => SCANNER_EXTENSIONS.has(extension));
+  });
+}
+
+function scannerResponse(request: NextRequest): NextResponse | null {
+  if (!isScannerPath(request.nextUrl.pathname)) return null;
+  return new NextResponse("Not Found", {
+    status: 404,
+    headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
+  });
+}
+
 export function proxy(request: NextRequest) {
-  return stagingAuthResponse(request) ?? lowercaseRedirect(request) ?? NextResponse.next();
+  // Scanner probes first: a 404 is the right answer on every stand, and on staging it spares a
+  // basic-auth challenge for junk traffic (nothing behind these URLs needs protecting).
+  return (
+    scannerResponse(request) ??
+    stagingAuthResponse(request) ??
+    lowercaseRedirect(request) ??
+    NextResponse.next()
+  );
 }
 
 export const config = {
-  // Excluded: /admin, /api, /_next and any path with a dot (static files). The proxy buffers
-  // only 10 MB of request body and silently truncates the rest, so the admin and API (uploads,
-  // /api/health/ healthcheck) must never pass through it.
-  matcher: ["/((?!admin(?:/|$)|api(?:/|$)|_next/|.*\\..*).*)"],
+  matcher: [
+    // Excluded: /admin, /api, /_next and any path with a dot (static files). The proxy buffers
+    // only 10 MB of request body and silently truncates the rest, so the admin and API
+    // (uploads, /api/health/ healthcheck) must never pass through it.
+    "/((?!admin(?:/|$)|api(?:/|$)|_next/|.*\\..*).*)",
+    // Dotted scanner probes (`/wp-login.php`, `/.env`, `/.git/config`, `/wp-content/x.js`) that
+    // the entry above excludes; handled by `isScannerPath`. Matchers are case-sensitive and
+    // must be static string literals (Next reads `config` at build time), so every letter is
+    // spelled as an `[xX]` class: `/WP-LOGIN.PHP` or `/.ENV` must reach the proxy too. Keep in
+    // sync with SCANNER_EXTENSIONS / SCANNER_SEGMENTS. Undotted paths of any case already pass
+    // the first entry. Real static files (fonts, images, robots.txt, the IndexNow key file)
+    // never match.
+    "/((?!admin(?:/|$)|api(?:/|$)|_next/).*\\.(?:[pP][hH][pP][3-7]?|[pP][hH][tT][mM][lL]|[aA][sS][pP][xX]?|[jJ][sS][pP]|[cC][gG][iI]|[eE][nN][vV]|[iI][nN][iI]|[sS][qQ][lL]|[bB][aA][kK]|[gG][iI][tT]|[sS][vV][nN]|[hH][tT][aA][cC][cC][eE][sS][sS]|[hH][tT][pP][aA][sS][sS][wW][dD])(?:[./].*)?)",
+    "/((?:.*/)?(?:[wW][pP]-[aA][dD][mM][iI][nN]|[wW][pP]-[cC][oO][nN][tT][eE][nN][tT]|[wW][pP]-[iI][nN][cC][lL][uU][dD][eE][sS]|[wW][pP]-[jJ][sS][oO][nN]|[pP][hH][pP][mM][yY][aA][dD][mM][iI][nN]|[cC][gG][iI]-[bB][iI][nN])/.*)",
+  ],
 };

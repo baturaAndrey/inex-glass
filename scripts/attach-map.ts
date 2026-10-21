@@ -71,6 +71,10 @@ const SCHEMA_GAP_SECTION =
   "В схеме нет поля фона секции: блоки задают фон токеном `background` (bg/sf/dark/…), " +
   "поля-изображения у секций нет. Нужна отдельная задача на схему.";
 
+const noHubCard = (href: string) =>
+  `Ни одна карточка блока \`cards\` не ссылается на хаб ${href}, а hero хаба (вариант p5Top) ` +
+  "не выводит изображение — места для иллюстрации нет. Привязать после добавления карточки.";
+
 const card = (collection: AttachCollection, slug: string, path: string): readonly Binding[] => [
   { kind: "docField", collection, slug, field: "card.image" },
   { kind: "cardLinks", hrefs: [path] },
@@ -238,12 +242,12 @@ export const ATTACH_MAP: Readonly<Record<string, AttachRule>> = {
   "doc:pages/zakalennoe-steklo#card.image": {
     bindings: [{ kind: "cardLinks", hrefs: ["/zakalennoe-steklo/"] }],
   },
-  "doc:pages/obrabotka-stekla#card.image": {
-    bindings: [{ kind: "cardLinks", hrefs: ["/obrabotka-stekla/"] }],
-  },
-  "doc:pages/kak-zakazat#card.image": {
-    bindings: [{ kind: "cardLinks", hrefs: ["/kak-zakazat/"] }],
-  },
+  // No `cards` item links to these two hubs (the home lists the six processing services one by
+  // one; «Как заказать» has no hub card anywhere) and their hero is the `p5Top` variant, which
+  // renders no image. A `cardLinks` binding could never match (wave-6 review), so the targets
+  // are documented gaps until a hub card is added to the content.
+  "doc:pages/obrabotka-stekla#card.image": { noTarget: noHubCard("/obrabotka-stekla/") },
+  "doc:pages/kak-zakazat#card.image": { noTarget: noHubCard("/kak-zakazat/") },
 
   /* ---- Articles (blog cards, home «Полезное») -------------------------------------------- */
   "doc:articles/chem-otlichaetsya-zakalennoe-steklo-ot-obychnogo#card.image": {

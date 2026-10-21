@@ -157,6 +157,64 @@ function logFailure(req: PayloadRequest, collection: string, error: unknown): vo
   });
 }
 
+/** A document whose stored `path` was rewritten without hooks (the path cascade). */
+export interface MovedDoc {
+  id: string;
+  /** Path before the move. */
+  from: string;
+  /** Path after the move. */
+  to: string;
+}
+
+/**
+ * Site paths to submit after the path cascade moved `moves` of `collection`: for each moved
+ * document (read from `docs`, its published version) the old and the new URL — when it is
+ * indexable — plus the listing. Pure.
+ */
+export function movedPaths(
+  collection: string,
+  moves: readonly MovedDoc[],
+  docs: ReadonlyMap<string, unknown>
+): string[] {
+  const paths = new Set<string>();
+  for (const move of moves) {
+    const doc = docs.get(move.id);
+    if (typeof doc !== "object" || doc === null) continue;
+    const current = { ...doc, path: move.to };
+    const previous = { ...doc, path: move.from };
+    for (const path of changedPaths(collection, current, previous)) paths.add(path);
+  }
+  return [...paths];
+}
+
+/**
+ * Queues IndexNow for documents moved by the path cascade (`src/payload/fields/path.ts`), whose
+ * own hooks do not run. Same gates as the hooks (environment, key, settings, seed context); runs
+ * inside the parent's transaction (`req`). Never throws: a failure is logged.
+ */
+export async function queueMovedDocs(
+  req: PayloadRequest,
+  collection: string,
+  moves: readonly MovedDoc[]
+): Promise<void> {
+  if (moves.length === 0 || isDisabled(req)) return;
+  try {
+    const { docs } = await req.payload.find({
+      collection: collection as CollectionSlug,
+      where: { id: { in: moves.map((move) => move.id) } },
+      depth: 0,
+      draft: false,
+      pagination: false,
+      overrideAccess: true,
+      req,
+    });
+    const byId = new Map<string, unknown>(docs.map((doc) => [String(doc.id), doc]));
+    await queueSubmit(req, collection, movedPaths(collection, moves, byId));
+  } catch (error) {
+    logFailure(req, collection, error);
+  }
+}
+
 const afterChange: CollectionAfterChangeHook = async ({
   collection,
   doc,

@@ -1,5 +1,6 @@
 import { telHref } from "@/components/layout/nav-data";
 import type { Contact } from "@/payload-types";
+import type { MapPoint } from "./map-widget";
 
 /**
  * Pure helpers of the contacts page (task 29): what a location card shows and the Yandex.Maps
@@ -65,16 +66,10 @@ export function mapQuery(location: Pick<ContactLocation, "city" | "address">): s
   return address.toLowerCase().includes(city.toLowerCase()) ? address : `${city}, ${address}`;
 }
 
-export const YANDEX_WIDGET_BASE = "https://yandex.ru/map-widget/v1/";
+// Widget URL + point shape live in the zod-free `./map-widget` (imported by the client map).
+export { YANDEX_WIDGET_BASE, YANDEX_WIDGET_ZOOM, yandexWidgetUrl } from "./map-widget";
+export type { MapPoint } from "./map-widget";
 export const YANDEX_MAPS_BASE = "https://yandex.ru/maps/";
-/** Street-level zoom of the embedded widget. */
-export const YANDEX_WIDGET_ZOOM = 16;
-
-/** Embeddable widget URL (iframe `src`), loaded only after the visitor clicks «Показать карту». */
-export function yandexWidgetUrl(query: string): string {
-  const params = new URLSearchParams({ text: query, z: String(YANDEX_WIDGET_ZOOM) });
-  return `${YANDEX_WIDGET_BASE}?${params.toString()}`;
-}
 
 /** Only an `https://` link is trusted from the CMS; anything else falls back to a search URL. */
 function isHttpsUrl(value: string): boolean {
@@ -93,18 +88,6 @@ export function yandexMapsUrl(
   if (custom && isHttpsUrl(custom)) return custom;
   const params = new URLSearchParams({ text: mapQuery(location) });
   return `${YANDEX_MAPS_BASE}?${params.toString()}`;
-}
-
-/** One point of the click-to-load map. */
-export interface MapPoint {
-  key: string;
-  /** Number of the pin, the same as on the address card (1-based). */
-  number: number;
-  title: string;
-  /** Widget search text. */
-  query: string;
-  /** «Открыть в Яндекс.Картах». */
-  openUrl: string;
 }
 
 export function mapPoints(contacts: Contact | null | undefined): MapPoint[] {

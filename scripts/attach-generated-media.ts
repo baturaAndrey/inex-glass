@@ -23,9 +23,17 @@
  * Slots are filled only when empty (`canAttach` in `./attach-map.ts`); each changed document is
  * written once, as the published version (`draft: false`), with revalidation hooks off.
  *
- * Exit code 1 when an entry fails (unreadable file, invalid alt, write error) or its target is
- * missing from `ATTACH_MAP`. Documented schema gaps (`noTarget` in the map) are listed but do
- * not fail the run.
+ * Editor drafts are never clobbered (checked in --dry-run too): a `draft: false` write is based on
+ * the PUBLISHED version and becomes the newest version, so a newer unpublished editor draft would
+ * drop out of the admin, and a never-published document would get published. Such documents of
+ * draft-enabled collections are skipped (`skipped: newer draft`) without failing the run; re-run
+ * after the editor publishes, or attach the image by hand.
+ *
+ * Exit code 1 when an entry fails (unreadable file, invalid alt, write error), its target is
+ * missing from `ATTACH_MAP`, or a mapped target is not found: a document / hero binding finds
+ * nothing, or a card-only target matches no card (listed in the closing summary; `cardLinks`
+ * beside a document binding are optional extras). Documented schema gaps (`noTarget` in the map) are listed but do not
+ * fail the run.
  *
  * Production: run in the `tools` container with the media volume (`/data/media` = MEDIA_DIR)
  * mounted, otherwise the files land where the app does not serve them.
@@ -120,6 +128,7 @@ type RowResult =
   | "skipped: no document"
   | "skipped: no hero block"
   | "skipped: no matching card"
+  | "skipped: newer draft"
   | "no target"
   | "error";
 
@@ -478,6 +487,29 @@ async function slotsOf(
   }
 }
 
+/**
+ * Why writing this document would clobber editor work, or `null` when the write is safe. Only
+ * draft-enabled collections are affected: there a `draft: false` update is applied on top of the
+ * PUBLISHED version and becomes the newest version, hiding (not merging) a newer draft.
+ */
+async function draftConflict(ctx: SeedContext, state: DocState): Promise<string | null> {
+  const versions = ctx.payload.collections[state.collection]?.config.versions;
+  if (!versions || !versions.drafts) return null;
+  if (state.doc._status !== "published") {
+    return "документ не опубликован — запись опубликовала бы черновик";
+  }
+  const latest = (await ctx.payload.findByID({
+    collection: state.collection,
+    id: String(state.doc.id),
+    draft: true,
+    depth: 0,
+    overrideAccess: true,
+  })) as unknown as Json;
+  return latest._status === "draft"
+    ? "есть черновик новее опубликованной версии — опубликуйте его и повторите запуск"
+    : null;
+}
+
 /* ------------------------------------------------------------------------------------------ */
 /* Main                                                                                       */
 /* ------------------------------------------------------------------------------------------ */
@@ -519,6 +551,8 @@ async function main(args: Args): Promise<number> {
   const rows: Row[] = [];
   const needsRedo: ManifestEntry[] = [];
   const mediaActions = new Map<string, number>();
+  /** Mapped targets whose document / hero block / card was not found (fail the run). */
+  const notFound: string[] = [];
   let failed = false;
 
   const store = new DocStore(ctx);
@@ -563,9 +597,24 @@ async function main(args: Args): Promise<number> {
       continue;
     }
 
+    // «Target not found» fails the run (wave-6 review): a document / hero binding that finds
+    // nothing, or a card-only target (hub cards) whose `cardLinks` match no card. `cardLinks`
+    // next to a document binding are optional extras (a home card may or may not exist), and
+    // under `--only` the card scan covers one collection only, so those misses do not count.
+    const cardsOptional = bindings.some((b) => b.kind !== "cardLinks");
+    const cardMisses: string[] = [];
+    let cardHits = 0;
     for (const binding of bindings) {
       const { slots, empty, where } = await slotsOf(store, binding, args.only);
+      if (binding.kind === "cardLinks") {
+        if (slots.length > 0) cardHits += 1;
+        else cardMisses.push(`${entry.id} → ${where} (${empty})`);
+      }
       if (slots.length === 0) {
+        if (binding.kind !== "cardLinks") {
+          failed = true;
+          notFound.push(`${entry.id} → ${where} (${empty})`);
+        }
         rows.push({ entryId: entry.id, mediaId: media.id, target: where, result: empty });
         continue;
       }
@@ -589,10 +638,32 @@ async function main(args: Args): Promise<number> {
         if (isWrite(decision)) slot.state.rows.push(row);
       }
     }
+    if (!cardsOptional && !args.only && cardHits === 0 && cardMisses.length > 0) {
+      failed = true;
+      notFound.push(...cardMisses);
+    }
   }
 
-  // One write per changed document: the published version, without extra drafts.
+  // One write per changed document: the published version, without extra drafts. Documents with
+  // a newer editor draft are skipped first (a read-only check, so --dry-run reports them too).
+  let draftSkipped = 0;
   for (const state of store.dirtyStates()) {
+    let conflict: string | null;
+    try {
+      conflict = await draftConflict(ctx, state);
+    } catch (error) {
+      failed = true;
+      const note = error instanceof Error ? error.message : String(error);
+      for (const row of state.rows) Object.assign(row, { result: "error" as const, note });
+      continue;
+    }
+    if (conflict) {
+      draftSkipped += 1;
+      for (const row of state.rows) {
+        Object.assign(row, { result: "skipped: newer draft" as const, note: conflict });
+      }
+      continue;
+    }
     if (args.dryRun) continue;
     const patch = Object.fromEntries([...state.dirty].map((key) => [key, state.doc[key]]));
     try {
@@ -621,9 +692,18 @@ async function main(args: Args): Promise<number> {
     `media: ${[...mediaActions].map(([action, n]) => `${action} ${n}`).join(", ") || "—"}; ` +
       `привязки: attached ${count("attached")}, replaced ${count("replaced placeholder")}, ` +
       `unchanged ${count("unchanged")}, real ${count("skipped: already has real image")}, ` +
-      `placeholder ${count("skipped: has placeholder")}, no target ${count("no target")}, ` +
-      `errors ${count("error")}; документов к записи: ${store.dirtyStates().length}`
+      `placeholder ${count("skipped: has placeholder")}, ` +
+      `newer draft ${count("skipped: newer draft")}, no target ${count("no target")}, ` +
+      `errors ${count("error")}; ` +
+      `документов к записи: ${store.dirtyStates().length - draftSkipped}` +
+      (draftSkipped > 0 ? ` (пропущено из-за черновиков: ${draftSkipped})` : "")
   );
+  if (notFound.length > 0) {
+    log(
+      `ОШИБКА: цели не найдены (${notFound.length}) — исправьте scripts/attach-map.ts или контент:`
+    );
+    for (const line of notFound) log(`  ${line}`);
+  }
   if (needsRedo.length > 0) {
     log(`ждут перегенерации (needsRedo), загружены как есть: ${needsRedo.length}`);
     for (const entry of needsRedo) log(`  ${entry.id}: ${entry.redoReason ?? ""}`);

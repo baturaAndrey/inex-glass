@@ -1,11 +1,10 @@
 "use client";
 
-import { useId, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useId, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { Loader2, Search, X } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ig/button";
-import { Container } from "@/components/ig/container";
 import { Input } from "@/components/ig/input";
 import {
   useSearchSuggestions,
@@ -15,7 +14,7 @@ import { pluralRu } from "@/lib/domain/plural";
 import { searchPageHref } from "@/lib/search/pagination";
 import { SEARCH_KIND_LABELS, SEARCH_QUERY_MAX_LENGTH } from "@/lib/search/types";
 import { cn } from "@/lib/utils";
-import { SEARCH_PATH } from "./nav-defaults";
+import { SEARCH_PATH } from "./nav-paths";
 
 export interface HeaderSearchProps {
   /** Visually hidden label, «Поиск по сайту». */
@@ -206,50 +205,59 @@ export function HeaderSearch({
 
 export type MobileSearchProps = Omit<HeaderSearchProps, "autoFocus" | "onNavigate">;
 
+const loadPanel = () => import("./mobile-search-panel");
+
+/** Client-only: the closed overlay has no markup (Radix renders nothing while closed anyway). */
+const MobileSearchPanel = dynamic(() => loadPanel().then((mod) => mod.MobileSearchPanel), {
+  ssr: false,
+});
+
+/** Starts loading the overlay chunk before the tap (hover / focus / touch of the button). */
+const preloadPanel = () => void loadPanel();
+
 /**
  * Phone (≤599 px) search: an icon button opening a panel at the top of the screen with the same
  * form. Radix Dialog: focus trap, Esc / overlay close, focus returns to the button. The panel
  * closes when a suggestion or the results page is opened.
+ *
+ * The overlay (`./mobile-search-panel`) is a lazy chunk mounted on the first open and kept
+ * mounted afterwards — task 39, JS budget.
  */
 export function MobileSearch({ label, placeholder, className }: MobileSearchProps) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  // `ig/Button` takes no ref: the clicked element itself is remembered for the focus return.
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   return (
-    <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
-      <DialogPrimitive.Trigger asChild>
-        <Button variant="ghost" size="icon" aria-label={label} className={cn("size-11", className)}>
-          <Search aria-hidden="true" />
-        </Button>
-      </DialogPrimitive.Trigger>
-      <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50 duration-(--ig-dur-base) motion-reduce:animate-none" />
-        <DialogPrimitive.Content
-          aria-describedby={undefined}
-          // Esc with the suggestions open closes the list only (the field handles it); the
-          // panel closes on the next Esc.
-          onEscapeKeyDown={(event) => {
-            const target = event.target as HTMLElement | null;
-            if (target?.getAttribute("aria-expanded") === "true") event.preventDefault();
-          }}
-          className="bg-surface shadow-modal data-[state=open]:animate-in data-[state=open]:slide-in-from-top-2 fixed inset-x-0 top-0 z-50 py-3 duration-(--ig-dur-base) outline-none motion-reduce:animate-none"
-        >
-          <DialogPrimitive.Title className="sr-only">{label}</DialogPrimitive.Title>
-          <Container className="flex items-center gap-2">
-            <HeaderSearch
-              label={label}
-              placeholder={placeholder}
-              className="flex-1"
-              autoFocus
-              onNavigate={() => setOpen(false)}
-            />
-            <DialogPrimitive.Close asChild>
-              <Button variant="ghost" size="icon" aria-label="Закрыть поиск" className="size-11">
-                <X aria-hidden="true" />
-              </Button>
-            </DialogPrimitive.Close>
-          </Container>
-        </DialogPrimitive.Content>
-      </DialogPrimitive.Portal>
-    </DialogPrimitive.Root>
+    <>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label={label}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={(event) => {
+          triggerRef.current = event.currentTarget;
+          setMounted(true);
+          setOpen(true);
+        }}
+        onPointerEnter={preloadPanel}
+        onTouchStart={preloadPanel}
+        onFocus={preloadPanel}
+        className={cn("size-11", className)}
+      >
+        <Search aria-hidden="true" />
+      </Button>
+      {mounted ? (
+        <MobileSearchPanel
+          open={open}
+          onOpenChange={setOpen}
+          label={label}
+          placeholder={placeholder}
+          triggerRef={triggerRef}
+        />
+      ) : null}
+    </>
   );
 }

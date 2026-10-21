@@ -88,6 +88,22 @@ export const KNOWN_CITIES = [
   "Москва",
 ] as const;
 
+/**
+ * A location that names a region, not a settlement: «Челябинская область», «Пермский край»,
+ * «Ханты-Мансийский автономный округ – Югра», «ХМАО», «Республика Башкортостан», «… район».
+ * Such a value never becomes a `cities` record.
+ */
+export const REGION_LOCATION =
+  /(?<![\p{L}])(?:област\p{L}*|кра[йя]|округ\p{L}*|республик\p{L}*|район\p{L}*|[\p{Lu}]*АО)(?![\p{L}])/u;
+
+/** Page publication date in the markup (none on inex.su at the 2026-10-21 crawl). */
+export const PAGE_DATE = {
+  meta: "meta[property='article:published_time'], meta[name='date'], meta[itemprop='datePublished']",
+  /** JSON-LD `"datePublished": "…"`. */
+  jsonLd: /"datePublished"\s*:\s*"([^"]+)"/,
+  time: ".content_right time[datetime]",
+} as const;
+
 /** Russian case endings to accept «в Челябинске», «Омска»… when searching the text. */
 export function cityPattern(city: string): RegExp {
   const stem = city.replace(/[ьаея]$/i, "");

@@ -189,7 +189,7 @@ describe("collectSitemapEntries", () => {
     expect(state.finds.find((args) => args.collection === "thicknesses")?.where).toBeUndefined();
   });
 
-  it("an empty site still lists the home page and the listings", () => {
+  it("an empty site lists the home page and fixed routes, but not the empty listings", () => {
     const empty = {
       docs: {
         pages: [],
@@ -207,6 +207,36 @@ describe("collectSitemapEntries", () => {
     const now = new Date("2026-10-21T00:00:00.000Z");
     const list = buildSitemapEntries(empty, `${ORIGIN}/`, now);
     expect(list[0]).toEqual({ url: `${ORIGIN}/`, lastModified: now });
-    expect(paths(list)).toEqual(expect.arrayContaining(["/obekty/", "/blog/", "/kontakty/"]));
+    expect(paths(list)).toEqual(expect.arrayContaining(["/kontakty/", "/raschet-stoimosti/"]));
+    expect(paths(list)).not.toContain("/obekty/");
+    expect(paths(list)).not.toContain("/blog/");
+  });
+
+  it("drops a listing without published documents even when a page backs it", async () => {
+    state.docs.objects = objects(2, "draft-obj", "draft");
+    state.docs.articles = [];
+    let list = paths(await collectSitemapEntries());
+    expect(list).not.toContain("/obekty/");
+    expect(list).not.toContain("/blog/");
+    expect(list.some((path) => path.startsWith("/obekty/page/"))).toBe(false);
+
+    state.docs.objects = objects(1);
+    state.docs.articles = articles(1);
+    list = paths(await collectSitemapEntries());
+    expect(list).toContain("/obekty/");
+    expect(list).toContain("/blog/");
+  });
+
+  it("keeps a noindex listing and its pagination out even with published documents", async () => {
+    state.docs.pages = (state.docs.pages ?? []).map((doc) =>
+      doc.path === "/obekty/" || doc.path === "/blog/" ? { ...doc, seo: { noindex: true } } : doc
+    );
+    const list = paths(await collectSitemapEntries());
+    expect(list).not.toContain("/obekty/");
+    expect(list).not.toContain("/blog/");
+    expect(list.some((path) => /^\/(obekty|blog)\/page\//.test(path))).toBe(false);
+    // The detail pages themselves stay listed.
+    expect(list).toContain("/obekty/obj-1/");
+    expect(list).toContain("/blog/statya-1/");
   });
 });

@@ -24,7 +24,7 @@ import {
   HOME_USEFUL,
   HOME_WHY,
 } from "../content/home";
-import { upsertByField } from "../context";
+import { mayOverwrite, upsertByField } from "../context";
 import { markdown } from "../lexical";
 import type { SeedContext } from "../context";
 
@@ -34,8 +34,8 @@ import type { SeedContext } from "../context";
  * (`hero`, `form`) or by `anchorId` (the rest), so the anchors below are part of the contract.
  *
  * Update rule: the document is created when missing; an existing one is overwritten only with
- * `--force` or while it is still untouched (created by the mini-seed: `updatedAt` within
- * `UNTOUCHED_WINDOW_MS` of `createdAt`). An edited home page is skipped with a log line.
+ * `--force` or while it is unchanged since the seed's last write (`mayOverwrite` in
+ * `../context.ts`, seed markers). An edited home page is skipped with a log line.
  * The slice never creates objects, media or globals.
  */
 
@@ -51,9 +51,6 @@ export const HOME_ANCHORS = {
   objectsFallback: "objects-fallback",
   useful: "useful",
 } as const;
-
-/** A document saved once (by a seed) has `updatedAt ≈ createdAt`; an editor's save moves it. */
-const UNTOUCHED_WINDOW_MS = 2000;
 
 type LayoutBlock = NonNullable<Page["layout"]>[number];
 type CtaButton = NonNullable<HeroBlock["buttons"]>[number];
@@ -121,8 +118,8 @@ export async function buildHomeLayout(ctx: SeedContext): Promise<LayoutBlock[]> 
     background: "bg",
     layout: "g4",
     heading: HOME_GLASS.heading,
-    // The price footnote (rendered under the grid only while a price is shown).
-    sub: HOME_GLASS.footnote,
+    // No `sub`: the price footnote comes from the `prices.caption` global (see HomeGlassCards).
+    sub: null,
     items: HOME_GLASS.items.map((item) =>
       card(item, "priceHint" in item ? { priceHint: item.priceHint } : {})
     ),
@@ -225,29 +222,9 @@ export async function buildHomeLayout(ctx: SeedContext): Promise<LayoutBlock[]> 
   ];
 }
 
-/** `true` while the stored home page has never been saved after its creation. */
-export function isUntouched(doc: { createdAt: string; updatedAt: string }): boolean {
-  const created = Date.parse(doc.createdAt);
-  const updated = Date.parse(doc.updatedAt);
-  if (!Number.isFinite(created) || !Number.isFinite(updated)) return false;
-  return Math.abs(updated - created) < UNTOUCHED_WINDOW_MS;
-}
-
 export async function seed(ctx: SeedContext): Promise<void> {
-  const existing = await ctx.payload.find({
-    collection: "pages",
-    where: { isHome: { equals: true } },
-    limit: 1,
-    depth: 0,
-    pagination: false,
-    overrideAccess: true,
-  });
-  const current = existing.docs[0];
-  const overwrite = ctx.force || (current ? isUntouched(current) : false);
-  if (current && !overwrite) {
-    ctx.log("главная отредактирована в админке — пропуск (обновить: --force)");
-    return;
-  }
+  const overwrite = await mayOverwrite(ctx, "pages", { isHome: { equals: true } }, HOME_PATH);
+  if (!overwrite) return;
 
   await upsertByField(
     ctx,

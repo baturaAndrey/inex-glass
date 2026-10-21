@@ -1,8 +1,8 @@
 "use client";
 
-import type { ComponentPropsWithoutRef, MouseEvent } from "react";
+import type { ComponentPropsWithoutRef, FocusEvent, MouseEvent, PointerEvent } from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { useFormDialog } from "./form-dialog-provider";
+import { preloadFormDialog, useFormDialog } from "./form-dialog-provider";
 import type { FormKey, FormParams } from "./form-dialog-provider";
 
 export type FormTriggerProps = Omit<ComponentPropsWithoutRef<"button">, "type"> & {
@@ -17,16 +17,27 @@ export type FormTriggerProps = Omit<ComponentPropsWithoutRef<"button">, "type"> 
  *
  * `<FormTrigger formKey="callback" asChild><Button>Заказать звонок</Button></FormTrigger>`.
  * Without `asChild` renders a plain `<button type="button">`. A child `onClick` that calls
- * `preventDefault()` cancels opening.
+ * `preventDefault()` cancels opening. Hover / focus preloads the dialog chunk (task 39).
  */
 export function FormTrigger({
   formKey,
   params,
   asChild = false,
   onClick,
+  onPointerEnter,
+  onFocus,
   ...props
 }: FormTriggerProps) {
   const { openForm } = useFormDialog();
+
+  const handlePointerEnter = (event: PointerEvent<HTMLButtonElement>) => {
+    onPointerEnter?.(event);
+    preloadFormDialog();
+  };
+  const handleFocus = (event: FocusEvent<HTMLButtonElement>) => {
+    onFocus?.(event);
+    preloadFormDialog();
+  };
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
@@ -36,7 +47,14 @@ export function FormTrigger({
 
   if (asChild) {
     return (
-      <Slot aria-haspopup="dialog" data-form-trigger={formKey} {...props} onClick={handleClick} />
+      <Slot
+        aria-haspopup="dialog"
+        data-form-trigger={formKey}
+        {...props}
+        onClick={handleClick}
+        onPointerEnter={handlePointerEnter}
+        onFocus={handleFocus}
+      />
     );
   }
   return (
@@ -46,6 +64,8 @@ export function FormTrigger({
       data-form-trigger={formKey}
       {...props}
       onClick={handleClick}
+      onPointerEnter={handlePointerEnter}
+      onFocus={handleFocus}
     />
   );
 }

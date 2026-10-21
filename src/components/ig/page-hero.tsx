@@ -174,7 +174,7 @@ function P5Hero({
   );
 }
 
-/** `sizes` shared by both copies of the photo so the browser downloads one file. */
+/** The photo spans the full width on phones and the right 58% from 600 px. */
 const HOME_MEDIA_SIZES = "(max-width: 599px) 100vw, 58vw";
 
 /**
@@ -184,7 +184,11 @@ const HOME_MEDIA_SIZES = "(max-width: 599px) 100vw, 58vw";
  */
 const HOME_INDENT = "ml-(--ig-gutter) max-md:ml-0";
 
-/** Home first screen (`.hero`): photo with a soft fade, caps H1, glass stats. */
+/**
+ * Home first screen (`.hero`): photo with a soft fade, caps H1, glass stats.
+ * One `<img>` only (task 39): the former blurred backdrop copy of the photo duplicated the LCP
+ * image in the HTML and was hidden on the home page anyway (task 22).
+ */
 function HomeHero({
   title,
   titleId = DEFAULT_TITLE_ID,
@@ -204,25 +208,16 @@ function HomeHero({
     >
       {media ? (
         <>
-          {/* Blurred backdrop that tints the area under the text (desktop/tablet only). */}
-          <div
-            className="absolute -inset-10 blur-[28px] saturate-[1.05] max-sm:hidden"
-            aria-hidden="true"
-          >
-            <Image
-              src={media.src}
-              alt=""
-              fill
-              sizes={HOME_MEDIA_SIZES}
-              className="object-cover object-right"
-            />
-          </div>
           <div className="absolute top-0 right-0 h-full w-[58%] [mask-image:linear-gradient(90deg,transparent_0%,black_32%)] max-sm:relative max-sm:h-[240px] max-sm:w-full max-sm:[mask-image:none]">
             <Image
               src={media.src}
               alt={media.alt}
               fill
+              // LCP element: preloaded and fetched with high priority (task 39). Quality 60 is
+              // the large-hero setting of next.config `images.qualities`.
               preload
+              fetchPriority="high"
+              quality={60}
               sizes={HOME_MEDIA_SIZES}
               className="object-cover"
             />

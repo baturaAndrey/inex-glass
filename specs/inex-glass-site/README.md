@@ -197,9 +197,9 @@ graph TD
 - [x] [task-38-placeholder-media](./tasks/task-38-placeholder-media.md) — Загрузка временных изображений в CMS
 
 ### Wave 7
-- [ ] [task-39-perf-images](./tasks/task-39-perf-images.md) — Производительность и изображения (CWV)
-- [ ] [task-40-content-audit](./tasks/task-40-content-audit.md) — Аудит контента, SEO и частотностей (Wordkeeper), e2e по всем URL
-- [ ] [task-41-prod-deploy](./tasks/task-41-prod-deploy.md) — Prod в Dokploy, домены, бэкапы
+- [x] [task-39-perf-images](./tasks/task-39-perf-images.md) — Производительность и изображения (CWV)
+- [x] [task-40-content-audit](./tasks/task-40-content-audit.md) — Аудит контента, SEO и частотностей (Wordkeeper), e2e по всем URL
+- [x] [task-41-prod-deploy](./tasks/task-41-prod-deploy.md) — Prod в Dokploy, домены, бэкапы
 
 ### Wave 8
 - [ ] [task-42-final-acceptance](./tasks/task-42-final-acceptance.md) — Финальная приёмка и выпуск

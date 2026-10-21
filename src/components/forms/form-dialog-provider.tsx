@@ -2,12 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
-import { Button } from "@/components/ig/button";
-import { useReturnFocus } from "@/components/ig/use-return-focus";
-import { cn } from "@/lib/utils";
-import { FORM_REGISTRY } from "./registry";
+import dynamic from "next/dynamic";
 
 /**
  * Site-wide modal for the forms (drawing, callback, sample, load, contacts, full): one context
@@ -17,8 +12,10 @@ import { FORM_REGISTRY } from "./registry";
  * Radix gives the focus trap, Esc / overlay / close-button dismissal and the scroll lock; focus
  * returns to the trigger (`useReturnFocus`). ≤599 px — full screen, otherwise a centred card
  * (`max-w-lg` for the callback form, `max-w-2xl` for the two-column ones). Title:
- * `params.title ?? params.label ?? DEFAULT_FORM_TITLES[key]`. The form components live in
- * `./registry` (lazy chunks, task 21).
+ * `params.title ?? params.label ?? DEFAULT_FORM_TITLES[key]`. The modal's form components live in
+ * `./modal-forms` (static, imported only by the dialog); the dialog itself is `./form-dialog`, a
+ * lazy chunk (task 39): it is loaded on the first `openForm()`, so Radix Dialog and the forms stay
+ * out of the JS of pages where no form is opened. Inline (page) forms use `./registry`.
  */
 
 export type FormKey = "drawing" | "callback" | "sample" | "load" | "contacts" | "full";
@@ -60,9 +57,6 @@ export const DEFAULT_FORM_TITLES: Readonly<Record<FormKey, string>> = {
   full: "Отправить заявку",
 };
 
-/** Two-column forms get a wider dialog (`max-w-2xl`); the callback form keeps `max-w-lg`. */
-const WIDE_FORMS: ReadonlySet<FormKey> = new Set(["drawing", "sample", "load", "contacts", "full"]);
-
 export interface FormDialogContextValue {
   openForm(key: FormKey, params?: FormParams): void;
   closeForm(): void;
@@ -86,6 +80,19 @@ export function useFormDialog(): FormDialogContextValue {
   return useContext(FormDialogContext) ?? NOOP_CONTEXT;
 }
 
+const loadFormDialog = () => import("./form-dialog");
+
+/** No server markup: the dialog exists only after the first `openForm()` in the browser. */
+const FormDialog = dynamic(() => loadFormDialog().then((mod) => mod.FormDialog), { ssr: false });
+
+/**
+ * Starts loading the dialog chunk ahead of the click (hover / focus of a trigger), so the first
+ * open does not wait for the network. Safe to call repeatedly: the module loads once.
+ */
+export function preloadFormDialog(): void {
+  void loadFormDialog();
+}
+
 interface ActiveForm {
   key: FormKey;
   params: FormParams;
@@ -95,7 +102,6 @@ export function FormDialogProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   // Kept after closing so the content stays rendered during the exit animation.
   const [active, setActive] = useState<ActiveForm | null>(null);
-  const returnFocus = useReturnFocus(open);
 
   const openForm = useCallback((key: FormKey, params: FormParams = {}) => {
     setActive({ key, params });
@@ -108,51 +114,18 @@ export function FormDialogProvider({ children }: { children: ReactNode }) {
     [openForm, closeForm, open, active]
   );
 
-  const FormComponent = active ? FORM_REGISTRY[active.key] : null;
-  // `label` doubles as the title so pages can open «Отправить планировку», «Загрузить чертёж
-  // DWG / DXF», … with one parameter; an explicit `title` still wins.
-  const title = active
-    ? active.params.title?.trim() || active.params.label?.trim() || DEFAULT_FORM_TITLES[active.key]
-    : "";
-  const width = active && WIDE_FORMS.has(active.key) ? "sm:max-w-2xl" : "sm:max-w-lg";
-
   return (
     <FormDialogContext.Provider value={value}>
       {children}
-      <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
-        <DialogPrimitive.Portal>
-          <DialogPrimitive.Overlay className="data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50 duration-(--ig-dur-base) motion-reduce:animate-none" />
-          <DialogPrimitive.Content
-            {...returnFocus}
-            aria-describedby={undefined}
-            data-form-key={active?.key}
-            className={cn(
-              "bg-surface text-text shadow-modal fixed z-50 flex flex-col outline-none",
-              "ease-ig data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-(--ig-dur-base) motion-reduce:animate-none",
-              // ≤599: full screen; otherwise a centred card.
-              "max-sm:inset-0 max-sm:h-dvh max-sm:w-full",
-              "sm:top-1/2 sm:left-1/2 sm:max-h-[calc(100dvh-48px)] sm:w-[calc(100%-48px)] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-lg",
-              width,
-              "sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95"
-            )}
-          >
-            <div className="flex flex-none items-start justify-between gap-4 px-6 pt-5 pb-2 max-sm:px-4">
-              <DialogPrimitive.Title className="ig-h4 m-0 pt-2">{title}</DialogPrimitive.Title>
-              <DialogPrimitive.Close asChild>
-                <Button variant="ghost" size="icon" aria-label="Закрыть" className="-mr-2">
-                  <X aria-hidden="true" strokeWidth={2} />
-                </Button>
-              </DialogPrimitive.Close>
-            </div>
-            {/* ≤599 no bottom padding: the form's footer sticks to the bottom edge itself. */}
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pt-2 pb-6 max-sm:px-4 max-sm:pb-0">
-              {FormComponent && active ? (
-                <FormComponent params={active.params} onClose={closeForm} variant="modal" />
-              ) : null}
-            </div>
-          </DialogPrimitive.Content>
-        </DialogPrimitive.Portal>
-      </DialogPrimitive.Root>
+      {active ? (
+        <FormDialog
+          open={open}
+          onOpenChange={setOpen}
+          formKey={active.key}
+          params={active.params}
+          onClose={closeForm}
+        />
+      ) : null}
     </FormDialogContext.Provider>
   );
 }

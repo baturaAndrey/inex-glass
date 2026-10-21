@@ -28,7 +28,14 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:db:reset": "tsx scripts/test-db.ts reset"
+    "test:db:reset": "tsx scripts/test-db.ts reset",
+    "audit:content": "payload run scripts/audit/content.ts --",
+    "audit:seo": "tsx --env-file-if-exists=.env scripts/audit/seo.ts",
+    "audit:frequency": "tsx --env-file-if-exists=.env scripts/audit/wordkeeper.ts",
+    "analyze": "node -e \"process.env.ANALYZE='true';require('node:child_process').execSync('next build --webpack',{stdio:'inherit'})\"",
+    "perf:budget": "tsx scripts/perf/js-budget.ts",
+    "perf:lighthouse": "tsx scripts/perf/lighthouse.ts",
+    "smoke:prod": "tsx scripts/ops/smoke-prod.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.91.0",

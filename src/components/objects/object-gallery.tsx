@@ -58,6 +58,7 @@ export function ObjectGallery({ photos, name }: ObjectGalleryProps) {
           alt={photo.alt}
           fill
           preload={current === 0}
+          fetchPriority={current === 0 ? "high" : "auto"}
           sizes={MAIN_SIZES}
           className="object-cover"
           data-gallery-main=""

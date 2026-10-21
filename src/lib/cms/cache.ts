@@ -55,8 +55,11 @@ import { connection } from "next/server";
  * - `cached()` calls `assertDbAvailableOrBailOut()` BEFORE entering `unstable_cache` (Next forbids
  *   `connection()` inside a cache scope). During `next build` (`NEXT_PHASE ===
  *   'phase-production-build'`) it awaits `connection()`, which tells Next "this route needs a
- *   request": the route is excluded from build-time prerendering and rendered on demand at
- *   runtime (then ISR'd by its `revalidate`). Outside the build it is a no-op.
+ *   request": the route is excluded from build-time prerendering. CAVEAT: Next 16 then marks
+ *   the route DYNAMIC for good (`ƒ` in the build output) — it is rendered on every request and is
+ *   NOT ISR'd later; a fixed-URL page's `revalidate` export does not cache its HTML. Only the
+ *   `unstable_cache` data layer keeps the per-request cost down. Restoring ISR for these routes
+ *   without a build-time database is deferred to task-42. Outside the build it is a no-op.
  * - `buildMetadata` (`@/lib/seo/metadata`) bails out the same way, so absolute URLs are always
  *   built from the RUNTIME `SITE_URL`, never baked in at build time.
  * - Dynamic segments (`[slug]`, `[...slug]`): `generateStaticParams() { return []; }`,
@@ -64,7 +67,7 @@ import { connection } from "next/server";
  *
  * Pattern for page tasks: fixed URLs — read data via the loaders of `@/lib/cms/*`; dynamic URLs —
  * `generateStaticParams → []`; pages whose output depends on the date (price, promo) —
- * `export const revalidate = 3600`.
+ * `export const revalidate = 3600` (effective only where the route is not dynamic, see CAVEAT).
  */
 
 /** Next.js sets this while running `next build` (same constant as in `@/lib/env`). */

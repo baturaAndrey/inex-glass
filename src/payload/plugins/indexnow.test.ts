@@ -10,7 +10,8 @@ const env = vi.hoisted(() => ({
 }));
 vi.mock("@/lib/env", () => ({ getEnv: () => env }));
 
-const { changedPaths, indexNowPlugin, INDEXNOW_COLLECTIONS } = await import("./indexnow");
+const { changedPaths, indexNowPlugin, INDEXNOW_COLLECTIONS, movedPaths, queueMovedDocs } =
+  await import("./indexnow");
 
 const existingHook = vi.fn();
 
@@ -181,5 +182,58 @@ describe("changedPaths", () => {
     expect(changedPaths("thicknesses", { n: 10, indexable: true })).toEqual([
       "/zakalennoe-steklo/10-mm/",
     ]);
+  });
+});
+
+describe("movedPaths / queueMovedDocs (path cascade)", () => {
+  const child = { id: "c1", _status: "published", slug: "dush", path: "/novyj/dush/" };
+  const moves = [{ id: "c1", from: "/staryj/dush/", to: "/novyj/dush/" }];
+
+  it("submits the old and the new URL of a published child", () => {
+    expect(movedPaths("pages", moves, new Map([["c1", child]]))).toEqual([
+      "/novyj/dush/",
+      "/staryj/dush/",
+    ]);
+  });
+
+  it("skips unpublished, noindex and unknown children", () => {
+    const draft = { ...child, _status: "draft" };
+    const noindex = { ...child, seo: { noindex: true } };
+    expect(movedPaths("pages", moves, new Map([["c1", draft]]))).toEqual([]);
+    expect(movedPaths("pages", moves, new Map([["c1", noindex]]))).toEqual([]);
+    expect(movedPaths("pages", moves, new Map())).toEqual([]);
+  });
+
+  it("queues one job with absolute URLs, read from the published versions", async () => {
+    const { req, queue } = makeReq();
+    const find = vi.fn(async () => ({ docs: [child] }));
+    Object.assign(req.payload, { find });
+    await queueMovedDocs(req as never, "pages", moves);
+    expect(find).toHaveBeenCalledWith(expect.objectContaining({ draft: false, req }));
+    expect(queue).toHaveBeenCalledTimes(1);
+    expect(queue).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: {
+          urls: ["https://inexglass.ru/novyj/dush/", "https://inexglass.ru/staryj/dush/"],
+        },
+      })
+    );
+  });
+
+  it("does nothing for seed writes or outside production, and never throws", async () => {
+    const seed = makeReq({ context: { disableRevalidate: true } });
+    await queueMovedDocs(seed.req as never, "pages", moves);
+    expect(seed.queue).not.toHaveBeenCalled();
+
+    env.SITE_ENV = "staging";
+    const staging = makeReq();
+    await queueMovedDocs(staging.req as never, "pages", moves);
+    expect(staging.queue).not.toHaveBeenCalled();
+
+    env.SITE_ENV = "production";
+    const broken = makeReq();
+    Object.assign(broken.req.payload, { find: vi.fn(async () => Promise.reject(new Error("x"))) });
+    await expect(queueMovedDocs(broken.req as never, "pages", moves)).resolves.toBeUndefined();
+    expect(broken.req.payload.logger.error).toHaveBeenCalled();
   });
 });

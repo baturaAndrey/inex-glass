@@ -82,10 +82,19 @@ function quantity(value: string | undefined): number | undefined {
 }
 
 /**
+ * Allow-list of entry-path characters. Every site path is a latin slug path
+ * (`/zakalennoe-steklo/10-mm/`, `/obekty/page/2/`); uppercase is tolerated (old links, typos).
+ * Everything else — dots (`/..`), `%`-escapes, quotes, `<>`, non-ASCII — is rejected: the value
+ * lands in Metrika goals and in the lead context, so it must stay a plain path.
+ */
+const ENTRY_PATH_CHARS = /^\/[A-Za-z0-9_/-]*$/;
+
+/**
  * Safe site path for the entry page, or `''`. Rejects anything that is not a same-site path:
  * protocol-relative `//host`, schemes (`javascript:`), backslashes (browsers treat `/\host` as
- * `//host`), whitespace / control characters. Query and hash are cut; secret paths
- * (`/zakaz/<token>/`) are masked by `quizSrc`. The quiz page itself is no entry page.
+ * `//host`), whitespace / control characters, and finally anything outside the
+ * `ENTRY_PATH_CHARS` allow-list. Query and hash are cut; secret paths (`/zakaz/<token>/`) are
+ * masked by `quizSrc`. The quiz page itself is no entry page.
  */
 export function sanitizeEntryPath(value: string | null | undefined): string {
   if (!value) return "";
@@ -97,7 +106,8 @@ export function sanitizeEntryPath(value: string | null | undefined): string {
     path.includes("\\") ||
     // Whitespace and control characters never occur in our paths (C0, DEL, C1).
     /[\s\u0000-\u001f\u007f-\u009f]/.test(path) ||
-    path.length > MAX_SRC_LENGTH
+    path.length > MAX_SRC_LENGTH ||
+    !ENTRY_PATH_CHARS.test(path)
   ) {
     return "";
   }

@@ -11,9 +11,11 @@ import {
 import type { BlockProps } from "@/components/blocks/types";
 import { Placeholder } from "@/components/ig/placeholder";
 import { buildQuizHref } from "@/components/page/quiz-cta";
+import { getPrices } from "@/lib/cms/globals";
 import { resolvePrice } from "@/lib/domain";
 import type { QuizTypeId } from "@/lib/domain";
 import { cn } from "@/lib/utils";
+import { homePriceFootnote } from "./price-footnote";
 
 /** Label of the quiz link on every catalog card (UI microcopy, `13-homepage.md` §3). */
 const CALC_LABEL = "Рассчитать";
@@ -56,10 +58,11 @@ function cardPrice(item: CardItem, ctx: BlockProps<"cards">["ctx"]): string | nu
 /**
  * Block 3 — «Закалённое стекло и триплекс под ваш размер»: 4 catalog cards. The card is not a
  * link itself: the title link stretches over the card (`::after`) and the separate «Рассчитать»
- * quiz link sits above it (`z-10`), so there are no nested `<a>`. The block `sub` holds the
- * price footnote, shown under the grid only while a price is displayed.
+ * quiz link sits above it (`z-10`), so there are no nested `<a>`. The price footnote under the
+ * grid is the `prices.caption` global (ТЗ §11 wording, see `homePriceFootnote`), shown only while
+ * a price is displayed; the block `sub` is the ordinary section subtitle.
  */
-export function HomeGlassCards({ block, ctx, section, page }: BlockProps<"cards">) {
+export async function HomeGlassCards({ block, ctx, section, page }: BlockProps<"cards">) {
   const items = block.items ?? [];
   if (items.length === 0) return null;
   const cards = items.map((item) => ({
@@ -68,10 +71,10 @@ export function HomeGlassCards({ block, ctx, section, page }: BlockProps<"cards"
     price: cardPrice(item, ctx),
   }));
   const showFootnote = cards.some((card) => card.price !== null);
-  const footnote = fill(block.sub, ctx);
+  const footnote = showFootnote ? homePriceFootnote((await getPrices())?.caption, ctx) : null;
 
   return (
-    <BlockSection block={{ ...block, sub: null }} section={section} ctx={ctx}>
+    <BlockSection block={block} section={section} ctx={ctx}>
       <ul className={cn(CARD_GRID[4], "m-0 list-none p-0")}>
         {cards.map(({ item, link, price }, index) => {
           const media = asMedia(item.image);
@@ -121,9 +124,7 @@ export function HomeGlassCards({ block, ctx, section, page }: BlockProps<"cards"
           );
         })}
       </ul>
-      {showFootnote && footnote ? (
-        <p className="text-small text-text-2 mt-5 mb-0">{footnote}</p>
-      ) : null}
+      {footnote ? <p className="text-small text-text-2 mt-5 mb-0">{footnote}</p> : null}
     </BlockSection>
   );
 }

@@ -24,6 +24,8 @@ import {
   PHOTO_EXTENSIONS,
   PHOTO_URL_ALLOW,
   PHOTO_URL_DENY,
+  PAGE_DATE,
+  REGION_LOCATION,
   REMOVE_SENTENCE,
   TITLE_SUFFIX,
   cityPattern,
@@ -44,7 +46,14 @@ export interface ParsedObject {
   /** Description as plain text (contacts and installation promises removed). */
   taskText: string;
   city?: string;
+  /**
+   * Region given as the location instead of a city («Челябинская область», «ХМАО – Югра»): not a
+   * `cities` record — reported, the editor picks the city.
+   */
+  region?: string;
   year?: number;
+  /** Publication date found on the page (ISO), the preferred `sortDate`. */
+  pageDate?: string;
   /** Map label of the object («Частный коттедж», «ТРК»…), input for the object-type heuristic. */
   kindLabel?: string;
   photos: ParsedPhoto[];
@@ -71,15 +80,48 @@ export function squash(text: string): string {
   return text.replace(/[\s ]+/g, " ").trim();
 }
 
+export interface BlockTextOptions {
+  /**
+   * The first import (wave 6) turned EVERY `<br>` into a paragraph break, which cut sentences
+   * wrapped with `<br>` into separate paragraphs. Kept only so `import.ts --fix-existing` can
+   * recompute the old output and recognise texts no editor has touched.
+   */
+  legacyBr?: boolean;
+}
+
 /**
- * Plain text of an element: `<br>` and block boundaries become line breaks, so sentences
- * written across `<br>` stay separate.
+ * Plain text of an element. Paragraphs come from block boundaries (`<p>`, `<li>`, `<div>`,
+ * headings) and from a double `<br><br>`; a single `<br>` is a soft line wrap inside the
+ * paragraph (inex.su wraps sentences mid-way: «…на алюминиевом профиле,<br>двойной витраж…»),
+ * so it becomes a space.
  */
-export function blockText($: cheerio.CheerioAPI, selector: string): string {
+export function blockText(
+  $: cheerio.CheerioAPI,
+  selector: string,
+  options: BlockTextOptions = {}
+): string {
   const parts: string[] = [];
   $(selector).each((_, element) => {
     const clone = $(element).clone();
-    clone.find("br").replaceWith("\n");
+    if (options.legacyBr) {
+      clone.find("br").replaceWith("\n");
+    } else {
+      // Source line breaks are formatting, not text: only markup decides the paragraphs.
+      clone
+        .find("*")
+        .addBack()
+        .contents()
+        .each((__, node) => {
+          if (node.type === "text") node.data = node.data.replace(/\s+/g, " ");
+        });
+      // A `<br>` directly followed (whitespace aside) by another one: a paragraph break.
+      clone.find("br").each((__, br) => {
+        let next = br.nextSibling;
+        while (next && next.type === "text" && !next.data.trim()) next = next.nextSibling;
+        const double = next !== null && next.type === "tag" && next.name === "br";
+        $(br).replaceWith(double ? "\n" : " ");
+      });
+    }
     clone.find("p, li, div, h2, h3, h4").each((__, block) => {
       $(block).append("\n");
     });
@@ -102,12 +144,21 @@ function sentences(paragraph: string): string[] {
   );
 }
 
+/** Stop-word check applied to imported texts (`checkStopWords` + the CMS list, see `./stop-words`). */
+export type StopWordCheck = (text: string) => ReadonlyArray<{ match: string; message: string }>;
+
+/** Built-in rules only: used when no CMS list is passed (offline CLI checks of the parser). */
+const builtInStopWords: StopWordCheck = (text) => checkStopWords(text);
+
 /**
  * Applies the content rules of ТЗ §11 to imported text: removes contacts and sentences that
  * promise installation/measuring/turnkey work, flags door mentions and stop-words. Nothing is
  * rewritten silently — every change is returned as a note.
  */
-export function cleanText(raw: string): { text: string; notes: TextNote[] } {
+export function cleanText(
+  raw: string,
+  stopWords: StopWordCheck = builtInStopWords
+): { text: string; notes: TextNote[] } {
   const notes: TextNote[] = [];
   const paragraphs = raw.split("\n").map((paragraph) => {
     const kept: string[] = [];
@@ -128,19 +179,69 @@ export function cleanText(raw: string): { text: string; notes: TextNote[] } {
     return kept.join(" ");
   });
   const text = paragraphs.filter(Boolean).join("\n\n");
-  for (const finding of checkStopWords(text)) {
+  for (const finding of stopWords(text)) {
     notes.push({ kind: "stop-word", text: `${finding.match} — ${finding.message}` });
   }
   return { text, notes };
 }
 
-/** File name of a photo URL (dedup key, also used by `sameObject`). */
-export function photoFileName(src: string): string {
+/** Longest file name kept (well under the 255-byte limit of common file systems). */
+const MAX_PHOTO_NAME_LENGTH = 120;
+const FALLBACK_PHOTO_NAME = "photo";
+
+/**
+ * Identity of a photo for de-duplication (`collectPhotos`, the merged gallery in `import.ts`,
+ * `sameObject`): host + decoded URL path, case preserved, query/hash ignored. NOT the sanitized
+ * file name: sanitizing is lossy (`фото 1.jpg` and `фото_1.jpg`, `A.jpg` and `a.jpg`, or
+ * `img.jpg` in two directories collapse to one name), which silently dropped distinct photos.
+ * Identical content under different URLs is still merged later, by sha1 of the bytes
+ * (`import.ts`).
+ */
+export function photoKey(src: string): string {
+  let url: URL;
   try {
-    return decodeURIComponent(path.posix.basename(new URL(src).pathname)).toLowerCase();
+    url = new URL(src);
   } catch {
-    return src.toLowerCase();
+    return src;
   }
+  let pathname = url.pathname;
+  try {
+    pathname = decodeURIComponent(pathname);
+  } catch {
+    // Malformed percent-encoding: the raw path is still a stable identity.
+  }
+  return `${url.host}${pathname.normalize("NFC")}`;
+}
+
+/**
+ * Safe file name of a photo URL: the on-disk name of the download (`import.ts`, inside a
+ * per-sha1 directory). Not a dedup key — see `photoKey`. The URL path is decoded BEFORE taking
+ * the base name — decoding
+ * afterwards turned `%2F..%2F` into `../` (path traversal) — and both `/` and `\` separate
+ * segments. Anything outside letters, digits, `.`, `_`, `-` becomes `_`; leading dots are dropped
+ * (no hidden files, no `..`).
+ */
+export function photoFileName(src: string): string {
+  let pathname: string;
+  try {
+    pathname = new URL(src).pathname;
+  } catch {
+    pathname = src;
+  }
+  let decoded = pathname;
+  try {
+    decoded = decodeURIComponent(pathname);
+  } catch {
+    // Malformed percent-encoding: keep the raw path, the sanitizer below makes it safe.
+  }
+  const base = decoded.split(/[/\\]/).pop() ?? "";
+  const safe = base
+    .normalize("NFC")
+    .replace(/[^\p{L}\p{N}._-]+/gu, "_")
+    .replace(/^[._]+/, "")
+    .slice(0, MAX_PHOTO_NAME_LENGTH)
+    .toLowerCase();
+  return safe || FALLBACK_PHOTO_NAME;
 }
 
 /** Collects absolute, de-duplicated photo URLs from links matching `selector`. */
@@ -162,7 +263,7 @@ export function collectPhotos(
     }
     if (!PHOTO_URL_ALLOW.test(src) || PHOTO_URL_DENY.test(src)) return;
     if (!PHOTO_EXTENSIONS.test(new URL(src).pathname)) return;
-    const key = photoFileName(src);
+    const key = photoKey(src);
     if (seen.has(key)) return;
     seen.add(key);
     const caption = squash($(element).attr("title") ?? "").replace(PHOTO_CAPTION_SUFFIX, "");
@@ -191,11 +292,47 @@ export function findCity(text: string): string | undefined {
   return KNOWN_CITIES.find((city) => cityPattern(city).test(text));
 }
 
+/**
+ * Splits the inex.su location («Челябинск», «Челябинская область», «Сатка, Челябинская
+ * область») into a settlement and a region. Comma-separated parts are classified one by one;
+ * a part matching `REGION_LOCATION` is never a city.
+ */
+export function splitLocation(location: string): { city?: string; region?: string } {
+  const parts = location.split(",").map(squash).filter(Boolean);
+  const region = parts.find((part) => REGION_LOCATION.test(part));
+  const city = parts.find((part) => !REGION_LOCATION.test(part));
+  return { ...(city ? { city } : {}), ...(region ? { region } : {}) };
+}
+
+/**
+ * Publication date of the page, when the markup has one (`article:published_time`, JSON-LD
+ * `datePublished`, `<time datetime>`). The inex.su pages crawled on 2026-10-21 carry none — the
+ * import then falls back (see `sortDateOf` in `import.ts`).
+ */
+export function findPageDate($: cheerio.CheerioAPI, html: string): string | undefined {
+  const candidates = [
+    $(PAGE_DATE.meta).first().attr("content"),
+    PAGE_DATE.jsonLd.exec(html)?.[1],
+    $(PAGE_DATE.time).first().attr("datetime"),
+  ];
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    const time = Date.parse(candidate);
+    if (Number.isFinite(time)) return new Date(time).toISOString();
+  }
+  return undefined;
+}
+
 /* ------------------------------------------------------------------------------------------ */
 /* Object page                                                                                */
 /* ------------------------------------------------------------------------------------------ */
 
-export function parseObject(entry: CacheEntry): ParseResult {
+/** Parser options: the stop-word check (CMS list) and the legacy `<br>` mode (`BlockTextOptions`). */
+export interface ParseOptions extends BlockTextOptions {
+  stopWords?: StopWordCheck;
+}
+
+export function parseObject(entry: CacheEntry, options: ParseOptions = {}): ParseResult {
   const oldUrl = entry.oldUrl;
   if (!entry.ok) return { ok: false, oldUrl, reason: entry.error ?? "страница не получена" };
   const html = cachedHtml(entry);
@@ -207,9 +344,9 @@ export function parseObject(entry: CacheEntry): ParseResult {
   // R7: nothing usable on the page.
   if (!name && photos.length === 0) return { ok: false, oldUrl, reason: "нет названия и фото" };
 
-  let rawDescription = blockText($, OBJECT.description);
-  if (!rawDescription) rawDescription = blockText($, OBJECT.descriptionFallback);
-  const { text: taskText, notes } = cleanText(rawDescription);
+  let rawDescription = blockText($, OBJECT.description, options);
+  if (!rawDescription) rawDescription = blockText($, OBJECT.descriptionFallback, options);
+  const { text: taskText, notes } = cleanText(rawDescription, options.stopWords);
 
   const specs = $(OBJECT.description)
     .find("li")
@@ -217,9 +354,12 @@ export function parseObject(entry: CacheEntry): ParseResult {
     .get()
     .filter(Boolean);
 
-  const explicitCity = squash($(OBJECT.city).first().text());
-  const city = explicitCity || findCity(`${name}\n${rawDescription}`);
+  // The location line may name a region instead of a city (wave-6 review: regions were imported
+  // as cities); then the city is looked up in the name and description.
+  const location = splitLocation(squash($(OBJECT.city).first().text()));
+  const city = location.city ?? findCity(`${name}\n${rawDescription}`);
   const year = findYear(`${name}\n${rawDescription}`);
+  const pageDate = findPageDate($, html);
   const kindLabel = OBJECT.mapLabel.exec(html)?.[1]?.trim();
 
   const value: ParsedObject = {
@@ -230,7 +370,9 @@ export function parseObject(entry: CacheEntry): ParseResult {
     photos,
     notes,
     ...(city ? { city } : {}),
+    ...(location.region ? { region: location.region } : {}),
     ...(year ? { year } : {}),
+    ...(pageDate ? { pageDate } : {}),
     ...(kindLabel ? { kindLabel } : {}),
     ...(specs.length > 0 ? { specs } : {}),
   };
@@ -238,13 +380,13 @@ export function parseObject(entry: CacheEntry): ParseResult {
 }
 
 /**
- * R5 collision test: same name (case-insensitive) and at least half of the photo file names in
+ * R5 collision test: same name (case-insensitive) and at least half of the photos (`photoKey`) in
  * common (relative to the larger gallery).
  */
 export function sameObject(a: ParsedObject, b: ParsedObject): boolean {
   if (a.name.trim().toLowerCase() !== b.name.trim().toLowerCase()) return false;
-  const filesA = new Set(a.photos.map((photo) => photoFileName(photo.src)));
-  const filesB = new Set(b.photos.map((photo) => photoFileName(photo.src)));
+  const filesA = new Set(a.photos.map((photo) => photoKey(photo.src)));
+  const filesB = new Set(b.photos.map((photo) => photoKey(photo.src)));
   const larger = Math.max(filesA.size, filesB.size);
   if (larger === 0) return false;
   const common = [...filesA].filter((file) => filesB.has(file)).length;
@@ -252,13 +394,15 @@ export function sameObject(a: ParsedObject, b: ParsedObject): boolean {
 }
 
 /** Parses every cached object page of the CSV (pages never crawled are left out). */
-export async function parseAllObjects(): Promise<Map<string, ParseResult>> {
+export async function parseAllObjects(
+  options: ParseOptions = {}
+): Promise<Map<string, ParseResult>> {
   const rows = await readSourceCsv();
   const results = new Map<string, ParseResult>();
   for (const target of crawlTargets(rows)) {
     if (target.kind !== "object") continue;
     const entry = await readCache(target.oldUrl);
-    if (entry) results.set(target.oldUrl, parseObject(entry));
+    if (entry) results.set(target.oldUrl, parseObject(entry, options));
   }
   return results;
 }

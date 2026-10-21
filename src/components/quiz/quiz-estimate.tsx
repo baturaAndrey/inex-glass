@@ -2,7 +2,8 @@ import type { QuizDerived } from "./derive";
 
 /**
  * «Ориентировочно от … ₽» block (`.qz-est`): the amount in large type, the domain caption
- * («за стекло без обработки и доставки. Цены на …. Точная стоимость — в КП») below.
+ * («за стекло без обработки и доставки. Ориентировочная цена на …. Точная стоимость — в КП; цена в
+ * договоре фиксируется», `priceCaption()`) below.
  * Rendered only when the domain returns an estimate (fresh price, area > 0, 4–12 mm, not triplex).
  */
 export function QuizEstimate({ estimate }: { estimate: NonNullable<QuizDerived["estimate"]> }) {

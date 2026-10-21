@@ -1,5 +1,5 @@
-import { HolesCalculator } from "@/components/calculators/holes-calculator";
 import { DEFAULT_HOLES_THICKNESS } from "@/components/calculators/holes-calculator-model";
+import { HolesCalculator } from "@/components/calculators/lazy";
 import { buildQuizHref, prefillToQuizParams } from "@/components/page/quiz-cta";
 import { THICKNESSES, isThickness, type Thickness } from "@/lib/domain";
 import { BlockSection, fill, hasText } from "./shared";

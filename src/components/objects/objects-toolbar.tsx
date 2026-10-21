@@ -4,7 +4,7 @@ import { useId } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ig/button";
 import { Select } from "@/components/ig/select";
-import { pluralObjects } from "@/lib/domain";
+import { pluralObjects } from "@/lib/domain/plural";
 import { SORT_LABELS, SORT_VALUES } from "@/lib/objects/filters";
 import type { ObjectsSort } from "@/lib/objects/filters";
 

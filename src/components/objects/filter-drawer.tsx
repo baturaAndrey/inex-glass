@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ig/button";
 import { Drawer } from "@/components/ig/drawer";
-import { pluralObjects } from "@/lib/domain";
+import { pluralObjects } from "@/lib/domain/plural";
 import { FILTER_KEYS, FILTER_LABELS } from "@/lib/objects/filters";
 import type { FacetOption, FilterKey, ObjectsFacets, ObjectsFilters } from "@/lib/objects/filters";
 

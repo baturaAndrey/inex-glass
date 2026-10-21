@@ -1,4 +1,6 @@
 import { z } from "zod";
+// Pure module (no env/Payload imports), so importing it here creates no cycle.
+import { INDEXNOW_KEY_PATTERN } from "@/lib/seo/indexnow";
 
 /**
  * Server environment validation (zod 4).
@@ -83,7 +85,18 @@ const envSchema = z.object({
   // Jobs / SEO
   /** Enable the Payload Jobs runner on exactly one container. */
   JOBS_ENABLED: booleanString,
-  INDEXNOW_KEY: z.string().optional(),
+  /**
+   * Same format as the IndexNow client and the key-file route expect (`openssl rand -hex 16`).
+   * Validated here so a malformed key fails the deploy healthcheck loudly instead of every
+   * IndexNow submission being skipped silently. Case is normalized: `openssl` prints lowercase,
+   * but a hand-typed uppercase key is the same key.
+   */
+  INDEXNOW_KEY: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .regex(INDEXNOW_KEY_PATTERN, "ожидается 32 hex-символа (openssl rand -hex 16)")
+    .optional(),
 
   // Dev tools (scripts only; never present in prod images or prod env)
   KIE_AI_API_KEY: z.string().optional(),

@@ -7,7 +7,7 @@ import {
   type GlassTypeContent,
   type LayoutContent,
 } from "../content/glass-types";
-import { SEED_REQUEST_CONTEXT, upsertBySlug } from "../context";
+import { mayOverwrite, SEED_REQUEST_CONTEXT, upsertBySlug } from "../context";
 import { markdown } from "../lexical";
 import type { SeedContext } from "../context";
 import type { RequiredDataFromCollectionSlug } from "payload";
@@ -18,16 +18,13 @@ import type { RequiredDataFromCollectionSlug } from "payload";
  * (`/tripleks/`). Copy lives in `../content/glass-types.ts` (verbatim teksty, meta from 17-meta).
  *
  * Update rule: an existing document (matched by `slug`) is overwritten only with `--force` or
- * when nobody has edited it yet — `updatedAt` within 2 s of `createdAt`, i.e. it was created by
- * the mini-seed. Otherwise it is skipped with a log line, so editor changes survive a re-run.
+ * while it is unchanged since the seed's last write (`mayOverwrite` in `../context.ts`, seed
+ * markers). Otherwise it is skipped with a log line, so editor changes survive a re-run.
  * Running the slice twice leaves the same eight documents.
  */
 
 type GlassTypeData = RequiredDataFromCollectionSlug<"glass-types">;
 type GlassTypeLayout = NonNullable<GlassType["layout"]>;
-
-/** A document is «not edited yet» when it was saved once (by a seed) and never touched again. */
-const UNEDITED_WINDOW_MS = 2_000;
 
 /** Media standing in for hero photos until real ones are uploaded (schema: image required). */
 export const PENDING_PHOTO_FILENAME = "glass-type-photo-pending.png";
@@ -39,14 +36,6 @@ const PENDING_PHOTO_SIZE = { width: 600, height: 800 };
 /* ------------------------------------------------------------------------------------------ */
 /* Helpers                                                                                    */
 /* ------------------------------------------------------------------------------------------ */
-
-function isUnedited(doc: { createdAt: string; updatedAt: string }): boolean {
-  const created = Date.parse(doc.createdAt);
-  const updated = Date.parse(doc.updatedAt);
-  return Number.isFinite(created) && Number.isFinite(updated)
-    ? Math.abs(updated - created) < UNEDITED_WINDOW_MS
-    : false;
-}
 
 /**
  * Id of the temporary «photo pending» media (created once, then reused). It is flagged
@@ -243,19 +232,8 @@ export async function seed(ctx: SeedContext): Promise<void> {
   const photoId = () => (photo ??= pendingPhotoId(ctx));
 
   for (const doc of GLASS_TYPES_CONTENT) {
-    const existing = await ctx.payload.find({
-      collection: "glass-types",
-      where: { slug: { equals: doc.slug } },
-      limit: 1,
-      depth: 0,
-      draft: true,
-      overrideAccess: true,
-    });
-    const current = existing.docs[0];
-    if (current && !ctx.force && !isUnedited(current)) {
-      ctx.log(`glass-types ${doc.slug}: изменялся после создания, пропуск (перезапись: --force)`);
-      continue;
-    }
+    const where = { slug: { equals: doc.slug } };
+    if (!(await mayOverwrite(ctx, "glass-types", where, doc.slug))) continue;
 
     const { doc: saved } = await upsertBySlug(
       ctx,

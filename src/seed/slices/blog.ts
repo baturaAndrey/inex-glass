@@ -12,7 +12,14 @@ import {
   WEIGHT_TOOL_PATH,
   type ArticleSeed,
 } from "../content/blog";
-import { SEED_REQUEST_CONTEXT, seedDate, upsertByField, upsertByPath } from "../context";
+import {
+  mayOverwrite,
+  rememberSeedWrite,
+  SEED_REQUEST_CONTEXT,
+  seedDate,
+  upsertByField,
+  upsertByPath,
+} from "../context";
 import { markdown, paragraphs } from "../lexical";
 import type { SeedContext } from "../context";
 
@@ -20,9 +27,10 @@ import type { SeedContext } from "../context";
  * Seed slice «blog» (task 31): the listing page `/blog/`, the weight calculator page
  * `/instrumenty/kalkulyator-vesa-stekla/` and six published articles.
  *
- * Idempotent by `path` / `slug`. Existing documents are skipped unless `--force` or still
- * untouched since a seed created them (`updatedAt ≈ createdAt` — e.g. the mini-seed article
- * `mozhno-li-rezat-zakalennoe-steklo` with its `[…]` body), so editor changes survive a re-run.
+ * Idempotent by `path` / `slug`. Existing documents are skipped unless `--force` or unchanged
+ * since the seed's last write (`mayOverwrite` in `../context.ts`, seed markers — e.g. the
+ * mini-seed article `mozhno-li-rezat-zakalennoe-steklo` with its `[…]` body), so editor changes
+ * survive a re-run.
  * «Читать также» needs the ids of all articles, so it is written in a second pass.
  */
 
@@ -36,36 +44,6 @@ type LayoutBlock = NonNullable<Page["layout"]>[number];
  */
 function seedDateModified(day: string): string {
   return seedDate(day).replace(".000Z", "Z");
-}
-
-/** A document saved once (by a seed) has `updatedAt ≈ createdAt`; an editor's save moves it. */
-const UNTOUCHED_WINDOW_MS = 2000;
-
-function isUntouched(doc: { createdAt: string; updatedAt: string }): boolean {
-  const created = Date.parse(doc.createdAt);
-  const updated = Date.parse(doc.updatedAt);
-  return Number.isFinite(created) && Number.isFinite(updated)
-    ? updated - created <= UNTOUCHED_WINDOW_MS
-    : false;
-}
-
-/** Whether an existing document may be overwritten (`--force` or untouched since the seed). */
-async function mayOverwrite(
-  ctx: SeedContext,
-  collection: "pages" | "articles",
-  where: Record<string, { equals: string }>
-): Promise<boolean> {
-  if (ctx.force) return true;
-  const { docs } = await ctx.payload.find({
-    collection,
-    where,
-    limit: 1,
-    depth: 0,
-    pagination: false,
-    overrideAccess: true,
-  });
-  const doc = docs[0];
-  return doc ? isUntouched(doc) : true;
 }
 
 const customLink = (url: string) => ({ type: "custom" as const, url });
@@ -101,7 +79,7 @@ async function seedListing(ctx: SeedContext): Promise<void> {
       seo: { ...BLOG_LISTING.seo },
       layout,
     },
-    { overwrite: await mayOverwrite(ctx, "pages", { path: { equals: BLOG_PATH } }) }
+    { overwrite: await mayOverwrite(ctx, "pages", { path: { equals: BLOG_PATH } }, BLOG_PATH) }
   );
 }
 
@@ -132,7 +110,14 @@ async function seedWeightTool(ctx: SeedContext): Promise<void> {
         },
       ],
     },
-    { overwrite: await mayOverwrite(ctx, "pages", { path: { equals: WEIGHT_TOOL_PATH } }) }
+    {
+      overwrite: await mayOverwrite(
+        ctx,
+        "pages",
+        { path: { equals: WEIGHT_TOOL_PATH } },
+        WEIGHT_TOOL_PATH
+      ),
+    }
   );
 }
 
@@ -166,7 +151,7 @@ async function seedArticle(ctx: SeedContext, article: ArticleSeed): Promise<Arti
   const plain = [lexicalToPlainText(lead), lexicalToPlainText(body)].join("\n");
   const date = seedDate(article.date);
   const where = { slug: { equals: article.slug } };
-  const overwrite = await mayOverwrite(ctx, "articles", where);
+  const overwrite = await mayOverwrite(ctx, "articles", where, article.slug);
 
   const { doc, action } = await upsertByField(
     ctx,
@@ -218,6 +203,7 @@ async function linkRelated(ctx: SeedContext, written: ReadonlyMap<string, Articl
       overrideAccess: true,
       context: SEED_REQUEST_CONTEXT,
     });
+    await rememberSeedWrite(ctx, "articles", doc.id);
   }
   ctx.log(`articles: «Читать также» связаны (${written.size})`);
 }

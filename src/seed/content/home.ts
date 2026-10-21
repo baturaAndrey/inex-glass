@@ -103,11 +103,12 @@ export const HOME_WHY = {
 /**
  * «Закалённое стекло и триплекс под ваш размер». `priceHint` keeps the teksty wording with the
  * placeholder; the template replaces it with the price of the CMS price list (or hides it).
- * `footnote` is stored in the block `sub` and rendered under the grid.
+ * The price footnote under the grid is NOT stored here: teksty's «* Ориентировочная цена на
+ * {дата_цен}. Точная стоимость — в КП.» lacks «цена в договоре фиксируется» (ТЗ §11), so the
+ * template renders the `prices.caption` global (→ `priceCaption()`), like every other price.
  */
 export const HOME_GLASS = {
   heading: "Закалённое стекло и триплекс под ваш размер",
-  footnote: "* Ориентировочная цена на {дата_цен}. Точная стоимость — в КП.",
   items: [
     {
       title: "Закалённое стекло",

@@ -1,6 +1,7 @@
 import type { ComponentPropsWithRef, ReactNode } from "react";
 import Link from "next/link";
-import { isRouterHref, type NavLink } from "./nav-defaults";
+import { isRouterHref } from "./nav-paths";
+import type { NavLink } from "./nav-defaults";
 
 export type NavAnchorProps = Omit<ComponentPropsWithRef<"a">, "href" | "children"> & {
   link: Pick<NavLink, "href" | "label"> & Partial<Pick<NavLink, "newTab">>;

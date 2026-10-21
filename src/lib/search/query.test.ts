@@ -19,11 +19,19 @@ describe("queryTokens / buildPrefixQuery", () => {
   it("strips tsquery syntax characters", () => {
     const tokens = queryTokens("стекло & | ! ( ) : ' * <-> 10");
     expect(tokens).toEqual(["стекло", "10"]);
-    expect(buildPrefixQuery(tokens)).toBe("стекло & 10:*");
+    expect(buildPrefixQuery(tokens)).toBe("стекло & 10");
   });
 
   it("drops one-character words", () => {
     expect(queryTokens("а и стекло в 5 мм")).toEqual(["стекло", "мм"]);
+  });
+
+  it("never makes a number a prefix («10» must not find «100»)", () => {
+    expect(buildPrefixQuery(["10"])).toBe("10");
+    expect(buildPrefixQuery(["стекло", "10"])).toBe("стекло & 10");
+    expect(buildPrefixQuery(["10", "мм"])).toBe("10 & мм:*");
+    // Mixed letters/digits are still prefixes (`10мм` is typed letter by letter).
+    expect(buildPrefixQuery(["м10"])).toBe("м10:*");
   });
 
   it("marks only the last word as a prefix", () => {

@@ -156,6 +156,38 @@ describe("sanitizeEntryPath", () => {
     expect(sanitizeEntryPath("/a\u0000/")).toBe("");
   });
 
+  it("accepts only path characters (allow-list)", () => {
+    for (const ok of [
+      "/zakalennoe-steklo/10-mm/",
+      "/blog/kak_zakazat/",
+      "/Zakalennoe-Steklo/",
+      "/obekty/page/2/",
+    ]) {
+      expect(sanitizeEntryPath(ok), ok).toBe(ok);
+    }
+    for (const bad of [
+      "/../admin/",
+      "/blog/a.b/",
+      "/%2F%2Fevil.com/",
+      "/blog/%D0%B0/",
+      "/стекло/",
+      '/a"onmouseover=1/',
+      "/a'b/",
+      "/<script>/",
+      "/a;b/",
+      "/a@b/",
+      "/a~b/",
+      "/a+b/",
+      "/a​b/",
+    ]) {
+      expect(sanitizeEntryPath(bad), bad).toBe("");
+    }
+  });
+
+  it("applies the allow-list after cutting query and hash", () => {
+    expect(sanitizeEntryPath("/blog/?q=a.b&x=%20#a.b")).toBe("/blog/");
+  });
+
   it("limits the length", () => {
     const ok = `/${"a".repeat(MAX_SRC_LENGTH - 1)}`;
     expect(sanitizeEntryPath(ok)).toBe(ok);

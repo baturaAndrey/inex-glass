@@ -1,5 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import bundleAnalyzer from "@next/bundle-analyzer";
 import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
 
@@ -36,8 +37,17 @@ const nextConfig: NextConfig = {
   // route failed `instanceof ValidationError` and dropped `name`/`data` (field paths and
   // messages) from every 400 response. One external copy keeps error classes identical.
   serverExternalPackages: ["payload"],
+  // Image optimizer (task 39). Widths follow the site grid: 375 (phones) … 1920 (the design's
+  // max width); imageSizes serve thumbnails and cards (all below the smallest device size).
+  // qualities: 75 default, 60 for large hero photos (`quality={60}`) — any other value is
+  // rejected by Next 16. minimumCacheTTL 14 days: replaced media get a new file name, so stale
+  // optimized copies are not a risk (Payload renames uploads, placeholder ids are versioned).
   images: {
     formats: ["image/avif", "image/webp"],
+    deviceSizes: [375, 640, 828, 1080, 1366, 1536, 1920],
+    imageSizes: [64, 128, 256, 384],
+    qualities: [60, 75],
+    minimumCacheTTL: 1_209_600,
     localPatterns: [
       { pathname: "/api/media/file/**" },
       { pathname: "/generated/**" },
@@ -75,4 +85,13 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withPayload(nextConfig, { devBundleServerPackages: false });
+/**
+ * `ANALYZE=true next build --webpack` writes webpack-bundle-analyzer reports to
+ * `.next/analyze/` (task 39). The default Turbopack build is analysed with `next analyze`.
+ */
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+  openAnalyzer: false,
+});
+
+export default withBundleAnalyzer(withPayload(nextConfig, { devBundleServerPackages: false }));

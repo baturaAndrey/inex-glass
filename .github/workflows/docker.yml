@@ -7,16 +7,26 @@
 #   push tag v*                         — reuse the sha-<commit> image built from main,
 #                                          tag it :vX.Y.Z and deploy it to prod.
 #
-# Required secrets (deploy jobs are skipped while DOKPLOY_API_KEY is empty):
+# Required secrets. The two Dokploy API keys are separate on purpose and live as ENVIRONMENT
+# secrets (never repository-level): a job of the staging environment must not be able to
+# redeploy prod without the "production" approval. Each deploy job is skipped while its key is
+# empty.
 #   DOKPLOY_URL               https://dokploy.example.ru (no trailing slash)
-#   DOKPLOY_API_KEY           Dokploy → Settings → Profile → API/CLI
+#   DOKPLOY_STAGING_API_KEY   env "staging": key of a Dokploy member limited to inex-glass-staging
+#   DOKPLOY_PROD_API_KEY      env "production": key with access to inex-glass-prod
 #   DOKPLOY_STAGING_APP_ID    applicationId of inex-glass-staging
 #   DOKPLOY_PROD_APP_ID       applicationId of inex-glass-prod (environment "production")
 #   GHCR_PULL_USERNAME        GitHub user owning the pull PAT
 #   GHCR_PULL_TOKEN           classic PAT with read:packages (Dokploy pulls with it)
+#   STAGING_SMOKE_BASIC_AUTH  env "staging": user:pass of the staging basic auth (smoke script)
+#   PROD_SSH_HOST / PROD_SSH_USER / PROD_SSH_KEY / PROD_SSH_KNOWN_HOSTS
+#                             pre-deploy pg_dump on the VDS (user in group docker, no sudo)
+#   NOTIFY_TELEGRAM_TOKEN / NOTIFY_TELEGRAM_CHAT   optional deploy notification
 # Variables:
 #   STAGING_URL               https://dev.inexglass.ru (smoke test)
-#   PROD_URL                  https://inexglass.ru     (smoke test)
+#   PROD_URL                  https://inexglass.ru     (health wait + smoke)
+#   PROD_PG_SERVICE           Swarm service name of the prod Postgres (pre-deploy dump)
+#   PROD_SSH_PORT             optional, default 22
 
 name: Docker
 
@@ -174,15 +184,21 @@ jobs:
     needs: build
     if: github.event_name == 'workflow_run'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    permissions: {}
+    timeout-minutes: 25
+    # contents: read — checkout of the smoke script; deployments: write — only for the
+    # "staging verified" record that the prod gate requires. No other job may write deployments.
+    permissions:
+      contents: read
+      deployments: write
     environment:
       name: staging
       url: ${{ vars.STAGING_URL }}
     # Secrets cannot be used in `if:` directly, so they are exposed via env and checked per step.
+    # DOKPLOY_STAGING_API_KEY is a secret of the "staging" environment and belongs to a Dokploy
+    # member limited to inex-glass-staging: it cannot touch the prod application.
     env:
       DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
-      DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+      DOKPLOY_STAGING_API_KEY: ${{ secrets.DOKPLOY_STAGING_API_KEY }}
       APP_ID: ${{ secrets.DOKPLOY_STAGING_APP_ID }}
       PULL_USER: ${{ secrets.GHCR_PULL_USERNAME }}
       PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
@@ -192,32 +208,36 @@ jobs:
       SITE: ${{ vars.STAGING_URL }}
     steps:
       - name: Dokploy not configured — skipping
-        if: env.DOKPLOY_API_KEY == ''
-        run: echo "::notice::DOKPLOY_API_KEY is not set; staging deploy skipped (see docs/deploy.md)."
+        if: env.DOKPLOY_STAGING_API_KEY == ''
+        run: echo "::notice::DOKPLOY_STAGING_API_KEY is not set; staging deploy skipped (see docs/deploy.md §10)."
 
+      # saveDockerProvider only stores configuration (the same values on every call), so a retry
+      # after a transient error is harmless.
       - name: Point Dokploy app at the new image
-        if: env.DOKPLOY_API_KEY != ''
+        if: env.DOKPLOY_STAGING_API_KEY != ''
         run: |
           body="$(jq -n --arg id "$APP_ID" --arg img "$DEPLOY_IMAGE" \
             --arg u "$PULL_USER" --arg p "$PULL_TOKEN" \
             '{applicationId:$id, dockerImage:$img, username:$u, password:$p, registryUrl:"ghcr.io"}')"
-          curl -fsS --retry 3 -X POST "$DOKPLOY_URL/api/application.saveDockerProvider" \
-            -H "x-api-key: $DOKPLOY_API_KEY" -H "Content-Type: application/json" \
+          curl -fsS --retry 3 --max-time 60 -X POST "$DOKPLOY_URL/api/application.saveDockerProvider" \
+            -H "x-api-key: $DOKPLOY_STAGING_API_KEY" -H "Content-Type: application/json" \
             -d "$body" > /dev/null
           echo "Staging: \`$DEPLOY_IMAGE\` (digest \`$DIGEST\`)" >> "$GITHUB_STEP_SUMMARY"
 
+      # Not idempotent: a retry after a timeout or 5xx could enqueue a second deploy. No --retry;
+      # a failed call fails the job and is re-run by a human (Re-run CI) after checking Dokploy.
       - name: Trigger deploy
-        if: env.DOKPLOY_API_KEY != ''
+        if: env.DOKPLOY_STAGING_API_KEY != ''
         run: |
           body="$(jq -n --arg id "$APP_ID" --arg t "staging ${RELEASE_SHA::7}" \
             '{applicationId:$id, title:$t}')"
-          curl -fsS --retry 3 -X POST "$DOKPLOY_URL/api/application.deploy" \
-            -H "x-api-key: $DOKPLOY_API_KEY" -H "Content-Type: application/json" \
+          curl -fsS --max-time 60 -X POST "$DOKPLOY_URL/api/application.deploy" \
+            -H "x-api-key: $DOKPLOY_STAGING_API_KEY" -H "Content-Type: application/json" \
             -d "$body" > /dev/null
 
       # /api is not behind staging basic auth. Wait until the NEW release answers.
-      - name: Smoke test /api/health/
-        if: env.DOKPLOY_API_KEY != '' && env.SITE != ''
+      - name: Wait for /api/health/ of the new release
+        if: env.DOKPLOY_STAGING_API_KEY != '' && env.SITE != ''
         run: |
           # Up to ~5 min: pull + stop-first swap + migrations (start_period) + first health call.
           for attempt in $(seq 1 30); do
@@ -229,28 +249,138 @@ jobs:
           echo "::error::$SITE/api/health/ did not report release $RELEASE_SHA"
           exit 1
 
-  deploy-prod:
-    name: Deploy to production
+      - name: Checkout (smoke script of the deployed commit)
+        if: env.DOKPLOY_STAGING_API_KEY != '' && env.SITE != ''
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.RELEASE_SHA }}
+          persist-credentials: false
+
+      - name: Set up Node (smoke)
+        if: env.DOKPLOY_STAGING_API_KEY != '' && env.SITE != ''
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      # The full smoke suite in staging mode (noindex, Disallow: /, basic auth expected) — the
+      # prod gate below trusts the record only because this step passed. Read-only.
+      - name: Smoke checks (staging)
+        if: env.DOKPLOY_STAGING_API_KEY != '' && env.SITE != ''
+        env:
+          SMOKE_BASE_URL: ${{ vars.STAGING_URL }}
+          SMOKE_EXPECT_ENV: staging
+          SMOKE_EXPECT_RELEASE: ${{ env.RELEASE_SHA }}
+          SMOKE_BASIC_AUTH: ${{ secrets.STAGING_SMOKE_BASIC_AUTH }}
+        run: node scripts/ops/smoke-prod.ts
+
+      # The prod gate (staging-gate) accepts a release only if THIS commit was deployed to staging,
+      # answered health and passed the smoke suite. GitHub's automatic environment deployment
+      # cannot serve as that proof: for workflow_run it records github.sha (the newest commit on
+      # main, not necessarily the tested one) and it is "success" even when the deploy steps above
+      # were skipped. Hence an explicit deployment record with task "smoke-ok" for exactly
+      # RELEASE_SHA, created by github-actions[bot] (the gate rejects records made by people).
+      - name: Record staging verification for the prod gate
+        if: env.DOKPLOY_STAGING_API_KEY != '' && env.SITE != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          id="$(jq -n --arg ref "$RELEASE_SHA" --arg url "$SITE" --arg run "$RUN_URL" \
+              '{ref:$ref, task:"smoke-ok", environment:"staging", auto_merge:false,
+                required_contexts:[], production_environment:false,
+                description:"staging deploy + health + smoke OK", payload:{url:$url, run:$run}}' \
+            | gh api "repos/$GITHUB_REPOSITORY/deployments" --input - --jq .id)"
+          gh api "repos/$GITHUB_REPOSITORY/deployments/$id/statuses" \
+            -f state=success -f environment_url="$SITE" -f log_url="$RUN_URL" \
+            -f description="health + smoke OK" > /dev/null
+          echo "Staging verified: deployment record \`$id\` (task smoke-ok) for \`$RELEASE_SHA\`" >> "$GITHUB_STEP_SUMMARY"
+
+  # One image staging → prod: the release commit must have been deployed to staging, answered
+  # health and passed the staging smoke (record written by deploy-staging). A separate job WITHOUT
+  # an environment, so it runs BEFORE the "production" approval: a reviewer is never asked to
+  # approve a release that would fail the gate. Fails closed — no record, no prod deploy.
+  staging-gate:
+    name: Gate — commit verified on staging
     needs: build
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    # Read-only registry access: verify what the release tag resolves to before deploying.
+    timeout-minutes: 5
     permissions:
+      deployments: read
+    steps:
+      - name: Find the staging verification record
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Only records created by this workflow (github-actions[bot]) count: anyone with write
+          # access could otherwise create a "smoke-ok" deployment by hand through the API.
+          ids="$(gh api "repos/$GITHUB_REPOSITORY/deployments?environment=staging&task=smoke-ok&sha=$RELEASE_SHA&per_page=100" \
+            --jq '.[] | select(.creator.login == "github-actions[bot]") | .id')"
+          for id in $ids; do
+            status="$(gh api "repos/$GITHUB_REPOSITORY/deployments/$id/statuses?per_page=1" \
+              --jq '.[0] | select(.creator.login == "github-actions[bot]") | .state')"
+            if [ "$status" = "success" ]; then
+              echo "Staging verification: deployment $id"
+              echo "- Staging verified: deployment record \`$id\` for \`$RELEASE_SHA\`" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+          done
+          echo "::error::Commit $RELEASE_SHA has no successful staging verification (task smoke-ok by github-actions[bot]). Deploy it to staging first (push to main → CI → Docker), then re-run this workflow."
+          exit 1
+
+  # Production: push of a tag vX.Y.Z (on a commit already built from main and verified on
+  # staging) → staging-gate → approval in the "production" environment → pre-deploy pg_dump on the VDS →
+  # Dokploy switches to the SAME image → wait for health → smoke → notification.
+  # Runbook: docs/deploy.md (sections «Прод-деплой», «Откат»), docs/runbooks/prod-launch-checklist.md.
+  deploy-prod:
+    name: Deploy to production
+    # staging-gate runs (and must pass) before the environment approval is requested.
+    needs: [build, staging-gate]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    # One prod deploy at a time across all tags; never cancel a deploy in progress.
+    concurrency:
+      group: deploy-prod
+      cancel-in-progress: false
+    # Read-only: checkout (ops scripts), registry digest check.
+    permissions:
+      contents: read
       packages: read
     environment:
       name: production # required reviewers are configured on the environment in GitHub
       url: ${{ vars.PROD_URL }}
+    # DOKPLOY_PROD_API_KEY must be a secret of the "production" environment only (not repository
+    # level), so no other job — staging included — can redeploy prod around the approval.
     env:
       DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
-      DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+      DOKPLOY_PROD_API_KEY: ${{ secrets.DOKPLOY_PROD_API_KEY }}
       APP_ID: ${{ secrets.DOKPLOY_PROD_APP_ID }}
       PULL_USER: ${{ secrets.GHCR_PULL_USERNAME }}
       PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
       IMAGE: ${{ needs.build.outputs.image }}
+      SHA_TAG: ${{ needs.build.outputs.sha_tag }}
       DIGEST: ${{ needs.build.outputs.digest }}
       SITE: ${{ vars.PROD_URL }}
+      # ~10 min: image pull + stop-first swap + migrations (StartPeriod 90 s) + first health call.
+      HEALTH_ATTEMPTS: "60"
+      HEALTH_INTERVAL_SECONDS: "10"
     steps:
+      # The tag name ends up in a remote shell command (pre-deploy dump) and in image tags. Git
+      # allows `;`, `$`, `|` … in ref names, so accept only a plain version.
+      - name: Validate release tag
+        run: |
+          if [[ ! "$GITHUB_REF_NAME" =~ ^v[0-9][0-9A-Za-z._-]{0,62}$ ]]; then
+            echo "::error::Unsupported release tag '$GITHUB_REF_NAME' (expected vX.Y.Z)"
+            exit 1
+          fi
+
+      - name: Checkout (ops scripts of the released commit)
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.RELEASE_SHA }}
+          persist-credentials: false
+
       - name: Log in to GHCR
         uses: docker/login-action@v4
         with:
@@ -278,42 +408,170 @@ jobs:
             echo "- Commit: \`$RELEASE_SHA\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # - name: Pre-deploy pg_dump
-      #   # TODO(task-41): dump the prod DB to S3 (RU) before switching the image.
-      #   run: ./scripts/predeploy-backup.sh
-
       - name: Dokploy not configured — skipping
-        if: env.DOKPLOY_API_KEY == ''
-        run: echo "::notice::DOKPLOY_API_KEY is not set; prod deploy skipped (see docs/deploy.md)."
+        if: env.DOKPLOY_PROD_API_KEY == ''
+        run: echo "::notice::DOKPLOY_PROD_API_KEY (secret of the production environment) is not set; prod deploy skipped (see docs/deploy.md §10)."
 
+      # Every input the deploy needs, checked up front: a half-configured environment must fail
+      # BEFORE the database dump and the image switch, not in the middle.
+      - name: Check production configuration
+        if: env.DOKPLOY_PROD_API_KEY != ''
+        env:
+          PROD_SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          PROD_SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          PROD_SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
+          PROD_SSH_KNOWN_HOSTS: ${{ secrets.PROD_SSH_KNOWN_HOSTS }}
+          PROD_PG_SERVICE: ${{ vars.PROD_PG_SERVICE }}
+        run: |
+          missing=""
+          for name in DOKPLOY_URL APP_ID PULL_USER PULL_TOKEN SITE PROD_SSH_HOST PROD_SSH_USER \
+                      PROD_SSH_KEY PROD_SSH_KNOWN_HOSTS PROD_PG_SERVICE; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Not configured:$missing (secrets/variables of the production environment, docs/deploy.md §10)"
+            exit 1
+          fi
+          # Goes into the remote command line of the pre-deploy dump: plain service names only.
+          if [[ ! "$PROD_PG_SERVICE" =~ ^[a-zA-Z0-9_.-]+$ ]]; then
+            echo "::error::PROD_PG_SERVICE '$PROD_PG_SERVICE' is not a valid Swarm service name ([a-zA-Z0-9_.-])"
+            exit 1
+          fi
+
+      # Previous image, for the rollback hint if anything below fails. Best effort: the response
+      # shape of application.one is not part of the documented contract (check Swagger).
+      - name: Remember the running image
+        id: previous
+        if: env.DOKPLOY_PROD_API_KEY != ''
+        run: |
+          image="$(curl -fsS --max-time 20 -G "$DOKPLOY_URL/api/application.one" \
+              --data-urlencode "applicationId=$APP_ID" -H "x-api-key: $DOKPLOY_PROD_API_KEY" \
+            | jq -r '.dockerImage // empty' 2> /dev/null || true)"
+          echo "image=${image:-unknown}" >> "$GITHUB_OUTPUT"
+          echo "Running before deploy: ${image:-unknown}"
+
+      # pg_dump BEFORE the image switch (migrations of the new release run on its first health
+      # call). Runs on the VDS over SSH; any failure stops the deploy. Host key pinned via the
+      # PROD_SSH_KNOWN_HOSTS secret, never trust-on-first-use.
+      - name: Pre-deploy pg_dump (VDS)
+        if: env.DOKPLOY_PROD_API_KEY != ''
+        env:
+          PROD_SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          PROD_SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          PROD_SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
+          PROD_SSH_KNOWN_HOSTS: ${{ secrets.PROD_SSH_KNOWN_HOSTS }}
+          PROD_SSH_PORT: ${{ vars.PROD_SSH_PORT || '22' }}
+          PROD_PG_SERVICE: ${{ vars.PROD_PG_SERVICE }}
+        run: |
+          # Both values end up in the remote shell command: validate (again — defense in depth)
+          # and single-quote them. The forced-command mode of predeploy-dump.sh accepts exactly
+          # this quoted form.
+          [[ "$PROD_PG_SERVICE" =~ ^[a-zA-Z0-9_.-]+$ ]] || { echo "::error::Invalid PROD_PG_SERVICE"; exit 1; }
+          [[ "$GITHUB_REF_NAME" =~ ^v[0-9][0-9A-Za-z._-]{0,62}$ ]] || { echo "::error::Invalid tag"; exit 1; }
+          ssh_dir="$RUNNER_TEMP/ssh"
+          install -m 700 -d "$ssh_dir"
+          printf '%s\n' "$PROD_SSH_KEY" > "$ssh_dir/id"
+          printf '%s\n' "$PROD_SSH_KNOWN_HOSTS" > "$ssh_dir/known_hosts"
+          chmod 600 "$ssh_dir/id" "$ssh_dir/known_hosts"
+          set -o pipefail
+          ssh -i "$ssh_dir/id" -p "$PROD_SSH_PORT" \
+              -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$ssh_dir/known_hosts" \
+              -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=20 -o ServerAliveInterval=30 \
+              "$PROD_SSH_USER@$PROD_SSH_HOST" "bash -s -- '$GITHUB_REF_NAME' '$PROD_PG_SERVICE'" \
+              < scripts/ops/predeploy-dump.sh | tee "$RUNNER_TEMP/dump.log"
+          dump_path="$(sed -n 's/^DUMP_PATH=//p' "$RUNNER_TEMP/dump.log")"
+          dump_bytes="$(sed -n 's/^DUMP_BYTES=//p' "$RUNNER_TEMP/dump.log")"
+          [ -n "$dump_path" ] || { echo "::error::Pre-deploy dump did not report a file"; exit 1; }
+          echo "- Pre-deploy dump: \`$dump_path\` ($dump_bytes bytes)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/ssh"
+
+      # saveDockerProvider only stores configuration (same values every call): retry is harmless.
       - name: Point Dokploy app at the release image
-        if: env.DOKPLOY_API_KEY != ''
+        if: env.DOKPLOY_PROD_API_KEY != ''
         run: |
           body="$(jq -n --arg id "$APP_ID" --arg img "$IMAGE:$GITHUB_REF_NAME" \
             --arg u "$PULL_USER" --arg p "$PULL_TOKEN" \
             '{applicationId:$id, dockerImage:$img, username:$u, password:$p, registryUrl:"ghcr.io"}')"
-          curl -fsS --retry 3 -X POST "$DOKPLOY_URL/api/application.saveDockerProvider" \
-            -H "x-api-key: $DOKPLOY_API_KEY" -H "Content-Type: application/json" \
+          curl -fsS --retry 3 --max-time 60 -X POST "$DOKPLOY_URL/api/application.saveDockerProvider" \
+            -H "x-api-key: $DOKPLOY_PROD_API_KEY" -H "Content-Type: application/json" \
             -d "$body" > /dev/null
 
+      # Not idempotent: a retry after a timeout or 5xx could start a second deploy (and a second
+      # migration run). No --retry; on failure check Dokploy → Deployments and re-run the job.
       - name: Trigger deploy
-        if: env.DOKPLOY_API_KEY != ''
+        if: env.DOKPLOY_PROD_API_KEY != ''
         run: |
           body="$(jq -n --arg id "$APP_ID" --arg t "prod $GITHUB_REF_NAME" \
             '{applicationId:$id, title:$t}')"
-          curl -fsS --retry 3 -X POST "$DOKPLOY_URL/api/application.deploy" \
-            -H "x-api-key: $DOKPLOY_API_KEY" -H "Content-Type: application/json" \
+          curl -fsS --max-time 60 -X POST "$DOKPLOY_URL/api/application.deploy" \
+            -H "x-api-key: $DOKPLOY_PROD_API_KEY" -H "Content-Type: application/json" \
             -d "$body" > /dev/null
 
-      - name: Smoke test /api/health/
-        if: env.DOKPLOY_API_KEY != '' && env.SITE != ''
+      # The new container reports the RELEASE_SHA baked into the promoted image. On timeout Swarm
+      # rolls back by itself (UpdateConfig FailureAction: rollback, docs/deploy.md §6).
+      - name: Wait for /api/health/ of the new release
+        if: env.DOKPLOY_PROD_API_KEY != ''
         run: |
-          # Prod health reports the same RELEASE_SHA baked into the promoted image.
-          for attempt in $(seq 1 30); do
-            release="$(curl -fsS --max-time 10 "$SITE/api/health/" | jq -r .release || true)"
-            if [ "$release" = "$RELEASE_SHA" ]; then echo "Healthy: $release"; exit 0; fi
-            echo "Attempt $attempt: release='${release:-none}', waiting..."
-            sleep 10
+          for attempt in $(seq 1 "$HEALTH_ATTEMPTS"); do
+            body="$(curl -fsS --max-time 10 "$SITE/api/health/" || true)"
+            status="$(jq -r '.status // empty' <<< "$body" 2> /dev/null || true)"
+            release="$(jq -r '.release // empty' <<< "$body" 2> /dev/null || true)"
+            if [ "$status" = "ok" ] && [ "$release" = "$RELEASE_SHA" ]; then
+              echo "Healthy: $release (attempt $attempt)"
+              exit 0
+            fi
+            echo "Attempt $attempt/$HEALTH_ATTEMPTS: status='${status:-none}' release='${release:-none}'"
+            sleep "$HEALTH_INTERVAL_SECONDS"
           done
-          echo "::error::$SITE/api/health/ did not report release $RELEASE_SHA"
+          echo "::error::$SITE/api/health/ did not report release $RELEASE_SHA within $((HEALTH_ATTEMPTS * HEALTH_INTERVAL_SECONDS)) s"
           exit 1
+
+      - name: Set up Node (smoke)
+        if: env.DOKPLOY_PROD_API_KEY != ''
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      # The same script as `pnpm smoke:prod`, run by Node directly (built-in type stripping): no
+      # dependency install needed in this job. Read-only — writes nothing to the prod database.
+      - name: Smoke checks (production)
+        if: env.DOKPLOY_PROD_API_KEY != ''
+        env:
+          SMOKE_BASE_URL: ${{ vars.PROD_URL }}
+          SMOKE_EXPECT_ENV: production
+          SMOKE_EXPECT_RELEASE: ${{ env.RELEASE_SHA }}
+        run: node scripts/ops/smoke-prod.ts
+
+      - name: Rollback instructions
+        if: failure() && env.DOKPLOY_PROD_API_KEY != ''
+        env:
+          PREVIOUS: ${{ steps.previous.outputs.image }}
+        run: |
+          {
+            echo "### Production deploy of \`$GITHUB_REF_NAME\` FAILED"
+            echo "- Running before this deploy: \`${PREVIOUS:-unknown}\`"
+            echo "- If health never turned green, Swarm has already rolled back (FailureAction: rollback) — check Dokploy → inex-glass-prod → Deployments / Logs."
+            echo "- Manual rollback: Dokploy → inex-glass-prod → Deployments → previous deploy → Rollback, or set the Docker image to the previous tag (\`${PREVIOUS:-ghcr.io/<owner>/inex-glass:vPREV}\`) and Deploy."
+            echo "- Contract migration in this release? Restore the pre-deploy dump instead (docs/deploy.md «Восстановление БД»)."
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # Optional: silent when the Telegram secrets are absent; never fails the job.
+      - name: Notify (Telegram)
+        if: always() && env.DOKPLOY_PROD_API_KEY != ''
+        env:
+          TG_TOKEN: ${{ secrets.NOTIFY_TELEGRAM_TOKEN }}
+          TG_CHAT: ${{ secrets.NOTIFY_TELEGRAM_CHAT }}
+          JOB_STATUS: ${{ job.status }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$TG_TOKEN" ] || [ -z "$TG_CHAT" ]; then
+            echo "Telegram notification not configured — skipped."
+            exit 0
+          fi
+          text="inexglass.ru: deploy $GITHUB_REF_NAME — $JOB_STATUS. $RUN_URL"
+          curl -fsS --max-time 20 -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$TG_CHAT" --data-urlencode "text=$text" > /dev/null \
+            || echo "::warning::Telegram notification failed"

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { activeTrigger, pageQuizOnScreen, takePendingTrigger } from "./modal-trigger";
 import { readLastPath } from "./path-tracker";
 import { Quiz } from "./quiz";
 import { QUIZ_META_LINE, QUIZ_TITLE } from "./quiz-header";
@@ -24,8 +25,6 @@ import type { QuizConfig, QuizPrefill } from "./types";
 
 /** Fallback entry page when neither `src` nor a remembered path exists. */
 const DEFAULT_ENTRY_PAGE = "/";
-/** A page-mode quiz already on screen (the modal was opened from `/raschet-stoimosti/` itself). */
-const PAGE_QUIZ_SELECTOR = '[data-slot="quiz"][data-variant="page"]';
 /** The intercepted route; any other path means the visitor navigated away from the modal. */
 const QUIZ_ROUTE = /^\/raschet-stoimosti\/?$/;
 
@@ -36,22 +35,6 @@ export interface QuizModalProps {
   entryPage?: string | undefined;
   /** «Мой расчёт»: restore the saved draft. */
   resume?: boolean | undefined;
-}
-
-/** Whether the page under the modal is the quiz page (client only; `false` on the server). */
-function pageQuizOnScreen(): HTMLElement | null {
-  return typeof document === "undefined"
-    ? null
-    : document.querySelector<HTMLElement>(PAGE_QUIZ_SELECTOR);
-}
-
-/** The focused element outside any dialog (the link that opened the modal), with its `href`. */
-function activeTrigger(): { element: HTMLElement; href: string | null } | null {
-  if (typeof document === "undefined") return null;
-  const active = document.activeElement;
-  if (!(active instanceof HTMLElement) || active === document.body) return null;
-  if (active.closest("[role=dialog]")) return null;
-  return { element: active, href: active.getAttribute("href") };
 }
 
 export function QuizModal({ config, prefill, entryPage = "", resume = false }: QuizModalProps) {
@@ -95,7 +78,9 @@ export function QuizModal({ config, prefill, entryPage = "", resume = false }: Q
   // unmounts the dialog while it is still `open`, so Radix' own restore cannot be relied upon
   // (under Strict Mode it remembers an element inside the dialog). `unmountedRef` tells the real
   // unmount from the Strict Mode double effect run.
-  const [trigger] = useState(activeTrigger);
+  // After the loading skeleton (task 39) the trigger may be gone already: take the one the
+  // skeleton remembered.
+  const [trigger] = useState(() => activeTrigger() ?? takePendingTrigger());
   const unmountedRef = useRef(false);
   useEffect(() => {
     unmountedRef.current = false;

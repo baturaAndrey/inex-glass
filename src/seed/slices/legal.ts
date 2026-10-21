@@ -36,7 +36,12 @@ function pageData(entry: LegalPage, layout: LayoutBlock[]) {
     _status: "published" as const,
     hideConditions: true,
     hideQuizCta: true,
-    seo: { h1: entry.seo.h1, title: entry.seo.title, description: null, noindex: true },
+    seo: {
+      h1: entry.seo.h1,
+      title: entry.seo.title,
+      description: entry.seo.description,
+      noindex: true,
+    },
     layout,
   };
 }

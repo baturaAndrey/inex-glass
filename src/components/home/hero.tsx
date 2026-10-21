@@ -3,7 +3,6 @@ import { asMedia, fill, hasText, mediaSrc } from "@/components/blocks/shared";
 import type { BlockProps } from "@/components/blocks/types";
 import { PageHero, PageHeroStat, PageHeroTerm } from "@/components/ig/page-hero";
 import { getConditions } from "@/lib/cms/globals";
-import { cn } from "@/lib/utils";
 import { lexicalToPlainText } from "@/payload/utils/lexical-text";
 
 /** Temporary hero photo of task 05 (replaced by real media in task 38). */
@@ -13,17 +12,11 @@ export const HOME_HERO_FALLBACK_SRC = "/images/hero-glass-temp.jpg";
 const MISSING_TEXT = "[…]";
 
 /**
- * Layout tweaks of `PageHero variant="home"` for this page, as descendant selectors (the
- * primitive itself is owned by task 05):
- * - the blurred copy of the photo is not rendered — the photo is loaded once and there is no
- *   blurred duplicate (task 22); the soft fade over the photo stays;
- * - below 1536 px the terms strip wraps inside the text column, otherwise its last item runs
- *   over the photo at 1366 (review note of wave 2).
+ * Layout tweak of `PageHero variant="home"` for this page, as a descendant selector (the
+ * primitive itself is owned by task 05): below 1536 px the terms strip wraps inside the text
+ * column, otherwise its last item runs over the photo at 1366 (review note of wave 2).
  */
-const HERO_TWEAKS = cn(
-  "[&>[class*='blur-']]:hidden",
-  "[&_div.text-micro]:max-xl:max-w-[560px] [&_div.text-micro]:max-md:max-w-none"
-);
+const HERO_TWEAKS = "[&_div.text-micro]:max-xl:max-w-[560px] [&_div.text-micro]:max-md:max-w-none";
 
 /** Terms strip from `conditions.termsBar` (or the short list), texts with placeholders. */
 async function heroTerms(block: BlockProps<"hero">["block"], ctx: BlockProps<"hero">["ctx"]) {

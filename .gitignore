@@ -68,3 +68,9 @@ nul
 # inex.su import (task 37): Firecrawl cache and downloaded photos
 /scripts/.cache/
 /scripts/.import-tmp/
+
+# performance audit (task 39): Lighthouse reports and JS budget results
+/scripts/perf/out/
+
+# audits (task 40)
+/scripts/audit/out/

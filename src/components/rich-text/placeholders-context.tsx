@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import { replacePlaceholders, type PlaceholderContext } from "@/lib/domain";
+import { replacePlaceholders, type PlaceholderContext } from "@/lib/domain/placeholders";
 
 /**
  * `PlaceholderContext` as it crosses the server → client boundary: every date is an ISO string.

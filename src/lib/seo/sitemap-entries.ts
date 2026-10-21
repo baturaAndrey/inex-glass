@@ -19,8 +19,10 @@ import type { PublicCollection } from "./doc-url";
  * Entries of `/sitemap.xml` (task 36, ТЗ §8.4) — also the URL list of `scripts/indexnow-all.ts`.
  *
  * Included: `/`, every published indexable document of the public collections (`isIndexable`),
- * the listings `/obekty/` and `/blog/` with their pagination pages 2…N, and the fixed routes of
- * `STATIC_PATHS` when no document claims them. Excluded: drafts, `seo.noindex`, thicknesses
+ * the listings `/obekty/` and `/blog/` with their pagination pages 2…N — only while they list
+ * at least one published document (an empty listing is a thin page), even when a `pages`
+ * document backs the listing — and the fixed routes of `STATIC_PATHS` when no document claims
+ * them. Excluded: drafts, `seo.noindex`, thicknesses
  * 5/15/19 mm, legal pages, `/poisk/`, `/zakaz/*`, the team page while the team is empty, and every
  * URL with a query (filters, quiz parameters, UTM) — those are never generated here.
  *
@@ -257,22 +259,36 @@ export function buildSitemapEntries(
     }
   }
 
-  // Listings: page 1 + pagination pages 2…N (index, follow, self-canonical — ТЗ §8.4).
+  /**
+   * Listing page 1 + pagination pages 2…N (index, follow, self-canonical — ТЗ §8.4). An empty
+   * listing is dropped — also when a `pages` document added it above — and kept out of the
+   * `STATIC_PATHS` fallback. A listing whose `pages` document was excluded above (draft-less
+   * but `seo.noindex`) stays out together with its pagination pages, which inherit that SEO.
+   */
+  const addListing = (
+    basePath: string,
+    docs: readonly SitemapDoc[],
+    totalPages: (count: number) => number,
+    pagePath: (page: number) => string
+  ) => {
+    if (excluded.has(basePath)) return;
+    if (docs.length === 0) {
+      entries.delete(basePath);
+      excluded.add(basePath);
+      return;
+    }
+    const lastModified = newest(docs);
+    add(basePath, lastModified, TEMPLATE_RANK.listing);
+    for (let page = 2; page <= totalPages(docs.length); page++) {
+      add(pagePath(page), lastModified, TEMPLATE_RANK.listing);
+    }
+  };
+
   const listedObjects = source.docs.objects.filter(
     (doc) => doc.slug !== RESERVED_OBJECT_SLUG && docUrl("objects", doc) !== null
   );
-  const objectsLastModified = newest(listedObjects);
-  add(OBJECTS_BASE_PATH, objectsLastModified, TEMPLATE_RANK.listing);
-  for (let page = 2; page <= objectsTotalPages(listedObjects.length); page++) {
-    add(objectsPagePath(page), objectsLastModified, TEMPLATE_RANK.listing);
-  }
-
-  const articles = source.docs.articles;
-  const articlesLastModified = newest(articles);
-  add(BLOG_PATH, articlesLastModified, TEMPLATE_RANK.listing);
-  for (let page = 2; page <= blogTotalPages(articles.length); page++) {
-    add(blogPageHref(page), articlesLastModified, TEMPLATE_RANK.listing);
-  }
+  addListing(OBJECTS_BASE_PATH, listedObjects, objectsTotalPages, objectsPagePath);
+  addListing(BLOG_PATH, source.docs.articles, blogTotalPages, blogPageHref);
 
   for (const path of STATIC_PATHS) {
     if (!entries.has(path) && !excluded.has(path))

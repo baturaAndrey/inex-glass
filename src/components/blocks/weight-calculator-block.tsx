@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { WeightCalculator, type CarryHintItem } from "@/components/calculators/weight-calculator";
+import { WeightCalculator } from "@/components/calculators/lazy";
+import type { CarryHintItem } from "@/components/calculators/weight-calculator";
 import { WEIGHT_PAGE_COPY, type CopyParagraph } from "@/components/calculators/weight-copy";
 import { WeightTable } from "@/components/calculators/weight-table";
 import { Section } from "@/components/ig/section";

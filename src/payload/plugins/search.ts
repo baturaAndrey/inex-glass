@@ -5,6 +5,7 @@ import { documentToText } from "@/lib/search/lexical-to-text";
 import { normalizeRu } from "@/lib/search/normalize";
 import { SEARCH_COLLECTIONS, type SearchKind } from "@/lib/search/types";
 import { docUrl } from "@/lib/seo/doc-url";
+import { isExcludedFromSearch } from "@/lib/seo/indexable";
 import { isAdmin } from "../access";
 import { rel } from "../slugs";
 import type { postgresAdapter } from "@payloadcms/db-postgres";
@@ -22,8 +23,13 @@ import type { Payload, Plugin, PayloadRequest } from "payload";
  *
  * Indexed: published documents only (`syncDrafts: false`; un-publishing removes the entry,
  * `deleteDrafts: true`); `thicknesses` / `processing-services` have no drafts and are always
- * indexed. Service pages (legal documents, `/zakaz/…`, pages closed with `seo.noindex`) are
- * skipped and their stale entries removed (`skipSync`). The first fill / a full rebuild:
+ * indexed. Closed documents (`isExcludedFromSearch` from `@/lib/seo/indexable` — the rule shared
+ * with the sitemap / IndexNow: `seo.noindex` in any collection, legal pages, service paths such
+ * as `/zakaz/…`) are skipped and their stale entries removed (`skipSync`). Only the published
+ * version decides: a draft save is left to the plugin (no sync; the entry is dropped only when
+ * no published version exists), so a draft with `seo.noindex` never removes the live entry.
+ * After a parent's slug change the children's entries are re-synced by the path cascade
+ * (`src/payload/fields/path.ts` → `reindexDocuments`). The first fill / a full rebuild:
  * `pnpm payload run scripts/reindex-search.ts`.
  */
 
@@ -40,9 +46,6 @@ export const SEARCH_PRIORITIES: Readonly<Record<SearchKind, number>> = {
   objects: 3,
 };
 
-/** Paths of pages that never appear in the site search. */
-const EXCLUDED_PAGE_PREFIXES: readonly string[] = ["/zakaz/"];
-
 type AnyDoc = Record<string, unknown>;
 
 const isObject = (value: unknown): value is AnyDoc => typeof value === "object" && value !== null;
@@ -50,17 +53,11 @@ const isObject = (value: unknown): value is AnyDoc => typeof value === "object" 
 const text = (value: unknown): string | null =>
   typeof value === "string" && value.trim() !== "" ? value.trim() : null;
 
-/**
- * `true` for documents that must not be in the index whatever their status: legal pages
- * (privacy policy, consent), order pages and pages closed from indexing.
- */
-export function isExcludedFromSearch(collection: string, doc: unknown): boolean {
-  if (collection !== "pages" || !isObject(doc)) return false;
-  if (doc.template === "legal") return true;
-  if (isObject(doc.seo) && doc.seo.noindex === true) return true;
-  const path = typeof doc.path === "string" ? doc.path : "";
-  return EXCLUDED_PAGE_PREFIXES.some((prefix) => path.startsWith(prefix));
-}
+/** Re-exported for the existing importers (`reindex.ts`, tests); the rule lives in `indexable.ts`. */
+export { isExcludedFromSearch };
+
+/** A draft save: the published version (main row) is unchanged, so it must not decide. */
+const isDraftSave = (doc: unknown): boolean => isObject(doc) && doc._status === "draft";
 
 /** `n` of a thickness (the only collection whose texts use `{N}` for the document itself). */
 function thicknessN(collection: string, doc: AnyDoc): string | null {
@@ -142,6 +139,9 @@ export const searchPluginEntry: Plugin = searchPlugin({
   syncDrafts: false,
   deleteDrafts: true,
   skipSync: async ({ collectionSlug, doc, req }) => {
+    // Drafts go through the plugin: it never indexes them and removes the entry only when no
+    // published version exists (un-publish), whatever the draft's `seo.noindex`.
+    if (isDraftSave(doc)) return false;
     if (!isExcludedFromSearch(collectionSlug, doc)) return false;
     // The plugin only skips the write: drop an entry left from before the page became excluded.
     await removeFromSearch(req.payload, collectionSlug, (doc as AnyDoc | undefined)?.id, req);

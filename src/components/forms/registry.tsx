@@ -11,12 +11,19 @@ import type { FormsConfig } from "./use-forms-config";
 export type { FormComponentProps, FormKey, FormParams } from "./form-dialog-provider";
 
 /**
- * Registry formKey → form component (task 21), rendered by `FormDialogProvider` (modal) and by
- * `FormSection` / the `form` block (`variant: 'page'`, through `InlineForm`).
+ * Registry formKey → form component (task 21) for the PAGE path: `FormSection` / the `form`
+ * block (through `InlineForm`) and `UploadCard`, all `variant: 'page'`.
  *
- * Every form is a `next/dynamic` chunk: the provider sits in the site layout, so static imports
- * would put all six forms into the initial bundle of every page. Inline forms are still
- * server-rendered (`ssr` stays on); the modal shows a spinner while its chunk loads.
+ * Every form is a `next/dynamic` chunk, server-rendered (`ssr` stays on): the catch-all route
+ * statically references every block, so static imports would ship all six forms (and zod) with
+ * every page of that route (+45 KB gzip measured); this way only pages that render a form load it.
+ *
+ * The modal does NOT use this module: it has its own static map in `./modal-forms`, inside the
+ * lazy `./form-dialog` chunk. Do not import this registry from the dialog again: with these
+ * loaders reachable both from the page entry and from the lazy dialog chunk, the Turbopack
+ * production build wrote never-emitted chunk files into `react-loadable-manifest.json`, so every
+ * page with an inline form preloaded a 404 (Wave 7). Verify any change here on a prod build: no
+ * `/_next/static/` 404 on `/`, `/kontakty/`, `/kak-zakazat/trebovaniya-k-chertezham/`.
  */
 
 function FormLoading() {

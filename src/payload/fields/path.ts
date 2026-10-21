@@ -261,6 +261,62 @@ function revalidateDocs(req: PayloadRequest, collection: string, ids: readonly s
   }
 }
 
+/** A descendant whose main-table `path` the cascade rewrote. */
+export interface CascadedChild {
+  id: string;
+  /** Stored path before the cascade (`null` when it was missing). */
+  from: string | null;
+  to: string;
+}
+
+/**
+ * Side effects the cascade's DB-level writes skip (no hooks run for the children): their site
+ * search entries still carry the old URLs and IndexNow is not told about the move. Re-syncs the
+ * entries from the published versions and queues IndexNow for the old and new URLs, inside the
+ * parent's transaction. Each part is independent and never throws into the parent's save.
+ *
+ * The modules are imported lazily: they pull the search plugin and the env/job helpers, which
+ * the collection configs importing this file do not need at config-build time.
+ */
+async function syncCascadedChildren(
+  req: PayloadRequest,
+  collection: string,
+  changed: readonly CascadedChild[]
+): Promise<void> {
+  if (changed.length === 0) return;
+  try {
+    const { isSearchKind } = await import("@/lib/search/types");
+    if (isSearchKind(collection)) {
+      const { reindexDocuments } = await import("@/lib/search/reindex");
+      await reindexDocuments(
+        req.payload,
+        collection,
+        changed.map((child) => child.id),
+        req
+      );
+    }
+  } catch (error) {
+    req.payload.logger.error({
+      err: error,
+      msg: `Поиск: не удалось обновить записи потомков ${collection} после смены адреса`,
+    });
+  }
+
+  // `queueMovedDocs` checks the environment / settings itself and logs its own failures.
+  const moves = changed.flatMap((child) =>
+    child.from ? [{ id: child.id, from: child.from, to: child.to }] : []
+  );
+  try {
+    const { queueMovedDocs } = await import("@/payload/plugins/indexnow");
+    await queueMovedDocs(req, collection, moves);
+  } catch (error) {
+    req.payload.logger.error({
+      err: error,
+      msg: `IndexNow: не удалось поставить в очередь потомков ${collection}`,
+    });
+  }
+}
+
 /**
  * Recomputes the stored `path` of all descendants of `rootId` after its published path became
  * `rootPath`. Breadth-first with a visited set.
@@ -273,19 +329,19 @@ function revalidateDocs(req: PayloadRequest, collection: string, ids: readonly s
  * that child and its subtree keep their old paths and the conflict is logged; the editor fixes
  * it by re-saving the child with another slug.
  *
- * Returns ids of children whose main-table path changed.
+ * Returns the children whose main-table path changed (id, old and new path).
  */
 export async function cascadeChildPaths(
   req: PayloadRequest,
   collection: string,
   rootId: string,
   rootPath: string
-): Promise<string[]> {
+): Promise<CascadedChild[]> {
   const slug = rel(collection);
   const hasVersions = Boolean(req.payload.collections[slug]?.config.versions);
   const visited = new Set<string>([rootId]);
   const queue: { id: string; path: string }[] = [{ id: rootId, path: rootPath }];
-  const changed: string[] = [];
+  const changed: CascadedChild[] = [];
 
   while (queue.length > 0) {
     const parent = queue.shift() as { id: string; path: string };
@@ -321,7 +377,11 @@ export async function cascadeChildPaths(
           returning: false,
           req,
         });
-        changed.push(childId);
+        changed.push({
+          id: childId,
+          from: typeof child.path === "string" ? child.path : null,
+          to: nextPath,
+        });
       }
       if (hasVersions) await syncVersionPaths(req, collection, childId, parent.id, parent.path);
       queue.push({ id: childId, path: nextPath });
@@ -369,7 +429,12 @@ export function cascadePathsAfterChange(collection: string): CollectionAfterChan
       const after = await readMainPath(req, collection, id);
       if (!after || after === before) return doc;
       const changed = await cascadeChildPaths(req, collection, id, after);
-      revalidateDocs(req, collection, changed);
+      revalidateDocs(
+        req,
+        collection,
+        changed.map((child) => child.id)
+      );
+      await syncCascadedChildren(req, collection, changed);
     } catch (error) {
       // Only infrastructure errors can get here (business rules are not evaluated); the save
       // itself is decided by the surrounding transaction.

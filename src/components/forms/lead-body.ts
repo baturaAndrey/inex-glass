@@ -1,4 +1,4 @@
-import { leadSubmitSchemaForForm, REQUIRED_MESSAGE } from "@/lib/domain/lead-schemas";
+import { REQUIRED_MESSAGE, siteFormLeadSchema } from "@/lib/domain/lead-form-schemas";
 import { FORM_TEXTS } from "./form-texts";
 import type { FormKey, FormParams } from "./form-dialog-provider";
 import type { z } from "zod";
@@ -202,7 +202,7 @@ const VALIDATION_META: Omit<LeadMeta, "consent"> = {
 };
 
 /**
- * Client-side validation with the form's own schema (`leadSubmitSchemaForForm`) plus the
+ * Client-side validation with the form's own schema (`siteFormLeadSchema`, quiz-free) plus the
  * UI-required fields. Returns the first message per field; `{}` when the input is valid.
  */
 export function validateLead(
@@ -219,7 +219,7 @@ export function validateLead(
   }
 
   const body = buildLeadBody(formKey, values, params, { ...VALIDATION_META, consent });
-  const schema = leadSubmitSchemaForForm(formKey) as z.ZodType;
+  const schema = siteFormLeadSchema(formKey) as z.ZodType;
   const result = schema.safeParse(body);
   if (!result.success) {
     for (const issue of result.error.issues) {

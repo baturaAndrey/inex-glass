@@ -8,26 +8,22 @@ import {
   type ServiceSeed,
   type TableSeed,
 } from "../content/processing";
-import { upsertByPath, upsertBySlug, type SeedContext } from "../context";
+import { mayOverwrite, upsertByPath, upsertBySlug, type SeedContext } from "../context";
 import { markdown, paragraphs } from "../lexical";
-import type { CollectionSlug, Where } from "payload";
 
 /**
  * Seed slice «processing» (task 25): the hub `/obrabotka-stekla/` (`pages`, template `hub`) and
  * the six `processing-services`. Texts live in `../content/processing.ts`.
  *
- * Update rule: an existing document is rewritten only with `--force` or while it is pristine —
- * `updatedAt` within `PRISTINE_WINDOW_MS` of `createdAt` (created by the mini-seed or by this
- * slice and never edited). Otherwise it is skipped with a log line, so editor changes survive.
+ * Update rule: an existing document is rewritten only with `--force` or while it is unchanged
+ * since the seed's last write (`mayOverwrite` in `../context.ts`, seed markers). Otherwise it is
+ * skipped with a log line, so editor changes survive.
  */
 
 type LayoutBlock = NonNullable<Page["layout"]>[number];
 type ServiceTable = NonNullable<ProcessingService["tables"]>[number];
 type TableData = NonNullable<Extract<LayoutBlock, { blockType: "table" }>["table"]>;
 type CtaButton = NonNullable<Extract<LayoutBlock, { blockType: "cta" }>["buttons"]>[number];
-
-/** A document saved within this time after its creation was never edited by a person. */
-const PRISTINE_WINDOW_MS = 2000;
 
 /* ------------------------------------------------------------------------------------------ */
 /* Converters                                                                                 */
@@ -104,44 +100,6 @@ async function layout(ctx: SeedContext, seeds: readonly LayoutSeed[]): Promise<L
   const blocks: LayoutBlock[] = [];
   for (const seed of seeds) blocks.push(await layoutBlock(ctx, seed));
   return blocks;
-}
-
-/* ------------------------------------------------------------------------------------------ */
-/* Update rule                                                                                */
-/* ------------------------------------------------------------------------------------------ */
-
-/**
- * `true` → the upsert may overwrite: `--force`, no document yet, or a pristine one. Logs the
- * reason when an edited document is kept.
- */
-async function mayOverwrite(
-  ctx: SeedContext,
-  collection: CollectionSlug,
-  where: Where,
-  label: string
-): Promise<boolean> {
-  if (ctx.force) return true;
-  const found = await ctx.payload.find({
-    collection,
-    where,
-    limit: 1,
-    depth: 0,
-    pagination: false,
-    overrideAccess: true,
-    // Drafts count too: an editor's unpublished changes must not be overwritten either.
-    draft: true,
-  });
-  const doc = found.docs[0] as { createdAt?: string; updatedAt?: string } | undefined;
-  if (!doc) return true;
-  const created = Date.parse(doc.createdAt ?? "");
-  const updated = Date.parse(doc.updatedAt ?? "");
-  const pristine =
-    Number.isFinite(created) &&
-    Number.isFinite(updated) &&
-    Math.abs(updated - created) < PRISTINE_WINDOW_MS;
-  if (!pristine)
-    ctx.log(`${collection} ${label}: изменён после создания — пропуск (перезапись: --force)`);
-  return pristine;
 }
 
 /* ------------------------------------------------------------------------------------------ */

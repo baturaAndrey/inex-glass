@@ -2,7 +2,17 @@
  * Import of the inex.su portfolio and shower catalogue into Payload as DRAFTS (task 37).
  *
  *   pnpm tsx --env-file=.env scripts/import-inex/import.ts [--dry-run] [--only=objects|showers]
- *        [--limit=N] [--i-know-this-is-prod]
+ *        [--limit=N] [--fix-existing] [--i-know-this-is-prod]
+ *
+ * `--fix-existing` (wave-6 review) repairs documents written by an earlier run — only values
+ * the import itself wrote and no editor has changed since:
+ *   - `task` / shower `description` / `importNotes` equal to what the old parser produced (every
+ *     `<br>` was a paragraph break, built-in stop words only) → re-parsed text;
+ *   - `city` pointing at a «city» created from a region («Челябинская область») → the city found
+ *     in the text or empty; such region records are deleted once nothing references them;
+ *   - `sortDate` still equal to the creation time of a document created by an import run → the
+ *     page date / fallback of `sortDateOf`.
+ * Works from the Firecrawl cache only (no crawling); idempotent — a second run changes nothing.
  *
  * Input: the Firecrawl cache of `crawl.ts` (run it first). Steps:
  *   1. taxonomies (find or create): `products` per portfolio category, `cities` found on the
@@ -50,14 +60,23 @@ import type { Object as PortfolioObject, ShowerConfig } from "@/payload-types";
 import {
   parseAllObjects,
   photoFileName,
+  photoKey,
   sameObject,
   type ParseResult,
   type ParsedObject,
+  type StopWordCheck,
   type ParsedPhoto,
   type TextNote,
 } from "./parse-objects";
 import { parseAllShowers, type ParsedShower } from "./parse-showers";
-import { CATEGORY_PRODUCTS, MIN_PHOTO_BYTES, MIN_PHOTO_SIDE, OBJECT_TYPE_RULES } from "./selectors";
+import {
+  CATEGORY_PRODUCTS,
+  MIN_PHOTO_BYTES,
+  MIN_PHOTO_SIDE,
+  OBJECT_TYPE_RULES,
+  REGION_LOCATION,
+} from "./selectors";
+import { cmsStopWordCheck, type CmsStopWord } from "./stop-words";
 import {
   CRAWL_STATS_JSON,
   IMPORT_REPORT,
@@ -88,6 +107,19 @@ const MAX_TASK_LENGTH = 300;
 /** Slug of the shower construction (seeded by task 26). */
 const SHOWER_CONSTRUCTION_SLUG = "dushevye-peregorodki";
 const MEDIA_CREDIT = "inex.su";
+
+/**
+ * `sortDate` of an imported object without a date on its page or a year in its text (none of
+ * the inex.su pages crawled on 2026-10-21 has either). A fixed date before the new site's
+ * launch: the inex.su archive sorts below every object an editor dates for real, and runs on
+ * different days give the same value (the import date used before made the archive look «new»
+ * and its order depend on when the script ran). Editors set the real completion date.
+ */
+const IMPORT_SORT_DATE_FALLBACK = "2020-01-01T00:00:00.000Z";
+/** A `sortDate` this close to `createdAt` was set by the import at creation, not by an editor. */
+const SORT_DATE_DEFAULT_TOLERANCE_MS = 60_000;
+/** Slack after an import run's recorded duration when matching `createdAt` to the run. */
+const RUN_WINDOW_SLACK_MS = 60_000;
 
 /** Aliases of the task-30 object types (reference data seeded earlier under other slugs). */
 const OBJECT_TYPE_ALIASES: Readonly<Record<string, readonly string[]>> = {
@@ -137,6 +169,8 @@ interface ObjectRecord {
   generatedAlts: string[];
   notes: TextNote[];
   merged: boolean;
+  /** Fields repaired by `--fix-existing`. */
+  fixed: string[];
 }
 
 interface ShowerRecord {
@@ -146,6 +180,7 @@ interface ShowerRecord {
   outcome: UpsertOutcome;
   notes: TextNote[];
   priceText?: string;
+  fixed: string[];
 }
 
 const stats = {
@@ -159,6 +194,10 @@ const stats = {
   showers: [] as ShowerRecord[],
   parseFailed: [] as Array<{ oldUrl: string; reason: string }>,
   slugChanges: [] as Array<{ oldUrl: string; from: string; to: string; reason: string }>,
+  /** Region «cities» removed by `--fix-existing` (or kept, with the reason). */
+  regionCities: [] as Array<{ name: string; result: string }>,
+  /** Where the stop-word list came from (report). */
+  stopWordSource: "",
 };
 
 const errorMessage = (error: unknown): string => {
@@ -229,7 +268,22 @@ class Taxonomies {
   }
 
   city(name: string): Promise<string | null> {
+    // Defense in depth: the parser already moves regions out of `city`.
+    if (REGION_LOCATION.test(name)) return Promise.resolve(null);
     return this.findOrCreate("cities", toLatinSlug(name), name);
+  }
+
+  /** `cities` records whose name is a region — created by the first import (wave 6). */
+  async regionCities(): Promise<Array<{ id: string; name: string; createdAt: string }>> {
+    const { docs } = await this.ctx.payload.find({
+      collection: "cities",
+      pagination: false,
+      depth: 0,
+      overrideAccess: true,
+    });
+    return docs
+      .filter((doc) => REGION_LOCATION.test(doc.name))
+      .map(({ id, name, createdAt }) => ({ id, name, createdAt }));
   }
 
   /** Object type by keyword; only existing records are used. */
@@ -382,7 +436,11 @@ class MediaStore {
     }
 
     // `<sha1>/<original name>`: Payload keeps the original file name (deduplicated on disk).
-    const filePath = path.join(PHOTO_DIR, sha1, photoFileName(src));
+    const photoDir = path.resolve(PHOTO_DIR, sha1);
+    const filePath = path.resolve(photoDir, photoFileName(src));
+    // Defense in depth: `photoFileName` already sanitizes, but a name taken from a remote URL
+    // must never escape the download directory.
+    if (path.dirname(filePath) !== photoDir) return skip("недопустимое имя файла");
     await mkdir(path.dirname(filePath), { recursive: true });
     if (!existsSync(filePath)) await writeFile(filePath, bytes);
     try {
@@ -424,10 +482,16 @@ function photoAlts(
   return { alts, generated };
 }
 
+const today = () => new Date().toISOString().slice(0, 10);
+
+/** Date in the first line of import notes («Импорт с inex.su 2026-10-21 (task 37).»). */
+const IMPORT_NOTES_DATE = /^Импорт с inex\.su (\d{4}-\d{2}-\d{2}) /;
+
 function importNotesText(
   oldUrls: readonly string[],
   notes: readonly TextNote[],
-  extra: readonly string[] = []
+  extra: readonly string[] = [],
+  date: string = today()
 ): string {
   const labels: Record<TextNote["kind"], string> = {
     removed: "Удалено из текста (монтаж/замер/под ключ — ТЗ §11)",
@@ -436,11 +500,141 @@ function importNotesText(
     "stop-word": "Стоп-слово (ТЗ §11)",
   };
   return [
-    `Импорт с inex.su ${new Date().toISOString().slice(0, 10)} (task 37).`,
+    `Импорт с inex.su ${date} (task 37).`,
     ...oldUrls.map((url) => `Источник: ${inexUrl(url)}`),
     ...extra,
     ...notes.map((note) => `${labels[note.kind]}: ${note.text}`),
   ].join("\n");
+}
+
+/**
+ * `sortDate` of an imported object: the page date, else 1 January of the year found in the
+ * text, else `IMPORT_SORT_DATE_FALLBACK` (never the import date).
+ */
+function sortDateOf(parsed: readonly ParsedObject[]): string {
+  const pageDate = parsed.map((item) => item.pageDate).find(Boolean);
+  if (pageDate) return pageDate;
+  const year = parsed.map((item) => item.year).find((value) => value !== undefined);
+  return year ? `${year}-01-01T00:00:00.000Z` : IMPORT_SORT_DATE_FALLBACK;
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* --fix-existing                                                                             */
+/* ------------------------------------------------------------------------------------------ */
+
+/** What `--fix-existing` needs to tell import-written values from editor changes. */
+interface FixContext {
+  /** Old-parser output per old URL (`legacyBr`, built-in stop words). */
+  legacyObjects: Map<string, ParseResult>;
+  legacyShowers: Map<string, ParsedShower>;
+  /** Ids of region «cities» (see `Taxonomies.regionCities`). */
+  regionCityIds: ReadonlySet<string>;
+  /** [start, end] (ms) of the import runs that created documents. */
+  runWindows: ReadonlyArray<readonly [number, number]>;
+}
+
+/** Whether the document was created by an import run (not a seed record the import adopted). */
+function createdByImport(fix: FixContext, createdAt: string | null | undefined): boolean {
+  const time = createdAt ? Date.parse(createdAt) : Number.NaN;
+  return fix.runWindows.some(([from, to]) => time >= from && time <= to);
+}
+
+/** `sortDate` still holding the creation-time default the import used to write. */
+function hasDefaultSortDate(doc: { sortDate?: string | null; createdAt: string }): boolean {
+  if (!doc.sortDate) return false;
+  return (
+    Math.abs(Date.parse(doc.sortDate) - Date.parse(doc.createdAt)) <= SORT_DATE_DEFAULT_TOLERANCE_MS
+  );
+}
+
+/** Import notes regenerated with the date of the original notes (so a re-run is a no-op). */
+function notesDate(current: string | null | undefined): string | null {
+  return IMPORT_NOTES_DATE.exec(current ?? "")?.[1] ?? null;
+}
+
+/** Group text / notes as the import composes them (shared by the new and the legacy parse). */
+function objectTexts(parsed: readonly ParsedObject[]): {
+  taskText: string;
+  notes: TextNote[];
+  extra: string[];
+} {
+  const primary = parsed[0];
+  const specs = parsed.flatMap((item) => item.specs ?? []);
+  const regions = [...new Set(parsed.map((item) => item.region).filter(Boolean))];
+  return {
+    taskText: parsed.map((item) => item.taskText).find((text) => text.trim() !== "") ?? "",
+    notes: parsed.flatMap((item) => item.notes),
+    extra: [
+      ...(primary?.kindLabel ? [`Подпись на карте inex.su: ${primary.kindLabel}`] : []),
+      ...(specs.length > 0 ? [`Изделия на странице: ${specs.join("; ")}`] : []),
+      ...regions.map((region) => `Регион на inex.su (не город): ${region}`),
+    ],
+  };
+}
+
+/**
+ * Repairs of an existing object (`--fix-existing`): only values equal to what the import wrote.
+ * `next` is the new parse of the group, `cityId` the city it resolves to.
+ */
+function objectFixes(
+  fix: FixContext,
+  current: PortfolioObject,
+  group: ObjectGroup,
+  next: { taskText: string; notesText: (date: string) => string; cityId: string | null }
+): Record<string, unknown> {
+  const patch: Record<string, unknown> = {};
+  const legacyParsed = group.oldUrls
+    .map((url) => fix.legacyObjects.get(url))
+    .flatMap((result) => (result?.ok ? [result.value] : []));
+  if (legacyParsed.length === group.oldUrls.length) {
+    const legacy = objectTexts(legacyParsed);
+    if (current.task === legacy.taskText && current.task !== next.taskText) {
+      patch.task = next.taskText;
+    }
+    const date = notesDate(current.importNotes);
+    // The first import wrote no region line: compare with the legacy extra without it.
+    const legacyExtra = legacy.extra.filter((line) => !line.startsWith("Регион на inex.su"));
+    if (
+      date &&
+      current.importNotes === importNotesText(group.oldUrls, legacy.notes, legacyExtra, date) &&
+      current.importNotes !== next.notesText(date)
+    ) {
+      patch.importNotes = next.notesText(date);
+    }
+  }
+  const cityId = typeof current.city === "string" ? current.city : (current.city?.id ?? null);
+  if (cityId && fix.regionCityIds.has(cityId) && cityId !== next.cityId) {
+    patch.city = next.cityId;
+  }
+  if (createdByImport(fix, current.createdAt) && hasDefaultSortDate(current)) {
+    patch.sortDate = sortDateOf(group.parsed);
+  }
+  return patch;
+}
+
+/** Repairs of an existing shower configuration (`--fix-existing`), same policy as objects. */
+function showerFixes(
+  fix: FixContext,
+  current: ShowerConfig,
+  shower: ParsedShower,
+  notesText: (date: string) => string
+): Record<string, unknown> {
+  const patch: Record<string, unknown> = {};
+  const legacy = fix.legacyShowers.get(shower.oldUrl);
+  if (!legacy) return patch;
+  if (current.description === legacy.description && current.description !== shower.description) {
+    patch.description = shower.description;
+  }
+  const date = notesDate(current.importNotes);
+  const extra = legacy.priceText ? [`Цена на inex.su (не импортируется): ${legacy.priceText}`] : [];
+  if (
+    date &&
+    current.importNotes === importNotesText([legacy.oldUrl], legacy.notes, extra, date) &&
+    current.importNotes !== notesText(date)
+  ) {
+    patch.importNotes = notesText(date);
+  }
+  return patch;
 }
 
 const isEmpty = (value: unknown): boolean =>
@@ -530,19 +724,23 @@ async function upsertObject(
   taxonomies: Taxonomies,
   media: MediaStore,
   dryRun: boolean,
-  slugs: Record<string, string>
+  slugs: Record<string, string>,
+  fix: FixContext | null
 ): Promise<void> {
   const primary = group.parsed[0];
   if (!primary) return;
   const name = primary.name;
-  const notes = group.parsed.flatMap((parsed) => parsed.notes);
+  const { taskText, notes, extra } = objectTexts(group.parsed);
+  const region = group.parsed.map((parsed) => parsed.region).find(Boolean);
 
-  // Photos of all merged pages, de-duplicated by file name; the first one is the cover.
+  // Photos of all merged pages, de-duplicated by source URL (`photoKey`, not the lossy sanitized
+  // file name); identical bytes under different URLs are merged by sha1 in `createMedia`. The
+  // first one is the cover.
   const seen = new Set<string>();
   const photos = group.parsed
     .flatMap((parsed) => parsed.photos)
     .filter((photo) => {
-      const key = photoFileName(photo.src);
+      const key = photoKey(photo.src);
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
@@ -551,18 +749,15 @@ async function upsertObject(
 
   const city = group.parsed.map((parsed) => parsed.city).find(Boolean);
   const year = group.parsed.map((parsed) => parsed.year).find((value) => value !== undefined);
-  const taskText =
-    group.parsed.map((parsed) => parsed.taskText).find((text) => text.trim() !== "") ?? "";
   const categories = [...new Set(group.oldUrls.map((url) => portfolioCategory(url) ?? ""))];
   const productIds = (
     await Promise.all(categories.map((category) => taxonomies.product(category)))
   ).filter((id): id is string => !!id);
   const cityId = city ? await taxonomies.city(city) : null;
   const typeId = await taxonomies.objectType(`${primary.kindLabel ?? ""} ${name}`);
-  const specs = group.parsed.flatMap((parsed) => parsed.specs ?? []);
 
   const missing: string[] = [];
-  if (!cityId) missing.push("город");
+  if (!cityId) missing.push(region ? `город (на inex.su указан регион: ${region})` : "город");
   if (!year) missing.push("год");
   if (!typeId) missing.push("тип объекта");
   if (!taskText) missing.push("задача (task)");
@@ -572,10 +767,6 @@ async function upsertObject(
   if (photos.length === 0) missing.push("фото");
   if (generated.length > 0) missing.push(`alt проверить (${generated.length})`);
 
-  const extra = [
-    ...(primary.kindLabel ? [`Подпись на карте inex.su: ${primary.kindLabel}`] : []),
-    ...(specs.length > 0 ? [`Изделия на странице: ${specs.join("; ")}`] : []),
-  ];
   const record: ObjectRecord = {
     slug: group.slug,
     name,
@@ -585,20 +776,23 @@ async function upsertObject(
     generatedAlts: generated,
     notes,
     merged: group.oldUrls.length > 1,
+    fixed: [],
   };
   stats.objects.push(record);
 
-  // Existing document: by any of the old URLs (draft versions included).
-  const existing = dryRun
-    ? null
-    : await ctx.payload.find({
-        collection: "objects",
-        where: { "legacyUrls.url": { in: group.oldUrls } },
-        limit: 2,
-        depth: 0,
-        draft: true,
-        overrideAccess: true,
-      });
+  // Existing document: by any of the old URLs (draft versions included). A read-only lookup,
+  // also done by `--fix-existing --dry-run` to plan the repairs.
+  const existing =
+    dryRun && !fix
+      ? null
+      : await ctx.payload.find({
+          collection: "objects",
+          where: { "legacyUrls.url": { in: group.oldUrls } },
+          limit: 2,
+          depth: 0,
+          draft: true,
+          overrideAccess: true,
+        });
   if (existing && existing.docs.length > 1) {
     stats.errors.push({
       what: `objects ${group.slug}`,
@@ -650,9 +844,21 @@ async function upsertObject(
     sourceUrl: inexUrl(group.oldUrls[0] ?? ""),
     importNotes: importNotesText(group.oldUrls, notes, extra),
   };
+  const fixes =
+    fix && current
+      ? objectFixes(fix, current, group, {
+          taskText,
+          notesText: (date) => importNotesText(group.oldUrls, notes, extra, date),
+          cityId,
+        })
+      : {};
+  record.fixed = Object.keys(fixes);
 
   if (dryRun) {
-    ctx.log(`[dry-run] objects ${slug}: ${photos.length} фото, ${group.oldUrls.length} URL`);
+    const planned = record.fixed.length > 0 ? `; исправить: ${record.fixed.join(", ")}` : "";
+    ctx.log(
+      `[dry-run] objects ${slug}: ${photos.length} фото, ${group.oldUrls.length} URL${planned}`
+    );
     return;
   }
 
@@ -664,7 +870,7 @@ async function upsertObject(
         legacyUrls,
         featured: false,
         spec: [],
-        sortDate: new Date().toISOString(),
+        sortDate: sortDateOf(group.parsed),
         _status: "draft",
       },
       draft: true,
@@ -677,11 +883,11 @@ async function upsertObject(
     return;
   }
 
-  // Existing: fill only empty fields, add missing legacy URLs.
-  const patch: Record<string, unknown> = onlyEmpty(
-    current as unknown as Record<string, unknown>,
-    full
-  );
+  // Existing: fill only empty fields, add missing legacy URLs; `--fix-existing` repairs on top.
+  const patch: Record<string, unknown> = {
+    ...onlyEmpty(current as unknown as Record<string, unknown>, full),
+    ...fixes,
+  };
   delete patch.slug;
   const knownUrls = new Set((current.legacyUrls ?? []).map((item) => item.url));
   const newUrls = group.oldUrls.filter((url) => !knownUrls.has(url));
@@ -705,7 +911,10 @@ async function upsertObject(
     context: SEED_REQUEST_CONTEXT,
   });
   record.outcome = "updated";
-  ctx.log(`objects ${slug}: дополнены поля ${Object.keys(patch).join(", ")}`);
+  ctx.log(
+    `objects ${slug}: дополнены поля ${Object.keys(patch).join(", ")}` +
+      (record.fixed.length > 0 ? ` (исправлено: ${record.fixed.join(", ")})` : "")
+  );
 }
 
 /* ------------------------------------------------------------------------------------------ */
@@ -735,7 +944,8 @@ async function upsertShower(
   shower: ParsedShower,
   constructionId: string | null,
   media: MediaStore,
-  dryRun: boolean
+  dryRun: boolean,
+  fix: FixContext | null
 ): Promise<void> {
   let slug = toLatinSlug(lastSegment(shower.oldUrl));
   const record: ShowerRecord = {
@@ -745,12 +955,14 @@ async function upsertShower(
     outcome: "planned",
     notes: shower.notes,
     ...(shower.priceText ? { priceText: shower.priceText } : {}),
+    fixed: [],
   };
   stats.showers.push(record);
 
   const photos = [shower.image, ...shower.gallery];
   const { alts } = photoAlts(shower.name, photos);
-  if (dryRun) {
+  const extra = shower.priceText ? [`Цена на inex.su (не импортируется): ${shower.priceText}`] : [];
+  if (dryRun && !fix) {
     stats.photosFound += photos.length;
     ctx.log(`[dry-run] shower-configs ${slug}: ${photos.length} фото, order ${shower.order}`);
     return;
@@ -781,9 +993,22 @@ async function upsertShower(
   }
   record.slug = current?.slug ?? slug;
 
+  const fixes =
+    fix && current
+      ? showerFixes(fix, current, shower, (date) =>
+          importNotesText([shower.oldUrl], shower.notes, extra, date)
+        )
+      : {};
+  record.fixed = Object.keys(fixes);
+  if (dryRun) {
+    stats.photosFound += photos.length;
+    const planned = record.fixed.length > 0 ? `; исправить: ${record.fixed.join(", ")}` : "";
+    ctx.log(`[dry-run] shower-configs ${record.slug}: ${photos.length} фото${planned}`);
+    return;
+  }
+
   const resolved = await media.resolve(photos, alts);
   const [image, ...gallery] = resolved;
-  const extra = shower.priceText ? [`Цена на inex.su (не импортируется): ${shower.priceText}`] : [];
   const full = {
     name: shower.name,
     description: shower.description,
@@ -810,10 +1035,13 @@ async function upsertShower(
     ctx.log(`shower-configs ${slug}: создан (черновик)`);
     return;
   }
-  const patch: Record<string, unknown> = onlyEmpty(current as unknown as Record<string, unknown>, {
-    ...full,
-    legacyUrl: shower.oldUrl,
-  });
+  const patch: Record<string, unknown> = {
+    ...onlyEmpty(current as unknown as Record<string, unknown>, {
+      ...full,
+      legacyUrl: shower.oldUrl,
+    }),
+    ...fixes,
+  };
   if (Object.keys(patch).length === 0) {
     record.outcome = "unchanged";
     return;
@@ -828,7 +1056,10 @@ async function upsertShower(
     context: SEED_REQUEST_CONTEXT,
   });
   record.outcome = "updated";
-  ctx.log(`shower-configs ${record.slug}: дополнены поля ${Object.keys(patch).join(", ")}`);
+  ctx.log(
+    `shower-configs ${record.slug}: дополнены поля ${Object.keys(patch).join(", ")}` +
+      (record.fixed.length > 0 ? ` (исправлено: ${record.fixed.join(", ")})` : "")
+  );
 }
 
 /* ------------------------------------------------------------------------------------------ */
@@ -862,7 +1093,44 @@ interface RunSummary {
   mediaReused: number;
   photosSkipped: number;
   errors: number;
+  /** `--fix-existing`: repaired field → number of documents. */
+  fixed?: Record<string, number>;
+  /** `--fix-existing`: region «cities» deleted. */
+  regionCitiesRemoved?: string[];
 }
+
+/** Field → number of documents repaired by `--fix-existing` in this run. */
+function fixedCounts(): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const record of [...stats.objects, ...stats.showers]) {
+    for (const field of record.fixed) counts[field] = (counts[field] ?? 0) + 1;
+  }
+  return counts;
+}
+
+/** History cell: «task 70, sortDate 159; удалены cities: …». */
+function fixSummary(run: RunSummary): string {
+  const fields = Object.entries(run.fixed ?? {})
+    .map(([field, count]) => `${field} ${count}`)
+    .join(", ");
+  const removed = run.regionCitiesRemoved?.length
+    ? `; удалены cities: ${run.regionCitiesRemoved.join(", ")}`
+    : "";
+  return `${fields || "ничего"}${removed}`;
+}
+
+/** What `--fix-existing` repairs and the `sortDate` policy (report section). */
+const FIX_EXISTING_SECTION: readonly string[] = [
+  "## Исправления первого импорта (`--fix-existing`, ревью волны 6)",
+  "",
+  "Режим `--fix-existing` чинит только значения, записанные импортом и не изменённые редактором (сравнение с выводом старого парсера и со временем создания документа); повторный запуск ничего не меняет. Количество исправлений — в колонке «Исправлено» истории запусков.",
+  "",
+  "- **Переносы `<br>`.** Одиночный `<br>` на inex.su — перенос строки внутри абзаца, а не конец предложения; раньше каждый `<br>` становился абзацем и резал предложения. Теперь абзацы — только по блокам (`<p>`) и двойному `<br><br>`; поле `task` и «Заметки импорта» пересобраны (у душевых описания без таких переносов — не изменились).",
+  "- **Регионы вместо городов.** Строка места на inex.su иногда содержит регион («Челябинская область», «Ханты-Мансийский автономный округ – Югра»). Такие значения больше не создают запись `cities`: город ищется в названии и тексте, иначе поле пустое, а регион записан в «Заметки импорта» и в таблицу «Чего не хватает для публикации». Ошибочные записи `cities` удалены, когда на них не осталось ссылок.",
+  "- **Стоп-слова.** Проверка использует встроенные правила **и** список CMS (`site-settings.stopWords`: основы, фразы, заводы-партнёры; формулировка опыта — `experienceText`).",
+  `- **\`sortDate\`.** Дата публикации со страницы (\`article:published_time\`, JSON-LD \`datePublished\`, \`<time datetime>\`), иначе 1 января года из текста, иначе фиксированная дата ${IMPORT_SORT_DATE_FALLBACK.slice(0, 10)} — архив inex.su ниже объектов, которым редактор поставит реальную дату. На страницах inex.su (обход 2026-10-21) дат и годов нет, поэтому у импортированных объектов стоит запасная дата; реальную дату сдачи указывает редактор при публикации. Дата импорта больше не используется.`,
+  "",
+];
 
 async function writeReport(startedAt: Date, mode: string): Promise<void> {
   const crawl = await readJson<CrawlStats | null>(CRAWL_STATS_JSON, null);
@@ -881,6 +1149,14 @@ async function writeReport(startedAt: Date, mode: string): Promise<void> {
     mediaReused: stats.mediaReused,
     photosSkipped: stats.photosSkipped.length,
     errors: stats.errors.length,
+    ...(mode.includes("--fix-existing")
+      ? {
+          fixed: fixedCounts(),
+          regionCitiesRemoved: stats.regionCities
+            .filter((city) => city.result === "удалён")
+            .map((city) => city.name),
+        }
+      : {}),
   });
   await writeFileAtomic(RUNS_JSON, JSON.stringify(history, null, 2));
   const fmt = (counts: Record<string, number>) =>
@@ -929,19 +1205,21 @@ async function writeReport(startedAt: Date, mode: string): Promise<void> {
     "",
     "Счётчики выше — последнего запуска. Повторный запуск не создаёт документов и медиа (идемпотентность).",
     "",
-    "| Запуск | Объекты | Душевые | Медиа создано / переиспользовано / пропущено | Ошибок | Длительность, с |",
-    "|---|---|---|---|---:|---:|",
+    "| Запуск | Объекты | Душевые | Медиа создано / переиспользовано / пропущено | Исправлено (`--fix-existing`) | Ошибок | Длительность, с |",
+    "|---|---|---|---|---|---:|---:|",
     ...history.map((run) =>
       mdRow([
         run.at,
         fmt(run.objects),
         fmt(run.showers),
         `${run.mediaCreated} / ${run.mediaReused} / ${run.photosSkipped}`,
+        run.fixed ? fixSummary(run) : "—",
         run.errors,
         run.seconds,
       ])
     ),
     "",
+    ...FIX_EXISTING_SECTION,
     "## Расход Firecrawl",
     "",
     crawl
@@ -991,6 +1269,8 @@ async function writeReport(startedAt: Date, mode: string): Promise<void> {
           ...stopWords.map(({ slug, note }) => mdRow([`\`${slug}\``, note.text])),
         ].join("\n")
       : "Не найдено (проверка `checkStopWords` по очищенным текстам).",
+    "",
+    `Список стоп-слов: ${stats.stopWordSource || "встроенные правила"}.`,
     ""
   );
 
@@ -1071,16 +1351,106 @@ async function writeReport(startedAt: Date, mode: string): Promise<void> {
 /* Main                                                                                       */
 /* ------------------------------------------------------------------------------------------ */
 
+/**
+ * Stop-word check with the CMS list (`site-settings.stopWords`, `experienceText`) merged into
+ * the built-in rules. Without the global (empty DB) the built-ins alone are used.
+ */
+async function loadCmsStopWords(ctx: SeedContext): Promise<StopWordCheck> {
+  const settings = await ctx.payload.findGlobal({
+    slug: "site-settings",
+    depth: 0,
+    overrideAccess: true,
+  });
+  const rows: CmsStopWord[] = (settings.stopWords ?? []).flatMap((row) =>
+    row.word?.trim() && row.kind ? [{ word: row.word, kind: row.kind }] : []
+  );
+  stats.stopWordSource =
+    rows.length > 0
+      ? `встроенные правила + список CMS (site-settings.stopWords: ${rows.length})`
+      : "встроенные правила (в site-settings.stopWords пусто)";
+  ctx.log(`стоп-слова: ${stats.stopWordSource}`);
+  return cmsStopWordCheck({ stopWords: rows, experiencePhrase: settings.experienceText });
+}
+
+/** Old-parser output, region «cities» and import-run windows for `--fix-existing`. */
+async function buildFixContext(ctx: SeedContext, taxonomies: Taxonomies): Promise<FixContext> {
+  const legacy = { legacyBr: true } as const;
+  const legacyShowers = new Map<string, ParsedShower>();
+  for (const result of await parseAllShowers(legacy)) {
+    if (result.ok) legacyShowers.set(result.value.oldUrl, result.value);
+  }
+  const runs = await readJson<RunSummary[]>(RUNS_JSON, []);
+  const runWindows = runs
+    .filter((run) => (run.objects.created ?? 0) + (run.showers.created ?? 0) > 0)
+    .map((run) => {
+      const from = Date.parse(run.at);
+      return [from, from + run.seconds * 1000 + RUN_WINDOW_SLACK_MS] as const;
+    });
+  if (runWindows.length === 0) {
+    ctx.log("--fix-existing: нет истории запусков (import-runs.json) — sortDate не исправляется");
+  }
+  const regions = await taxonomies.regionCities();
+  ctx.log(`--fix-existing: регионы в cities: ${regions.map((r) => r.name).join(", ") || "нет"}`);
+  return {
+    legacyObjects: await parseAllObjects(legacy),
+    legacyShowers,
+    regionCityIds: new Set(regions.map((region) => region.id)),
+    runWindows,
+  };
+}
+
+/** Deletes region «cities» nothing references any more (objects, latest versions). */
+async function removeRegionCities(
+  ctx: SeedContext,
+  fix: FixContext,
+  dryRun: boolean
+): Promise<void> {
+  for (const id of fix.regionCityIds) {
+    const city = await ctx.payload.findByID({
+      collection: "cities",
+      id,
+      depth: 0,
+      overrideAccess: true,
+    });
+    // Latest versions (drafts included): what an editor sees in the admin.
+    const { totalDocs } = await ctx.payload.find({
+      collection: "objects",
+      where: { city: { equals: id } },
+      draft: true,
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    });
+    // In --dry-run the planned repairs are not written, so the references are still there.
+    if (totalDocs > 0 && !dryRun) {
+      stats.regionCities.push({ name: city.name, result: `оставлен: ссылок ${totalDocs}` });
+      continue;
+    }
+    if (!dryRun) {
+      await ctx.payload.delete({
+        collection: "cities",
+        id,
+        overrideAccess: true,
+        context: SEED_REQUEST_CONTEXT,
+      });
+    }
+    stats.regionCities.push({ name: city.name, result: dryRun ? "будет удалён" : "удалён" });
+    ctx.log(`cities «${city.name}»: ${dryRun ? "будет удалён" : "удалён"} (регион, не город)`);
+  }
+}
+
 async function main(): Promise<void> {
   const { values } = parseArgs({
     options: {
       "dry-run": { type: "boolean", default: false },
       only: { type: "string" },
       limit: { type: "string" },
+      "fix-existing": { type: "boolean", default: false },
       "i-know-this-is-prod": { type: "boolean", default: false },
     },
   });
   const dryRun = values["dry-run"];
+  const fixExisting = values["fix-existing"];
   const only = values.only;
   if (only && only !== "objects" && only !== "showers") throw new Error("--only=objects|showers");
   const limit = values.limit ? Number(values.limit) : Number.POSITIVE_INFINITY;
@@ -1092,10 +1462,12 @@ async function main(): Promise<void> {
   const media = new MediaStore(ctx, dryRun);
   await media.init();
   const slugs = await readJson<Record<string, string>>(SLUGS_JSON, {});
+  const parseOptions = { stopWords: await loadCmsStopWords(ctx) };
+  const fix = fixExisting ? await buildFixContext(ctx, taxonomies) : null;
 
   if (only !== "showers") {
     const rows = await readSourceCsv();
-    const parsed = await parseAllObjects();
+    const parsed = await parseAllObjects(parseOptions);
     for (const [oldUrl, result] of parsed) {
       if (!result.ok) stats.parseFailed.push({ oldUrl, reason: result.reason });
     }
@@ -1105,7 +1477,7 @@ async function main(): Promise<void> {
     );
     for (const group of groups) {
       try {
-        await upsertObject(ctx, group, taxonomies, media, dryRun, slugs);
+        await upsertObject(ctx, group, taxonomies, media, dryRun, slugs, fix);
       } catch (error) {
         stats.errors.push({ what: `objects ${group.slug}`, error: errorMessage(error) });
         ctx.log(`objects ${group.slug}: ОШИБКА ${errorMessage(error)}`);
@@ -1129,14 +1501,14 @@ async function main(): Promise<void> {
         `нет конструкции «${SHOWER_CONSTRUCTION_SLUG}» — сначала сид constructions (pnpm seed --only=constructions)`
       );
     }
-    const showers = (await parseAllShowers()).slice(0, limit);
+    const showers = (await parseAllShowers(parseOptions)).slice(0, limit);
     for (const result of showers) {
       if (!result.ok) {
         stats.errors.push({ what: `shower ${result.oldUrl}`, error: result.reason });
         continue;
       }
       try {
-        await upsertShower(ctx, result.value, constructionId, media, dryRun);
+        await upsertShower(ctx, result.value, constructionId, media, dryRun, fix);
       } catch (error) {
         stats.errors.push({
           what: `shower-configs ${result.value.oldUrl}`,
@@ -1147,9 +1519,13 @@ async function main(): Promise<void> {
     }
   }
 
+  // Region «cities» are removed only after every object has been repaired.
+  if (fix && only !== "showers" && !values.limit) await removeRegionCities(ctx, fix, dryRun);
+
   await media.save();
   const mode = [
     dryRun ? "--dry-run" : "запись в БД",
+    fixExisting ? "--fix-existing" : "",
     only ? `--only=${only}` : "",
     values.limit ? `--limit=${values.limit}` : "",
   ]

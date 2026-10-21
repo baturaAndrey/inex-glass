@@ -1,5 +1,3 @@
-import { z } from "zod";
-
 /**
  * Portfolio listing `/obekty/` — pure functions (no Next / Payload imports): query parsing and
  * building, filtering, sorting, pagination, facets and the «Другие объекты» pick.
@@ -114,41 +112,40 @@ export const EMPTY_FILTERS: ObjectsFilters = { product: [], type: [], city: [] }
 // Parsing
 // ---------------------------------------------------------------------------------------------
 
-/** A query value may repeat (`?type=a&type=b`); both forms are accepted. */
-const rawValue = z.union([z.string(), z.array(z.string())]).optional();
+/** A query value may repeat (`?type=a&type=b`); both forms are accepted. Anything else → `[]`. */
+function rawStrings(value: unknown): string[] {
+  if (typeof value === "string") return [value];
+  if (Array.isArray(value) && value.every((item) => typeof item === "string")) return value;
+  return [];
+}
 
 /** Comma-separated slug list → unique, valid slugs in the given order. Garbage → `[]`. */
-const slugList = rawValue
-  .transform((value) => {
-    const parts = (Array.isArray(value) ? value : value === undefined ? [] : [value])
-      .flatMap((item) => item.split(","))
-      .map((item) => item.trim().toLowerCase())
-      .filter((item) => SLUG_VALUE.test(item));
-    return [...new Set(parts)].slice(0, MAX_VALUES_PER_FILTER);
-  })
-  .catch([]);
+function slugList(value: unknown): string[] {
+  const parts = rawStrings(value)
+    .flatMap((item) => item.split(","))
+    .map((item) => item.trim().toLowerCase())
+    .filter((item) => SLUG_VALUE.test(item));
+  return [...new Set(parts)].slice(0, MAX_VALUES_PER_FILTER);
+}
 
-const firstValue = (value: unknown) => (Array.isArray(value) ? value[0] : value);
+const firstValue = (value: unknown): unknown => (Array.isArray(value) ? value[0] : value);
 
-const sortSchema = z.preprocess(firstValue, z.enum(SORT_VALUES)).catch(DEFAULT_SORT);
+const isSort = (value: unknown): value is ObjectsSort =>
+  typeof value === "string" && (SORT_VALUES as readonly string[]).includes(value);
 
-const pageSchema = z
-  .preprocess(
-    firstValue,
-    z
-      .string()
-      .regex(/^[1-9]\d{0,5}$/)
-      .transform(Number)
-  )
-  .catch(1);
+/** `sort`: one of `SORT_VALUES`, otherwise the default. */
+function parseSort(value: unknown): ObjectsSort {
+  const first = firstValue(value);
+  return isSort(first) ? first : DEFAULT_SORT;
+}
 
-const querySchema = z.object({
-  product: slugList,
-  type: slugList,
-  city: slugList,
-  sort: sortSchema,
-  page: pageSchema,
-});
+const PAGE_VALUE = /^[1-9]\d{0,5}$/;
+
+/** `page`: a positive integer of up to 6 digits, otherwise 1. */
+function parsePage(value: unknown): number {
+  const first = firstValue(value);
+  return typeof first === "string" && PAGE_VALUE.test(first) ? Number(first) : 1;
+}
 
 /** Known slugs per filter (published facets); values outside them are dropped. */
 export type KnownSlugs = Readonly<Record<FilterKey, ReadonlySet<string>>>;
@@ -164,26 +161,24 @@ export function knownSlugsOf(facets: ObjectsFacets): KnownSlugs {
 
 /**
  * `searchParams` → listing state. Never throws: unknown keys are ignored, malformed values fall
- * back to the defaults (zod `.catch`), unknown slugs are dropped when `known` is given.
+ * back to the defaults, unknown slugs are dropped when `known` is given.
+ *
+ * Plain TS on purpose (no zod): the listing's client components import this module, and zod
+ * would add ~15 KB gzip to the `/obekty/` bundle for five trivial checks.
  */
 export function parseObjectsQuery(raw: RawSearchParams, known?: KnownSlugs): ObjectsQuery {
-  const parsed = querySchema.parse({
-    product: raw.product,
-    type: raw.type,
-    city: raw.city,
-    sort: raw.sort,
-    page: raw[PAGE_QUERY_KEY],
-  });
-  const keep = (key: FilterKey, values: string[]) =>
-    known ? values.filter((value) => known[key].has(value)) : values;
+  const keep = (key: FilterKey) => {
+    const values = slugList(raw[key]);
+    return known ? values.filter((value) => known[key].has(value)) : values;
+  };
   return {
     filters: {
-      product: keep("product", parsed.product),
-      type: keep("type", parsed.type),
-      city: keep("city", parsed.city),
+      product: keep("product"),
+      type: keep("type"),
+      city: keep("city"),
     },
-    sort: parsed.sort,
-    page: parsed.page,
+    sort: parseSort(raw.sort),
+    page: parsePage(raw[PAGE_QUERY_KEY]),
   };
 }
 

@@ -10,9 +10,13 @@ import {
   SEARCH_SUGGEST_LIMIT,
   type SearchHit,
 } from "@/lib/search/types";
+import { SuggestCache } from "./suggest-cache";
 
 /** Debounce of the suggestion requests (ТЗ: 200 ms). */
 export const SUGGEST_DEBOUNCE_MS = 200;
+
+/** Successful answers kept per field (LRU); plenty for one typing session. */
+export const SUGGEST_CACHE_LIMIT = 50;
 
 export type SuggestStatus = "idle" | "loading" | "ready" | "error";
 
@@ -23,8 +27,6 @@ export interface SuggestionsState {
   hits: SearchHit[];
   status: SuggestStatus;
 }
-
-type Answer = { hits: SearchHit[]; status: "ready" | "error" };
 
 const IDLE: SuggestionsState = { query: "", hits: [], status: "idle" };
 
@@ -55,25 +57,28 @@ export function suggestQuery(value: string): string {
 
 /**
  * Header suggestions: debounced `GET /api/site-search/?q=&limit=6`; an in-flight request is
- * aborted when the input changes; answers are kept per normalized query for the lifetime of the
- * component. Blank or one-letter input → `idle`, no request. The state is derived from the
- * stored answers during render; the effect only talks to the network.
+ * aborted when the input changes. Successful answers are kept per normalized query in a bounded
+ * LRU (`SUGGEST_CACHE_LIMIT`) for the lifetime of the component; a failed request is NOT cached:
+ * the error is shown for that query, and typing it again retries. Blank or one-letter input →
+ * `idle`, no request. The state is derived during render; the effect only talks to the network.
  */
 export function useSearchSuggestions(value: string): SuggestionsState {
-  const [answers, setAnswers] = useState<ReadonlyMap<string, Answer>>(() => new Map());
+  const [cache] = useState(() => new SuggestCache<SearchHit[]>(SUGGEST_CACHE_LIMIT));
   const [lastHits, setLastHits] = useState<SearchHit[]>([]);
+  // The query whose last request failed (cleared by the next success of any query).
+  const [failedQuery, setFailedQuery] = useState<string | null>(null);
   const query = suggestQuery(value);
-  const answer = query ? answers.get(query) : undefined;
-  const answered = answer !== undefined;
+  const cached = query ? cache.peek(query) : undefined;
+  const answered = cached !== undefined;
 
   useEffect(() => {
-    if (!query || answered) return;
+    if (!query) return;
+    // Recency is refreshed here, not during render (render only peeks).
+    if (cache.touch(query)) return;
     const controller = new AbortController();
-    const store = (next: Answer) => {
-      setAnswers((previous) => new Map(previous).set(query, next));
-      setLastHits(next.hits);
-    };
     const timer = window.setTimeout(async () => {
+      // A retry of a failed query shows «loading» again, not the old error.
+      setFailedQuery((failed) => (failed === query ? null : failed));
       try {
         const params = new URLSearchParams({ q: query, limit: String(SEARCH_SUGGEST_LIMIT) });
         const response = await fetch(`${SEARCH_API_PATH}?${params.toString()}`, {
@@ -81,11 +86,16 @@ export function useSearchSuggestions(value: string): SuggestionsState {
           headers: { Accept: "application/json" },
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        store({ hits: parseHits(await response.json()), status: "ready" });
+        const hits = parseHits(await response.json());
+        if (controller.signal.aborted) return;
+        cache.set(query, hits);
+        setLastHits(hits);
+        setFailedQuery(null);
       } catch (error) {
         if (controller.signal.aborted) return;
         console.warn("header search: suggestions failed", error);
-        store({ hits: [], status: "error" });
+        setLastHits([]);
+        setFailedQuery(query);
       }
     }, SUGGEST_DEBOUNCE_MS);
 
@@ -93,9 +103,10 @@ export function useSearchSuggestions(value: string): SuggestionsState {
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [query, answered]);
+  }, [cache, query, answered]);
 
   if (!query) return IDLE;
-  if (answer) return { query, ...answer };
+  if (cached) return { query, hits: cached, status: "ready" };
+  if (failedQuery === query) return { query, hits: [], status: "error" };
   return { query, hits: lastHits, status: "loading" };
 }

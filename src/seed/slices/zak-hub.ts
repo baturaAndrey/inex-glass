@@ -18,9 +18,8 @@ import {
   HUB_SOURCE,
   ZAK_HUB,
 } from "../content/zak-hub";
-import { upsertByPath } from "../context";
+import { mayOverwrite, upsertByPath } from "../context";
 import { markdown } from "../lexical";
-import { mayOverwrite } from "./thicknesses";
 import type { HubCard, HubLink } from "../content/zak-hub";
 import type { SeedContext } from "../context";
 

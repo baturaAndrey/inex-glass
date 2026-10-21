@@ -4,10 +4,9 @@ import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { ClipboardList } from "lucide-react";
 import { Button } from "@/components/ig/button";
-import { QUIZ_DRAFT_EVENT } from "@/components/quiz/persistence";
-import { QUIZ_DRAFT_KEY } from "@/lib/domain/quiz-schema";
+import { QUIZ_DRAFT_EVENT, QUIZ_DRAFT_KEY } from "@/lib/domain/quiz-draft-key";
 import { cn } from "@/lib/utils";
-import { MY_CALC_URL } from "./nav-defaults";
+import { MY_CALC_URL } from "./nav-paths";
 
 /**
  * Re-check the draft when another tab saves or clears it (`storage`) and when the quiz in this

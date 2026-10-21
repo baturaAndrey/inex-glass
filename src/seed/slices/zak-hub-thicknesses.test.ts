@@ -28,7 +28,9 @@ const upserts = vi.hoisted(
       overwrite: boolean | undefined;
     }>
 );
-vi.mock("../context", () => {
+vi.mock("../context", async () => {
+  // The real «edited in the admin?» rule (`../marker` has no runtime Payload imports).
+  const { mayOverwrite } = await import("../marker");
   const record = (
     collection: string,
     where: unknown,
@@ -39,6 +41,7 @@ vi.mock("../context", () => {
     return Promise.resolve({ doc: { id: `id-${upserts.length}`, ...data }, action: "created" });
   };
   return {
+    mayOverwrite,
     upsertByField: vi.fn(
       (
         _ctx: unknown,
@@ -225,10 +228,15 @@ describe("zak-hub / thicknesses content rules", () => {
 // Slices (Payload mocked)
 // ---------------------------------------------------------------------------------------------
 
-function fakeContext(existing: Record<string, unknown> | null, force = false): SeedContext {
+function fakeContext(
+  existing: Record<string, unknown> | null,
+  force = false,
+  marker: { updatedAt: string } | null = null
+): SeedContext {
   return {
     payload: {
-      find: vi.fn(async () => ({ docs: existing ? [existing] : [] })),
+      find: vi.fn(async () => ({ docs: existing ? [{ id: "doc-1", ...existing }] : [] })),
+      kv: { get: vi.fn(async () => marker), set: vi.fn(async () => undefined) },
     } as unknown as SeedContext["payload"],
     log: vi.fn(),
     force,
@@ -318,6 +326,20 @@ describe("seed thicknesses", () => {
   it("does not overwrite edited documents without --force", async () => {
     upserts.length = 0;
     await seedThicknesses(fakeContext(EDITED));
+    expect(upserts.every((u) => u.overwrite === false)).toBe(true);
+  });
+
+  it("re-run after its own update (seed marker matches): overwrites without --force", async () => {
+    // Mini-seed created the card, the slice updated it a day later and recorded the marker.
+    upserts.length = 0;
+    await seedThicknesses(fakeContext(EDITED, false, { updatedAt: EDITED.updatedAt }));
+    expect(upserts.length).toBeGreaterThan(0);
+    expect(upserts.every((u) => u.overwrite === true)).toBe(true);
+  });
+
+  it("an admin save after the seed's last write (marker differs): skipped", async () => {
+    upserts.length = 0;
+    await seedThicknesses(fakeContext(EDITED, false, { updatedAt: PRISTINE.updatedAt }));
     expect(upserts.every((u) => u.overwrite === false)).toBe(true);
   });
 });

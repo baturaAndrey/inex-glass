@@ -8,7 +8,7 @@ import { readPageParam, readQueryParam, searchOffset } from "@/lib/search/pagina
 import { searchSite } from "@/lib/search/query";
 import { SEARCH_PAGE_PATH, SEARCH_PAGE_SIZE, type SearchResult } from "@/lib/search/types";
 import { buildBreadcrumbs } from "@/lib/seo/breadcrumbs";
-import { TITLE_BRAND_SUFFIX } from "@/lib/seo/metadata";
+import { buildMetadata, TITLE_BRAND_SUFFIX } from "@/lib/seo/metadata";
 import type { Metadata } from "next";
 
 /**
@@ -24,11 +24,23 @@ import type { Metadata } from "next";
 const TITLE = "Поиск по сайту";
 const TITLE_ID = "search-title";
 const CRUMB_LABEL = "Поиск";
+/**
+ * Neutral functional description: 17-meta / teksty give none for the search page (copy to be
+ * approved by Inex).
+ */
+const DESCRIPTION =
+  "Поиск по страницам сайта Inex Glass: закалённое стекло и триплекс, обработка стекла, конструкции, объекты и статьи блога.";
 
-export const metadata: Metadata = {
-  title: { absolute: `${TITLE}${TITLE_BRAND_SUFFIX}` },
-  robots: { index: false, follow: true },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const metadata = await buildMetadata({
+    seo: { title: `${TITLE}${TITLE_BRAND_SUFFIX}`, description: DESCRIPTION },
+    path: SEARCH_PAGE_PATH,
+    fallbackTitle: TITLE,
+    forceNoindex: true,
+  });
+  // Deliberately no canonical (noindex + `Disallow: /poisk/`): drop the one buildMetadata adds.
+  return { ...metadata, alternates: null };
+}
 
 type SearchPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

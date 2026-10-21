@@ -5,10 +5,10 @@ import {
   THICKNESS_SEO,
   THICKNESS_VALUES,
 } from "../content/thicknesses";
-import { upsertByField } from "../context";
+import { mayOverwrite, upsertByField } from "../context";
 import { paragraphs } from "../lexical";
 import type { SeedContext } from "../context";
-import type { CollectionSlug, Where } from "payload";
+import type { Where } from "payload";
 
 /**
  * Seed slice «thicknesses» (task 23): enriches the 4 thickness groups and 8 thicknesses the base
@@ -16,48 +16,10 @@ import type { CollectionSlug, Where } from "payload";
  * the cards (17-meta). A missing document is created.
  *
  * Natural keys: groups by `label`, thicknesses by `n`. Update rule: an existing document is
- * updated with `--force` or while it is still untouched (`updatedAt` within 2 s of `createdAt` —
- * written once by a seed); an edited one is skipped with a log line. `indexable` is never set
- * here (the base seed decides: false for 5, 15, 19 mm), nor weight / slug / path (hooks).
+ * updated with `--force` or while it is unchanged since the seed's last write (`mayOverwrite`,
+ * seed markers in `../marker.ts`); an edited one is skipped with a log line. `indexable` is never
+ * set here (the base seed decides: false for 5, 15, 19 mm), nor weight / slug / path (hooks).
  */
-
-/** A document saved once (by a seed) has `updatedAt ≈ createdAt`; an editor's save moves it. */
-const PRISTINE_WINDOW_MS = 2000;
-
-/**
- * Whether the slice may overwrite the document matching `where`: always with `--force`, when
- * it does not exist yet, or while it is untouched. Logs the skip otherwise.
- */
-export async function mayOverwrite(
-  ctx: SeedContext,
-  collection: CollectionSlug,
-  where: Where,
-  label: string
-): Promise<boolean> {
-  if (ctx.force) return true;
-  const found = await ctx.payload.find({
-    collection,
-    where,
-    limit: 1,
-    depth: 0,
-    pagination: false,
-    overrideAccess: true,
-    // Drafts count too: an editor's unpublished changes must not be overwritten either.
-    draft: true,
-  });
-  const doc = found.docs[0] as { createdAt?: string; updatedAt?: string } | undefined;
-  if (!doc) return true;
-  const created = Date.parse(doc.createdAt ?? "");
-  const updated = Date.parse(doc.updatedAt ?? "");
-  const pristine =
-    Number.isFinite(created) &&
-    Number.isFinite(updated) &&
-    Math.abs(updated - created) < PRISTINE_WINDOW_MS;
-  if (!pristine) {
-    ctx.log(`${collection} ${label}: изменён в админке — пропуск (используйте --force)`);
-  }
-  return pristine;
-}
 
 type FaqItems = NonNullable<ThicknessGroup["faq"]>;
 

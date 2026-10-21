@@ -50,7 +50,6 @@ function contentStrings(): string[] {
     ...HOME_WHY.rows.flatMap((row) => [row.left, row.right]),
     HOME_WHY.footLink.label,
     HOME_GLASS.heading,
-    HOME_GLASS.footnote,
     ...HOME_GLASS.items.flatMap((item) => [
       item.title,
       item.text,

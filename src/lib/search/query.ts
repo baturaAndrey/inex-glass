@@ -69,11 +69,18 @@ export function queryTokens(normalized: string): string[] {
   return tokens.filter((token) => token.length >= MIN_TOKEN_LENGTH).slice(0, MAX_TOKENS);
 }
 
-/** `to_tsquery` text: tokens joined with ` & `, the last one as a prefix (`:*`); `""` if none. */
+/** A token of digits only (a thickness, a size): never a prefix. */
+const NUMERIC_TOKEN = /^\d+$/;
+
+/**
+ * `to_tsquery` text: tokens joined with ` & `, the last one as a prefix (`:*`); `""` if none.
+ * A purely numeric last token stays exact: «10» must not find «100» or «1000 × 2000».
+ */
 export function buildPrefixQuery(tokens: readonly string[]): string {
   if (tokens.length === 0) return "";
   const head = tokens.slice(0, -1);
-  return [...head, `${tokens[tokens.length - 1]}:*`].join(" & ");
+  const last = tokens[tokens.length - 1] as string;
+  return [...head, NUMERIC_TOKEN.test(last) ? last : `${last}:*`].join(" & ");
 }
 
 /** Both tsquery inputs for a raw user query, or `null` when it has no searchable word. */

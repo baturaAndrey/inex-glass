@@ -301,7 +301,16 @@ function GlassTypeHero({ doc, title, path, ctx, terms }: GlassTypeHeroProps) {
         aria-hidden="true"
         className="absolute inset-y-0 right-0 -z-10 w-[45%] [mask-image:linear-gradient(90deg,transparent_0%,black_55%)] max-md:hidden"
       >
-        <Image src={backgroundSrc} alt="" fill preload sizes="45vw" className="object-cover" />
+        {/* Hidden ≤1100 px: the 1px slot makes the phone preload pick the smallest candidate
+            instead of a full image nobody sees (task 39). */}
+        <Image
+          src={backgroundSrc}
+          alt=""
+          fill
+          preload
+          sizes="(max-width: 1100px) 1px, 45vw"
+          className="object-cover"
+        />
       </div>
       {hero}
     </div>

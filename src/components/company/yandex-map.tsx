@@ -5,7 +5,7 @@ import { ExternalLink, MapPin } from "lucide-react";
 import { Button } from "@/components/ig/button";
 import { Chip } from "@/components/ig/chip";
 import { cn } from "@/lib/utils";
-import { yandexWidgetUrl, type MapPoint } from "./contact-format";
+import { yandexWidgetUrl, type MapPoint } from "./map-widget";
 
 /*
  * Microcopy of the map that is not in teksty (task 29 Notes: «на согласование»).

@@ -1,3 +1,4 @@
+import { QUIZ_DRAFT_EVENT } from "@/lib/domain/quiz-draft-key";
 import { QUIZ_DRAFT_KEY, quizDraftSchema } from "@/lib/domain/quiz-schema";
 import type { QuizAnswersDraft } from "@/lib/domain/quiz-schema";
 import { EMPTY_RAW, isQuizStep } from "./state";
@@ -12,8 +13,8 @@ import type { QuizRawFields, QuizStep } from "./types";
  */
 
 export const QUIZ_DRAFT_VERSION = 1;
-/** Fired on `window` after the draft was saved or cleared in this tab. */
-export const QUIZ_DRAFT_EVENT = "inex:quiz-draft";
+/** Fired on `window` after the draft was saved or cleared in this tab (see `quiz-draft-key`). */
+export { QUIZ_DRAFT_EVENT };
 
 export interface QuizDraftRecord {
   v: typeof QUIZ_DRAFT_VERSION;

@@ -6,7 +6,7 @@ import {
   type FaqSeed,
   type LayoutSeed,
 } from "../content/constructions";
-import { upsertBySlug } from "../context";
+import { mayOverwrite, upsertBySlug } from "../context";
 import { getEditorConfig, markdownToLexical, type LexicalState } from "../lexical";
 import type { SeedContext } from "../context";
 import type { RequiredDataFromCollectionSlug } from "payload";
@@ -16,25 +16,14 @@ import type { RequiredDataFromCollectionSlug } from "payload";
  * construction pages (`../content/constructions.ts`), published.
  *
  * Idempotent by `slug`. An existing document is updated only with `--force` or while it is
- * still untouched since a seed created it (`|updatedAt − createdAt| < 2 s` — e.g. the mini-seed
- * stub of `steklyannye-peregorodki`); otherwise it is skipped with a log line, so editor changes
- * survive a re-run. `productTag` links an EXISTING `products` record (matched by `quizType`);
- * the slice never creates taxonomy records or objects.
+ * unchanged since the seed's last write (`mayOverwrite` in `../context.ts`, seed markers —
+ * e.g. the mini-seed stub of `steklyannye-peregorodki`); otherwise it is skipped with a log
+ * line, so editor changes survive a re-run. `productTag` links an EXISTING `products` record
+ * (matched by `quizType`); the slice never creates taxonomy records or objects.
  */
 
 type LayoutBlock = NonNullable<Construction["layout"]>[number];
 type ConstructionData = RequiredDataFromCollectionSlug<"constructions">;
-
-/** A document saved once (by a seed) has `updatedAt ≈ createdAt`; an editor's save moves it. */
-const UNTOUCHED_WINDOW_MS = 2000;
-
-export function isUntouched(doc: { createdAt: string; updatedAt: string }): boolean {
-  const created = Date.parse(doc.createdAt);
-  const updated = Date.parse(doc.updatedAt);
-  return Number.isFinite(created) && Number.isFinite(updated)
-    ? Math.abs(updated - created) < UNTOUCHED_WINDOW_MS
-    : false;
-}
 
 type Md = (markdown: string) => LexicalState;
 
@@ -177,19 +166,8 @@ export async function seed(ctx: SeedContext): Promise<void> {
   const md: Md = (markdown) => markdownToLexical(markdown, editorConfig);
 
   for (const item of CONSTRUCTIONS) {
-    const { docs } = await ctx.payload.find({
-      collection: "constructions",
-      where: { slug: { equals: item.slug } },
-      limit: 1,
-      depth: 0,
-      pagination: false,
-      overrideAccess: true,
-    });
-    const existing = docs[0];
-    if (existing && !ctx.force && !isUntouched(existing)) {
-      ctx.log(`constructions ${item.slug}: изменён в админке, пропуск (обновить: --force)`);
-      continue;
-    }
+    const where = { slug: { equals: item.slug } };
+    if (!(await mayOverwrite(ctx, "constructions", where, item.slug))) continue;
     const productId = item.productQuizType ? await findProductId(ctx, item.productQuizType) : null;
     if (item.productQuizType && !productId) {
       ctx.log(

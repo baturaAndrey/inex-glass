@@ -1,7 +1,7 @@
-import { formatDateRu, formatRub } from "./format";
+import { formatRub } from "./format";
 import { HOLE_DIAMETER_HINT, holeHint } from "./holes";
 import { DEFAULT_TECH_LIMITS, minBendRadius } from "./limits";
-import { estimateAmount } from "./prices";
+import { estimateAmount, priceCaption } from "./prices";
 import { promoHint } from "./promo";
 import { isUrgent, URGENT_MESSAGE } from "./working-days";
 import type { TechLimits } from "./limits";
@@ -233,6 +233,8 @@ export function getQuizHints(a: QuizAnswersDraft, ctx: QuizContext): QuizHint[] 
 /**
  * Price estimate after step 3: area × price «from». Only for a fresh price, a positive area,
  * a numeric thickness and non-triplex orders (15/19 mm and stale prices give `null`).
+ * The caption after the amount is `priceCaption()` — the ТЗ §11 wording used next to every price
+ * («…Точная стоимость — в КП; цена в договоре фиксируется»), so the quiz never drifts from it.
  */
 export function quizEstimate(
   a: QuizAnswersDraft,
@@ -242,6 +244,6 @@ export function quizEstimate(
   if (t === undefined || a.type === "triplex" || !isPositive(a.area)) return null;
   const amount = estimateAmount(a.area, t, ctx.prices, ctx.now);
   if (amount === null || ctx.prices.priceDate === null) return null;
-  const text = `Ориентировочно от ${formatRub(amount)} за стекло без обработки и доставки. Цены на ${formatDateRu(ctx.prices.priceDate)}. Точная стоимость — в КП`;
+  const text = `Ориентировочно от ${formatRub(amount)} за стекло без обработки и доставки. ${priceCaption(ctx.prices)}`;
   return { amount, text };
 }

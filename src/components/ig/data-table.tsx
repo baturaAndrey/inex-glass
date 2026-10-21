@@ -174,7 +174,9 @@ function MobileCard({
         highlighted && "border-brand bg-primary-light"
       )}
     >
-      <p className="m-0 text-lg leading-snug font-semibold">
+      {/* A <div>, not a <p>: rich-text cells render their own <p>, and <p> inside <p> is invalid
+          HTML — the parser splits it and hydration fails (React #418). */}
+      <div className="m-0 text-lg leading-snug font-semibold">
         {href ? (
           <Link href={href} className={STRETCHED_LINK}>
             {title}
@@ -182,7 +184,7 @@ function MobileCard({
         ) : (
           title
         )}
-      </p>
+      </div>
       {details.length > 0 ? (
         <dl className="m-0 flex flex-col gap-1.5">
           {details.map((column) => (

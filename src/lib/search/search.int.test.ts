@@ -172,6 +172,63 @@ describe.skipIf(!DATABASE_URL)("site search (Postgres FTS, throwaway DB)", () =>
     expect(await urls("перегор")).toContain("/steklyannye-peregorodki/");
   });
 
+  it("a number is not a prefix: «10» does not find a page about «100»", async () => {
+    await createPage({
+      title: "Нестандартная партия",
+      slug: "partiya",
+      _status: "published",
+      layout: [{ blockType: "richText", content: paragraphs("Партия от 100 листов.") }],
+    });
+    expect(await urls("партия 100")).toContain("/partiya/");
+    expect(await urls("партия 10")).not.toContain("/partiya/");
+  });
+
+  it("a draft with seo.noindex keeps the live entry; publishing it removes the entry", async () => {
+    const page = await createPage({
+      title: "Витражи",
+      slug: "vitrazhi",
+      _status: "published",
+    });
+    expect(await urls("витражи")).toContain("/vitrazhi/");
+
+    const save = (data: Record<string, unknown>, draft: boolean) =>
+      payload.update({
+        collection: rel("pages"),
+        id: page.id,
+        data: data as never,
+        draft,
+        overrideAccess: true,
+        context: { disableRevalidate: true },
+      });
+    await save({ seo: { noindex: true } }, true);
+    expect(await urls("витражи")).toContain("/vitrazhi/");
+
+    await save({ seo: { noindex: true }, _status: "published" }, false);
+    expect(await urls("витражи")).not.toContain("/vitrazhi/");
+  });
+
+  it("after a parent's slug change the children's entries carry the new URLs", async () => {
+    const parent = await createPage({ title: "Раздел", slug: "razdel", _status: "published" });
+    await createPage({
+      title: "Душевые кабины",
+      slug: "dushevye",
+      parent: parent.id,
+      _status: "published",
+    });
+    expect(await urls("душевые")).toContain("/razdel/dushevye/");
+
+    await payload.update({
+      collection: rel("pages"),
+      id: parent.id,
+      data: { slug: "novyj-razdel", _status: "published" } as never,
+      overrideAccess: true,
+      context: { disableRevalidate: true },
+    });
+    const found = await urls("душевые");
+    expect(found).toContain("/novyj-razdel/dushevye/");
+    expect(found).not.toContain("/razdel/dushevye/");
+  });
+
   it("uses the GIN index on 5000 synthetic rows", async () => {
     const { sql } = await import("@payloadcms/db-postgres");
     const { buildSearchSql, prepareQuery } = await import("./query");

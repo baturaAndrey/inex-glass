@@ -46,6 +46,9 @@ test.describe("SEO files", () => {
       expect(body).toContain("Disallow: /zakaz/");
       expect(body).toContain("Disallow: /admin/");
       expect(body).toContain("Clean-param: utm_source&");
+      // Quiz CTA URLs (`?type=…&src=…`) are cleaned for Yandex, not disallowed.
+      expect(body).toMatch(/^Clean-param: [^\s]*\bsrc\b[^\s]* \/raschet-stoimosti\/$/m);
+      expect(body).not.toContain("Disallow: /raschet-stoimosti/");
       expect(body).toMatch(/^Sitemap: https?:\/\/[^\s]+\/sitemap\.xml$/m);
       expect(body).not.toMatch(/^Disallow: \/$/m);
     } else {

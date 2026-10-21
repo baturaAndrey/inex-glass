@@ -1,5 +1,6 @@
 import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 import { adminToken, skipOnMissingAdmin } from "./helpers/admin";
+import { CONSENT, POLICY } from "../src/seed/content/legal";
 
 /**
  * Task 29: «Для кого» (hub + 4 segments), «О компании», «Команда», «Контакты», policy and
@@ -95,6 +96,8 @@ const PAGES: PageCase[] = [
     h1: "Политика обработки персональных данных",
     title: "Политика обработки персональных данных | Inex Glass",
     crumb: "Политика обработки персональных данных",
+    // Neutral descriptions added in Wave 7 (17-meta gives none; pending Inex approval).
+    description: POLICY.page.seo.description,
     legal: true,
   },
   {
@@ -102,6 +105,7 @@ const PAGES: PageCase[] = [
     h1: "Согласие на обработку персональных данных",
     title: "Согласие на обработку персональных данных | Inex Glass",
     crumb: "Согласие на обработку персональных данных",
+    description: CONSENT.page.seo.description,
     legal: true,
   },
 ];

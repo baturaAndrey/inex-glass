@@ -19,6 +19,7 @@ import {
   cleanTitle,
   collectPhotos,
   squash,
+  type ParseOptions,
   type ParsedPhoto,
   type TextNote,
 } from "./parse-objects";
@@ -60,7 +61,11 @@ export function listingOrder(entry: CacheEntry | null): string[] {
   return slugs;
 }
 
-export function parseShower(entry: CacheEntry, order: number): ShowerParseResult {
+export function parseShower(
+  entry: CacheEntry,
+  order: number,
+  options: ParseOptions = {}
+): ShowerParseResult {
   const oldUrl = entry.oldUrl;
   if (!entry.ok) return { ok: false, oldUrl, reason: entry.error ?? "страница не получена" };
   const html = cachedHtml(entry);
@@ -77,7 +82,10 @@ export function parseShower(entry: CacheEntry, order: number): ShowerParseResult
     ) ?? photos[0];
   if (!name || !image) return { ok: false, oldUrl, reason: !name ? "нет названия" : "нет фото" };
 
-  const { text: description, notes } = cleanText(blockText($, SHOWER.description));
+  const { text: description, notes } = cleanText(
+    blockText($, SHOWER.description, options),
+    options.stopWords
+  );
   const priceText = squash($(SHOWER.price).first().text());
   const value: ParsedShower = {
     oldUrl,
@@ -93,7 +101,7 @@ export function parseShower(entry: CacheEntry, order: number): ShowerParseResult
 }
 
 /** Parses every cached shower configuration; `order` follows the listing, then the CSV. */
-export async function parseAllShowers(): Promise<ShowerParseResult[]> {
+export async function parseAllShowers(options: ParseOptions = {}): Promise<ShowerParseResult[]> {
   const targets = crawlTargets(await readSourceCsv());
   const listing = targets.find((target) => isShowerListingUrl(target.oldUrl));
   const order = listingOrder(listing ? await readCache(listing.oldUrl) : null);
@@ -106,7 +114,7 @@ export async function parseAllShowers(): Promise<ShowerParseResult[]> {
     const listed = order.indexOf(lastSegment(target.oldUrl));
     // Configurations missing from the listing go after the listed ones, in CSV order.
     const position = listed >= 0 ? listed : order.length + csvIndex;
-    results.push(parseShower(entry, (position + 1) * ORDER_STEP));
+    results.push(parseShower(entry, (position + 1) * ORDER_STEP, options));
   }
   return results.sort((a, b) => (a.ok && b.ok ? a.value.order - b.value.order : 0));
 }

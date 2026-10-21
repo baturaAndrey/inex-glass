@@ -74,6 +74,11 @@ jobs:
       # Full seed: wave 5 slice specs expect full content. Drop `|| echo` after task 16.
       # The package.json seed script ends with `--`, so bare flags reach the script.
       - run: pnpm seed --full || echo "seed not available"
+      # Generated placeholder images (task 38): without them e2e/placeholder-media.spec.ts skips
+      # its page checks. Files go to the default MEDIA_DIR (./.data/media), which `next start`
+      # serves. No site is running yet and the data cache is cleared before e2e, so revalidation
+      # is skipped.
+      - run: pnpm payload run scripts/attach-generated-media.ts -- --no-revalidate
 
       - name: Resolve Playwright version
         id: playwright

@@ -2,6 +2,7 @@ import { getPayload } from "payload";
 import { requestSiteRevalidation } from "@/lib/cms/revalidate-token";
 import { getEnv } from "@/lib/env";
 import config from "@payload-config";
+import { rememberSeedWrite } from "./marker";
 import type {
   CollectionSlug,
   DataFromCollectionSlug,
@@ -26,6 +27,9 @@ export interface SeedContext {
   force: boolean;
   options: { minimal: boolean };
 }
+
+/** «Edited in the admin?» — seed write markers live in `./marker.ts`. */
+export { mayOverwrite, rememberSeedWrite } from "./marker";
 
 /** `req.context` of every seed write (honoured by `src/payload/hooks/revalidate.ts`). */
 export const SEED_REQUEST_CONTEXT = { disableRevalidate: true } as const;
@@ -64,6 +68,11 @@ export async function getSeedContext(opts: SeedContextOptions = {}): Promise<See
  */
 export async function revalidateSite(ctx: SeedContext): Promise<void> {
   const env = getEnv();
+  // The purge hits whatever site SITE_URL points at — seeding a test/staging DB with the dev
+  // `.env` would purge the dev server instead of the target. Say which site is purged.
+  ctx.log(
+    `сброс кэша сайта по SITE_URL=${env.SITE_URL} — при сиде не-dev БД задайте SITE_URL целевого сервера`
+  );
   const result = await requestSiteRevalidation({
     siteUrl: env.SITE_URL,
     secret: env.PAYLOAD_SECRET,
@@ -159,6 +168,7 @@ export async function upsertByField<TSlug extends CollectionSlug>(
       context: SEED_REQUEST_CONTEXT,
     })) as DataFromCollectionSlug<TSlug>;
     ctx.log(`${label}: обновлён`);
+    await rememberSeedWrite(ctx, collection, doc.id);
     return { doc, action: "updated" };
   }
 
@@ -171,6 +181,7 @@ export async function upsertByField<TSlug extends CollectionSlug>(
     context: SEED_REQUEST_CONTEXT,
   })) as DataFromCollectionSlug<TSlug>;
   ctx.log(`${label}: создан`);
+  await rememberSeedWrite(ctx, collection, doc.id);
   return { doc, action: "created" };
 }
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { ORDER_PATH_PREFIX } from "./nav-defaults";
+import { ORDER_PATH_PREFIX } from "./nav-paths";
 
 /** Scroll position (px) after which the header turns compact… */
 const COMPACT_ON_Y = 80;

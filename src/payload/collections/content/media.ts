@@ -3,6 +3,7 @@ import { getEnv } from "@/lib/env";
 import { isAdmin, isAnyone } from "../../access";
 import { stripUploadUrlTrailingSlash } from "../../hooks/media-urls";
 import { revalidateCollection } from "../../hooks/revalidate";
+import { stripUploadMetadata } from "../../hooks/strip-image-metadata";
 import { GROUP_CONTENT } from "../shared";
 import type { CollectionConfig, TextFieldSingleValidation } from "payload";
 
@@ -61,6 +62,8 @@ export const Media: CollectionConfig = {
     ],
   },
   hooks: {
+    // EXIF / GPS out of the publicly served originals (task 39); see the hook.
+    beforeOperation: [stripUploadMetadata],
     afterChange: [revalidate.afterChange],
     afterDelete: [revalidate.afterDelete],
     // Payload appends `/` to computed file URLs under `trailingSlash: true`; see the hook.
