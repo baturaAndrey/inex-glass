@@ -1,3 +1,4 @@
+import { FORM_TEXTS } from "@/components/forms/form-texts";
 import {
   DEFAULT_DELIVERY_CITIES,
   EXPERIENCE_PHRASE,
@@ -345,6 +346,15 @@ async function seedSiteSettings(ctx: SeedContext): Promise<void> {
     },
     consent: {
       errorText: "Чтобы отправить заявку, отметьте согласие на обработку персональных данных",
+    },
+    // teksty/05-kviz.md (the screen after sending, «Ошибки формы»). Seeded explicitly: the schema
+    // defaults are shorter than the source text and would otherwise override `FORM_TEXTS`.
+    forms: {
+      thankYouTitle: FORM_TEXTS.thankYouTitle,
+      thankYouText: FORM_TEXTS.thankYouText,
+      submitErrorText: FORM_TEXTS.submitErrorText,
+      antispamMinSeconds: 3,
+      antispamMaxHours: 2,
     },
   });
 }

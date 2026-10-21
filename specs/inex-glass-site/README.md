@@ -174,20 +174,20 @@ graph TD
 - [x] [task-19-metrika-analytics](./tasks/task-19-metrika-analytics.md) — Яндекс.Метрика после согласия, цели
 
 ### Wave 5
-- [ ] [task-20-quiz-core](./tasks/task-20-quiz-core.md) — Квиз «Расчёт стоимости» (7 шагов)
-- [ ] [task-21-forms-modals](./tasks/task-21-forms-modals.md) — Формы: чертёж, звонок, образец, под нагрузку, контакты
-- [ ] [task-22-page-home](./tasks/task-22-page-home.md) — Главная
-- [ ] [task-23-zak-hub-thicknesses](./tasks/task-23-zak-hub-thicknesses.md) — Хаб «Закалённое стекло» и 8 карточек толщин
-- [ ] [task-24-glass-types](./tasks/task-24-glass-types.md) — Виды стекла и триплекс
-- [ ] [task-25-processing](./tasks/task-25-processing.md) — Обработка стекла и калькулятор отверстий
-- [ ] [task-26-constructions](./tasks/task-26-constructions.md) — Стеклянные конструкции
-- [ ] [task-27-glazing-mirrors](./tasks/task-27-glazing-mirrors.md) — Остекление и зеркала
-- [ ] [task-28-how-to-order](./tasks/task-28-how-to-order.md) — «Как заказать», сервисные страницы, проектирование
-- [ ] [task-29-klientam-company-legal](./tasks/task-29-klientam-company-legal.md) — «Для кого», о компании, сотрудники, контакты, ПДн
-- [ ] [task-30-objects](./tasks/task-30-objects.md) — Объекты: листинг, фильтры, карточка
-- [ ] [task-31-blog-weight](./tasks/task-31-blog-weight.md) — Блог и калькулятор веса
-- [ ] [task-32-admin-leads](./tasks/task-32-admin-leads.md) — Модуль заявок в админке (ТЗ §6.1)
-- [ ] [task-33-orders](./tasks/task-33-orders.md) — Заказы и страница /zakaz/ (ТЗ §6.2)
+- [x] [task-20-quiz-core](./tasks/task-20-quiz-core.md) — Квиз «Расчёт стоимости» (7 шагов)
+- [x] [task-21-forms-modals](./tasks/task-21-forms-modals.md) — Формы: чертёж, звонок, образец, под нагрузку, контакты
+- [x] [task-22-page-home](./tasks/task-22-page-home.md) — Главная
+- [x] [task-23-zak-hub-thicknesses](./tasks/task-23-zak-hub-thicknesses.md) — Хаб «Закалённое стекло» и 8 карточек толщин
+- [x] [task-24-glass-types](./tasks/task-24-glass-types.md) — Виды стекла и триплекс
+- [x] [task-25-processing](./tasks/task-25-processing.md) — Обработка стекла и калькулятор отверстий
+- [x] [task-26-constructions](./tasks/task-26-constructions.md) — Стеклянные конструкции
+- [x] [task-27-glazing-mirrors](./tasks/task-27-glazing-mirrors.md) — Остекление и зеркала
+- [x] [task-28-how-to-order](./tasks/task-28-how-to-order.md) — «Как заказать», сервисные страницы, проектирование
+- [x] [task-29-klientam-company-legal](./tasks/task-29-klientam-company-legal.md) — «Для кого», о компании, сотрудники, контакты, ПДн
+- [x] [task-30-objects](./tasks/task-30-objects.md) — Объекты: листинг, фильтры, карточка
+- [x] [task-31-blog-weight](./tasks/task-31-blog-weight.md) — Блог и калькулятор веса
+- [x] [task-32-admin-leads](./tasks/task-32-admin-leads.md) — Модуль заявок в админке (ТЗ §6.1)
+- [x] [task-33-orders](./tasks/task-33-orders.md) — Заказы и страница /zakaz/ (ТЗ §6.2)
 
 ### Wave 6
 - [ ] [task-34-quiz-routing](./tasks/task-34-quiz-routing.md) — Страница и модалка квиза, «Мой расчёт»

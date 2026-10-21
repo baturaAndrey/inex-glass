@@ -8,6 +8,11 @@ import { cn } from "@/lib/utils";
 export type FieldContextValue = {
   /** `id` of the control (the label's `htmlFor`). */
   id: string;
+  /**
+   * `id` of the label element. Group controls (`ChipGroup`, `RadioCardGroup`, `FileUpload`)
+   * cannot be targeted by `<label for>`; they reference the label with `aria-labelledby`.
+   */
+  labelId: string;
   /** Space-separated ids of the hint and the error, or `undefined` when there are none. */
   describedBy: string | undefined;
   invalid: boolean;
@@ -60,6 +65,31 @@ export function useFieldControl(overrides: FieldControlOverrides = {}): FieldCon
   };
 }
 
+/** Attributes a group control (radiogroup, group of chips, upload zone) takes from a `Field`. */
+export type FieldGroupProps = {
+  "aria-labelledby": string | undefined;
+  "aria-describedby": string | undefined;
+};
+
+/**
+ * Accessible name/description of a GROUP control inside a `Field` (`<Field group>`): the label
+ * is referenced through `aria-labelledby` (a `<label for>` cannot name a `div`), the hint and
+ * the error through `aria-describedby`. An explicit `aria-label` / `aria-labelledby` wins.
+ */
+export function useFieldGroup(overrides: {
+  ariaLabel?: string | undefined;
+  "aria-labelledby"?: string | undefined;
+  "aria-describedby"?: string | undefined;
+}): FieldGroupProps {
+  const field = useContext(FieldContext);
+  const labelledBy =
+    overrides["aria-labelledby"] ?? (overrides.ariaLabel ? undefined : field?.labelId);
+  return {
+    "aria-labelledby": labelledBy,
+    "aria-describedby": joinIds(field?.describedBy, overrides["aria-describedby"]),
+  };
+}
+
 /** Normalises the native `aria-invalid` attribute value to a boolean (or `undefined` if unset). */
 export function ariaInvalidToBoolean(value: unknown): boolean | undefined {
   if (value === undefined || value === null) return undefined;
@@ -77,6 +107,11 @@ export type FieldProps = {
   error?: string | null | undefined;
   /** Use an existing control id instead of a generated one. */
   htmlFor?: string | undefined;
+  /**
+   * The child is a group (`ChipGroup`, `RadioCardGroup`, `FileUpload`): the label renders as a
+   * `<span id>` that the group references via `aria-labelledby` instead of `<label for>`.
+   */
+  group?: boolean | undefined;
   className?: string | undefined;
   children: ReactNode;
 };
@@ -93,11 +128,13 @@ export function Field({
   hint,
   error,
   htmlFor,
+  group = false,
   className,
   children,
 }: FieldProps) {
   const generatedId = useId();
   const id = htmlFor ?? generatedId;
+  const labelId = `${id}-label`;
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
   const hasHint = hint !== undefined && hint !== null && hint !== false;
@@ -105,30 +142,43 @@ export function Field({
 
   const context: FieldContextValue = {
     id,
+    labelId,
     describedBy: joinIds(hasHint && hintId, hasError && errorId),
     invalid: hasError,
     required,
   };
 
+  const labelContent = (
+    <>
+      {label}
+      {required ? (
+        <>
+          {" "}
+          <span className="ig-req" aria-hidden="true">
+            *
+          </span>
+        </>
+      ) : null}
+      {optional && !required ? (
+        <>
+          {" "}
+          <span className="ig-field__opt">— необязательно</span>
+        </>
+      ) : null}
+    </>
+  );
+
   return (
     <div data-slot="ig-field" className={cn("ig-field", className)}>
-      <label htmlFor={id} className="ig-field__label">
-        {label}
-        {required ? (
-          <>
-            {" "}
-            <span className="ig-req" aria-hidden="true">
-              *
-            </span>
-          </>
-        ) : null}
-        {optional && !required ? (
-          <>
-            {" "}
-            <span className="ig-field__opt">— необязательно</span>
-          </>
-        ) : null}
-      </label>
+      {group ? (
+        <span id={labelId} className="ig-field__label">
+          {labelContent}
+        </span>
+      ) : (
+        <label htmlFor={id} id={labelId} className="ig-field__label">
+          {labelContent}
+        </label>
+      )}
       <FieldContext.Provider value={context}>{children}</FieldContext.Provider>
       {hasHint ? (
         <div id={hintId} className="ig-field__hint">
@@ -137,11 +187,7 @@ export function Field({
       ) : null}
       {/* The live region stays mounted so that a newly shown error is announced reliably;
           while empty it cancels the flex gap (6px) so the layout does not shift. */}
-      <div
-        id={errorId}
-        aria-live="polite"
-        className={hasError ? "ig-field__error" : "-mt-1.5"}
-      >
+      <div id={errorId} aria-live="polite" className={hasError ? "ig-field__error" : "-mt-1.5"}>
         {hasError ? (
           <>
             <TriangleAlert aria-hidden="true" />

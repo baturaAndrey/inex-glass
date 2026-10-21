@@ -29,6 +29,13 @@ const nextConfig: NextConfig = {
   // Standalone output is enabled only by the Docker build (task 03): NEXT_OUTPUT=standalone
   // (spread, because exactOptionalPropertyTypes forbids an explicit `output: undefined`)
   ...(process.env.NEXT_OUTPUT === "standalone" ? { output: "standalone" as const } : {}),
+  // `payload` stays a plain Node module in production too (withPayload externalizes it in dev
+  // only). Bundled, every Next entry (admin page, REST route, site pages) gets its own copy of
+  // Payload's classes, while the Payload instance is a process-wide singleton created by
+  // whichever entry runs first. Once the admin page initialized it, `formatErrors` in the REST
+  // route failed `instanceof ValidationError` and dropped `name`/`data` (field paths and
+  // messages) from every 400 response. One external copy keeps error classes identical.
+  serverExternalPackages: ["payload"],
   images: {
     formats: ["image/avif", "image/webp"],
     localPatterns: [

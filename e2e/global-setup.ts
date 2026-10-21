@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { existsSync, mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync } from "node:fs";
 import path from "node:path";
 import { E2E_BASE_URL, E2E_DATABASE_URL, e2eServerEnv } from "./helpers/env";
 import { ensureTestDb, resolveTestDbTarget } from "./helpers/test-db";
@@ -9,14 +9,23 @@ import { ensureTestDb, resolveTestDbTarget } from "./helpers/test-db";
  * 1. creates `inex_glass_test` if missing (CI: the Postgres service already has it);
  * 2. applies Payload migrations;
  * 3. runs the full seed (idempotent; wave 5 slice specs rely on full content);
- * 4. creates upload/media directories.
+ * 4. clears Next's data cache (`.next/cache/fetch-cache`): it survives rebuilds and database
+ *    switches and would otherwise serve CMS data of another database;
+ * 5. creates upload/media directories.
  *
  * Skipped entirely when testing an external stand (`E2E_BASE_URL`). `E2E_SKIP_DB=1` skips
- * steps 1-3 (CI migrates and seeds in its own steps right before Playwright).
+ * steps 1-4 (CI migrates and seeds in its own steps and clears the cache itself) and only warns
+ * about a leftover data cache.
  * The database is never reset automatically: use `pnpm test:db:reset` for a clean slate.
  */
 
 const SEED_ENTRY = path.join("src", "seed", "index.ts");
+
+/**
+ * Next's persistent data cache (`unstable_cache` / fetch). ONLY this directory is touched: the
+ * build output and `.next/dev` (a running `next dev`) must stay intact.
+ */
+const FETCH_CACHE_DIR = path.join(".next", "cache", "fetch-cache");
 
 type ServerEnv = Record<string, string>;
 
@@ -48,6 +57,20 @@ async function prepareDatabase(env: ServerEnv): Promise<void> {
   }
 }
 
+function clearFetchCache(): void {
+  if (!existsSync(FETCH_CACHE_DIR)) return;
+  rmSync(FETCH_CACHE_DIR, { recursive: true, force: true });
+  console.warn(`[e2e] cleared ${FETCH_CACHE_DIR} (CMS data cache of a previous database)`);
+}
+
+function warnAboutFetchCache(): void {
+  if (!existsSync(FETCH_CACHE_DIR)) return;
+  console.warn(
+    `[e2e] ${FETCH_CACHE_DIR} exists and is reused: if the database changed since it was filled, ` +
+      "pages may show stale CMS data — delete that directory (see docs/deploy.md, «Кэш Next»)."
+  );
+}
+
 function createFileDirs(env: ServerEnv): void {
   for (const dir of [env.UPLOADS_DIR, env.MEDIA_DIR]) {
     if (dir) mkdirSync(dir, { recursive: true });
@@ -63,8 +86,10 @@ export default async function globalSetup(): Promise<void> {
   const env = e2eServerEnv();
   if (process.env.E2E_SKIP_DB === "1") {
     console.warn("[e2e] global-setup: database preparation skipped (E2E_SKIP_DB=1)");
+    warnAboutFetchCache();
   } else {
     await prepareDatabase(env);
+    clearFetchCache();
   }
   createFileDirs(env);
 }

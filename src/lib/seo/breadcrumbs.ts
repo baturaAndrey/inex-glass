@@ -24,7 +24,7 @@ export const SEGMENT_LABELS: Readonly<Record<string, SegmentLabel>> = {
   osteklenie: { label: "Остекление", hasPage: true },
   zerkala: { label: "Зеркала", hasPage: true },
   "kak-zakazat": { label: "Как заказать", hasPage: true },
-  klientam: { label: "Для кого", hasPage: true },
+  klientam: { label: "С кем мы работаем", hasPage: true },
   "o-kompanii": { label: "О компании", hasPage: true },
   obekty: { label: "Объекты", hasPage: true },
   blog: { label: "Блог", hasPage: true },

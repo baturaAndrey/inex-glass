@@ -8,6 +8,7 @@ import {
   type Ref,
 } from "react";
 import { cn } from "@/lib/utils";
+import { useFieldGroup } from "./field";
 
 /* -------------------------------------------------------------------------------------------------
  * Roving tabindex for radio groups (shared with ChipGroup in single mode)
@@ -38,7 +39,8 @@ export function useRovingRadioGroup(
   const itemsRef = useRef<(HTMLButtonElement | null)[]>([]);
 
   const selectedIndex = options.findIndex((option) => option.value === value && !option.disabled);
-  const tabStop = selectedIndex >= 0 ? selectedIndex : options.findIndex((option) => !option.disabled);
+  const tabStop =
+    selectedIndex >= 0 ? selectedIndex : options.findIndex((option) => !option.disabled);
 
   function findEnabled(from: number, step: 1 | -1): number {
     const count = options.length;
@@ -201,13 +203,19 @@ export function RadioCardGroup({
     ? options.map((option) => ({ ...option, disabled: true }))
     : options;
   const getItemProps = useRovingRadioGroup(effectiveOptions, value, onChange);
+  // Inside `<Field group>` the field label names the group.
+  const fieldGroup = useFieldGroup({
+    ariaLabel,
+    "aria-labelledby": ariaLabelledBy,
+    "aria-describedby": ariaDescribedBy,
+  });
 
   return (
     <div
       role="radiogroup"
       aria-label={ariaLabel}
-      aria-labelledby={ariaLabelledBy}
-      aria-describedby={ariaDescribedBy}
+      aria-labelledby={fieldGroup["aria-labelledby"]}
+      aria-describedby={fieldGroup["aria-describedby"]}
       aria-disabled={disabled || undefined}
       data-slot="ig-radio-card-group"
       className={cn(

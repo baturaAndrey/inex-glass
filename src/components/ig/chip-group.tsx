@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Chip } from "./chip";
+import { useFieldGroup } from "./field";
 import { useRovingRadioGroup } from "./radio-card";
 
 export type ChipOption = {
@@ -51,11 +52,12 @@ export function ChipGroup(props: ChipGroupProps) {
   );
 }
 
-function groupAttributes(props: ChipGroupBaseProps) {
+/** Inside `<Field group>` the group is named by the field label (`aria-labelledby`). */
+function useGroupAttributes(props: ChipGroupBaseProps) {
+  const fieldGroup = useFieldGroup(props);
   return {
     "aria-label": props.ariaLabel,
-    "aria-labelledby": props["aria-labelledby"],
-    "aria-describedby": props["aria-describedby"],
+    ...fieldGroup,
     "data-slot": "ig-chip-group",
     className: cn("ig-chips", props.className),
   };
@@ -64,9 +66,10 @@ function groupAttributes(props: ChipGroupBaseProps) {
 function SingleChipGroup(props: ChipGroupSingleProps) {
   const { options, value, onChange, allowClear = false } = props;
   const getItemProps = useRovingRadioGroup(options, value, onChange);
+  const groupAttrs = useGroupAttributes(props);
 
   return (
-    <div role="radiogroup" {...groupAttributes(props)}>
+    <div role="radiogroup" {...groupAttrs}>
       {options.map((option, index) => {
         const checked = option.value === value;
         return (
@@ -90,6 +93,7 @@ function SingleChipGroup(props: ChipGroupSingleProps) {
 
 function MultipleChipGroup(props: ChipGroupMultipleProps) {
   const { options, value, onChange } = props;
+  const groupAttrs = useGroupAttributes(props);
 
   function toggle(optionValue: string) {
     const isOn = value.includes(optionValue);
@@ -101,7 +105,7 @@ function MultipleChipGroup(props: ChipGroupMultipleProps) {
   }
 
   return (
-    <div role="group" {...groupAttributes(props)}>
+    <div role="group" {...groupAttrs}>
       {options.map((option) => (
         <Chip
           key={option.value}

@@ -1,4 +1,4 @@
-import { isAdmin, isAdminOrManager } from "@/payload/access";
+import { adminFieldAccess, isAdmin, isAdminOrManager } from "@/payload/access";
 import { rel } from "@/payload/slugs";
 import type { CollectionConfig } from "payload";
 
@@ -37,8 +37,10 @@ export const ConsentLog: CollectionConfig = {
     { name: "consentVersion", type: "text", label: "Версия согласия" },
     { name: "policyVersion", type: "text", label: "Версия политики" },
     { name: "consentText", type: "textarea", label: "Текст согласия (снимок)" },
-    { name: "ip", type: "text", label: "IP" },
-    { name: "userAgent", type: "text", label: "User-Agent" },
+    // Network identifiers are for admins only (ТЗ: managers do not see the IP). Writes go through
+    // the Local API with `overrideAccess`, so only `read` needs a rule.
+    { name: "ip", type: "text", label: "IP", access: { read: adminFieldAccess } },
+    { name: "userAgent", type: "text", label: "User-Agent", access: { read: adminFieldAccess } },
     { name: "pageUrl", type: "text", label: "Страница" },
     {
       name: "givenAt",

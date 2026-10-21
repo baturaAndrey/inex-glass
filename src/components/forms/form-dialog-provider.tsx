@@ -15,8 +15,10 @@ import { FORM_REGISTRY } from "./registry";
  * or declaratively with `<FormTrigger formKey="callback">`.
  *
  * Radix gives the focus trap, Esc / overlay / close-button dismissal and the scroll lock; focus
- * returns to the trigger (`useReturnFocus`). ≤599 px — full screen, otherwise a centred
- * `max-w-lg` card. The form components live in `./registry` (stubs until task 21).
+ * returns to the trigger (`useReturnFocus`). ≤599 px — full screen, otherwise a centred card
+ * (`max-w-lg` for the callback form, `max-w-2xl` for the two-column ones). Title:
+ * `params.title ?? params.label ?? DEFAULT_FORM_TITLES[key]`. The form components live in
+ * `./registry` (lazy chunks, task 21).
  */
 
 export type FormKey = "drawing" | "callback" | "sample" | "load" | "contacts" | "full";
@@ -57,6 +59,9 @@ export const DEFAULT_FORM_TITLES: Readonly<Record<FormKey, string>> = {
   contacts: "Отправить заявку",
   full: "Отправить заявку",
 };
+
+/** Two-column forms get a wider dialog (`max-w-2xl`); the callback form keeps `max-w-lg`. */
+const WIDE_FORMS: ReadonlySet<FormKey> = new Set(["drawing", "sample", "load", "contacts", "full"]);
 
 export interface FormDialogContextValue {
   openForm(key: FormKey, params?: FormParams): void;
@@ -104,7 +109,12 @@ export function FormDialogProvider({ children }: { children: ReactNode }) {
   );
 
   const FormComponent = active ? FORM_REGISTRY[active.key] : null;
-  const title = active ? active.params.title?.trim() || DEFAULT_FORM_TITLES[active.key] : "";
+  // `label` doubles as the title so pages can open «Отправить планировку», «Загрузить чертёж
+  // DWG / DXF», … with one parameter; an explicit `title` still wins.
+  const title = active
+    ? active.params.title?.trim() || active.params.label?.trim() || DEFAULT_FORM_TITLES[active.key]
+    : "";
+  const width = active && WIDE_FORMS.has(active.key) ? "sm:max-w-2xl" : "sm:max-w-lg";
 
   return (
     <FormDialogContext.Provider value={value}>
@@ -121,7 +131,8 @@ export function FormDialogProvider({ children }: { children: ReactNode }) {
               "ease-ig data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-(--ig-dur-base) motion-reduce:animate-none",
               // ≤599: full screen; otherwise a centred card.
               "max-sm:inset-0 max-sm:h-dvh max-sm:w-full",
-              "sm:top-1/2 sm:left-1/2 sm:max-h-[calc(100dvh-48px)] sm:w-[calc(100%-48px)] sm:max-w-lg sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-lg",
+              "sm:top-1/2 sm:left-1/2 sm:max-h-[calc(100dvh-48px)] sm:w-[calc(100%-48px)] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-lg",
+              width,
               "sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95"
             )}
           >
@@ -133,7 +144,8 @@ export function FormDialogProvider({ children }: { children: ReactNode }) {
                 </Button>
               </DialogPrimitive.Close>
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pt-2 pb-6 max-sm:px-4">
+            {/* ≤599 no bottom padding: the form's footer sticks to the bottom edge itself. */}
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pt-2 pb-6 max-sm:px-4 max-sm:pb-0">
               {FormComponent && active ? (
                 <FormComponent params={active.params} onClose={closeForm} variant="modal" />
               ) : null}

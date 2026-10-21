@@ -58,6 +58,8 @@
 - `cacheComponents` is off; CMS data is read through the Local API + `unstable_cache` with tags
 - Scripts run via `payload run <file>` must use top-level `await` — otherwise the command exits silently with code 0 before the script finishes
 - Running Payload outside production (dev server, `payload run`, integration tests) regenerates `src/payload-types.ts`; revert it unless your task owns generated files this wave
+- E2E specs that need an admin use `loginAdmin` / `adminToken` / `adminApi` from `e2e/helpers/admin.ts` (one default admin via `E2E_ADMIN_EMAIL`/`E2E_ADMIN_PASSWORD`); never call `/api/users/login/` directly or reset passwords — parallel logins of one user wipe each other's Payload sessions (403). Fixture-mutating tests run serially in the `desktop-1366` project only
+- `next.config.ts` must keep `serverExternalPackages: ["payload"]`: without it the prod (Turbopack) build bundles a separate `payload` copy per entry and REST validation errors lose `name`/`data` (field errors, Russian messages)
 - Postgres needs `max_locks_per_transaction=256` for migration rollbacks (~600 tables in one transaction); set in `docker-compose.yml`
 
 <!-- BEGIN:nextjs-agent-rules -->

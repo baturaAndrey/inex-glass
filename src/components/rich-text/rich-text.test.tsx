@@ -171,6 +171,77 @@ describe("RichText", () => {
     expect(safeExternalHref(input)).toBe(expected);
   });
 
+  describe("tables", () => {
+    /** Lexical table cell: `headerState` 1 = row header (Lexical `TableCellHeaderStates.ROW`). */
+    const cell = (children: unknown[], headerState = 0) =>
+      element("tablecell", [element("paragraph", children)], {
+        headerState,
+        colSpan: 1,
+        backgroundColor: null,
+      });
+    const row = (...cells: unknown[]) => element("tablerow", cells);
+    const table = (...rows: unknown[]) => element("table", rows, { colWidths: [120, 120] });
+
+    it("renders a header row as <thead>, cells as rich text, and phone cards", () => {
+      const { container } = render(
+        <RichText
+          ctx={ctx}
+          data={doc(
+            table(
+              row(cell([text("Сегмент")], 1), cell([text("Цена")], 1)),
+              row(
+                cell([text("Дизайнеры", 1)]),
+                cell([
+                  text("от {цена_10мм} ₽ "),
+                  element("link", [text("подробнее")], {
+                    fields: { linkType: "custom", newTab: false, url: "/klientam/" },
+                  }),
+                ])
+              )
+            )
+          )}
+        />
+      );
+
+      const wrap = container.querySelector(".ig-table-wrap");
+      expect(wrap?.querySelector("table.ig-table")).not.toBeNull();
+      const headers = [...container.querySelectorAll("thead th")];
+      expect(headers.map((th) => th.textContent)).toEqual(["Сегмент", "Цена"]);
+      headers.forEach((th) => expect(th).toHaveAttribute("scope", "col"));
+      // The header row is not repeated in the body.
+      const bodyRows = container.querySelectorAll("tbody tr");
+      expect(bodyRows).toHaveLength(1);
+
+      const cells = bodyRows[0]!.querySelectorAll("td");
+      expect(cells[0]?.querySelector("strong")?.textContent).toBe("Дизайнеры");
+      expect(cells[1]?.textContent).toContain(`1${NBSP}400`);
+      expect(cells[1]?.querySelector('a[href^="/klientam"]')?.textContent).toBe("подробнее");
+      // No Payload default inline styles (borders, padding) on the table.
+      expect(container.querySelectorAll("table [style]")).toHaveLength(0);
+
+      // Phone view: one `.ig-mcard` per body row with «label — value» lines.
+      const cards = container.querySelectorAll("li.ig-mcard");
+      expect(cards).toHaveLength(1);
+      expect(cards[0]?.textContent).toContain("Дизайнеры");
+      expect(cards[0]?.querySelector("dt")?.textContent).toBe("Цена");
+    });
+
+    it("keeps a table without a header row in the body and scrolls it on phones", () => {
+      const { container } = render(
+        <RichText
+          ctx={ctx}
+          data={doc(table(row(cell([text("А")]), cell([text("Б")])), row(cell([text("В")]))))}
+        />
+      );
+      expect(container.querySelectorAll("tbody tr")).toHaveLength(2);
+      // DataTable always has a <thead>; without labels it is hidden.
+      expect(container.querySelector('[class*="[&_thead]:hidden"] thead')).not.toBeNull();
+      expect(container.querySelector(".ig-mcard")).toBeNull();
+      // A short row is padded to the table width.
+      expect(container.querySelectorAll("tbody tr")[1]?.querySelectorAll("td")).toHaveLength(2);
+    });
+  });
+
   it("renders nothing for an empty value", () => {
     const { container } = render(<RichText data={null} ctx={ctx} />);
     expect(container.innerHTML).toBe("");

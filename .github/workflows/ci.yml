@@ -94,10 +94,19 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: pnpm exec playwright install-deps chromium
 
+      # The restored .next/cache carries the data cache of earlier runs / the build: drop it so
+      # `next start` reads CMS data from this run's freshly seeded database.
+      - name: Clear Next data cache
+        run: rm -rf .next/cache/fetch-cache
+
       - run: pnpm test:e2e
         env:
           # Migrations and seed already ran in the steps above.
           E2E_SKIP_DB: "1"
+          # The single e2e admin (e2e/helpers/admin.ts). The fresh CI database has no users,
+          # so the first spec that needs it registers it via first-register. Test-only values.
+          E2E_ADMIN_EMAIL: e2e-admin@inexglass.test
+          E2E_ADMIN_PASSWORD: e2e-admin-password-0000
 
       - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}

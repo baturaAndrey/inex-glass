@@ -90,4 +90,30 @@ describe("markdownToLexical", () => {
     expect(bullets?.children).toHaveLength(2);
     expect(numbers).toMatchObject({ type: "list", listType: "number" });
   });
+
+  it("converts GFM tables: header row, trimmed cells, inline formats", async () => {
+    const state = markdownToLexical(
+      [
+        "| | Обычное | Закалённое |",
+        "|---|---|---|",
+        "| Прочность | Базовая | **В 5–6 раз** выше |",
+      ].join("\n"),
+      await editorConfig()
+    );
+    const [table] = childrenOf(state);
+    expect(table?.type).toBe("table");
+    const [head, row] = table?.children ?? [];
+    const cells = (node: Node | undefined) => node?.children ?? [];
+    const cellText = (cell: Node | undefined) =>
+      (cell?.children?.[0]?.children ?? []).map((node) => node.text).join("");
+    expect(cells(head).map((cell) => (cell as { headerState?: number }).headerState)).toEqual([
+      1, 1, 1,
+    ]);
+    expect(cells(head).map(cellText)).toEqual(["", "Обычное", "Закалённое"]);
+    expect(cells(row).map(cellText)).toEqual(["Прочность", "Базовая", "В 5–6 раз выше"]);
+    expect(cells(row)[2]?.children?.[0]?.children?.[0]).toMatchObject({
+      text: "В 5–6 раз",
+      format: 1,
+    });
+  });
 });

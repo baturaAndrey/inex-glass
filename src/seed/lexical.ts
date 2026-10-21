@@ -1,6 +1,7 @@
 import {
   convertMarkdownToLexical,
   editorConfigFactory,
+  EXPERIMENTAL_TableFeature,
   HeadingFeature,
   LinkFeature,
 } from "@payloadcms/richtext-lexical";
@@ -14,7 +15,7 @@ export type LexicalState = RichTextBlock["content"];
 
 /**
  * Feature keys of the seed converter. It mirrors `src/payload/editor.ts` (same block-level
- * features, headings h2–h4, links to the same collections) and additionally keeps `bold` and
+ * features, headings h2–h4, links to the same collections, tables) and additionally keeps `bold` and
  * `italic`: `teksty/` use **bold** / *italic*, and the site renderer outputs the text-format
  * bits even though editors have no toolbar buttons for them.
  */
@@ -44,6 +45,7 @@ export function getEditorConfig(payload: Payload): Promise<SanitizedServerEditor
         ...defaultFeatures.filter((feature) => SEED_FEATURE_KEYS.has(feature.key)),
         HeadingFeature({ enabledHeadingSizes: ["h2", "h3", "h4"] }),
         LinkFeature({ enabledCollections: [...LINKABLE_COLLECTIONS] }),
+        EXPERIMENTAL_TableFeature(),
       ],
     });
     editorConfigCache.set(payload, cached);
@@ -54,7 +56,8 @@ export function getEditorConfig(payload: Payload): Promise<SanitizedServerEditor
 /**
  * Markdown → Lexical with Payload's official converter. Supported: `##`/`###`/`####` headings,
  * paragraphs, **bold**, *italic*, bulleted and numbered lists, `> quotes`, `---`, links
- * `[text](/path/)`. Tables are not enabled in the editor: slices convert them to `table` blocks.
+ * `[text](/path/)` and GFM tables (`| a | b |`; a `|---|` line after the first row turns it into
+ * the header row — `headerState: 1` on its cells).
  *
  * Text such as `{цена_10мм}` stays plain text — placeholders are resolved at render time.
  */
@@ -63,9 +66,34 @@ export function markdownToLexical(
   editorConfig: SanitizedServerEditorConfig
 ): LexicalState {
   const state = convertMarkdownToLexical({ editorConfig, markdown: markdown.trim() });
+  trimTableCells(state.root);
   // The converter returns lexical's `SerializedEditorState`; the generated field type is the
   // same JSON with an index signature, which interfaces cannot satisfy structurally.
   return state as unknown as LexicalState;
+}
+
+type MutableNode = { type?: unknown; text?: unknown; children?: unknown };
+
+const childNodes = (node: MutableNode): MutableNode[] =>
+  Array.isArray(node.children) ? (node.children as MutableNode[]) : [];
+
+/**
+ * The table transformer keeps the padding of `| cell |` («␠Здание␠»). Trims the first and last
+ * text node of every paragraph inside a table cell (in place); inner spacing is untouched.
+ */
+function trimTableCells(node: MutableNode, inCell = false): void {
+  const isCell = inCell || node.type === "tablecell";
+  if (isCell && node.type === "paragraph") {
+    const texts = childNodes(node).filter((child) => typeof child.text === "string");
+    const first = texts[0];
+    const last = texts[texts.length - 1];
+    if (first) first.text = (first.text as string).trimStart();
+    if (last) last.text = (last.text as string).trimEnd();
+    // A cell that starts with **bold** leaves an empty text node in front of it.
+    node.children = childNodes(node).filter((child) => child.text !== "");
+    return;
+  }
+  for (const child of childNodes(node)) trimTableCells(child, isCell);
 }
 
 /** `markdownToLexical` with the editor config resolved from the seed's Payload instance. */

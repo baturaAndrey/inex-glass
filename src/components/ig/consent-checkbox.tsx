@@ -4,9 +4,11 @@ import { useId } from "react";
 import { TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/** Error shown when the form is submitted without consent (verbatim, teksty/05-kviz.md). */
-export const CONSENT_ERROR =
-  "Чтобы отправить заявку, отметьте согласие на обработку персональных данных";
+/**
+ * Error shown when the form is submitted without consent (verbatim, teksty/05-kviz.md). The same
+ * constant the lead schemas use, so the client and the server never drift apart.
+ */
+export { CONSENT_MESSAGE as CONSENT_ERROR } from "@/lib/domain/contact-fields";
 
 export const CONSENT_URL = "/soglasie-na-obrabotku-personalnyh-dannyh/";
 export const PRIVACY_POLICY_URL = "/politika-konfidencialnosti/";

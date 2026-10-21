@@ -5,7 +5,8 @@ import { createHash, timingSafeEqual } from "node:crypto";
 /**
  * Site proxy. Does exactly two things:
  * 1. Basic auth on staging (`SITE_ENV=staging` and `STAGING_BASIC_AUTH=user:pass`).
- * 2. 301 from a path with uppercase letters to its lowercase form (query preserved).
+ * 2. 301 from a path with uppercase letters to its lowercase form (query preserved); for
+ *    `/zakaz/<token>/` only the prefix is lowercased.
  *
  * "No trailing slash -> slash" is done by Next itself (`trailingSlash: true`, status 308).
  *
@@ -45,11 +46,20 @@ function stagingAuthResponse(request: NextRequest): NextResponse | null {
 }
 
 /**
- * Lowercases the decoded path (covers Cyrillic too). Comparing decoded values avoids
- * redirect loops on percent-encoding, whose hex digits are uppercase by convention.
+ * Prefixes followed by a case-sensitive secret that must never be lowercased: the client order
+ * page `/zakaz/<token>/` (task 33) — its token is base64url (task 18), so lowercasing it would
+ * turn every valid link into «Ссылка больше не действует». Only the prefix itself is
+ * normalized (`/ZAKAZ/<token>/` → `/zakaz/<token>/`).
  */
-function lowercaseRedirect(request: NextRequest): NextResponse | null {
-  const { pathname } = request.nextUrl;
+const CASE_SENSITIVE_PREFIXES = ["/zakaz/"] as const;
+
+/**
+ * Canonical (lowercase) form of a pathname, or `null` when it is already canonical or cannot be
+ * decoded. Works on the decoded path (covers Cyrillic too): comparing decoded values avoids
+ * redirect loops on percent-encoding, whose hex digits are uppercase by convention.
+ * Exported for unit tests.
+ */
+export function canonicalPathname(pathname: string): string | null {
   let decoded: string;
   try {
     decoded = decodeURIComponent(pathname);
@@ -58,10 +68,20 @@ function lowercaseRedirect(request: NextRequest): NextResponse | null {
   }
 
   const lowered = decoded.toLowerCase();
-  if (lowered === decoded) return null;
+  const sensitivePrefix = CASE_SENSITIVE_PREFIXES.find((prefix) => lowered.startsWith(prefix));
+  // Lowercase only the prefix; the rest is a secret and keeps its case.
+  const canonical = sensitivePrefix
+    ? sensitivePrefix + decoded.slice(sensitivePrefix.length)
+    : lowered;
+  return canonical === decoded ? null : canonical;
+}
+
+function lowercaseRedirect(request: NextRequest): NextResponse | null {
+  const canonical = canonicalPathname(request.nextUrl.pathname);
+  if (canonical === null) return null;
 
   const target = request.nextUrl.clone();
-  target.pathname = lowered;
+  target.pathname = canonical;
   return NextResponse.redirect(target, 301);
 }
 

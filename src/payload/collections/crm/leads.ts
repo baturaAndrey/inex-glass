@@ -1,4 +1,6 @@
 import { adminOrManagerFieldAccess, isAdmin, isAdminOrManager } from "@/payload/access";
+import { notifyAssigneeChange } from "@/payload/hooks/lead-assignee-notify";
+import { stampInternalComments } from "@/payload/hooks/lead-comments";
 import {
   assignDefaultStatus,
   detectDuplicate,
@@ -9,6 +11,7 @@ import {
   validatePhone,
   validateRefuseReason,
 } from "@/payload/hooks/lead-hooks";
+import { validateLeadStatusReason } from "@/payload/hooks/lead-status-validation";
 import { orderFromLead } from "@/payload/hooks/order-from-lead";
 import { rel } from "@/payload/slugs";
 import {
@@ -24,6 +27,10 @@ import { systemOnly } from "./field-access";
 import type { CollectionConfig, Field } from "payload";
 
 const MAX_VERSIONS_PER_LEAD = 50;
+
+/** Admin components of the leads module (task 32), paths relative to `importMap.baseDir` (src). */
+const ADMIN_LEADS = "/payload/admin/leads";
+const LEADS_PAGE_SIZE = 25;
 
 const UTM_KEYS = [
   "source",
@@ -59,18 +66,36 @@ export const Leads: CollectionConfig = {
   admin: {
     group: "Заявки",
     useAsTitle: "name",
+    // `formType` renders the source (form, label, entry page), `name` the whole contact.
     defaultColumns: [
       "createdAt",
       "formType",
       "company",
       "name",
-      "phone",
       "area",
       "productType",
       "status",
       "assignee",
+      "isDuplicate",
     ],
-    listSearchableFields: ["name", "company", "phone", "email", "inn", "comment"],
+    // Phones are stored normalized (+7XXXXXXXXXX); a substring search finds partial numbers.
+    listSearchableFields: ["company", "name", "phone", "email", "inn", "sourceLabel", "comment"],
+    pagination: { defaultLimit: LEADS_PAGE_SIZE },
+    components: {
+      beforeListTable: [`${ADMIN_LEADS}/lead-list-quick-filters#LeadListQuickFilters`],
+      edit: {
+        editMenuItems: [`${ADMIN_LEADS}/erase-menu-item#EraseMenuItem`],
+      },
+      views: {
+        edit: {
+          summary: {
+            Component: `${ADMIN_LEADS}/lead-summary-view#LeadSummaryView`,
+            path: "/summary",
+            tab: { label: "Сводка", href: "/summary", order: 150 },
+          },
+        },
+      },
+    },
   },
   defaultSort: "-createdAt",
   versions: { maxPerDoc: MAX_VERSIONS_PER_LEAD, drafts: false },
@@ -81,9 +106,15 @@ export const Leads: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
-    beforeValidate: [normalizeContacts],
-    beforeChange: [assignDefaultStatus, touchStatusChangedAt, detectDuplicate],
-    afterChange: [orderFromLead],
+    beforeValidate: [normalizeContacts, validateLeadStatusReason],
+    beforeChange: [
+      assignDefaultStatus,
+      touchStatusChangedAt,
+      detectDuplicate,
+      stampInternalComments,
+    ],
+    // Order matters: the assignee e-mail job first, then the order (task 33).
+    afterChange: [notifyAssigneeChange, orderFromLead],
   },
   fields: [
     // --- Source ---------------------------------------------------------------------------
@@ -94,6 +125,7 @@ export const Leads: CollectionConfig = {
       required: true,
       index: true,
       options: toOptions(LEAD_FORM_TYPES),
+      admin: { components: { Cell: `${ADMIN_LEADS}/cells/source-cell#SourceCell` } },
     },
     {
       name: "sourceLabel",
@@ -120,7 +152,13 @@ export const Leads: CollectionConfig = {
     // --- Contacts -------------------------------------------------------------------------
     { name: "company", type: "text", label: "Компания" },
     { name: "inn", type: "text", label: "ИНН", validate: validateInn },
-    { name: "name", type: "text", label: "Имя", required: true },
+    {
+      name: "name",
+      type: "text",
+      label: "Имя",
+      required: true,
+      admin: { components: { Cell: `${ADMIN_LEADS}/cells/contact-cell#ContactCell` } },
+    },
     {
       name: "phone",
       type: "text",
@@ -174,6 +212,7 @@ export const Leads: CollectionConfig = {
       label: "Флаги",
       hasMany: true,
       options: toOptions(LEAD_FLAGS),
+      admin: { components: { Cell: `${ADMIN_LEADS}/cells/flags-cell#FlagsCell` } },
     },
     {
       name: "files",
@@ -191,7 +230,10 @@ export const Leads: CollectionConfig = {
       relationTo: rel("lead-statuses"),
       index: true,
       validate: validateLeadStatus,
-      admin: { position: "sidebar" },
+      admin: {
+        position: "sidebar",
+        components: { Cell: `${ADMIN_LEADS}/cells/status-cell#StatusCell` },
+      },
     },
     {
       name: "statusChangedAt",
@@ -254,7 +296,10 @@ export const Leads: CollectionConfig = {
       defaultValue: false,
       index: true,
       access: systemOnly,
-      admin: computed,
+      admin: {
+        ...computed,
+        components: { Cell: `${ADMIN_LEADS}/cells/duplicate-cell#DuplicateCell` },
+      },
     },
     {
       name: "duplicateOf",

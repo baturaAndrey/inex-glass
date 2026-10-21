@@ -13,6 +13,7 @@ import {
 import { Check, TriangleAlert, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
+import { useFieldGroup } from "./field";
 
 /* -------------------------------------------------------------------------------------------------
  * Pure helpers (exported for consumers and tests)
@@ -56,10 +57,12 @@ function joinWithOr(items: readonly string[]): string {
 /** Upper-case format names for messages, de-duplicated and in the canonical order. */
 export function acceptedFormatLabels(accept: readonly string[]): string[] {
   const normalized = [
-    ...new Set(accept.map((ext) => {
-      const clean = ext.replace(/^\./, "").toLowerCase();
-      return FORMAT_ALIASES[clean] ?? clean;
-    })),
+    ...new Set(
+      accept.map((ext) => {
+        const clean = ext.replace(/^\./, "").toLowerCase();
+        return FORMAT_ALIASES[clean] ?? clean;
+      })
+    ),
   ];
   const known = FORMAT_ORDER.filter((ext) => normalized.includes(ext));
   const others = normalized.filter((ext) => !(FORMAT_ORDER as readonly string[]).includes(ext));
@@ -129,6 +132,10 @@ export type FileUploadViewProps = {
       }
     | undefined;
   browseRef?: Ref<HTMLButtonElement> | undefined;
+  /** Names the drop zone (e.g. the label of a surrounding `<Field group>`) instead of «Загрузка файла». */
+  labelledBy?: string | undefined;
+  /** Hint/error ids of a surrounding `Field`. */
+  describedBy?: string | undefined;
   className?: string | undefined;
   /** Rendered inside the root (the hidden `<input type="file">`). */
   children?: ReactNode;
@@ -183,11 +190,11 @@ function FilePlaque({
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={percent}
-              className="h-1.5 w-full overflow-hidden rounded-full bg-well"
+              className="bg-well h-1.5 w-full overflow-hidden rounded-full"
             >
               <div
                 className={cn(
-                  "h-full rounded-full bg-primary transition-[width] duration-200",
+                  "bg-primary h-full rounded-full transition-[width] duration-200",
                   percent === undefined && "w-full animate-pulse opacity-40"
                 )}
                 style={percent === undefined ? undefined : { width: `${percent}%` }}
@@ -230,6 +237,8 @@ export function FileUploadView({
   onClear,
   dropZoneHandlers,
   browseRef,
+  labelledBy,
+  describedBy,
   className,
   children,
 }: FileUploadViewProps) {
@@ -272,7 +281,9 @@ export function FileUploadView({
     body = (
       <div
         role="group"
-        aria-label={DROP_ZONE_LABEL}
+        aria-label={labelledBy ? undefined : DROP_ZONE_LABEL}
+        aria-labelledby={labelledBy}
+        aria-describedby={describedBy}
         aria-disabled={disabled || undefined}
         className={cn(
           "ig-upload",
@@ -376,6 +387,10 @@ export function FileUpload({
   const browseRef = useRef<HTMLButtonElement | null>(null);
   const restoreFocusRef = useRef(false);
   const [isDragging, setIsDragging] = useState(false);
+  // dragenter/dragleave fire for every child the pointer crosses, and Safari reports
+  // `relatedTarget = null` on dragleave, so «still inside» is tracked with a counter.
+  const dragDepthRef = useRef(0);
+  const fieldGroup = useFieldGroup({});
   const [localError, setLocalError] = useState<FileRejectReason | null>(null);
 
   // After "удалить" the plaque (and the focused button) disappears: move focus to the
@@ -432,6 +447,7 @@ export function FileUpload({
     onDragEnter(event: DragEvent<HTMLDivElement>) {
       if (disabled) return;
       event.preventDefault();
+      dragDepthRef.current += 1;
       setIsDragging(true);
     },
     onDragOver(event: DragEvent<HTMLDivElement>) {
@@ -440,14 +456,13 @@ export function FileUpload({
       event.preventDefault();
       event.dataTransfer.dropEffect = "copy";
     },
-    onDragLeave(event: DragEvent<HTMLDivElement>) {
-      // Ignore leave events fired when the pointer moves onto a child element.
-      const next = event.relatedTarget;
-      if (next instanceof Node && event.currentTarget.contains(next)) return;
-      setIsDragging(false);
+    onDragLeave() {
+      dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
+      if (dragDepthRef.current === 0) setIsDragging(false);
     },
     onDrop(event: DragEvent<HTMLDivElement>) {
       event.preventDefault();
+      dragDepthRef.current = 0;
       setIsDragging(false);
       if (disabled) return;
       handleFile(event.dataTransfer.files[0]);
@@ -464,6 +479,8 @@ export function FileUpload({
       onClear={handleClear}
       dropZoneHandlers={dropZoneHandlers}
       browseRef={browseRef}
+      labelledBy={fieldGroup["aria-labelledby"]}
+      describedBy={fieldGroup["aria-describedby"]}
       className={className}
     >
       <input

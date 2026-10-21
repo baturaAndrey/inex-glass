@@ -1,6 +1,6 @@
 import { DataTable, type DataTableColumn } from "@/components/ig/data-table";
+import { sanitizeSvg } from "@/lib/svg-sanitize";
 import { cn } from "@/lib/utils";
-import { sanitizeSvg } from "./sanitize-svg";
 import { BlockImage, BlockSection, CARD_GRID, asMedia, fill, hasText } from "./shared";
 import type { BlockProps, SystemItem } from "./types";
 
@@ -14,7 +14,7 @@ const FACTS = [
 
 function SystemCard({ system, ctx }: { system: SystemItem; ctx: Parameters<typeof fill>[1] }) {
   const media = asMedia(system.image);
-  const svg = media ? null : sanitizeSvg(system.schemeSvg);
+  const svg = media ? "" : sanitizeSvg(system.schemeSvg, { decorative: true });
   return (
     <article className="bg-surface shadow-card flex flex-col overflow-hidden rounded-lg">
       {media ? (

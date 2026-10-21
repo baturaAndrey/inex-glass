@@ -4,17 +4,25 @@ import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { ClipboardList } from "lucide-react";
 import { Button } from "@/components/ig/button";
+import { QUIZ_DRAFT_EVENT } from "@/components/quiz/persistence";
 import { QUIZ_DRAFT_KEY } from "@/lib/domain/quiz-schema";
 import { cn } from "@/lib/utils";
 import { MY_CALC_URL } from "./nav-defaults";
 
-/** Re-check the draft when another tab saves or clears it. */
+/**
+ * Re-check the draft when another tab saves or clears it (`storage`) and when the quiz in this
+ * tab does (`inex:quiz-draft`: `storage` never fires in the tab that wrote the value).
+ */
 function subscribe(onChange: () => void): () => void {
   const onStorage = (event: StorageEvent) => {
     if (event.key === null || event.key === QUIZ_DRAFT_KEY) onChange();
   };
   window.addEventListener("storage", onStorage);
-  return () => window.removeEventListener("storage", onStorage);
+  window.addEventListener(QUIZ_DRAFT_EVENT, onChange);
+  return () => {
+    window.removeEventListener("storage", onStorage);
+    window.removeEventListener(QUIZ_DRAFT_EVENT, onChange);
+  };
 }
 
 /** localStorage may be unavailable (privacy mode, blocked storage): treat as «no draft». */

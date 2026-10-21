@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   PageHero,
   PageHeroStat,
@@ -55,8 +56,12 @@ function DefaultActions({
   );
 }
 
-/** Photo column of the catalog hero: the main image or the first photos. */
-function HeroAside({ block }: { block: BlockOf<"hero"> }) {
+/**
+ * Photo column of the catalog hero: the main image or the first photos; `null` without any, so
+ * the hero drops the column instead of keeping an empty 520 px track that squeezes the H1.
+ * A plain function (not a component) because the caller needs to know whether it rendered.
+ */
+function heroAside(block: BlockOf<"hero">): ReactNode {
   const main = asMedia(block.image);
   if (main) {
     return (
@@ -131,7 +136,7 @@ export async function HeroBlock({ block, ctx, page }: BlockProps<"hero">) {
         )
       }
       terms={terms ?? undefined}
-      aside={variant === "ct-hero" ? <HeroAside block={block} /> : undefined}
+      aside={variant === "ct-hero" ? (heroAside(block) ?? undefined) : undefined}
       {...(homeImage && homeSrc
         ? { media: { src: homeSrc, alt: fill(block.imageAlt, ctx) || homeImage.alt || "" } }
         : {})}

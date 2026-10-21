@@ -4,9 +4,11 @@ import {
   type JSXConverters,
   type JSXConvertersFunction,
 } from "@payloadcms/richtext-lexical/react";
+import { DataTable, type DataTableColumn, type DataTableRow } from "@/components/ig/data-table";
 import { TextLink } from "@/components/ig/text-link";
 import { replacePlaceholders, type PlaceholderContext } from "@/lib/domain";
 import { cn } from "@/lib/utils";
+import { lexicalToPlainText } from "@/payload/utils/lexical-text";
 import { docToHref } from "./internal-links";
 import type { SerializedPlaceholderContext } from "./placeholders-context";
 import type {
@@ -83,6 +85,69 @@ function renderText(node: SerializedTextNode, ctx: PlaceholderContext | undefine
   return out;
 }
 
+/**
+ * Cell content inside a table: the cell's paragraphs (links, bold…) without the measure, spacing
+ * and font size of free-standing paragraphs — the table row / phone card sets the typography.
+ */
+const CELL_CLASS =
+  "flex flex-col gap-1 [&_p]:m-0 [&_p]:max-w-none [&_p]:text-[length:inherit] [&_p]:leading-[inherit] [&_p]:text-inherit";
+
+type LexicalChild = { type?: unknown; children?: unknown; headerState?: unknown };
+
+const childrenOf = (node: LexicalChild): LexicalChild[] =>
+  Array.isArray(node.children) ? (node.children as LexicalChild[]) : [];
+
+/** Lexical `TableCellHeaderStates`: any non-zero state (row / column / both) is a header cell. */
+const isHeaderCell = (cell: LexicalChild): boolean =>
+  typeof cell.headerState === "number" && cell.headerState > 0;
+
+/**
+ * Lexical table → `DataTable` (`.ig-table-wrap > .ig-table` with `<thead>` / `<th scope="col">`,
+ * one `.ig-mcard` per row on ≤599 px). A first row made only of header cells becomes the column
+ * labels; a table without one has no labels for the cards, so it scrolls horizontally on phones.
+ * Payload's default table converters (inline cell styles, no `<thead>`) are never used.
+ */
+function renderTable(node: LexicalChild, nodesToJSX: NodesToJSX): ReactNode {
+  const rows = childrenOf(node).filter((row) => row.type === "tablerow");
+  const [first, ...rest] = rows;
+  if (!first) return null;
+  const firstCells = childrenOf(first);
+  const hasHeader = firstCells.length > 0 && firstCells.every(isHeaderCell);
+  const bodyRows = hasHeader ? rest : rows;
+  const width = Math.max(...rows.map((row) => childrenOf(row).length));
+
+  const columns: DataTableColumn[] = Array.from({ length: width }, (_, index) => {
+    const cell = hasHeader ? firstCells[index] : undefined;
+    return {
+      key: `c${index}`,
+      label: cell ? lexicalToPlainText({ root: cell }).replace(/\s+/g, " ").trim() : "",
+    };
+  });
+  const data: DataTableRow[] = bodyRows.map((row) => {
+    const cells = childrenOf(row);
+    return Object.fromEntries(
+      columns.map((column, index) => {
+        const cell = cells[index];
+        const content = cell
+          ? nodesToJSX({ nodes: childrenOf(cell) as Parameters<NodesToJSX>[0]["nodes"] })
+          : null;
+        return [column.key, content ? <div className={CELL_CLASS}>{content}</div> : null];
+      })
+    );
+  });
+
+  return (
+    <DataTable
+      columns={columns}
+      rows={data}
+      mobile={hasHeader ? "cards" : "scroll"}
+      // The first column names the row («Прочность…», «Жилые дома…»): medium weight in the table.
+      // Without a header row the empty label strip is hidden.
+      className={cn("[&_tbody_td:first-child]:font-medium", !hasHeader && "[&_thead]:hidden")}
+    />
+  );
+}
+
 function buildConverters(ctx: PlaceholderContext | undefined): JSXConvertersFunction {
   return ({ defaultConverters }) => {
     const overrides: JSXConverters<DefaultNodeTypes> = {
@@ -139,13 +204,11 @@ function buildConverters(ctx: PlaceholderContext | undefined): JSXConvertersFunc
     return {
       ...defaultConverters,
       ...overrides,
-      table: ({ node, nodesToJSX }) => (
-        <div className="ig-table-wrap">
-          <table className="ig-table">
-            <tbody>{nodesToJSX({ nodes: node.children })}</tbody>
-          </table>
-        </div>
-      ),
+      table: ({ node, nodesToJSX }) => renderTable(node, nodesToJSX),
+      // Rows and cells are rendered by `renderTable`; these only drop Payload's inline-styled
+      // `<tr>`/`<td>` for a row / cell reached outside a table.
+      tablerow: ({ node, nodesToJSX }) => <>{nodesToJSX({ nodes: node.children })}</>,
+      tablecell: ({ node, nodesToJSX }) => <>{nodesToJSX({ nodes: node.children })}</>,
     };
   };
 }

@@ -1,6 +1,7 @@
 import path from "node:path";
 import { getEnv } from "@/lib/env";
 import { isAdmin, isAnyone } from "../../access";
+import { stripUploadUrlTrailingSlash } from "../../hooks/media-urls";
 import { revalidateCollection } from "../../hooks/revalidate";
 import { GROUP_CONTENT } from "../shared";
 import type { CollectionConfig, TextFieldSingleValidation } from "payload";
@@ -57,6 +58,8 @@ export const Media: CollectionConfig = {
   hooks: {
     afterChange: [revalidate.afterChange],
     afterDelete: [revalidate.afterDelete],
+    // Payload appends `/` to computed file URLs under `trailingSlash: true`; see the hook.
+    afterRead: [stripUploadUrlTrailingSlash],
   },
   fields: [
     {

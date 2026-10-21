@@ -64,7 +64,7 @@ describe("buildBreadcrumbs", () => {
     ]);
     expect(buildBreadcrumbs("/klientam/zastrojshchikam/", { lastLabel: "Застройщикам" })).toEqual([
       { label: "Главная", href: "/" },
-      { label: "Для кого", href: "/klientam/" },
+      { label: "С кем мы работаем", href: "/klientam/" },
       { label: "Застройщикам" },
     ]);
     expect(

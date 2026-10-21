@@ -40,7 +40,19 @@ const MAX_REQUEST_SIZE = MAX_FILE_SIZE + MIB;
 export default buildConfig({
   admin: {
     user: Users.slug,
+    // Russian day-first format for every date in the admin (list cells, fields); date-fns pattern.
+    dateFormat: "dd.MM.yyyy HH:mm",
     importMap: { baseDir: path.resolve(dirname) },
+    components: {
+      // Leads report (task 32): sidebar link + the `/admin/leads-report` view.
+      afterNavLinks: ["/payload/admin/nav/reports-nav-link#ReportsNavLink"],
+      views: {
+        leadsReport: {
+          Component: "/payload/admin/views/leads-report#LeadsReportView",
+          path: "/leads-report",
+        },
+      },
+    },
   },
   i18n: {
     supportedLanguages: { ru },

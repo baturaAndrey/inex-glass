@@ -5,6 +5,7 @@ import {
   findRepeatedStatus,
 } from "@/payload/hooks/order-hooks";
 import type { StatusHistoryEntry } from "@/payload/hooks/order-hooks";
+import { orderLifecycleAfterChange, syncStatusHistory } from "@/payload/hooks/order-lifecycle";
 import { rel } from "@/payload/slugs";
 import { ORDER_DOCUMENT_KINDS, ORDER_STATUSES, STAFF_ROLES, toOptions } from "./constants";
 import { neverReadable, systemOnly } from "./field-access";
@@ -47,8 +48,20 @@ export const Orders: CollectionConfig = {
   admin: {
     group: "Заказы",
     useAsTitle: "number",
-    defaultColumns: ["number", "company", "currentStatus", "manager", "expiresAt"],
-    listSearchableFields: ["number", "company", "clientName", "clientEmail", "clientPhone"],
+    defaultColumns: ["number", "company", "currentStatus", "manager", "expiresAt", "createdAt"],
+    listSearchableFields: ["number", "company", "composition"],
+    components: {
+      views: {
+        edit: {
+          // «Управление» (task 33): client link, status change, warnings.
+          manage: {
+            Component: "/payload/admin/orders/order-manage-view#OrderManageView",
+            path: "/manage",
+            tab: { label: "Управление", href: "/manage", order: 50 },
+          },
+        },
+      },
+    },
   },
   defaultSort: "-createdAt",
   access: {
@@ -58,7 +71,9 @@ export const Orders: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
-    beforeChange: [assignOrderNumber, computeOrderState],
+    // `syncStatusHistory` must run before `computeOrderState`, which derives the status from it.
+    beforeChange: [assignOrderNumber, syncStatusHistory, computeOrderState],
+    afterChange: [orderLifecycleAfterChange],
   },
   fields: [
     {
@@ -149,7 +164,11 @@ export const Orders: CollectionConfig = {
       label: "Текущий статус",
       options: toOptions(ORDER_STATUSES),
       access: systemOnly,
-      admin: computed,
+      // List cell only (task 33): coloured status badge.
+      admin: {
+        ...computed,
+        components: { Cell: "/payload/admin/orders/cells/status-cell#StatusCell" },
+      },
     },
     {
       name: "clientComment",
@@ -252,7 +271,12 @@ export const Orders: CollectionConfig = {
       type: "date",
       label: "Ссылка действует до",
       access: systemOnly,
-      admin: { ...computed, description: "Дата получения + срок из настроек сайта." },
+      admin: {
+        ...computed,
+        description: "Дата получения + срок из настроек сайта.",
+        // List cell only (task 33): «Отозвана» / «Действует» / «До …» / «Истекла …».
+        components: { Cell: "/payload/admin/orders/cells/link-expiry-cell#LinkExpiryCell" },
+      },
     },
 
     // --- Notification idempotency (tasks 18/33) -------------------------------------------

@@ -7,7 +7,6 @@ import type { BlockProps } from "./types";
 
 const KB = 1024;
 const MB = KB * KB;
-const FILE_COMING = "Файл будет добавлен";
 
 /** «340 КБ» / «1,2 МБ». */
 function formatSize(bytes: number | null | undefined): string | null {
@@ -22,9 +21,17 @@ function extension(media: Media): string | null {
   return match?.[1] ? match[1].toUpperCase() : null;
 }
 
-/** Downloadable documents: card per file with type, size and a direct link to the media file. */
+/**
+ * Downloadable documents: card per file with type, size and a direct link to the media file.
+ * Items without an uploaded file (`fileMissing`, unset or unresolvable media) are not shown —
+ * a «download» without a file is a dead end; a block left with no files renders nothing.
+ */
 export function DownloadBlock({ block, ctx, section }: BlockProps<"download">) {
-  const items = block.items ?? [];
+  const items = (block.items ?? []).flatMap((item) => {
+    const media = item.fileMissing ? null : asMedia(item.file);
+    const href = media ? mediaSrc(media) : null;
+    return media && href ? [{ item, media, href }] : [];
+  });
   if (items.length === 0) return null;
   const asCards = block.variant === "card";
 
@@ -38,35 +45,23 @@ export function DownloadBlock({ block, ctx, section }: BlockProps<"download">) {
             : "flex max-w-[900px] flex-col gap-3"
         )}
       >
-        {items.map((item, index) => {
-          const media = item.fileMissing ? null : asMedia(item.file);
-          const href = media ? mediaSrc(media) : null;
+        {items.map(({ item, media, href }, index) => {
           const title = fill(item.title, ctx);
           const description = fill(item.description, ctx);
-          const meta = media
-            ? [extension(media), formatSize(media.filesize)].filter(Boolean).join(" · ")
-            : null;
+          const meta = [extension(media), formatSize(media.filesize)].filter(Boolean).join(" · ");
           return (
             <li key={item.id ?? index} className="ig-file items-start">
               <span className="ig-file__ext" aria-hidden="true">
-                {media ? (
-                  (extension(media) ?? <Download className="size-5" />)
-                ) : (
-                  <Download className="size-5" />
-                )}
+                {extension(media) ?? <Download className="size-5" />}
               </span>
               <div className="flex min-w-0 flex-1 flex-col gap-1">
-                {href ? (
-                  <a href={href} download rel="noopener" className="ig-link font-medium">
-                    {title}
-                  </a>
-                ) : (
-                  <span className="font-medium">{title}</span>
-                )}
+                <a href={href} download rel="noopener" className="ig-link font-medium">
+                  {title}
+                </a>
                 {hasText(description) ? (
                   <p className="text-small text-text-2 m-0">{description}</p>
                 ) : null}
-                <span className="text-small text-text-2">{href ? meta : FILE_COMING}</span>
+                {meta ? <span className="text-small text-text-2">{meta}</span> : null}
               </div>
             </li>
           );

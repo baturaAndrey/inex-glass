@@ -9,7 +9,7 @@ import {
   requiredText,
   softNumber,
 } from "./contact-fields";
-import { quizAnswersSchema } from "./quiz-schema";
+import { leadAttributionSchema, quizAnswersSchema } from "./quiz-schema";
 
 /**
  * Lead submission schemas of every site form. The same schemas validate on the client
@@ -64,6 +64,11 @@ const leadBase = {
   /** Honeypot: any string is accepted here; the server decides what to do with a filled one. */
   company_website: z.string().optional(),
   uploadTokens: uploadTokensSchema.optional(),
+  /**
+   * Ad click ids / external referrer; never blocks a lead. Site forms send it here and the
+   * server keeps it in the stored `answers` JSON; the quiz sends it inside `answers.attribution`.
+   */
+  attribution: leadAttributionSchema,
 };
 
 const contactBase = {
