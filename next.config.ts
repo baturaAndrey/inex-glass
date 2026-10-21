@@ -63,6 +63,16 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/(.*)", headers: SECURITY_HEADERS }];
   },
+  async rewrites() {
+    return [
+      // IndexNow key file `/<32 hex>.txt` (task 36). Paths with a file extension get no
+      // trailing-slash redirect; the destination carries the slash of `trailingSlash: true`.
+      {
+        source: "/:key([a-f0-9]{32}).txt",
+        destination: "/indexnow-key/:key/",
+      },
+    ];
+  },
 };
 
 export default withPayload(nextConfig, { devBundleServerPackages: false });

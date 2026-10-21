@@ -14,8 +14,9 @@ import { redirectIfExists } from "@/lib/cms/queries";
 import { buildBreadcrumbs } from "@/lib/seo/breadcrumbs";
 import { articleLd, JsonLd } from "@/lib/seo/jsonld";
 import { buildMetadata, resolveH1, SITE_NAME } from "@/lib/seo/metadata";
+import { pickOgImage, type OgImage } from "@/lib/seo/og-image";
 import { lexicalToPlainText } from "@/payload/utils/lexical-text";
-import type { Article, Media, Team } from "@/payload-types";
+import type { Article, Team } from "@/payload-types";
 import type { Metadata } from "next";
 
 /**
@@ -48,12 +49,9 @@ function decodeSlug(raw: string): string {
   }
 }
 
-function imageOf(article: Article): Media | null {
-  const candidates = [article.seo?.ogImage, article.heroImage, article.card?.image];
-  for (const candidate of candidates) {
-    if (candidate && typeof candidate === "object" && candidate.url) return candidate;
-  }
-  return null;
+/** Share / JSON-LD image: SEO image, hero, card; generated placeholders never qualify. */
+function imageOf(article: Article): OgImage | null {
+  return pickOgImage([article.seo?.ogImage, article.heroImage, article.card?.image]);
 }
 
 /** Author name for JSON-LD: the team member, otherwise `authorName` unless it is the brand. */
@@ -76,7 +74,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     fallbackTitle: article.seo?.h1 || article.title,
     placeholders,
     type: "article",
-    image: image?.url ? { url: image.url, alt: image.alt ?? null } : null,
+    image,
   });
 }
 

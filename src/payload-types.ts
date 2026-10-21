@@ -90,6 +90,7 @@ export interface Config {
     'consent-log': ConsentLog;
     redirects: Redirect;
     'rate-limits': RateLimit;
+    search: Search;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -131,6 +132,7 @@ export interface Config {
     'consent-log': ConsentLogSelect<false> | ConsentLogSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'rate-limits': RateLimitsSelect<false> | RateLimitsSelect<true>;
+    search: SearchSelect<false> | SearchSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -3970,6 +3972,52 @@ export interface RateLimit {
   createdAt: string;
 }
 /**
+ * Индекс поиска по сайту обновляется автоматически при публикации документов. Приоритет влияет на порядок выдачи.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "search".
+ */
+export interface Search {
+  id: string;
+  title?: string | null;
+  priority?: number | null;
+  doc:
+    | {
+        relationTo: 'glass-types';
+        value: string | GlassType;
+      }
+    | {
+        relationTo: 'thicknesses';
+        value: string | Thickness;
+      }
+    | {
+        relationTo: 'constructions';
+        value: string | Construction;
+      }
+    | {
+        relationTo: 'processing-services';
+        value: string | ProcessingService;
+      }
+    | {
+        relationTo: 'pages';
+        value: string | Page;
+      }
+    | {
+        relationTo: 'articles';
+        value: string | Article;
+      }
+    | {
+        relationTo: 'objects';
+        value: string | Object;
+      };
+  url?: string | null;
+  kind?: string | null;
+  titleNorm?: string | null;
+  bodyText?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -4204,6 +4252,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'rate-limits';
         value: string | RateLimit;
+      } | null)
+    | ({
+        relationTo: 'search';
+        value: string | Search;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -6358,6 +6410,21 @@ export interface RateLimitsSelect<T extends boolean = true> {
   key?: T;
   count?: T;
   windowStart?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "search_select".
+ */
+export interface SearchSelect<T extends boolean = true> {
+  title?: T;
+  priority?: T;
+  doc?: T;
+  url?: T;
+  kind?: T;
+  titleNorm?: T;
+  bodyText?: T;
   updatedAt?: T;
   createdAt?: T;
 }

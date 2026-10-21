@@ -18,6 +18,7 @@ import { joinMeta, mediaPath, specRows } from "@/lib/objects/format";
 import { objectFallbackDescription, objectFallbackTitle } from "@/lib/objects/seo";
 import { buildBreadcrumbs } from "@/lib/seo/breadcrumbs";
 import { buildMetadata, resolveH1 } from "@/lib/seo/metadata";
+import { pickOgImage, type OgImage } from "@/lib/seo/og-image";
 import type { City, Media, Object as PortfolioObject, ObjectType, Product } from "@/payload-types";
 import type { Metadata } from "next";
 
@@ -85,11 +86,21 @@ function galleryPhotos(doc: PortfolioObject): GalleryPhoto[] {
   });
 }
 
-function ogImageOf(doc: PortfolioObject): { url: string; alt?: string | null } | null {
-  const seoImage = populated<Media>(doc.seo?.ogImage);
-  if (seoImage?.url) return { url: seoImage.url, alt: seoImage.alt ?? null };
-  const photo = galleryPhotos(doc)[0];
-  return photo ? { url: photo.src, alt: photo.alt } : null;
+/**
+ * Share image: the SEO image, otherwise the first real gallery photo (with its own alt).
+ * Generated placeholders never qualify; with none left `buildMetadata` uses the default image.
+ */
+function ogImageOf(doc: PortfolioObject): OgImage | null {
+  const photos = (doc.photos ?? []).map((photo) => {
+    const media = populated<Media>(photo.image);
+    if (!media) return null;
+    return {
+      url: mediaPath(media.url),
+      alt: photo.alt?.trim() || media.alt?.trim() || doc.name,
+      isPlaceholder: media.isPlaceholder,
+    };
+  });
+  return pickOgImage([populated<Media>(doc.seo?.ogImage), ...photos]);
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {

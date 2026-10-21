@@ -443,7 +443,7 @@ test.describe("quiz — blocking validation", () => {
 });
 
 test.describe("quiz — draft", () => {
-  test("restores with resume, starts empty without it, survives a submit error", async ({
+  test("restores with resume, keeps the answers at step 1 without it", async ({
     page,
   }, testInfo) => {
     await prepare(page, testInfo);
@@ -465,10 +465,17 @@ test.describe("quiz — draft", () => {
         .getByRole("radio", { name: /^10 мм/ })
     ).toHaveAttribute("aria-checked", "true");
 
+    // Without resume: step 1, but the draft answers are kept (task-34 source priority).
     await openQuiz(page);
     await expect(quiz(page).getByText("Шаг 1 из 7")).toBeVisible();
-    await expect(page.locator('[role=radio][aria-checked="true"]')).toHaveCount(0);
     await expect(page.locator("[data-slot=quiz-resumed]")).toHaveCount(0);
+    await expect(quiz(page).getByRole("radio", { name: "Закалённое стекло" })).toHaveAttribute(
+      "aria-checked",
+      "true"
+    );
+    await next(page);
+    await next(page);
+    await expect(quiz(page).getByLabel("Площадь, м²")).toHaveValue("86,5");
   });
 
   test("submit error keeps the data and shows the phone", async ({ page }, testInfo) => {

@@ -132,6 +132,14 @@ export function useQuiz({ config, initial, entryPage, variant }: UseQuizOptions)
     rawDispatch(action);
   }, []);
 
+  /**
+   * Swaps in a state restored from the draft after mount (the server cannot read it). Not a user
+   * change: the draft is not rewritten until the visitor edits something.
+   */
+  const restore = useCallback((next: QuizUiState) => {
+    rawDispatch({ type: "replace", state: next });
+  }, []);
+
   /* ------------------------------ goals ------------------------------ */
 
   const goalPage = entryPage || currentPath();
@@ -361,6 +369,7 @@ export function useQuiz({ config, initial, entryPage, variant }: UseQuizOptions)
   return {
     state,
     dispatch,
+    restore,
     derived,
     config,
     next,

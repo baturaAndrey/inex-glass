@@ -122,9 +122,25 @@ function isIndexableEnvironment(): boolean {
   return getEnv().SITE_ENV === "production";
 }
 
-function robotsFor(noindex: boolean): NonNullable<Metadata["robots"]> {
+/** Robots of a page: `noindex, nofollow` everywhere outside production. */
+export function robotsFor(noindex: boolean): NonNullable<Metadata["robots"]> {
   if (!isIndexableEnvironment()) return { index: false, follow: false };
   return { index: !noindex, follow: true };
+}
+
+/**
+ * Yandex Webmaster / Google Search Console ownership tokens (`site-settings.analytics`), task 36.
+ * Home page of production only; an empty field adds no tag. The loader is imported lazily so
+ * that this module stays free of the Payload config for unit tests and non-home pages.
+ */
+async function verificationFor(path: string): Promise<Metadata["verification"] | undefined> {
+  if (path !== "/" || !isIndexableEnvironment()) return undefined;
+  const { getSiteSettings } = await import("@/lib/cms/globals");
+  const analytics = (await getSiteSettings())?.analytics;
+  const yandex = analytics?.yandexVerification?.trim() || undefined;
+  const google = analytics?.googleVerification?.trim() || undefined;
+  if (!yandex && !google) return undefined;
+  return { ...(yandex ? { yandex } : {}), ...(google ? { google } : {}) };
 }
 
 export async function buildMetadata(input: BuildMetadataInput): Promise<Metadata> {
@@ -154,11 +170,14 @@ export async function buildMetadata(input: BuildMetadataInput): Promise<Metadata
         alt: SITE_NAME,
       };
 
+  const verification = await verificationFor(input.path);
+
   return {
     title: { absolute: title },
     ...(description ? { description } : {}),
     alternates: { canonical },
     robots: robotsFor(Boolean(seo?.noindex) || Boolean(input.forceNoindex)),
+    ...(verification ? { verification } : {}),
     openGraph: {
       type: input.type ?? "website",
       locale: "ru_RU",

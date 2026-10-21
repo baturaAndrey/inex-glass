@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { createInitialState, nextEdges, quizReducer, type QuizAction } from "./state";
+import {
+  createInitialState,
+  EMPTY_RAW,
+  initialQuizState,
+  nextEdges,
+  quizReducer,
+  type QuizAction,
+  type QuizDraftSnapshot,
+} from "./state";
 import type { QuizUiState } from "./types";
 
 const play = (actions: QuizAction[], state: QuizUiState = createInitialState()) =>
@@ -24,6 +32,112 @@ describe("createInitialState", () => {
         .triplex
     ).toEqual({ glass1: 6, film: 0.76 });
     expect(createInitialState({ thickness: 7 }).answers.thickness).toBeUndefined();
+  });
+});
+
+describe("initialQuizState (draft × pre-fill)", () => {
+  const draft: QuizDraftSnapshot = {
+    step: 4,
+    answers: {
+      type: "mirrors",
+      thickness: 8,
+      kind: "bent",
+      bendRadius: 1500,
+      edges: ["polished", "facet30"],
+      maxW: 1200,
+      maxH: 800,
+      positions: 2,
+      area: 5,
+      contact: { name: "Иван", phone: "+7 900 000-00-00", email: "ivan@example.com" },
+    },
+    raw: { ...EMPTY_RAW, maxW: "1200", maxH: "800", positions: "2", area: "5", bendRadius: "1500" },
+  };
+
+  it("no draft + pre-fill: the pre-fill alone", () => {
+    const state = initialQuizState({ prefill: { type: "tempered", thickness: 10 }, draft: null });
+    expect(state).toMatchObject({ step: 1, maxStepReached: 1, resumed: false });
+    expect(state.answers).toEqual({ type: "tempered", thickness: 10 });
+  });
+
+  it("draft + no pre-fill: the draft answers and raw texts at step 1", () => {
+    const state = initialQuizState({ prefill: {}, draft });
+    expect(state).toMatchObject({ step: 1, maxStepReached: 1, resumed: false });
+    expect(state.answers).toEqual(draft.answers);
+    expect(state.raw).toEqual(draft.raw);
+  });
+
+  it("draft + pre-fill of the same type: only the carried fields change", () => {
+    const state = initialQuizState({
+      prefill: { type: "mirrors", thickness: 10, kind: "clear", maxW: 2000, maxH: 1000 },
+      draft,
+    });
+    expect(state.answers).toMatchObject({
+      type: "mirrors",
+      thickness: 10,
+      kind: "clear",
+      edges: ["polished", "facet30"],
+      maxW: 2000,
+      maxH: 1000,
+      positions: 2,
+      // New sizes from the link replace the area of the draft.
+      area: 4,
+      contact: draft.answers.contact,
+    });
+    // A kind change drops the bend radius and its text (the `setKind` rule).
+    expect(state.answers.bendRadius).toBeUndefined();
+    expect(state.raw).toMatchObject({ maxW: "2000", maxH: "1000", area: "4", bendRadius: "" });
+  });
+
+  it("draft + pre-fill of another type: type-dependent answers are reset", () => {
+    const state = initialQuizState({ prefill: { type: "partitions" }, draft });
+    expect(state.answers.type).toBe("partitions");
+    expect(state.answers.thickness).toBeUndefined();
+    // A facet is a mirrors-only edge (the `setType` rule); «polished» stays.
+    expect(state.answers.edges).toEqual(["polished"]);
+    expect(state.answers).toMatchObject({ kind: "bent", maxW: 1200, area: 5 });
+    expect(state.answers.contact).toEqual(draft.answers.contact);
+
+    const triplex = initialQuizState({
+      prefill: { type: "triplex", triplex: { glass1: 6, film: 0.76 } },
+      draft,
+    });
+    expect(triplex.answers.thickness).toBeUndefined();
+    expect(triplex.answers.triplex).toEqual({ glass1: 6, film: 0.76 });
+    expect(triplex.answers.contact).toEqual(draft.answers.contact);
+
+    // Back to a non-triplex type with a thickness: the layers go, the link thickness is used.
+    const back = initialQuizState({
+      prefill: { type: "tempered", thickness: 12 },
+      draft: { ...draft, answers: triplex.answers, raw: triplex.raw },
+    });
+    expect(back.answers.triplex).toBeUndefined();
+    expect(back.answers.thickness).toBe(12);
+  });
+
+  it("triplex draft + triplex pre-fill: carried layers override, the others stay", () => {
+    const state = initialQuizState({
+      prefill: { type: "triplex", triplex: { glass2: 8 } },
+      draft: {
+        ...draft,
+        answers: { type: "triplex", triplex: { glass1: 6, glass2: 6, film: 0.38 } },
+      },
+    });
+    expect(state.answers.triplex).toEqual({ glass1: 6, glass2: 8, film: 0.38 });
+  });
+
+  it("resume: the draft wins and continues at its step", () => {
+    const state = initialQuizState({
+      prefill: { type: "partitions", thickness: 10 },
+      resume: true,
+      draft,
+    });
+    expect(state).toMatchObject({ step: 4, maxStepReached: 4, resumed: true });
+    expect(state.answers).toEqual(draft.answers);
+  });
+
+  it("resume without a draft: the pre-fill", () => {
+    const state = initialQuizState({ prefill: { type: "mirrors" }, resume: true, draft: null });
+    expect(state).toMatchObject({ step: 1, resumed: false, answers: { type: "mirrors" } });
   });
 });
 

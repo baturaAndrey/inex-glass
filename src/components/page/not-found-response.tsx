@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { TITLE_BRAND_SUFFIX } from "@/lib/seo/metadata";
+import { getEnv } from "@/lib/env";
+import { robotsFor, TITLE_BRAND_SUFFIX } from "@/lib/seo/metadata";
 import { NotFoundContent, NOT_FOUND_TITLE } from "./not-found-content";
 import type { Metadata } from "next";
 
@@ -57,10 +58,18 @@ function NotFoundSignal(): never {
 }
 
 /**
- * Metadata of an unknown URL. `robots` is explicit: Next's own noindex tag for this render is
- * injected into the streamed body, while this one is guaranteed to be in `<head>`.
+ * Metadata of an unknown URL (pair with `<NotFoundResponse />`).
+ *
+ * Production: no `robots` here — Next itself adds `<meta name="robots" content="noindex">` to
+ * the `<head>` of every 404 render, so an explicit tag would only duplicate it.
+ * Staging / dev: `robotsFor` (`noindex, nofollow`) like every other page of those stands.
+ *
+ * `robots` is a getter: `SITE_ENV` is read at request time (pages return this object from
+ * `generateMetadata`), never at module evaluation during `next build`.
  */
 export const NOT_FOUND_METADATA: Metadata = {
   title: { absolute: `${NOT_FOUND_TITLE}${TITLE_BRAND_SUFFIX}` },
-  robots: { index: false, follow: true },
+  get robots(): Metadata["robots"] {
+    return getEnv().SITE_ENV === "production" ? undefined : robotsFor(true);
+  },
 };

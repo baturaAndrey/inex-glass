@@ -1,3 +1,5 @@
+import { PlaceholderCell as PlaceholderCell_026c3f61349edc7c1393b4a80d41e03f } from '../../../payload/admin/media/placeholder-cell'
+import { PlaceholderFilterLink as PlaceholderFilterLink_1ad8aa1ffb60e39e5f266c36dfaf193c } from '../../../payload/admin/media/placeholder-filter-link'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -21,12 +23,16 @@ import { LeadSummaryView as LeadSummaryView_8e9c9de4855ebc1a351c689bea99cc6d } f
 import { StatusCell as StatusCell_6a4396422208b3cd537e67b568c6c9b5 } from '../../../payload/admin/orders/cells/status-cell'
 import { LinkExpiryCell as LinkExpiryCell_c12b29996b6b3e70d1181cf4f749534f } from '../../../payload/admin/orders/cells/link-expiry-cell'
 import { OrderManageView as OrderManageView_1771195cb9aa76a83b23f6cb8761737b } from '../../../payload/admin/orders/order-manage-view'
+import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
+import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { ReportsNavLink as ReportsNavLink_7f2b6a50a123213baf42cc914c715387 } from '../../../payload/admin/nav/reports-nav-link'
 import { LeadsReportView as LeadsReportView_46223cd483499ef4b006adf811cffd93 } from '../../../payload/admin/views/leads-report'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "/payload/admin/media/placeholder-cell#PlaceholderCell": PlaceholderCell_026c3f61349edc7c1393b4a80d41e03f,
+  "/payload/admin/media/placeholder-filter-link#PlaceholderFilterLink": PlaceholderFilterLink_1ad8aa1ffb60e39e5f266c36dfaf193c,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -50,6 +56,8 @@ export const importMap = {
   "/payload/admin/orders/cells/status-cell#StatusCell": StatusCell_6a4396422208b3cd537e67b568c6c9b5,
   "/payload/admin/orders/cells/link-expiry-cell#LinkExpiryCell": LinkExpiryCell_c12b29996b6b3e70d1181cf4f749534f,
   "/payload/admin/orders/order-manage-view#OrderManageView": OrderManageView_1771195cb9aa76a83b23f6cb8761737b,
+  "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,
+  "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,
   "/payload/admin/nav/reports-nav-link#ReportsNavLink": ReportsNavLink_7f2b6a50a123213baf42cc914c715387,
   "/payload/admin/views/leads-report#LeadsReportView": LeadsReportView_46223cd483499ef4b006adf811cffd93,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1

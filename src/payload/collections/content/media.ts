@@ -7,6 +7,7 @@ import { GROUP_CONTENT } from "../shared";
 import type { CollectionConfig, TextFieldSingleValidation } from "payload";
 
 const SLUG = "media";
+const ADMIN_MEDIA = "/payload/admin/media";
 const revalidate = revalidateCollection(SLUG);
 
 /**
@@ -36,6 +37,10 @@ export const Media: CollectionConfig = {
     useAsTitle: "filename",
     defaultColumns: ["filename", "alt", "kind", "isPlaceholder", "updatedAt"],
     listSearchableFields: ["filename", "alt"],
+    components: {
+      // Quick filter «Временные изображения» with a counter (task 38).
+      beforeListTable: [`${ADMIN_MEDIA}/placeholder-filter-link#PlaceholderFilterLink`],
+    },
   },
   access: {
     read: isAnyone,
@@ -93,6 +98,8 @@ export const Media: CollectionConfig = {
       admin: {
         position: "sidebar",
         description: "Сгенерированная заглушка — заменить реальным фото.",
+        // List badge «Временное» (task 38; admin-only, no schema change).
+        components: { Cell: `${ADMIN_MEDIA}/placeholder-cell#PlaceholderCell` },
       },
     },
     {

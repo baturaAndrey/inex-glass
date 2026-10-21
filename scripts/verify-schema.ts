@@ -44,6 +44,8 @@ const EXPECTED_COLLECTIONS = [
   "consent-log",
   "redirects",
   "rate-limits",
+  // Site search index of `@payloadcms/plugin-search` (task 35, migration `add_search`).
+  "search",
 ] as const satisfies readonly CollectionSlug[];
 
 const EXPECTED_GLOBALS = [
@@ -68,12 +70,15 @@ const PRIVATE_COLLECTIONS = [
   "orders",
   "consent-log",
   "rate-limits",
+  // Read through raw SQL by the site; REST `/api/search/` is for admins only (task 35).
+  "search",
 ] as const satisfies readonly CollectionSlug[];
 
 /** Collections that no API caller may create (Local API with `overrideAccess` only). */
 const API_CREATE_FORBIDDEN = [
   "consent-log",
   "rate-limits",
+  "search",
 ] as const satisfies readonly CollectionSlug[];
 
 /** `table.column` pairs that must be covered by a single-column unique index. */

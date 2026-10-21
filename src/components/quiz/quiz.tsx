@@ -1,13 +1,21 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import { Check, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { prefillBadgeText } from "./derive";
 import { loadDraft } from "./persistence";
 import { QuizFooter } from "./quiz-footer";
 import { QuizProgress } from "./quiz-progress";
-import { createInitialState, hasPrefill } from "./state";
+import { hasPrefill, initialQuizState } from "./state";
 import { Step1Type } from "./steps/step-1-type";
 import { Step2Glass } from "./steps/step-2-glass";
 import { Step3Volume } from "./steps/step-3-volume";
@@ -62,20 +70,18 @@ export function Quiz(props: QuizProps) {
   return <QuizInner {...props} />;
 }
 
+/**
+ * State of the first render. With `resume` the saved draft wins and the quiz continues at the
+ * saved step (this render is client-only, see `Quiz`). Without it the first render must match
+ * the server HTML, so it holds only the pre-fill; the draft is merged in after mount (see
+ * `QuizInner`).
+ */
 function initialStateOf(props: QuizProps): QuizUiState {
-  if (props.resume) {
-    const draft = loadDraft();
-    if (draft) {
-      return {
-        step: draft.step,
-        maxStepReached: draft.step,
-        answers: draft.answers,
-        raw: draft.raw,
-        resumed: true,
-      };
-    }
-  }
-  return createInitialState(props.prefill);
+  return initialQuizState({
+    prefill: props.prefill,
+    resume: props.resume,
+    draft: props.resume ? loadDraft() : null,
+  });
 }
 
 /** `tel:` href from a displayed phone («+7 (351) 247-05-57» → `tel:+73512470557`). */
@@ -113,7 +119,21 @@ function QuizInner(props: QuizProps) {
   const { config, prefill, entryPage = "", variant = "page", header } = props;
   const [initial] = useState(() => initialStateOf(props));
   const q = useQuiz({ config, initial, entryPage, variant });
-  const { state } = q;
+  const { state, restore } = q;
+
+  // Without `resume` a saved draft is still the base: its answers and contacts are kept, the
+  // URL pre-fill overrides only the fields it carries (task-34), and the quiz starts at step 1.
+  // A layout effect, so the merged state is painted right away, without a flash of the empty
+  // quiz. Without this a plain CTA would start empty and the first answer would overwrite the
+  // saved calculation.
+  const resume = Boolean(props.resume);
+  useLayoutEffect(() => {
+    if (resume) return;
+    const draft = loadDraft();
+    if (draft) restore(initialQuizState({ prefill, draft }));
+    // Once per mount: later prop changes do not restart the quiz.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const baseId = useId();
   const fieldId = (field: QuizErrorField | string) => `${baseId}-${field}`;

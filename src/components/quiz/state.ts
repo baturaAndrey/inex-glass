@@ -224,35 +224,79 @@ const MM_PER_M = 1000;
 /** «12,5» for the raw text of a pre-filled decimal. */
 const rawNumber = (n: number) => String(n).replace(".", ",");
 
-export function createInitialState(prefill?: QuizPrefill): QuizUiState {
-  const answers: QuizAnswersDraft = {};
-  const raw: QuizRawFields = { ...EMPTY_RAW };
+/** Saved answers a fresh quiz starts from: the draft without its step. */
+export interface QuizInitialBase {
+  answers: QuizAnswersDraft;
+  raw: QuizRawFields;
+}
 
-  if (prefill?.type) answers.type = prefill.type;
+/**
+ * Initial state of a quiz opened without `resume`: the saved draft (`base`, when there is one)
+ * with the URL pre-fill on top, always at step 1. The pre-fill overrides only the fields it
+ * carries; everything else — contacts included — comes from the draft (task-34: «параметры URL
+ * перекрывают только те поля, которые пришли»).
+ *
+ * When the link names another product type than the draft, the glass chosen for the old type is
+ * stale: the thickness (with its «подберите» note) and the triplex layers are reset unless the
+ * link carries them, and `sanitizeQuizAnswers` drops edges not allowed for the new type (the
+ * `setType` rule). A kind from the link clears the bend radius text like `setKind` does.
+ */
+export function createInitialState(
+  prefill?: QuizPrefill,
+  base?: QuizInitialBase | null
+): QuizUiState {
+  const answers: QuizAnswersDraft = { ...base?.answers };
+  const raw: QuizRawFields = { ...EMPTY_RAW, ...base?.raw };
+
+  if (prefill?.type) {
+    if (prefill.type !== answers.type) {
+      delete answers.thickness;
+      delete answers.customNote;
+      delete answers.triplex;
+    }
+    answers.type = prefill.type;
+  }
   if (isThickness(prefill?.thickness)) answers.thickness = prefill.thickness;
-  if (prefill?.kind) answers.kind = prefill.kind;
-  if (prefill?.type === "triplex" && prefill.triplex) {
+  if (prefill?.kind) {
+    answers.kind = prefill.kind;
+    if (prefill.kind !== "bent") raw.bendRadius = "";
+  }
+  if (answers.type === "triplex" && prefill?.triplex) {
     const { glass1, glass2, film } = prefill.triplex;
+    // Layers of the same-type draft that the link does not carry are kept.
     answers.triplex = compact({
-      glass1: isThickness(glass1) ? glass1 : undefined,
-      glass2: isThickness(glass2) ? glass2 : undefined,
-      film: isFilm(film) ? film : undefined,
+      ...answers.triplex,
+      ...compact({
+        glass1: isThickness(glass1) ? glass1 : undefined,
+        glass2: isThickness(glass2) ? glass2 : undefined,
+        film: isFilm(film) ? film : undefined,
+      }),
     });
   }
+  let sizesPrefilled = false;
   if (isPositive(prefill?.maxW)) {
     answers.maxW = prefill.maxW;
     raw.maxW = rawNumber(prefill.maxW);
+    sizesPrefilled = true;
   }
   if (isPositive(prefill?.maxH)) {
     answers.maxH = prefill.maxH;
     raw.maxH = rawNumber(prefill.maxH);
+    sizesPrefilled = true;
   }
   if (isPositive(prefill?.positions)) {
     answers.positions = Math.round(prefill.positions);
     raw.positions = String(answers.positions);
+    sizesPrefilled = true;
   }
-  // Calculator hand-off: W × H × quantity gives the area when it is not known yet.
-  if (answers.maxW && answers.maxH && answers.positions && answers.area === undefined) {
+  // Calculator hand-off: W × H × quantity gives the area. Sizes from the link replace the area
+  // of the draft (it described other glass); without them a known area stays as typed.
+  if (
+    answers.maxW &&
+    answers.maxH &&
+    answers.positions &&
+    (answers.area === undefined || sizesPrefilled)
+  ) {
     answers.area = round2(
       (answers.maxW / MM_PER_M) * (answers.maxH / MM_PER_M) * answers.positions
     );
@@ -266,6 +310,39 @@ export function createInitialState(prefill?: QuizPrefill): QuizUiState {
     raw,
     resumed: false,
   };
+}
+
+/** A saved draft as `loadDraft()` returns it (only the parts the initial state needs). */
+export interface QuizDraftSnapshot extends QuizInitialBase {
+  step: QuizStep;
+}
+
+/**
+ * Where a quiz starts (task-34 source priority):
+ * - `resume` («Мой расчёт») with a draft: the draft wins and the quiz continues at its step;
+ * - otherwise the draft (if any) is the base and the URL pre-fill overrides the fields it
+ *   carries, at step 1 (`createInitialState`);
+ * - no draft: the pre-fill alone.
+ */
+export function initialQuizState({
+  prefill,
+  resume,
+  draft,
+}: {
+  prefill?: QuizPrefill | undefined;
+  resume?: boolean | undefined;
+  draft?: QuizDraftSnapshot | null | undefined;
+}): QuizUiState {
+  if (resume && draft) {
+    return {
+      step: draft.step,
+      maxStepReached: draft.step,
+      answers: draft.answers,
+      raw: draft.raw,
+      resumed: true,
+    };
+  }
+  return createInitialState(prefill, draft);
 }
 
 /** Whether a pre-fill carries anything to show in the «Из карточки» badge. */

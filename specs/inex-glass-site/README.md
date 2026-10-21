@@ -190,11 +190,11 @@ graph TD
 - [x] [task-33-orders](./tasks/task-33-orders.md) — Заказы и страница /zakaz/ (ТЗ §6.2)
 
 ### Wave 6
-- [ ] [task-34-quiz-routing](./tasks/task-34-quiz-routing.md) — Страница и модалка квиза, «Мой расчёт»
-- [ ] [task-35-site-search](./tasks/task-35-site-search.md) — Поиск по сайту (Postgres FTS)
-- [ ] [task-36-sitemap-robots-indexnow](./tasks/task-36-sitemap-robots-indexnow.md) — sitemap, robots.txt, IndexNow, верификации
-- [ ] [task-37-inex-import](./tasks/task-37-inex-import.md) — Импорт портфолио и душевых (Firecrawl), исправленный CSV
-- [ ] [task-38-placeholder-media](./tasks/task-38-placeholder-media.md) — Загрузка временных изображений в CMS
+- [x] [task-34-quiz-routing](./tasks/task-34-quiz-routing.md) — Страница и модалка квиза, «Мой расчёт»
+- [x] [task-35-site-search](./tasks/task-35-site-search.md) — Поиск по сайту (Postgres FTS)
+- [x] [task-36-sitemap-robots-indexnow](./tasks/task-36-sitemap-robots-indexnow.md) — sitemap, robots.txt, IndexNow, верификации
+- [x] [task-37-inex-import](./tasks/task-37-inex-import.md) — Импорт портфолио и душевых (Firecrawl), исправленный CSV
+- [x] [task-38-placeholder-media](./tasks/task-38-placeholder-media.md) — Загрузка временных изображений в CMS
 
 ### Wave 7
 - [ ] [task-39-perf-images](./tasks/task-39-perf-images.md) — Производительность и изображения (CWV)

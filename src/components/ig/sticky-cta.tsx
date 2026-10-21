@@ -4,12 +4,12 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Calculator } from "lucide-react";
+import { quizHref } from "@/components/layout/calc-link";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 
 /** CSS variable with the bar height: the cookie banner and page bottoms keep clear of it. */
 const STICKY_HEIGHT_VAR = "--ig-sticky-h";
-const QUIZ_PATH = "/raschet-stoimosti/";
 /** No sticky button on the quiz itself and on client order pages. */
 const HIDDEN_PATH = /^\/(?:raschet-stoimosti|zakaz)(?:\/|$)/;
 
@@ -19,8 +19,8 @@ export interface StickyCtaProps {
 
 /**
  * Phone-only (≤599 px) fixed «Рассчитать стоимость» bar. Links to the quiz with the current
- * page as `src`. While visible it publishes its height as `--ig-sticky-h` on `<html>`;
- * the variable is removed when the bar is hidden (desktop, excluded paths) or unmounted.
+ * page as `src` (`quizHref`: one rule with the header CTA, secret paths are masked). While
+ * visible it publishes its height as `--ig-sticky-h` on `<html>`; the variable is removed when the bar is hidden (desktop, excluded paths) or unmounted.
  */
 export function StickyCta({ className }: StickyCtaProps) {
   const pathname = usePathname() ?? "/";
@@ -56,7 +56,7 @@ export function StickyCta({ className }: StickyCtaProps) {
       className={cn("ig-sticky-cta fixed inset-x-0 bottom-0 z-30 hidden max-sm:block", className)}
     >
       <Button asChild variant="primary" block leftIcon={<Calculator aria-hidden="true" />}>
-        <Link href={`${QUIZ_PATH}?src=${encodeURIComponent(pathname)}`}>Рассчитать стоимость</Link>
+        <Link href={quizHref(pathname)}>Рассчитать стоимость</Link>
       </Button>
     </div>
   );

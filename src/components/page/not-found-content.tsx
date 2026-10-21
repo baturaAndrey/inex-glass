@@ -1,15 +1,15 @@
-import { FileQuestion, Search } from "lucide-react";
-import { Button } from "@/components/ig/button";
+import { FileQuestion } from "lucide-react";
 import { Chip } from "@/components/ig/chip";
 import { Container } from "@/components/ig/container";
-import { Input } from "@/components/ig/input";
+import { SearchForm } from "@/components/search/search-form";
 import { QuizLink } from "./quiz-cta";
 
 /**
  * Body of the 404 page (ТЗ §2.4: own 404 with search and links to the sections). Shared by
  * `NotFoundResponse` (server-rendered 404 returned by pages), `(site)/not-found.tsx` (client-side
  * boundary) and `app/global-not-found.tsx` (unmatched URLs). Static on purpose: it must render even when the database is down.
- * Task 35 replaces the search form with the site search component.
+ * The search is the plain GET form of the site search (task 35, `SearchForm`): no suggestions,
+ * no database access.
  */
 
 /** Section row of the header (same URLs). */
@@ -29,8 +29,6 @@ export const NOT_FOUND_TITLE = "Страница не найдена";
 export const NOT_FOUND_TEXT =
   "Возможно, адрес изменился или страница удалена. Воспользуйтесь поиском или перейдите в нужный раздел.";
 
-const SEARCH_PATH = "/poisk/";
-
 export function NotFoundContent() {
   return (
     <Container className="py-16">
@@ -41,19 +39,7 @@ export function NotFoundContent() {
           <p className="ig-body text-text-2 m-0">{NOT_FOUND_TEXT}</p>
         </div>
 
-        <form action={SEARCH_PATH} method="get" role="search" className="flex w-full gap-2">
-          <Input
-            type="search"
-            name="q"
-            aria-label="Поиск по сайту"
-            placeholder="Поиск по сайту"
-            autoComplete="off"
-            className="min-w-0 flex-1"
-          />
-          <Button type="submit" leftIcon={<Search aria-hidden="true" strokeWidth={2} />}>
-            Найти
-          </Button>
-        </form>
+        <SearchForm placeholder="Поиск по сайту" />
 
         <nav aria-label="Разделы сайта" className="w-full">
           <ul className="m-0 flex list-none flex-wrap justify-center gap-2 p-0">
