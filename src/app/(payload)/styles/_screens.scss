@@ -1,1 +1,1548 @@
 // Владелец: task-12 (волна 3). Остальные экраны админки в теме (списки, заказ, глобалы, логин, медиатека).
+//
+// Screens of the Payload admin that have no partial of their own, in the theme of the approved
+// mockup (res/admin-mockup/*.dc.html): top bar, collection lists (+ leads quick filters, media),
+// the order «Управление» tab, globals, login, account, versions, toasts, modals / drawers and
+// the leads report. Grouped by screen; every group names the Payload 3.91 classes it relies on
+// (checked against the DOM), so a Payload update shows what to re-check.
+//
+// Rules: colours only `--ig-*` (or Payload variables remapped in `_base.scss`); radii: cards 16,
+// fields 10, chips / badges 6, buttons pill. The shared edit-view selectors (`.collection-edit`,
+// `.document-fields`, `.doc-controls`, `.tabs-field`, `.collapsible`, `.array-field`) belong to
+// `_edit-form.scss` (task-07) and are not restyled here — only screen-scoped additions.
+// No `!important` except where Payload sets an inline style (commented).
+
+$phone: 599px;
+$tablet: 1100px;
+
+// Overlay of modals and drawers: `--ig-text` (#1C1F22) at 40 % (DESIGN.md has no overlay token;
+// same rgb as `--iga-shadow-xs` of `_base.scss`).
+$overlay: rgb(28 31 34 / 0.4);
+
+// Page gutters of the mockup (`.top`, `.page`): 32 / 24 / 16 px, as `_edit-form.scss`.
+@mixin iga-gutters {
+  --gutter-h: 32px;
+
+  @media (max-width: $tablet) {
+    --gutter-h: 24px;
+  }
+
+  @media (max-width: $phone) {
+    --gutter-h: 16px;
+  }
+}
+
+// Payload `.btn` as a 40 px pill (`.btn-p` / `.btn-s` of the mockup). Colours stay on Payload's
+// own variables, already remapped to the theme in `_base.scss`.
+@mixin iga-payload-pill($height: 40px) {
+  height: $height;
+  margin: 0;
+  padding: 0 18px;
+  border-radius: var(--ig-r-pill);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: $height - 2px;
+
+  .btn__content {
+    line-height: inherit;
+  }
+}
+
+// Secondary pill of the theme for Payload `.pill` / `.btn` controls (white, grey outline).
+@mixin iga-ghost-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--ig-line);
+  border-radius: var(--ig-r-pill);
+  background: var(--ig-surface);
+  box-shadow: none;
+  color: var(--ig-text);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+  transition:
+    background var(--ig-dur-fast) var(--iga-ease),
+    border-color var(--ig-dur-fast) var(--iga-ease);
+
+  &:hover:not(:disabled) {
+    border-color: var(--ig-primary);
+    background: var(--ig-surface);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ig-primary);
+    outline-offset: 2px;
+  }
+}
+
+// =============================================================================================
+// 0. Small shared pieces of these screens (`src/payload/admin/leads/ui.tsx`, cells, panels)
+// =============================================================================================
+
+// Secondary text (`MUTED_CLASS` of `leads/ui.tsx`); sizes are refined by the screen classes.
+.iga-muted {
+  color: var(--ig-text-2);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.iga-screens-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--iga-gap, 2px);
+}
+
+.iga-screens-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--iga-gap, 4px);
+}
+
+.iga-screens-break {
+  word-break: break-all;
+}
+
+// `Badge` of `leads/ui.tsx`: an explicit fill (`--iga-badge-bg`) wins over the derived one.
+.iga-screens-badge {
+  background: var(
+    --iga-badge-bg,
+    color-mix(in srgb, var(--iga-badge-color) 12%, var(--ig-surface))
+  );
+}
+
+// Quick-filter chips are links: the current one (`aria-current="true"`) looks pressed.
+.iga-screens-chip {
+  text-decoration: none;
+
+  &[aria-current="true"] {
+    background: var(--ig-primary-light);
+    border-color: var(--ig-primary);
+    color: var(--ig-primary-dark);
+    font-weight: 500;
+  }
+}
+
+// Status colour dot of a chip; the colour arrives as `--iga-badge-color`.
+.iga-screens-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--iga-badge-color, var(--ig-text-2));
+}
+
+// =============================================================================================
+// 1. Top bar (`.app-header`, `.step-nav`): gutters and the logo mark of the breadcrumbs
+// =============================================================================================
+
+.app-header {
+  @include iga-gutters;
+}
+
+// Long breadcrumbs (document / «Версии» / date) scroll inside the bar, never widen the page.
+.app-header__step-nav-wrapper {
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.step-nav {
+  font-size: 13px;
+  color: var(--ig-text-2);
+
+  a {
+    color: var(--ig-text);
+    font-weight: 500;
+  }
+
+  // Payload squeezes the home mark into 16 × 16; the logo keeps its ratio at 30 px (DESIGN.md:
+  // logo at least 30 px high on phones).
+  .step-nav__home {
+    width: auto;
+    height: auto;
+  }
+
+  .iga-icon {
+    display: block;
+    height: 30px;
+  }
+}
+
+// With the menu open its header already shows the logo: no second, tiny copy in the top bar
+// (and no «/» after it). It comes back when the menu is closed (phones, collapsed menu).
+.app-header--nav-open .step-nav__home,
+.app-header--nav-open .step-nav__home + span {
+  display: none;
+}
+
+// =============================================================================================
+// 2. Collection lists (`.collection-list`, `.list-header`, `.list-controls`, `.search-bar`,
+//    `.pill-selector`, `.where-builder`, `.table`, `.page-controls`, `.paginator`, `.per-page`),
+//    the versions list (`.versions`) and the list drawer (`.list-drawer`)
+// =============================================================================================
+
+.collection-list,
+.versions {
+  @include iga-gutters;
+}
+
+// «Канбан / Таблица» of the leads list (task-05, `beforeList`) sits outside Payload's gutter.
+.collection-list > .iga-kanban__list-toggle {
+  margin-bottom: 0;
+  padding: 16px var(--gutter-h) 0;
+}
+
+.collection-list {
+  &__wrap {
+    padding-top: 16px;
+  }
+
+  .list-header {
+    &__title-and-actions {
+      align-items: center;
+      gap: 12px;
+    }
+
+    &__title {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    &__title-actions,
+    &__actions {
+      margin-bottom: 0;
+      gap: 8px;
+    }
+
+    // «Создать» — primary pill; other header buttons («Массовая загрузка») — secondary.
+    .btn {
+      @include iga-payload-pill(36px);
+
+      --bg-color: var(--ig-surface);
+      --color: var(--ig-primary-pressed);
+      --hover-bg: var(--ig-primary-light);
+      --hover-color: var(--ig-primary-pressed);
+      --btn-border: 1px solid var(--ig-primary);
+    }
+
+    .list-create-new-doc__create-new-button {
+      --bg-color: var(--ig-btn-primary-bg);
+      --color: var(--ig-on-navy);
+      --hover-bg: var(--ig-btn-primary-bg-hover);
+      --hover-color: var(--ig-on-navy);
+      --btn-border: 1px solid transparent;
+    }
+  }
+}
+
+// Bulk actions of selected rows (`.list-selection` in the header): wrap instead of running
+// off-screen on phones.
+.collection-list .list-selection {
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
+
+  &__actions {
+    flex-wrap: wrap;
+  }
+}
+
+// Empty list («Результатов не найдено»): a calm heading and a primary pill.
+.collection-list .no-results {
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  p {
+    color: var(--ig-text-2);
+  }
+
+  .btn {
+    @include iga-payload-pill;
+  }
+}
+
+// Search: a 40 px pill on the page background (`.search` of the mockup).
+.list-controls .search-bar {
+  --search-bg: var(--ig-bg);
+
+  min-height: 40px;
+  column-gap: 12px;
+  background: transparent;
+
+  .search-filter {
+    height: 40px;
+    border: 1px solid var(--ig-line);
+    border-radius: var(--ig-r-pill);
+    background: var(--ig-bg);
+    transition:
+      border-color var(--ig-dur-fast) var(--iga-ease),
+      box-shadow var(--ig-dur-fast) var(--iga-ease);
+
+    &:focus-within {
+      border-color: var(--ig-primary);
+      box-shadow: var(--ig-focus-ring);
+    }
+
+    input {
+      height: 38px;
+      padding-block: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      color: var(--ig-text);
+      font-size: 14px;
+
+      &::placeholder {
+        color: var(--ig-text-muted);
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: none;
+      }
+    }
+  }
+
+  .icon--search {
+    color: var(--ig-text-2);
+  }
+
+  &__actions {
+    gap: 8px;
+    padding: 0;
+  }
+
+  // «Колонки» / «Фильтры»: secondary pills; the open one looks pressed.
+  .pill {
+    @include iga-ghost-pill;
+
+    &[aria-expanded="true"] {
+      border-color: var(--ig-primary);
+      background: var(--ig-primary-light);
+      color: var(--ig-primary-dark);
+    }
+  }
+}
+
+// Column picker and filter builder: white cards under the search.
+.list-controls {
+  .pill-selector,
+  .where-builder {
+    border: 1px solid var(--ig-hairline);
+    border-radius: var(--ig-r-lg);
+    background: var(--ig-surface);
+    box-shadow: var(--iga-shadow-xs);
+  }
+
+  .pill-selector {
+    gap: 8px;
+    padding: 16px;
+
+    &__pill {
+      @include iga-ghost-pill;
+
+      height: 32px;
+      padding: 0 10px 0 12px;
+
+      &.pill-selector__pill--selected {
+        border-color: var(--ig-primary);
+        background: var(--ig-primary-light);
+        box-shadow: none;
+        color: var(--ig-primary-dark);
+
+        &:hover {
+          background: var(--ig-primary-light);
+          box-shadow: none;
+        }
+      }
+    }
+  }
+
+  .where-builder {
+    padding: 16px;
+    font-size: 14px;
+
+    &__label {
+      color: var(--ig-text-2);
+    }
+
+    .btn {
+      @include iga-payload-pill(36px);
+    }
+  }
+}
+
+// The table: a white card, 12 px headers in sentence case, 48 px rows, hairline dividers.
+// Below 1100 px it scrolls inside its own frame (Payload's `.table { overflow: auto }`).
+.collection-list .table,
+.versions .table,
+.list-drawer .table {
+  border: 1px solid var(--ig-hairline);
+  border-radius: var(--ig-r-lg);
+  background: var(--ig-surface);
+  box-shadow: var(--iga-shadow-xs);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+
+  table {
+    border-collapse: collapse;
+  }
+
+  thead {
+    color: var(--ig-text-2);
+
+    th {
+      padding: 12px;
+      border-bottom: 1px solid var(--ig-hairline);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: normal;
+      white-space: nowrap;
+    }
+  }
+
+  td {
+    height: 48px;
+    padding: 12px;
+    border-bottom: 1px solid var(--ig-hairline);
+    vertical-align: middle;
+    transition: background var(--ig-dur-fast) var(--iga-ease);
+  }
+
+  th:first-child,
+  td:first-child {
+    padding-inline-start: 16px;
+  }
+
+  th:last-child,
+  td:last-child {
+    padding-inline-end: 16px;
+  }
+
+  tbody tr {
+    // Payload zebra-stripes odd rows; the mockup has plain rows with dividers.
+    &:nth-child(odd) {
+      background: transparent;
+    }
+
+    &:last-child td {
+      border-bottom: 0;
+    }
+
+    &:hover td {
+      background: var(--ig-primary-light);
+    }
+  }
+
+  a:not(.iga-btn, .iga-chip) {
+    color: var(--ig-primary-pressed);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--ig-primary-dark);
+      text-decoration: underline;
+    }
+  }
+
+  .sort-column {
+    &__label {
+      color: var(--ig-text-2);
+    }
+
+    &__button {
+      color: var(--ig-text-muted);
+
+      &:hover {
+        color: var(--ig-text);
+      }
+    }
+  }
+
+  .sort-column--active .sort-column__label {
+    color: var(--ig-text);
+  }
+}
+
+// Payload makes the table full-bleed below 1024 px (negative gutter margins): no card frame.
+@media (max-width: 1024px) {
+  .collection-list .table,
+  .versions .table {
+    border-inline: 0;
+    border-radius: 0;
+  }
+}
+
+// Pagination and «На странице»: pill buttons; the current page is filled with the brand colour.
+.page-controls,
+.versions__page-controls {
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  font-size: 13px;
+
+  .paginator {
+    flex-wrap: wrap;
+    gap: 4px;
+
+    &__page,
+    &__separator {
+      margin: 0;
+    }
+
+    &__page {
+      align-items: center;
+      width: auto;
+      min-width: 36px;
+      height: 36px;
+      padding: 0 10px;
+      border-radius: var(--ig-r-pill);
+      color: var(--ig-text);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+
+      &:hover:not(.paginator__page--is-current) {
+        background: var(--ig-well);
+      }
+
+      &--is-current {
+        background: var(--ig-btn-primary-bg);
+        color: var(--ig-on-navy);
+        font-weight: 500;
+      }
+    }
+
+    &__separator {
+      color: var(--ig-text-2);
+    }
+  }
+
+  .clickable-arrow {
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    border-radius: var(--ig-r-pill);
+    color: var(--ig-text);
+
+    &--is-disabled {
+      color: var(--ig-text-muted);
+    }
+  }
+
+  .page-controls__page-info,
+  .versions__page-info {
+    color: var(--ig-text-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .per-page .popup-button {
+    @include iga-ghost-pill;
+  }
+
+  .per-page__base-button {
+    font-weight: 500;
+  }
+}
+
+// =============================================================================================
+// 3. Leads list: quick filters and «Выгрузка» (`lead-list-quick-filters.tsx`, `export-panel.tsx`)
+// =============================================================================================
+
+.iga-screens-quick {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__label {
+    flex: none;
+    min-width: 88px;
+    color: var(--ig-text-2);
+    font-size: 12px;
+  }
+}
+
+.iga-screens-export {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+
+  &__panel {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px 16px;
+    width: 100%;
+  }
+
+  &__field {
+    flex: 1 1 160px;
+    max-width: 260px;
+    color: var(--ig-text-2);
+    font-size: 13px;
+  }
+
+  &__check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    font-size: 14px;
+
+    input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--ig-primary);
+    }
+  }
+
+  &__error {
+    align-self: center;
+    font-size: 13px;
+  }
+}
+
+// =============================================================================================
+// 4. Media library (`.collection-list--media`, `.file`, `.thumbnail`, `placeholder-*.tsx`)
+// =============================================================================================
+
+.iga-screens-media-filter {
+  margin-bottom: 16px;
+
+  .iga-muted {
+    font-size: 12px;
+  }
+}
+
+.collection-list--media .table .file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.collection-list--media .table .file__thumbnail,
+.list-drawer .table .file__thumbnail {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--ig-r-sm);
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// Grid / folder views (when enabled): cards with a 10 px radius.
+.thumbnail-card {
+  border: 1px solid var(--ig-hairline);
+  border-radius: var(--ig-r-md);
+  background: var(--ig-surface);
+  overflow: hidden;
+}
+
+// =============================================================================================
+// 5. Order «Управление» tab (`orders/order-manage-view.tsx`, `panel.tsx`, `status-panel.tsx`,
+//    `token-panel.tsx`); Payload `Banner` for the warnings, Payload `.btn` for the actions
+// =============================================================================================
+
+.gutter:has(> .iga-orders-manage) {
+  @include iga-gutters;
+}
+
+.iga-orders-manage {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 960px;
+  padding: 24px 0 56px;
+}
+
+.iga-orders-empty {
+  margin: 24px 0;
+}
+
+.iga-orders-warnings {
+  display: grid;
+  gap: 8px;
+
+  .banner {
+    margin: 0;
+    padding: 12px 16px;
+    border: 0;
+    border-radius: var(--ig-r-md);
+    font-size: 14px;
+  }
+
+  .banner--type-warning {
+    background: var(--ig-warning-bg);
+    color: var(--ig-warning-text);
+  }
+
+  .banner--type-error {
+    background: var(--ig-danger-bg);
+    color: var(--ig-danger-text);
+  }
+}
+
+.iga-orders-panel {
+  gap: 16px;
+
+  &__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .btn {
+    @include iga-payload-pill;
+  }
+
+  // Payload's «error» button (Отозвать): a danger outline pill.
+  .btn--style-error {
+    --bg-color: var(--ig-surface);
+    --color: var(--ig-danger-text);
+    --hover-bg: var(--ig-danger-bg);
+    --hover-color: var(--ig-danger-text);
+    --btn-border: 1px solid var(--ig-danger);
+  }
+}
+
+.iga-orders-hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.iga-orders-error {
+  margin: 0;
+  color: var(--ig-danger-text);
+}
+
+.iga-orders-form {
+  display: grid;
+  gap: 16px;
+}
+
+.iga-orders-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  align-items: end;
+  gap: 16px;
+}
+
+.iga-orders-field {
+  min-width: 0;
+  color: var(--ig-text-2);
+  font-size: 13px;
+}
+
+.iga-orders-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.iga-orders-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+
+  input {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--ig-primary);
+  }
+
+  &--danger {
+    color: var(--ig-danger-text);
+  }
+}
+
+.iga-orders-link {
+  background: var(--ig-bg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+// Status history: a timeline with a line on the left (as the lead card history).
+.iga-orders-history {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 2px 0 2px 18px;
+  border-left: 2px solid var(--ig-line);
+  list-style: none;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+
+  li {
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0.45em;
+      left: -24px;
+      width: 10px;
+      height: 10px;
+      border: 2px solid var(--ig-surface);
+      border-radius: 50%;
+      background: var(--ig-line);
+    }
+
+    &[data-current="true"] {
+      font-weight: 500;
+
+      &::before {
+        background: var(--ig-primary);
+      }
+    }
+  }
+}
+
+// =============================================================================================
+// 6. Globals and the account form (`[class*="global-edit--"]`, `.collection-edit--users`):
+//    readable column width and `.group-field` as cards. Fields themselves: `_edit-form.scss`.
+// =============================================================================================
+
+[class*="global-edit--"],
+.collection-edit--users {
+  .document-fields__fields,
+  .auth-fields {
+    max-width: 960px;
+  }
+
+  .group-field:not(.group-field--within-group, .group-field--within-row) {
+    margin: 0 0 16px;
+    padding: 16px 18px;
+    border: 1px solid var(--ig-hairline);
+    border-radius: var(--ig-r-md);
+    background: var(--ig-surface);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .group-field__title,
+  .group-field__header .field-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ig-text);
+  }
+}
+
+// =============================================================================================
+// 7. Login and the other minimal screens (`.template-minimal`: login, forgot / reset password,
+//    create first user, verify)
+// =============================================================================================
+
+.template-minimal {
+  background: var(--ig-bg);
+
+  &__wrap {
+    padding: 32px;
+    border: 1px solid var(--ig-hairline);
+    border-radius: var(--ig-r-lg);
+    background: var(--ig-surface);
+    box-shadow: var(--ig-shadow-card);
+  }
+
+  &--width-normal .template-minimal__wrap {
+    max-width: 420px;
+  }
+
+  .login__brand {
+    margin-bottom: 28px;
+  }
+
+  h1,
+  h2 {
+    margin-top: 0;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .field-label {
+    color: var(--ig-text-2);
+    font-size: 13px;
+    font-weight: 400;
+  }
+
+  .field-type__wrap input {
+    height: 42px;
+    border: 1px solid var(--ig-line);
+    border-radius: var(--ig-r-md);
+    background: var(--ig-surface);
+    box-shadow: none;
+    color: var(--ig-text);
+    font-size: 14px;
+
+    &:hover {
+      border-color: var(--ig-gray-2);
+    }
+
+    &:focus {
+      border-color: var(--ig-primary);
+      box-shadow: var(--ig-focus-ring);
+      outline: none;
+    }
+  }
+
+  .field-type.error .field-type__wrap input {
+    border-color: var(--ig-danger-text);
+  }
+
+  a:not(.btn) {
+    color: var(--ig-primary-pressed);
+    font-size: 14px;
+
+    &:hover {
+      color: var(--ig-primary-dark);
+    }
+  }
+
+  .form-submit {
+    margin-top: 16px;
+  }
+
+  .form-submit .btn {
+    @include iga-payload-pill(44px);
+
+    width: 100%;
+  }
+}
+
+@media (max-width: $phone) {
+  .template-minimal {
+    align-items: flex-start;
+    padding: 24px 0;
+    background: var(--ig-surface);
+
+    &__wrap {
+      padding: 16px;
+      border: 0;
+      box-shadow: none;
+    }
+  }
+}
+
+// =============================================================================================
+// 8. Account (`/admin/account`): «Настройки Payload» (language) as a card. There is no theme
+//    switch: `admin.theme: 'light'` removes it; hidden anyway should Payload render it.
+// =============================================================================================
+
+.auth-fields {
+  border: 1px solid var(--ig-hairline);
+  border-radius: var(--ig-r-lg);
+  background: var(--ig-surface);
+  box-shadow: var(--iga-shadow-xs);
+
+  .btn {
+    @include iga-payload-pill;
+  }
+}
+
+.payload-settings {
+  max-width: 960px;
+  margin: 24px 0;
+  padding: 20px 22px;
+  border: 1px solid var(--ig-hairline);
+  border-radius: var(--ig-r-lg);
+  background: var(--ig-surface);
+  box-shadow: var(--iga-shadow-xs);
+
+  // Payload draws full-bleed dividers that are wider than the page (horizontal scroll).
+  &::before,
+  &::after {
+    display: none;
+  }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .btn {
+    @include iga-payload-pill;
+
+    align-self: flex-start;
+  }
+
+  &__theme {
+    display: none;
+  }
+}
+
+// =============================================================================================
+// 9. Versions: list (`.versions`, see 2) and comparison (`.view-version`, `.html-diff`,
+//    `.field-diff-*`): removed = danger, added = success (AA text, DESIGN.md).
+// =============================================================================================
+
+.view-version {
+  @include iga-gutters;
+
+  --diff-delete-pill-bg: var(--ig-danger-bg);
+  --diff-delete-pill-color: var(--ig-danger-text);
+  --diff-delete-pill-border: var(--ig-danger);
+  --diff-delete-parent-bg: var(--ig-danger-bg);
+  --diff-delete-parent-color: var(--ig-danger-text);
+  --diff-delete-link-color: var(--ig-danger-text);
+  --diff-create-pill-bg: var(--ig-success-bg);
+  --diff-create-pill-color: var(--ig-success-text);
+  --diff-create-pill-border: var(--ig-success);
+  --diff-create-parent-bg: var(--ig-success-bg);
+  --diff-create-parent-color: var(--ig-success-text);
+  --diff-create-link-color: var(--ig-success-text);
+
+  .render-field-diffs__field {
+    min-width: 0;
+  }
+
+  .field-diff-container {
+    border-radius: var(--ig-r-md);
+  }
+}
+
+// =============================================================================================
+// 10. Toasts (sonner: `.payload-toast-container`, `.payload-toast-item`, `.toast-*`)
+// =============================================================================================
+
+// White card; the status shows in the outline and icon colour (no coloured fill).
+.payload-toast-container .payload-toast-item {
+  border: 1px solid var(--ig-hairline);
+  border-radius: var(--ig-r-md);
+  background: var(--ig-surface);
+  box-shadow: var(--ig-shadow-dropdown);
+  color: var(--ig-text);
+  font-size: 14px;
+  font-weight: 500;
+
+  .payload-toast-close-button {
+    color: var(--ig-text-2);
+
+    &:hover {
+      color: var(--ig-text);
+    }
+  }
+
+  &.toast-success,
+  &.toast-error,
+  &.toast-warning,
+  &.toast-info {
+    background: var(--ig-surface);
+    color: var(--ig-text);
+
+    .payload-toast-close-button {
+      color: var(--ig-text-2);
+
+      &:hover {
+        color: var(--ig-text);
+      }
+    }
+  }
+
+  &.toast-success {
+    border-color: var(--ig-success);
+
+    .toast-icon {
+      color: var(--ig-success-text);
+    }
+  }
+
+  &.toast-error {
+    border-color: var(--ig-danger);
+
+    .toast-icon {
+      color: var(--ig-danger-text);
+    }
+  }
+
+  &.toast-warning {
+    border-color: var(--ig-warning);
+
+    .toast-icon {
+      color: var(--ig-warning-text);
+    }
+  }
+
+  &.toast-info {
+    border-color: var(--ig-info);
+
+    .toast-icon {
+      color: var(--ig-info-text);
+    }
+  }
+}
+
+// =============================================================================================
+// 11. Modals and drawers (`.confirmation-modal`, `.drawer`, `.document-drawer`, `.list-drawer`)
+// =============================================================================================
+
+.confirmation-modal {
+  // Payload's blurred light veil → the dark overlay of the mockup.
+  &::before {
+    background: $overlay;
+    opacity: 1;
+  }
+
+  &__wrapper {
+    width: min(480px, calc(100vw - 32px));
+    padding: 24px;
+    border: 1px solid var(--ig-hairline);
+    border-radius: var(--ig-r-lg);
+    background: var(--ig-surface);
+    box-shadow: var(--ig-shadow-modal);
+  }
+
+  &__content {
+    gap: 8px;
+    color: var(--ig-text-2);
+    font-size: 14px;
+    line-height: 1.5;
+
+    h1,
+    h2,
+    h3 {
+      color: var(--ig-text);
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+  }
+
+  &__controls {
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .btn {
+      @include iga-payload-pill;
+    }
+  }
+}
+
+.drawer {
+  &__blur-bg::before {
+    background: $overlay;
+    opacity: 1;
+  }
+
+  &__close {
+    background: transparent;
+  }
+
+  &__content {
+    border-radius: var(--ig-r-lg) 0 0 var(--ig-r-lg);
+    background: var(--ig-bg);
+    box-shadow: var(--ig-shadow-modal);
+  }
+
+  &__header__title {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+}
+
+@media (max-width: $phone) {
+  .drawer__content {
+    // Payload sets the width inline (`calc(100% - depth × gutter)`): full width on phones.
+    width: 100% !important;
+    border-radius: 0;
+  }
+}
+
+// =============================================================================================
+// 12. Leads report (`/admin/leads-report/`, `views/leads-report.tsx`)
+// =============================================================================================
+
+.iga-report-page {
+  min-width: 0;
+}
+
+.iga-report-head {
+  .iga-page-head__eyebrow {
+    display: block;
+  }
+
+  .iga-page-head__title {
+    margin-top: 2px;
+  }
+}
+
+.iga-report {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px 32px 56px;
+  color: var(--ig-text);
+  font-size: 14px;
+
+  &__period {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px 20px;
+  }
+
+  &__seg {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    > a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      white-space: nowrap;
+    }
+
+    > a:focus-visible {
+      outline-offset: -2px;
+    }
+  }
+
+  &__dates {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+
+    .iga-field {
+      width: 170px;
+    }
+  }
+
+  &__alert {
+    margin: 0;
+    padding: 10px 14px;
+    border-radius: var(--ig-r-md);
+    background: var(--ig-danger-bg);
+    color: var(--ig-danger-text);
+  }
+
+  &__range {
+    margin: 0;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+  }
+
+  &__tile {
+    gap: 6px;
+    padding: 18px 20px;
+  }
+
+  &__tile-label {
+    color: var(--ig-text-2);
+    font-size: 13px;
+  }
+
+  &__tile-value {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__card {
+    min-width: 0;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+    gap: 20px;
+  }
+
+  &__scroll {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--ig-hairline);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th:first-child,
+    td:first-child {
+      padding-left: 0;
+    }
+
+    th:last-child,
+    td:last-child {
+      padding-right: 0;
+    }
+
+    thead th {
+      color: var(--ig-text-2);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    tbody th {
+      font-weight: 400;
+    }
+
+    tbody tr:hover > * {
+      background: var(--ig-primary-light);
+    }
+
+    tfoot th,
+    tfoot td {
+      border-top: 1px solid var(--ig-line);
+      border-bottom: 0;
+      font-weight: 600;
+    }
+
+    &--share {
+      th {
+        width: 40%;
+        white-space: normal;
+      }
+
+      tr:last-child > * {
+        border-bottom: 0;
+      }
+    }
+  }
+
+  // Same specificity as the cells above, later in the file: numbers stay right-aligned.
+  &__table &__num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__share {
+    color: var(--ig-text-2);
+  }
+
+  &__strong {
+    font-weight: 600;
+  }
+
+  &__bar-cell {
+    width: 35%;
+    min-width: 80px;
+  }
+
+  // A status row carries its colour as `--iga-badge-color`; other rows use the brand colour.
+  &__bar > span {
+    background: var(--iga-badge-color, var(--ig-primary));
+  }
+
+  &__note,
+  &__empty {
+    margin: 0;
+  }
+}
+
+@media (max-width: $tablet) {
+  .iga-report {
+    padding: 20px 24px 48px;
+  }
+}
+
+// =============================================================================================
+// 13. Phones (≤ 599): no horizontal page scroll, 44 px touch targets, one column
+// =============================================================================================
+
+@media (max-width: $phone) {
+  .collection-list {
+    &__wrap {
+      padding-top: 12px;
+    }
+
+    .list-header__title {
+      font-size: 20px;
+    }
+
+    .list-header .btn {
+      height: 44px;
+      line-height: 42px;
+    }
+  }
+
+  .list-controls .search-bar {
+    row-gap: 8px;
+
+    .search-filter,
+    .search-filter input {
+      height: 44px;
+    }
+
+    .pill {
+      height: 44px;
+    }
+  }
+
+  // Each chip group is one line that scrolls sideways inside the page gutter.
+  .iga-screens-quick__row {
+    flex-wrap: nowrap;
+    margin-inline: calc(var(--gutter-h, 16px) * -1);
+    padding-inline: var(--gutter-h, 16px);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .iga-screens-quick__label {
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  // Media: two chips and a hint — wraps instead of scrolling.
+  .iga-screens-quick__row.iga-screens-media-filter {
+    flex-wrap: wrap;
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: visible;
+  }
+
+  .iga-screens-export__field {
+    max-width: none;
+    flex-basis: 100%;
+  }
+
+  .iga-screens-export__panel > .iga-btn {
+    width: 100%;
+  }
+
+  .page-controls {
+    .paginator__page,
+    .clickable-arrow {
+      min-width: 44px;
+      height: 44px;
+    }
+
+    .per-page .popup-button {
+      height: 44px;
+    }
+  }
+
+  .iga-orders-manage {
+    padding: 16px 0 40px;
+  }
+
+  .iga-orders-row {
+    flex-direction: column;
+    align-items: stretch;
+
+    .btn,
+    > a {
+      width: 100%;
+      height: 44px;
+      line-height: 42px;
+    }
+  }
+
+  [class*="global-edit--"],
+  .collection-edit--users {
+    .group-field:not(.group-field--within-group, .group-field--within-row) {
+      padding: 14px;
+    }
+  }
+
+  .payload-settings {
+    padding: 16px;
+  }
+
+  .confirmation-modal__controls .btn {
+    flex: 1 1 100%;
+    height: 44px;
+  }
+
+  .iga-report {
+    padding: 16px 16px 40px;
+
+    &__period,
+    &__dates {
+      align-items: stretch;
+    }
+
+    &__dates {
+      width: 100%;
+
+      .iga-field {
+        flex: 1 1 calc(50% - 6px);
+        width: auto;
+      }
+
+      .iga-btn {
+        flex: 1 1 100%;
+      }
+    }
+
+    &__seg > a {
+      min-height: 40px;
+    }
+
+    &__tiles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    &__tile {
+      padding: 14px 16px;
+    }
+
+    &__tile-value {
+      font-size: 26px;
+    }
+  }
+}
+
+// =============================================================================================
+// 14. Reduced motion: no transitions (Payload's own shimmer stays as is)
+// =============================================================================================
+
+@media (prefers-reduced-motion: reduce) {
+  .list-controls .search-bar .search-filter,
+  .list-controls .search-bar .pill,
+  .list-controls .pill-selector__pill,
+  .collection-list .table td,
+  .versions .table td,
+  .list-drawer .table td,
+  .per-page .popup-button {
+    transition: none;
+  }
+
+  .drawer__content,
+  .drawer__blur-bg {
+    transition: none;
+  }
+}

@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import { formatNumber } from "@/lib/domain/format";
 import type { BeforeListTableServerProps } from "payload";
 
@@ -16,36 +15,6 @@ const MEDIA_LIST_PATH = "/admin/collections/media/";
 const PLACEHOLDER_PARAM = "where[isPlaceholder][equals]";
 
 const placeholderHref = `${MEDIA_LIST_PATH}?${new URLSearchParams({ [PLACEHOLDER_PARAM]: "true" }).toString()}`;
-
-const rowStyle: CSSProperties = {
-  display: "flex",
-  flexWrap: "wrap",
-  alignItems: "center",
-  gap: "8px",
-  marginBottom: "16px",
-};
-
-const hintStyle: CSSProperties = {
-  color: "var(--theme-elevation-500)",
-  fontSize: "12px",
-};
-
-function chipStyle(active: boolean): CSSProperties {
-  return {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "6px",
-    padding: "3px 10px",
-    borderRadius: "999px",
-    border: `1px solid ${active ? "var(--theme-elevation-800)" : "var(--theme-elevation-150)"}`,
-    background: active ? "var(--theme-elevation-800)" : "var(--theme-elevation-0)",
-    color: active ? "var(--theme-elevation-0)" : "var(--theme-elevation-800)",
-    fontSize: "13px",
-    lineHeight: "18px",
-    textDecoration: "none",
-    whiteSpace: "nowrap",
-  };
-}
 
 /** `true` when the list is filtered by exactly `isPlaceholder = true`. */
 function isPlaceholderFilter(searchParams: BeforeListTableServerProps["searchParams"]): boolean {
@@ -78,12 +47,15 @@ export async function PlaceholderFilterLink({
   const anyFilter = Object.keys(searchParams ?? {}).some((key) => key.startsWith("where["));
 
   return (
-    <nav aria-label="Быстрый фильтр медиафайлов" style={rowStyle}>
+    <nav
+      aria-label="Быстрый фильтр медиафайлов"
+      className="iga-screens-quick__row iga-screens-media-filter"
+    >
       <a
         href={MEDIA_LIST_PATH}
         aria-current={!anyFilter ? "true" : undefined}
         data-quick-filter="all"
-        style={chipStyle(!anyFilter)}
+        className="iga-chip iga-screens-chip"
       >
         Все изображения
       </a>
@@ -91,16 +63,12 @@ export async function PlaceholderFilterLink({
         href={placeholderHref}
         aria-current={filtered ? "true" : undefined}
         data-quick-filter="placeholders"
-        style={chipStyle(filtered)}
+        className="iga-chip iga-screens-chip"
       >
         Временные изображения
-        {count !== undefined ? (
-          <span data-placeholder-count style={{ opacity: 0.7, fontVariantNumeric: "tabular-nums" }}>
-            {formatNumber(count)}
-          </span>
-        ) : null}
+        {count !== undefined ? <b data-placeholder-count>{formatNumber(count)}</b> : null}
       </a>
-      <span style={hintStyle}>
+      <span className="iga-muted">
         Замените временное изображение в документе, затем удалите его из медиатеки.
       </span>
     </nav>

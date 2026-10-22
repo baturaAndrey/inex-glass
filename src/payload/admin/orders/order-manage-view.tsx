@@ -28,7 +28,7 @@ export async function OrderManageView({ doc, initPageResult }: DocumentViewServe
   if (!order) {
     return (
       <Gutter>
-        <p style={{ marginTop: 24 }}>Сначала сохраните заказ.</p>
+        <p className="iga-orders-empty">Сначала сохраните заказ.</p>
       </Gutter>
     );
   }
@@ -39,12 +39,9 @@ export async function OrderManageView({ doc, initPageResult }: DocumentViewServe
 
   return (
     <Gutter>
-      <div
-        data-testid="order-manage"
-        style={{ display: "flex", flexDirection: "column", gap: 24, padding: "24px 0 48px" }}
-      >
+      <div data-testid="order-manage" className="iga-orders-manage">
         {warnings.length > 0 ? (
-          <section aria-label="Предупреждения" style={{ display: "grid", gap: 8 }}>
+          <section aria-label="Предупреждения" className="iga-orders-warnings">
             {warnings.map((warning) => (
               <Banner key={warning.key} type={warning.tone === "danger" ? "error" : "warning"}>
                 <span data-warning={warning.key}>{warning.text}</span>

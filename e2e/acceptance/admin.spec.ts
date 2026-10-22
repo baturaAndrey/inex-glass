@@ -24,9 +24,10 @@ import type { APIRequestContext, TestInfo } from "@playwright/test";
  * - An object: publish of an empty draft is refused with the required-on-publish messages (REST
  *   and in the admin UI); filled in (city, type, products, year, task, spec, photo with alt) it
  *   publishes → `/obekty/<slug>/`.
- * - Preview: pages answer `X-Frame-Options: SAMEORIGIN` and can be framed by the site itself
- *   (what Payload live preview needs); live preview itself is not configured (task 30: out of
- *   scope) — reported as an annotation.
+ * - Preview: pages answer `X-Frame-Options: SAMEORIGIN` and can be framed by the site itself;
+ *   the page form offers «Предпросмотр» → `/api/preview/?path=…` (Draft Mode, admin redesign
+ *   task 11; the full flow is in `e2e/preview.spec.ts`). Payload live preview
+ *   (`admin.livePreview`, the in-admin iframe) is still not configured: out of scope.
  * - A 52 MiB PDF uploads in the admin (`media`, `order-files`); a bigger one is refused.
  * - Lead erase (152-ФЗ): the lead, its versions and its file (record + file on disk) are gone.
  *
@@ -236,15 +237,15 @@ test("11b. object: publish validation (REST + admin UI), then a full object publ
   expect(await response.text()).toContain(name);
 });
 
-test("11c. preview: pages may be framed by the site itself (X-Frame-Options SAMEORIGIN)", async ({
+test("11c. preview: pages are framed by the site itself and the draft preview works", async ({
   page,
   request,
-}, info) => {
+}) => {
   for (const url of ["/", "/zakalennoe-steklo/10-mm/", "/admin/login/"]) {
     const response = await request.get(url);
     expect(response.headers()["x-frame-options"], url).toBe("SAMEORIGIN");
   }
-  // A same-origin frame renders (what Payload live preview relies on).
+  // A same-origin frame renders (what an in-admin preview would rely on).
   await page.goto("/kontakty/");
   const title = await page.evaluate(
     () =>
@@ -259,12 +260,27 @@ test("11c. preview: pages may be framed by the site itself (X-Frame-Options SAME
       })
   );
   expect(title).toContain("10 мм");
-  info.annotations.push({
-    type: "note",
-    description:
-      "Payload live preview не настроен (admin.livePreview отсутствует; task-30: вне задачи) — " +
-      "проверены только заголовки и встраивание в собственный origin.",
-  });
+
+  // Draft preview (admin redesign, task 11): the page form offers «Предпросмотр» …
+  const home = await okJson<{ docs: { id: string }[] }>(
+    await api.get("/api/pages/?where[path][equals]=%2F&limit=1&depth=0"),
+    "home page"
+  );
+  const homeId = home.docs[0]?.id;
+  if (!homeId) throw new Error("no home page on the stand (seed --full)");
+  await page.context().addCookies([{ name: "payload-token", value: token, url: siteURL }]);
+  await page.goto(`/admin/collections/pages/${homeId}/`);
+  const previewButton = page.locator("#preview-button");
+  await expect(previewButton).toBeVisible({ timeout: 30_000 });
+  await expect(previewButton).toHaveAttribute("aria-label", "Предпросмотр");
+  const href = (await previewButton.getAttribute("href")) ?? "";
+  expect(href).toContain("/api/preview/?path=%2F");
+
+  // … whose URL enables Draft Mode for staff and redirects to the page.
+  const response = await api.get(href, { maxRedirects: 0 });
+  expect(response.status()).toBe(307);
+  expect(response.headers()["location"]).toBe("/");
+  expect(response.headers()["set-cookie"] ?? "").toContain("__prerender_bypass");
 });
 
 test("11d. a PDF up to 52 MiB uploads in the admin; a bigger one is refused", async () => {

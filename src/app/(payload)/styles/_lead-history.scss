@@ -1,1 +1,158 @@
 // Владелец: task-09 (волна 3). Стили комментариев и истории заявки.
+// Comments and timeline of the lead card («Комментарии и история», res/admin-mockup/Lead.dc.html:
+// `.av.sm`, `.tl`, `.tl-i`, `.tl-i.c`, `.tl-m`). Colours: `--ig-*` tokens only; no animations.
+// Classes: `.iga-lead-comments*`, `.iga-lead-history*`.
+
+$phone: 599px;
+
+// Shared look of a timeline row: a 2 px left rule, meta line above the text.
+@mixin timeline-item($rule) {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 14px;
+  border-left: 2px solid $rule;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+@mixin timeline-meta {
+  font-size: 12px;
+  color: var(--ig-text-2);
+}
+
+@mixin timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Comments
+// ---------------------------------------------------------------------------------------------
+
+.iga-lead-comments {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--ig-text);
+
+  &__form {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin: 0;
+  }
+
+  &__fields {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  &__label {
+    font-size: 13px;
+    color: var(--ig-text-2);
+  }
+
+  &__submit {
+    height: 36px;
+  }
+
+  &__error {
+    margin: 0;
+    font-size: 12px;
+    color: var(--ig-danger-text);
+  }
+
+  &__list {
+    @include timeline-list;
+  }
+
+  &__item {
+    @include timeline-item(var(--ig-primary));
+  }
+
+  &__meta {
+    @include timeline-meta;
+  }
+
+  &__text {
+    white-space: pre-wrap;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// History
+// ---------------------------------------------------------------------------------------------
+
+// Inside the card (`.iga-card`: flex column, gap 14 px) the extra 2 px make the 16 px between
+// the comments and the history.
+.iga-lead-comments + .iga-lead-history {
+  margin-top: 2px;
+}
+
+.iga-lead-history {
+  color: var(--ig-text);
+
+  &__list {
+    @include timeline-list;
+  }
+
+  &__item {
+    @include timeline-item(var(--ig-line));
+
+    &[data-tone="danger"] {
+      border-left-color: var(--ig-danger);
+      color: var(--ig-danger-text);
+    }
+
+    a {
+      color: var(--ig-primary-pressed);
+      text-decoration: underline;
+
+      &:hover {
+        color: var(--ig-primary-dark);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--ig-primary);
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  &__meta {
+    @include timeline-meta;
+  }
+
+  &__empty {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ig-text-2);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Phones: no avatar, a full-width «Добавить» of a 44 px touch target.
+// ---------------------------------------------------------------------------------------------
+
+@media (max-width: $phone) {
+  .iga-lead-comments {
+    &__avatar {
+      display: none;
+    }
+
+    &__submit {
+      width: 100%;
+      height: auto;
+      min-height: 44px;
+    }
+  }
+}

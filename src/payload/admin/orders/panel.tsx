@@ -1,50 +1,22 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 /**
- * Card frame of the «Управление» panels. The Payload admin has its own theme (no Tailwind, no
- * site tokens), so the panels use Payload's CSS variables and inline styles.
+ * Card frame of the «Управление» panels and the class names of their parts. The look lives in
+ * the admin theme (`.iga-card`, `.iga-field`, `.iga-input`, `.iga-orders-*` in
+ * `src/app/(payload)/styles/`), never in inline styles.
  */
 
-const PANEL_STYLE: CSSProperties = {
-  border: "1px solid var(--theme-elevation-150)",
-  borderRadius: "var(--style-radius-m, 8px)",
-  background: "var(--theme-elevation-0)",
-  padding: 24,
-  display: "flex",
-  flexDirection: "column",
-  gap: 16,
-};
+/** Hint under a field or a panel: 13 px secondary text. */
+export const HINT_CLASS = "iga-muted iga-orders-hint";
 
-export const HINT_STYLE: CSSProperties = {
-  margin: 0,
-  color: "var(--theme-elevation-600)",
-  fontSize: 13,
-  lineHeight: 1.45,
-};
+/** Row of controls (buttons, checkbox + label); wraps, stacks on phones. */
+export const ROW_CLASS = "iga-orders-row";
 
-export const ROW_STYLE: CSSProperties = {
-  display: "flex",
-  flexWrap: "wrap",
-  gap: 8,
-  alignItems: "center",
-};
+/** Label with its control below. */
+export const FIELD_CLASS = "iga-field iga-orders-field";
 
-export const FIELD_STYLE: CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 6,
-  minWidth: 0,
-};
-
-export const INPUT_STYLE: CSSProperties = {
-  height: 40,
-  padding: "0 12px",
-  border: "1px solid var(--theme-elevation-150)",
-  borderRadius: "var(--style-radius-s, 4px)",
-  background: "var(--theme-input-bg, var(--theme-elevation-0))",
-  color: "var(--theme-text)",
-  font: "inherit",
-};
+/** Text / date input of a panel (`.iga-select` for selects, `textarea.iga-input` for text). */
+export const INPUT_CLASS = "iga-input";
 
 export function Panel({
   title,
@@ -56,8 +28,8 @@ export function Panel({
   testId?: string;
 }) {
   return (
-    <section aria-label={title} data-testid={testId} style={PANEL_STYLE}>
-      <h3 style={{ margin: 0 }}>{title}</h3>
+    <section aria-label={title} data-testid={testId} className="iga-card iga-orders-panel">
+      <h3 className="iga-orders-panel__title">{title}</h3>
       {children}
     </section>
   );

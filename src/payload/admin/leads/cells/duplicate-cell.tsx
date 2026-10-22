@@ -1,5 +1,4 @@
-import { DUPLICATE_BADGE_COLORS, leadAdminPath } from "../constants";
-import { Badge } from "../ui";
+import { leadAdminPath } from "../constants";
 import type { DefaultServerCellComponentProps } from "payload";
 
 const DUPLICATE_REASON_TEXT: Readonly<Record<string, string>> = {
@@ -8,7 +7,7 @@ const DUPLICATE_REASON_TEXT: Readonly<Record<string, string>> = {
   both: "совпали телефон и e-mail",
 };
 
-/** List cell on `leads.isDuplicate`: amber «Повтор» badge linking to the original lead. */
+/** List cell on `leads.isDuplicate`: amber «Повтор» badge (`.iga-badge--work`) linking to the original lead. */
 export function DuplicateCell({ cellData, rowData }: DefaultServerCellComponentProps) {
   if (cellData !== true) return null;
   const original =
@@ -22,13 +21,12 @@ export function DuplicateCell({ cellData, rowData }: DefaultServerCellComponentP
       ? DUPLICATE_REASON_TEXT[rowData.duplicateReason]
       : undefined;
   const badge = (
-    <Badge
-      color={DUPLICATE_BADGE_COLORS.color}
-      background={DUPLICATE_BADGE_COLORS.background}
+    <span
+      className="iga-badge iga-badge--work"
       title={reason ? `Повтор: ${reason}` : "Повторное обращение"}
     >
       Повтор
-    </Badge>
+    </span>
   );
   if (!original) return badge;
   return (

@@ -2,6 +2,7 @@ import { NavHamburger, NavWrapper } from "@payloadcms/next/client";
 import { getTranslation } from "@payloadcms/translations";
 import { getRole } from "@/payload/access";
 import type { Role } from "@/payload/access";
+import { DocTabsCurrent } from "../doc-tabs-current";
 import { buildNav } from "./build-nav";
 import { NavClient } from "./nav-client";
 import { NAV_GROUPS } from "./nav-config";
@@ -110,6 +111,8 @@ export async function InexNav(props: InexNavProps) {
   return (
     <NavWrapper baseClass="nav">
       <NavClient groups={groups} counters={counters} user={navUser(user, role)} />
+      {/* Current document tab: Payload marks none with `trailingSlash: true`. */}
+      <DocTabsCurrent />
       <div className="nav__header">
         <div className="nav__header-content">
           <NavHamburger baseClass="nav" />

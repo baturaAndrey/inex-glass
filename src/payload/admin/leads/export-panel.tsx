@@ -1,8 +1,6 @@
 "use client";
 
 import { useId, useMemo, useState } from "react";
-import type { CSSProperties } from "react";
-import { Button } from "@payloadcms/ui";
 import { FORM_TYPE_LABELS, LEAD_FORM_TYPE_VALUES, LEADS_EXPORT_API_PATH } from "./constants";
 
 /**
@@ -22,24 +20,6 @@ const PRESETS: readonly (readonly [Preset, string])[] = [
   ["quarter", "Этот квартал"],
   ["custom", "Даты"],
 ];
-
-const fieldStyle: CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "4px",
-  fontSize: "12px",
-  color: "var(--theme-elevation-500)",
-};
-
-const controlStyle: CSSProperties = {
-  height: "32px",
-  padding: "0 8px",
-  border: "1px solid var(--theme-elevation-150)",
-  borderRadius: "var(--style-radius-s, 4px)",
-  background: "var(--theme-input-bg, var(--theme-elevation-0))",
-  color: "var(--theme-elevation-800)",
-  fontSize: "13px",
-};
 
 export function ExportPanel({ statuses, assignees }: { statuses: Option[]; assignees: Option[] }) {
   const id = useId();
@@ -71,37 +51,27 @@ export function ExportPanel({ statuses, assignees }: { statuses: Option[]; assig
   }, [assignee, duplicates, format, from, preset, source, status, to]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "8px", alignItems: "flex-start" }}>
-      <Button
-        buttonStyle="secondary"
-        size="small"
-        margin={false}
-        extraButtonProps={{ "aria-expanded": open, "aria-controls": `${id}-panel` }}
+    <div className="iga-screens-export">
+      <button
+        type="button"
+        className="iga-btn iga-btn--secondary iga-btn--sm"
+        aria-expanded={open}
+        aria-controls={`${id}-panel`}
         onClick={() => setOpen((value) => !value)}
       >
         {open ? "Скрыть выгрузку" : "Выгрузка"}
-      </Button>
+      </button>
       {open ? (
         <div
           id={`${id}-panel`}
           role="region"
           aria-label="Выгрузка заявок"
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "flex-end",
-            gap: "12px",
-            padding: "12px",
-            border: "1px solid var(--theme-elevation-150)",
-            borderRadius: "var(--style-radius-m, 4px)",
-            background: "var(--theme-elevation-50)",
-            width: "100%",
-          }}
+          className="iga-card iga-screens-export__panel"
         >
-          <label style={fieldStyle}>
+          <label className="iga-field iga-screens-export__field">
             Период
             <select
-              style={controlStyle}
+              className="iga-select"
               value={preset}
               onChange={(event) => setPreset(event.target.value as Preset)}
             >
@@ -114,21 +84,21 @@ export function ExportPanel({ statuses, assignees }: { statuses: Option[]; assig
           </label>
           {preset === "custom" ? (
             <>
-              <label style={fieldStyle}>
+              <label className="iga-field iga-screens-export__field">
                 С
                 <input
                   type="date"
-                  style={controlStyle}
+                  className="iga-input"
                   value={from}
                   max={to || undefined}
                   onChange={(event) => setFrom(event.target.value)}
                 />
               </label>
-              <label style={fieldStyle}>
+              <label className="iga-field iga-screens-export__field">
                 По
                 <input
                   type="date"
-                  style={controlStyle}
+                  className="iga-input"
                   value={to}
                   min={from || undefined}
                   onChange={(event) => setTo(event.target.value)}
@@ -136,10 +106,10 @@ export function ExportPanel({ statuses, assignees }: { statuses: Option[]; assig
               </label>
             </>
           ) : null}
-          <label style={fieldStyle}>
+          <label className="iga-field iga-screens-export__field">
             Формат
             <select
-              style={controlStyle}
+              className="iga-select"
               value={format}
               onChange={(event) => setFormat(event.target.value as "csv" | "xlsx")}
             >
@@ -147,10 +117,10 @@ export function ExportPanel({ statuses, assignees }: { statuses: Option[]; assig
               <option value="csv">CSV</option>
             </select>
           </label>
-          <label style={fieldStyle}>
+          <label className="iga-field iga-screens-export__field">
             Статус
             <select
-              style={controlStyle}
+              className="iga-select"
               value={status}
               onChange={(event) => setStatus(event.target.value)}
             >
@@ -162,10 +132,10 @@ export function ExportPanel({ statuses, assignees }: { statuses: Option[]; assig
               ))}
             </select>
           </label>
-          <label style={fieldStyle}>
+          <label className="iga-field iga-screens-export__field">
             Источник
             <select
-              style={controlStyle}
+              className="iga-select"
               value={source}
               onChange={(event) => setSource(event.target.value)}
             >
@@ -177,10 +147,10 @@ export function ExportPanel({ statuses, assignees }: { statuses: Option[]; assig
               ))}
             </select>
           </label>
-          <label style={fieldStyle}>
+          <label className="iga-field iga-screens-export__field">
             Ответственный
             <select
-              style={controlStyle}
+              className="iga-select"
               value={assignee}
               onChange={(event) => setAssignee(event.target.value)}
             >
@@ -193,9 +163,7 @@ export function ExportPanel({ statuses, assignees }: { statuses: Option[]; assig
               ))}
             </select>
           </label>
-          <label
-            style={{ ...fieldStyle, flexDirection: "row", alignItems: "center", height: "32px" }}
-          >
+          <label className="iga-screens-export__check">
             <input
               type="checkbox"
               checked={duplicates}
@@ -204,13 +172,13 @@ export function ExportPanel({ statuses, assignees }: { statuses: Option[]; assig
             Только дубли
           </label>
           {customInvalid ? (
-            <span style={{ ...fieldStyle, color: "var(--theme-error-500)" }} role="status">
+            <span className="iga-field__error iga-screens-export__error" role="status">
               Укажите даты «с» и «по»
             </span>
           ) : (
-            <Button el="anchor" url={href} buttonStyle="primary" size="small" margin={false}>
+            <a className="iga-btn iga-btn--primary iga-btn--sm" href={href}>
               Скачать
-            </Button>
+            </a>
           )}
         </div>
       ) : null}

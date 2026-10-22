@@ -45,6 +45,7 @@ export const JOB_WRITE_CONTEXT = {
   skipOrderHooks: true,
   skipStatusEmail: true,
   keepUpdatedBy: true,
+  skipMaxNotify: true,
 } as const;
 
 /** Id of a relationship value (`string` with depth 0, document with depth ≥ 1). */

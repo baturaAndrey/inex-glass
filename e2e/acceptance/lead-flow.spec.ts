@@ -392,13 +392,15 @@ test.describe("scenario 1 — quiz lead end to end", () => {
     await signInBrowser(page.context(), api, baseURL!);
     await page.goto(`/admin/collections/leads/${leadId}/summary/`);
     const flags = page.getByRole("region", { name: "Флаги" });
-    await expect(flags.getByText("Нестандартный размер")).toBeVisible();
-    await expect(flags.getByText("Срочно")).toBeVisible();
-    await expect(flags.getByText("Нужны документы")).toBeVisible();
-    const attribution = page.getByRole("region", { name: "Атрибуция" });
-    await expect(attribution.getByText("test", { exact: true })).toBeVisible();
-    await expect(attribution.getByText("cpc", { exact: true })).toBeVisible();
-    await expect(attribution.getByText(CLIENT_ID)).toBeVisible();
+    for (const flag of ["Нестандартный размер", "Срочно", "Нужны документы"]) {
+      await expect(flags.getByRole("button", { name: flag, pressed: true })).toBeVisible();
+    }
+    // «Откуда пришёл клиент» is collapsed (<details>): open it before checking the UTM rows.
+    const source = page.getByRole("region", { name: "Откуда пришёл клиент" });
+    await source.getByText("Откуда пришёл клиент").click();
+    await expect(source.getByText("test", { exact: true })).toBeVisible();
+    await expect(source.getByText("cpc", { exact: true })).toBeVisible();
+    await expect(source.getByText(CLIENT_ID)).toBeVisible();
     await expect(
       page.getByRole("region", { name: "Файлы" }).getByRole("link", { name: "Скачать" })
     ).toHaveAttribute("href", `/api/lead-files/${file.id}/download/`);

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, ConfirmationModal, toast, useModal } from "@payloadcms/ui";
-import { HINT_STYLE, INPUT_STYLE, Panel, ROW_STYLE } from "./panel";
+import { HINT_CLASS, INPUT_CLASS, Panel, ROW_CLASS } from "./panel";
 
 /**
  * «Ссылка» panel of the «Управление» tab (task 33): the client's order page URL with copy /
@@ -115,8 +115,12 @@ export function TokenPanel({
 
   return (
     <Panel title="Ссылка для клиента" testId="order-token-panel">
-      {loading ? <p style={HINT_STYLE}>Загрузка…</p> : null}
-      {error ? <p role="alert">{error}</p> : null}
+      {loading ? <p className={HINT_CLASS}>Загрузка…</p> : null}
+      {error ? (
+        <p role="alert" className="iga-orders-error">
+          {error}
+        </p>
+      ) : null}
       {!loading && !error ? (
         <>
           <input
@@ -124,14 +128,14 @@ export function TokenPanel({
             readOnly
             value={url ?? "Ссылка ещё не выпущена"}
             onFocus={(event) => event.currentTarget.select()}
-            style={{ ...INPUT_STYLE, width: "100%", fontFamily: "monospace" }}
+            className={`${INPUT_CLASS} iga-orders-link`}
           />
-          <p style={HINT_STYLE} data-testid="order-link-state">
+          <p className={HINT_CLASS} data-testid="order-link-state">
             {revoked
               ? "Ссылка отозвана: клиент видит «Ссылка больше не действует»."
               : "Ссылка действует. Её получает клиент в каждом письме о смене статуса."}
           </p>
-          <div style={ROW_STYLE}>
+          <div className={ROW_CLASS}>
             <Button
               buttonStyle="primary"
               size="medium"
@@ -147,7 +151,6 @@ export function TokenPanel({
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ margin: 0 }}
               >
                 Открыть
               </a>

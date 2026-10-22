@@ -12,7 +12,7 @@ import {
   statusIndex,
 } from "@/lib/orders/status";
 import type { OrderStatus } from "@/lib/orders/status";
-import { FIELD_STYLE, HINT_STYLE, INPUT_STYLE, Panel, ROW_STYLE } from "./panel";
+import { FIELD_CLASS, HINT_CLASS, INPUT_CLASS, Panel, ROW_CLASS } from "./panel";
 
 /**
  * «Статус» panel of the «Управление» tab (task 33): stage (next one by default), its date
@@ -107,25 +107,25 @@ export function StatusPanel({
 
   return (
     <Panel title="Статус заказа" testId="order-status-panel">
-      <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
+      <ol className="iga-orders-history">
         {history.map((row) => (
-          <li key={row.status}>
+          <li key={row.status} data-current={row.status === currentStatus ? "true" : undefined}>
             {ORDER_STATUS_META[row.status].label} — {row.date ?? "без даты"}
             {row.status === currentStatus ? " (текущий)" : null}
           </li>
         ))}
       </ol>
 
-      <form onSubmit={submit} style={{ display: "grid", gap: 16 }}>
-        <div style={{ ...ROW_STYLE, alignItems: "flex-end", gap: 16 }}>
-          <label htmlFor={ids.status} style={FIELD_STYLE}>
+      <form onSubmit={submit} className="iga-orders-form">
+        <div className="iga-orders-fields">
+          <label htmlFor={ids.status} className={FIELD_CLASS}>
             Новый статус
             <select
               id={ids.status}
               name="status"
               value={status}
               onChange={(event) => changeStatus(event.target.value as OrderStatus)}
-              style={INPUT_STYLE}
+              className="iga-select"
             >
               {ORDER_STATUS_IDS.map((id) => (
                 <option key={id} value={id}>
@@ -134,7 +134,7 @@ export function StatusPanel({
               ))}
             </select>
           </label>
-          <label htmlFor={ids.date} style={FIELD_STYLE}>
+          <label htmlFor={ids.date} className={FIELD_CLASS}>
             Дата
             <input
               id={ids.date}
@@ -144,10 +144,10 @@ export function StatusPanel({
               value={date}
               max={maxStatusDateKey()}
               onChange={(event) => setDate(event.target.value)}
-              style={INPUT_STYLE}
+              className={INPUT_CLASS}
             />
           </label>
-          <label htmlFor={ids.planned} style={FIELD_STYLE}>
+          <label htmlFor={ids.planned} className={FIELD_CLASS}>
             Плановая дата следующего этапа
             <input
               id={ids.planned}
@@ -156,12 +156,12 @@ export function StatusPanel({
               value={plannedDate}
               min={date || undefined}
               onChange={(event) => setPlannedDate(event.target.value)}
-              style={INPUT_STYLE}
+              className={INPUT_CLASS}
             />
           </label>
         </div>
 
-        <label htmlFor={ids.comment} style={FIELD_STYLE}>
+        <label htmlFor={ids.comment} className={FIELD_CLASS}>
           Комментарий клиенту
           <textarea
             id={ids.comment}
@@ -170,14 +170,14 @@ export function StatusPanel({
             maxLength={2000}
             value={comment}
             onChange={(event) => setComment(event.target.value)}
-            style={{ ...INPUT_STYLE, height: "auto", padding: 12, resize: "vertical" }}
+            className={INPUT_CLASS}
           />
-          <span style={HINT_STYLE}>
+          <span className={HINT_CLASS}>
             Виден на странице заказа (например, перенос срока). Пустое поле убирает комментарий.
           </span>
         </label>
 
-        <label style={{ ...ROW_STYLE, gap: 8 }}>
+        <label className="iga-orders-check">
           <input
             type="checkbox"
             name="notify"
@@ -188,7 +188,7 @@ export function StatusPanel({
         </label>
 
         {isRollback ? (
-          <label style={{ ...ROW_STYLE, gap: 8, color: "var(--theme-error-500)" }}>
+          <label className="iga-orders-check iga-orders-check--danger">
             <input
               type="checkbox"
               name="confirmRollback"
@@ -200,7 +200,7 @@ export function StatusPanel({
           </label>
         ) : null}
 
-        <div style={ROW_STYLE}>
+        <div className={ROW_CLASS}>
           <Button
             type="submit"
             buttonStyle="primary"
@@ -211,7 +211,7 @@ export function StatusPanel({
             {saving ? "Сохранение…" : "Сохранить статус"}
           </Button>
         </div>
-        <p style={HINT_STYLE}>
+        <p className={HINT_CLASS}>
           Статус можно менять и в форме заказа (история статусов): тогда письмо клиенту уходит
           всегда, если у заказа есть e-mail и уведомления включены.
         </p>

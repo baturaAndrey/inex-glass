@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { notFound, permanentRedirect } from "next/navigation";
 import { collectionTag, docTag } from "@/lib/cache-tags";
+import { isDraftModeEnabled } from "@/lib/preview/draft";
 import { normalizeRedirectPath } from "@/payload/collections/crm/redirects";
 import { LINKABLE_COLLECTIONS } from "@/payload/fields/link";
 import type { Page, Thickness, ThicknessGroup } from "@/payload-types";
@@ -148,9 +149,40 @@ const getPageByPathMemo = cache((path: string, depth: number): Promise<Page | nu
   getPublishedBy("pages", "path", path, depth)
 );
 
-/** Published document of `pages` by its full path (`/o-kompanii/`, `/` for the home page). */
-export function getPageByPath(path: string, opts: { depth?: number } = {}): Promise<Page | null> {
-  return getPageByPathMemo(toPagePath(path), opts.depth ?? DOC_DEPTH);
+/**
+ * Draft preview (task 11, admin redesign): the LATEST version of the page — its draft when one
+ * exists, otherwise the published document. Deliberately not wrapped in `cached()`: drafts must
+ * never reach the data cache (in Draft Mode Next bypasses `unstable_cache` anyway).
+ *
+ * `overrideAccess: true`: only reachable in Draft Mode, which `/api/preview/` enables for staff
+ * only, and its cookie (`__prerender_bypass`, per-build value) cannot be forged.
+ */
+const getDraftPageByPathMemo = cache(async (path: string, depth: number): Promise<Page | null> => {
+  const payload = await getPayloadClient();
+  const { docs } = await payload.find({
+    collection: "pages",
+    where: { path: { equals: path } },
+    draft: true,
+    limit: 1,
+    depth,
+    pagination: false,
+    overrideAccess: true,
+  });
+  return docs[0] ?? null;
+});
+
+/**
+ * Document of `pages` by its full path (`/o-kompanii/`, `/` for the home page): the published
+ * one, or the latest draft while the request is in Draft Mode (the page preview).
+ */
+export async function getPageByPath(
+  path: string,
+  opts: { depth?: number } = {}
+): Promise<Page | null> {
+  const key = toPagePath(path);
+  const depth = opts.depth ?? DOC_DEPTH;
+  if (await isDraftModeEnabled()) return getDraftPageByPathMemo(key, depth);
+  return getPageByPathMemo(key, depth);
 }
 
 /** Published document of a public collection by `slug`. */

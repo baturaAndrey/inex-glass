@@ -110,13 +110,17 @@ $tablet: 1100px;
       display: none;
     }
 
-    // Payload compares the URL without the trailing slash (`trailingSlash: true` here), so on
-    // the edit route no tab is marked active: the first tab («Редактировать») is then the current.
-    &.doc-tab--active {
+    // With `trailingSlash: true` Payload builds the tab hrefs with a double slash and marks no
+    // tab active; `DocTabsCurrent` (src/payload/admin/doc-tabs-current.tsx) sets
+    // `aria-current="page"` on the current one. Until it runs (before hydration) the first tab
+    // («Редактировать», the default route) stands in.
+    &.doc-tab--active,
+    &[aria-current="page"] {
       @extend %iga-doc-tab-active;
     }
 
-    @at-root .doc-tabs__tabs:not(:has(.doc-tab--active)) > .doc-tab:first-child {
+    @at-root .doc-tabs__tabs:not(:has(.doc-tab--active, .doc-tab[aria-current="page"]))
+        > .doc-tab:first-child {
       @extend %iga-doc-tab-active;
     }
 

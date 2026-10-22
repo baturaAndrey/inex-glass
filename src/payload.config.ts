@@ -66,6 +66,8 @@ export default buildConfig({
         leadsReport: {
           Component: "/payload/admin/views/leads-report#LeadsReportView",
           path: "/leads-report",
+          // Tab title; Payload appends `admin.meta.titleSuffix` (« — Inex Glass»).
+          meta: { title: "Отчёт по заявкам" },
         },
       },
     },

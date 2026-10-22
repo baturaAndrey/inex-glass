@@ -6,6 +6,7 @@ import { CookieBanner } from "@/components/ig/cookie-banner";
 import { StickyCta } from "@/components/ig/sticky-cta";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { PreviewBanner } from "@/components/preview/preview-banner";
 import { PathTracker } from "@/components/quiz/path-tracker";
 import { getEnv } from "@/lib/env";
 import { rubik } from "./fonts";
@@ -27,7 +28,9 @@ export function generateMetadata(): Metadata {
 }
 
 /**
- * Composition: skip link · header · `<main>` · footer · cookie banner · sticky CTA (phones) ·
+ * Composition: skip link · header · draft preview banner (only in Draft Mode, task 11 of the
+ * admin redesign; `draftMode()` is `false` while prerendering, so the layout stays static) ·
+ * `<main>` · footer · cookie banner · sticky CTA (phones) ·
  * form modals provider · `{modal}` slot of the quiz intercepting route (`@modal`, task 34) ·
  * `PathTracker` (last visited path → entry page of the quiz modal, task 34) · Yandex Metrika
  * (consent-gated; also captures UTM attribution on every page).
@@ -52,6 +55,8 @@ export default function SiteLayout({
         </a>
         <FormDialogProvider>
           <SiteHeader />
+          {/* After the header: the full header is `position: fixed` over its spacer and would cover it. */}
+          <PreviewBanner />
           <main id="main-content" className="flex-1 outline-none" tabIndex={-1}>
             {children}
           </main>

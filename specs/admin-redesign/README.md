@@ -103,7 +103,7 @@ graph TD
 | `src/jobs/max-notify.ts`, `src/jobs/max-unassigned-reminder.ts` | 01 (заглушки) | 10 (W3) |
 | `src/payload/admin/max/connect-button.tsx`, `group-link-panel.tsx` | 01 (заглушки) | 06 (W2) |
 | `src/payload/admin/seo/seo-title-counter.tsx`, `seo-description-counter.tsx`, `seo-snippet-preview.tsx` | 01 (заглушки) | 07 (W2) |
-| `src/payload/admin/nav/*` | 02 (заглушка `inex-nav.tsx`) | 03 (W2) |
+| `src/payload/admin/nav/*` | 02 (заглушка `inex-nav.tsx`) | 03 (W2) → координатор (W3: подключение `DocTabsCurrent` из `src/payload/admin/doc-tabs-current.tsx` — исправление подсветки вкладок документа при `trailingSlash`) |
 | `src/payload/admin/views/dashboard.tsx` | 02 (заглушка) | 04 (W2) |
 | `src/payload/admin/leads/kanban/*` | 05 | — |
 | `src/payload/admin/leads/lead-summary-view.tsx` | — (есть) | 05 (W2: не трогает) → 08 (W3) |
@@ -178,11 +178,11 @@ graph TD
 - [x] [task-07-page-edit-form](./tasks/task-07-page-edit-form.md) — Форма страницы: SEO-счётчики, сниппет, «Кем изменена»
 
 ### Wave 3
-- [ ] [task-08-lead-card-processing](./tasks/task-08-lead-card-processing.md) — Карточка заявки и панель обработки
-- [ ] [task-09-lead-history-comments](./tasks/task-09-lead-history-comments.md) — Комментарии и история заявки, e2e карточки
-- [ ] [task-10-max-notifications](./tasks/task-10-max-notifications.md) — Уведомления MAX и напоминание
-- [ ] [task-11-draft-preview](./tasks/task-11-draft-preview.md) — Превью черновика страницы
-- [ ] [task-12-admin-screens-theme](./tasks/task-12-admin-screens-theme.md) — Остальные экраны в теме
+- [x] [task-08-lead-card-processing](./tasks/task-08-lead-card-processing.md) — Карточка заявки и панель обработки
+- [x] [task-09-lead-history-comments](./tasks/task-09-lead-history-comments.md) — Комментарии и история заявки, e2e карточки
+- [x] [task-10-max-notifications](./tasks/task-10-max-notifications.md) — Уведомления MAX и напоминание
+- [x] [task-11-draft-preview](./tasks/task-11-draft-preview.md) — Превью черновика страницы
+- [x] [task-12-admin-screens-theme](./tasks/task-12-admin-screens-theme.md) — Остальные экраны в теме
 
 ### Wave 4
 - [ ] [task-13-acceptance](./tasks/task-13-acceptance.md) — Приёмка, документация, Docker CA

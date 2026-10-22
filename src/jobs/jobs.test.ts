@@ -127,10 +127,12 @@ describe("job registry", () => {
     expect(bySlug("max-notify")?.retries).toEqual(MAIL_RETRIES);
   });
 
-  it("MAX handlers are no-op stubs", async () => {
+  it("MAX handlers do nothing while MAX is disabled", async () => {
+    vi.stubEnv("MAX_ENABLED", "false");
+    await loadRegistry();
     const { maxNotifyTask } = await import("./max-notify");
     const { maxUnassignedReminderTask } = await import("./max-unassigned-reminder");
-    const handlerArgs = { input: { event: "new_lead" }, req: {} } as any;
+    const handlerArgs = { input: { event: "new_lead" }, job: { id: "J" }, req: {} } as any;
     expect(await (maxNotifyTask.handler as any)(handlerArgs)).toEqual({ output: {} });
     expect(await (maxUnassignedReminderTask.handler as any)(handlerArgs)).toEqual({ output: {} });
   });

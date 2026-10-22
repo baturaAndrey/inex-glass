@@ -80,19 +80,6 @@ async function countLeads(
   }
 }
 
-const rowStyle: CSSProperties = {
-  display: "flex",
-  flexWrap: "wrap",
-  alignItems: "center",
-  gap: "6px",
-};
-
-const groupLabelStyle: CSSProperties = {
-  color: "var(--theme-elevation-500)",
-  fontSize: "12px",
-  minWidth: "88px",
-};
-
 function ChipLink({ chip, active }: { chip: Chip; active: boolean }) {
   const colors = chip.color ? statusBadgeColors(chip.color) : null;
   return (
@@ -100,33 +87,17 @@ function ChipLink({ chip, active }: { chip: Chip; active: boolean }) {
       href={chipHref(chip.params)}
       aria-current={active ? "true" : undefined}
       data-quick-filter={chip.key}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "6px",
-        padding: "3px 10px",
-        borderRadius: "999px",
-        border: `1px solid ${active ? "var(--theme-elevation-800)" : "var(--theme-elevation-150)"}`,
-        background: active ? "var(--theme-elevation-800)" : "var(--theme-elevation-0)",
-        color: active ? "var(--theme-elevation-0)" : "var(--theme-elevation-800)",
-        fontSize: "13px",
-        lineHeight: "18px",
-        textDecoration: "none",
-        whiteSpace: "nowrap",
-      }}
+      className="iga-chip iga-screens-chip"
     >
       {colors ? (
         <span
           aria-hidden="true"
-          style={{ width: 8, height: 8, borderRadius: "50%", background: colors.color }}
+          className="iga-screens-dot"
+          style={{ "--iga-badge-color": colors.color } as CSSProperties}
         />
       ) : null}
       {chip.label}
-      {chip.count !== undefined ? (
-        <span style={{ opacity: 0.7, fontVariantNumeric: "tabular-nums" }}>
-          {formatNumber(chip.count)}
-        </span>
-      ) : null}
+      {chip.count !== undefined ? <b>{formatNumber(chip.count)}</b> : null}
     </a>
   );
 }
@@ -143,8 +114,8 @@ function ChipGroup({
   children?: ReactNode;
 }) {
   return (
-    <div style={rowStyle} role="group" aria-label={label}>
-      <span style={groupLabelStyle}>{label}</span>
+    <div className="iga-screens-quick__row" role="group" aria-label={label}>
+      <span className="iga-screens-quick__label">{label}</span>
       {chips.map((chip) => (
         <ChipLink key={chip.key} chip={chip} active={isActive(chip, current)} />
       ))}
@@ -215,10 +186,7 @@ export async function LeadListQuickFilters({ payload, user, searchParams }: Prop
   }));
 
   return (
-    <section
-      aria-label="Быстрые фильтры заявок"
-      style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}
-    >
+    <section aria-label="Быстрые фильтры заявок" className="iga-screens-quick">
       <ChipGroup label="Статус" chips={statusChips} current={current} />
       <ChipGroup label="Работа" chips={workChips} current={current} />
       <ChipGroup label="Период" chips={periodChips} current={current} />

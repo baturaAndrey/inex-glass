@@ -1,5 +1,5 @@
 import { formTypeLabel } from "../constants";
-import { mutedText, Stack } from "../ui";
+import { MUTED_CLASS, Stack } from "../ui";
 import type { DefaultServerCellComponentProps } from "payload";
 
 /**
@@ -13,9 +13,9 @@ export function SourceCell({ cellData, rowData }: DefaultServerCellComponentProp
   return (
     <Stack>
       <span>{form}</span>
-      {label && label !== form ? <span style={mutedText}>{label}</span> : null}
+      {label && label !== form ? <span className={MUTED_CLASS}>{label}</span> : null}
       {entryPage ? (
-        <span style={{ ...mutedText, wordBreak: "break-all" }} title={entryPage}>
+        <span className={`${MUTED_CLASS} iga-screens-break`} title={entryPage}>
           {entryPage}
         </span>
       ) : null}

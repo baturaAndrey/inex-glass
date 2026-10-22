@@ -2,6 +2,7 @@ import { access } from "node:fs/promises";
 import path from "node:path";
 import { commitTransaction, createLocalReq, initTransaction, killTransaction } from "payload";
 import { getEnv } from "@/lib/env";
+import { maxDeleteMessage } from "@/lib/max/client";
 import { ERASE_CONFIRM_WORD } from "@/payload/admin/leads/constants";
 import { consentEmailHash, consentPhoneHash } from "@/payload/utils/normalize";
 import type { Payload, PayloadRequest, Where } from "payload";
@@ -17,9 +18,11 @@ import type { Payload, PayloadRequest, Where } from "payload";
  *  3. all versions of the lead are deleted (otherwise the PII survives in `_leads_v`);
  *  4. links `duplicateOf → lead` of other leads are cleared (no hooks, no new versions);
  *  5. the lead is deleted;
- *  6. its attachments (`lead-files`, Payload removes the files from `UPLOADS_DIR`) are deleted.
+ *  6. its attachments (`lead-files`, Payload removes the files from `UPLOADS_DIR`) are deleted;
+ *  7. its MAX notification journal (`notification-log`) is deleted; the message ids are kept.
  * After the commit (best effort, outside the transaction so a failure cannot abort it): pending
- * jobs carrying the lead id are removed and the disk is checked for leftovers.
+ * jobs carrying the lead id are removed, the disk is checked for leftovers and the MAX messages
+ * (they quote the phone) are deleted from the chats.
  *
  * Nothing personal is logged: only ids and counters.
  */
@@ -29,6 +32,7 @@ export const ERASE_CONTEXT = {
   skipAssigneeNotify: true,
   skipOrderHooks: true,
   skipStatusEmail: true,
+  skipMaxNotify: true,
 } as const;
 
 export const ORDER_EXISTS_MESSAGE =
@@ -37,7 +41,13 @@ export const ORDER_EXISTS_MESSAGE =
 export type EraseResult =
   | {
       ok: true;
-      deleted: { versions: number; files: number; consentAnonymized: number };
+      deleted: {
+        versions: number;
+        files: number;
+        consentAnonymized: number;
+        /** Rows of `notification-log` deleted with the lead. */
+        notifications: number;
+      };
     }
   | { ok: false; status: 404 | 409; error: string };
 
@@ -101,6 +111,16 @@ export function consentRecordsWhere(args: {
   return { or };
 }
 
+/** Unique non-empty MAX message ids of journal rows (what to delete in the chats). */
+export function collectMaxMessageIds(rows: readonly { messageId?: unknown }[]): string[] {
+  const ids = new Set<string>();
+  for (const row of rows) {
+    const id = row.messageId;
+    if (typeof id === "string" && id.trim() !== "") ids.add(id.trim());
+  }
+  return [...ids];
+}
+
 /** Pending (not completed, not running) jobs whose input carries the lead id. */
 export function pendingJobsWhere(leadId: string): Where {
   return {
@@ -110,6 +130,12 @@ export function pendingJobsWhere(leadId: string): Where {
       { processing: { equals: false } },
     ],
   };
+}
+
+/** What the transaction leaves for the after-commit cleanup. */
+interface ErasedLeftovers {
+  fileNames: string[];
+  maxMessageIds: string[];
 }
 
 type LeadForErase = {
@@ -140,7 +166,7 @@ async function runInTransaction(
 async function eraseInTransaction(
   req: PayloadRequest,
   leadId: string,
-  stored: { fileNames: string[] }
+  stored: ErasedLeftovers
 ): Promise<EraseResult> {
   const { payload } = req;
   const lead = (await payload.findByID({
@@ -205,6 +231,33 @@ async function eraseInTransaction(
     req,
   });
 
+  // MAX notifications: remember the message ids (deleted in the chats after the commit), then
+  // drop the journal rows together with the lead.
+  const notificationWhere: Where = { lead: { equals: leadId } };
+  const journal = await payload.find({
+    collection: "notification-log",
+    where: notificationWhere,
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+    select: { messageId: true },
+    req,
+  });
+  stored.maxMessageIds = collectMaxMessageIds(journal.docs);
+  let notifications = 0;
+  if (journal.docs.length > 0) {
+    const removed = await payload.delete({
+      collection: "notification-log",
+      where: notificationWhere,
+      depth: 0,
+      overrideAccess: true,
+      context: ERASE_CONTEXT,
+      req,
+    });
+    if (removed.errors.length > 0) throw new Error("notification-log deletion failed");
+    notifications = removed.docs.length;
+  }
+
   await payload.delete({
     collection: "leads",
     id: leadId,
@@ -233,7 +286,10 @@ async function eraseInTransaction(
     }
   }
 
-  return { ok: true, deleted: { versions, files, consentAnonymized: consent.docs.length } };
+  return {
+    ok: true,
+    deleted: { versions, files, consentAnonymized: consent.docs.length, notifications },
+  };
 }
 
 /** Best effort after the commit: queued jobs with the lead id (their input is only ids). */
@@ -254,6 +310,36 @@ async function removePendingJobs(payload: Payload, leadId: string): Promise<numb
     });
     return 0;
   }
+}
+
+/**
+ * Best effort after the commit: deletes the lead's MAX messages one by one. Old messages may be
+ * beyond what the platform lets a bot delete; such failures only show up in the counters.
+ */
+async function deleteMaxMessages(
+  payload: Payload,
+  leadId: string,
+  messageIds: readonly string[]
+): Promise<void> {
+  if (messageIds.length === 0) return;
+  if (!getEnv().MAX_ENABLED) {
+    payload.logger.warn({ event: "lead-erase-max-skipped", leadId, count: messageIds.length });
+    return;
+  }
+  let deleted = 0;
+  let failed = 0;
+  for (const id of messageIds) {
+    try {
+      await maxDeleteMessage(id);
+      deleted += 1;
+    } catch {
+      // The error may quote the API answer: only the counter is kept.
+      failed += 1;
+    }
+  }
+  const log = { event: "lead-erase-max-messages", leadId, deleted, failed };
+  if (failed > 0) payload.logger.warn(log);
+  else payload.logger.info(log);
 }
 
 /** Files Payload should have unlinked; any that are still on disk are reported (names only). */
@@ -278,12 +364,13 @@ export async function eraseLeadPersonalData(
   actor: EraseActor
 ): Promise<EraseResult> {
   const req = await createLocalReq({ context: { ...ERASE_CONTEXT } }, payload);
-  const stored = { fileNames: [] as string[] };
+  const stored: ErasedLeftovers = { fileNames: [], maxMessageIds: [] };
 
   const result = await runInTransaction(req, () => eraseInTransaction(req, leadId, stored));
   if (!result.ok) return result;
 
   const jobs = await removePendingJobs(payload, leadId);
+  await deleteMaxMessages(payload, leadId, stored.maxMessageIds);
   const leftovers = await findLeftoverFiles(stored.fileNames);
   if (leftovers > 0) {
     payload.logger.warn({ event: "lead-erase-files-left", leadId, leftovers });
@@ -296,6 +383,7 @@ export async function eraseLeadPersonalData(
     versions: result.deleted.versions,
     files: result.deleted.files,
     consentAnonymized: result.deleted.consentAnonymized,
+    notifications: result.deleted.notifications,
     jobs,
   });
   return result;

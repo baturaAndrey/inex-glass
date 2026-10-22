@@ -2,8 +2,12 @@ import { daysBetween, todayKey } from "@/lib/domain";
 import { formatOrderDate, orderDateKey } from "@/lib/orders/status";
 import type { DefaultServerCellComponentProps } from "payload";
 
-const DANGER = "#B23B3B";
-const MUTED = "#5B636B";
+/** Badge of each tone (`.iga-badge*` in the admin theme): valid, counting down, revoked/expired. */
+const TONE_CLASS: Readonly<Record<LinkExpiryState["tone"], string>> = {
+  ok: "iga-badge iga-badge--ok",
+  muted: "iga-badge",
+  danger: "iga-badge iga-badge--no",
+};
 
 export interface LinkExpiryState {
   text: string;
@@ -36,10 +40,5 @@ export function LinkExpiryCell({ cellData, rowData }: DefaultServerCellComponent
     (rowData as { revoked?: unknown } | undefined)?.revoked,
     cellData
   );
-  const color = tone === "danger" ? DANGER : tone === "muted" ? MUTED : undefined;
-  return (
-    <span style={{ color, fontWeight: tone === "danger" ? 500 : undefined, whiteSpace: "nowrap" }}>
-      {text}
-    </span>
-  );
+  return <span className={TONE_CLASS[tone]}>{text}</span>;
 }

@@ -270,13 +270,17 @@ test("summary tab: contacts, flags, UTM, files and repeat requests", async ({
   const contacts = page.getByRole("region", { name: "Контакты" });
   await expect(contacts.locator(`a[href="tel:${phoneAB}"]`)).toBeVisible();
   await expect(contacts.locator(`a[href="mailto:${RUN}-a@example.com"]`)).toBeVisible();
+  // «Флаги» (inside «Обработка»): every flag is a toggle chip, the lead's flags are pressed.
   const flags = page.getByRole("region", { name: "Флаги" });
-  await expect(flags.getByText("Срочно")).toBeVisible();
-  await expect(flags.getByText("Нужны документы")).toBeVisible();
-  const attribution = page.getByRole("region", { name: "Атрибуция" });
-  await expect(attribution.getByText("utm_source")).toBeVisible();
-  await expect(attribution.getByText("yandex")).toBeVisible();
-  await expect(attribution.getByText("1234567890")).toBeVisible();
+  await expect(flags.getByRole("button", { name: "Срочно", pressed: true })).toBeVisible();
+  await expect(flags.getByRole("button", { name: "Нужны документы", pressed: true })).toBeVisible();
+  await expect(flags.getByRole("button", { name: "Малый объём", pressed: false })).toBeVisible();
+  // «Откуда пришёл клиент» is collapsed (<details>): open it, then the UTM rows are visible.
+  const source = page.getByRole("region", { name: "Откуда пришёл клиент" });
+  await source.getByText("Откуда пришёл клиент").click();
+  await expect(source.getByText("utm_source")).toBeVisible();
+  await expect(source.getByText("yandex")).toBeVisible();
+  await expect(source.getByText("1234567890")).toBeVisible();
   await expect(page.getByRole("region", { name: "Повторные обращения" })).toContainText(
     "Есть повторы: 1"
   );
@@ -295,7 +299,91 @@ test("summary tab: contacts, flags, UTM, files and repeat requests", async ({
     page.getByRole("region", { name: "Повторные обращения" }).getByRole("link", {
       name: "Исходная заявка",
     })
-  ).toHaveAttribute("href", `/admin/collections/leads/${leadA.id}/`);
+  ).toHaveAttribute("href", `/admin/collections/leads/${leadA.id}/summary/`);
+});
+
+test("card: comment is added and shown with author", async ({ page, baseURL }) => {
+  const before = (await admin.json<Lead>(`/api/leads/${leadA.id}/?depth=0`)).internalComments ?? [];
+  expect(before.length, "comments of the «comments…» test").toBeGreaterThan(0);
+  const authorOf = (row: { author?: unknown }) =>
+    typeof row.author === "object" && row.author !== null
+      ? (row.author as { id?: string }).id
+      : row.author;
+
+  await signInBrowser(page.context(), manager, baseURL!);
+  await page.goto(`/admin/collections/leads/${leadA.id}/summary/`);
+  const comments = page.getByRole("region", { name: "Комментарии", exact: true });
+  const text = `${RUN} комментарий`;
+  await comments.getByLabel("Внутренний комментарий (клиент его не видит)").fill(text);
+  await comments.getByRole("button", { name: "Добавить" }).click();
+
+  const row = comments.getByRole("listitem").filter({ hasText: text });
+  await expect(row).toBeVisible();
+  await expect(row).toContainText(manager.user.name ?? "");
+  await expect(comments.getByLabel("Внутренний комментарий (клиент его не видит)")).toHaveValue("");
+
+  // Server state: the new row is the manager's; earlier rows and their authors are untouched.
+  const after = (await admin.json<Lead>(`/api/leads/${leadA.id}/?depth=0`)).internalComments ?? [];
+  expect(after).toHaveLength(before.length + 1);
+  const added = after.find((comment) => comment.text === text);
+  expect(added && authorOf(added)).toBe(manager.user.id);
+  for (const old of before) {
+    const kept = after.find((comment) => comment.id === old.id);
+    expect(kept?.text).toBe(old.text);
+    expect(kept && authorOf(kept)).toBe(authorOf(old));
+    expect(kept?.date).toBe(old.date);
+  }
+});
+
+test("card: processing panel saves status and history shows it", async ({ page, baseURL }) => {
+  const adminName = admin.user.name ?? "";
+  await signInBrowser(page.context(), admin, baseURL!);
+  await page.goto(`/admin/collections/leads/${leadB.id}/summary/`);
+  const processing = page.getByRole("region", { name: "Обработка" });
+  const history = page.getByRole("region", { name: "История", exact: true });
+  const save = processing.getByRole("button", { name: "Сохранить" });
+
+  // «Новая» → «В работе»: saved through REST, the version shows up in the history with its author.
+  await processing.getByLabel("Статус", { exact: true }).selectOption({ label: "В работе" });
+  await save.click();
+  await expect(page.getByText("Сохранено", { exact: true })).toBeVisible();
+  const toWork = history.getByRole("listitem").filter({ hasText: "Статус: «Новая» → «В работе»" });
+  await expect(toWork).toBeVisible();
+  await expect(toWork).toContainText(adminName);
+
+  // «Отказ» without a reason is refused by the server rule; with a reason code it is saved.
+  await processing.getByLabel("Статус", { exact: true }).selectOption({ label: "Отказ" });
+  await save.click();
+  await expect(processing.getByText(REFUSE_REASON_REQUIRED_MESSAGE)).toBeVisible();
+  await processing.getByLabel("Причина отказа").selectOption({ label: "Дорого" });
+  await save.click();
+  await expect(
+    history
+      .getByRole("listitem")
+      .filter({ hasText: "Статус: «В работе» → «Отказ» · причина: Дорого" })
+  ).toBeVisible();
+  const saved = await admin.json<Lead>(`/api/leads/${leadB.id}/?depth=0`);
+  expect(saved.status).toBe(statusRefused);
+  expect(saved.refuseReasonCode).toBe("expensive");
+
+  // «Назначить себя» saves the assignee at once.
+  await processing.getByRole("button", { name: "Назначить себя" }).click();
+  await expect(
+    history.getByRole("listitem").filter({ hasText: `Ответственный: ${adminName}` })
+  ).toBeVisible();
+});
+
+test("card: MAX notification rows appear in history", async () => {
+  // `notification-log` is written only through the Local API (REST create is denied for
+  // everyone), so e2e cannot put rows into it without a dedicated endpoint, which must not exist.
+  test.info().annotations.push({
+    type: "covered-by",
+    description: "проверяется unit-тестом buildLeadTimeline (build-timeline.test.ts, правило 4)",
+  });
+  test.skip(
+    true,
+    "notification-log пишется только Local API; проверяется unit-тестом buildLeadTimeline"
+  );
 });
 
 test("export: CSV and XLSX for a period, access and validation", async ({ request }) => {

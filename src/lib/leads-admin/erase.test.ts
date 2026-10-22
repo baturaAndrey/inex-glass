@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   collectFileIds,
+  collectMaxMessageIds,
   consentRecordsWhere,
   isEraseConfirmed,
   isSameOrigin,
@@ -72,5 +73,22 @@ describe("pendingJobsWhere", () => {
         { processing: { equals: false } },
       ],
     });
+  });
+});
+
+describe("collectMaxMessageIds", () => {
+  it("keeps unique non-empty string ids", () => {
+    expect(
+      collectMaxMessageIds([
+        { messageId: "mid.1" },
+        { messageId: "mid.1" },
+        { messageId: " mid.2 " },
+        { messageId: "" },
+        { messageId: null },
+        { messageId: 42 },
+        {},
+      ])
+    ).toEqual(["mid.1", "mid.2"]);
+    expect(collectMaxMessageIds([])).toEqual([]);
   });
 });

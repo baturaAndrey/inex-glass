@@ -14,9 +14,12 @@ const denyAll = () => false;
  * Journal of messenger notifications (MAX): idempotency of jobs (unique `key`) and the source of
  * the lead timeline (task 08). Written only via Local API by jobs (task 10); erased together with
  * the lead (task 10, `src/lib/leads-admin/erase.ts`).
- * Key format: `max:<event>:<leadId|orderId>[:<suffix>]`, e.g. `max:new-lead:<leadId>`,
- * `max:status:<leadId>:<statusChangedAt ISO>`, `max:assigned:<leadId>:<assigneeId>`,
- * `max:unassigned:<leadId>`, `max:order:<orderId>:<status>`.
+ * Key format: `max:<event>:<leadId|orderId>[:<suffix>]` + channel `:group` or `:user:<userId>`
+ * (one key = one message to one recipient; builders: `maxKeys` in `src/lib/max/notify.ts`), e.g.
+ * `max:new-lead:<leadId>:group`, `max:status:<leadId>:<statusChangedAt ISO>:group`,
+ * `max:status:<leadId>:<statusChangedAt ISO>:user:<userId>`,
+ * `max:assigned:<leadId>:<jobId>:user:<assigneeId>`, `max:unassigned:<leadId>:group`,
+ * `max:order:<orderId>:<status>:group`, `max:order:<orderId>:<status>:user:<managerId>`.
  */
 export const NotificationLog: CollectionConfig = {
   slug: "notification-log",

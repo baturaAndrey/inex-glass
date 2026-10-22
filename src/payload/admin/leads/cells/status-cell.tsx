@@ -15,10 +15,6 @@ export async function StatusCell({ cellData, payload }: DefaultServerCellCompone
 
   const status = (await loadLeadStatuses(payload)).find((option) => option.id === id);
   if (!status) return <span>{EMPTY}</span>;
-  const colors = statusBadgeColors(status.color);
-  return (
-    <Badge color={colors.color} background={colors.background}>
-      {status.name}
-    </Badge>
-  );
+  // Only the text colour: `.iga-badge` derives the 12 % fill from it (ТЗ table «Статусы»).
+  return <Badge color={statusBadgeColors(status.color).color}>{status.name}</Badge>;
 }
