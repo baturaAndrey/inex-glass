@@ -22,9 +22,11 @@ import { ContactCell as ContactCell_551613320129b8604e97a93947ba4c89 } from '../
 import { FlagsCell as FlagsCell_561f9a868e0ed1cd1957ee5165c83a6e } from '../../../payload/admin/leads/cells/flags-cell'
 import { StatusCell as StatusCell_6f149399eb232b960a8ba220e5fd9a3d } from '../../../payload/admin/leads/cells/status-cell'
 import { DuplicateCell as DuplicateCell_a2601ab884c88b00c614740934302c61 } from '../../../payload/admin/leads/cells/duplicate-cell'
+import { LeadsViewToggle as LeadsViewToggle_3a23fe7b3d34461f92e17f1d6011dc9b } from '../../../payload/admin/leads/kanban/view-toggle'
 import { LeadListQuickFilters as LeadListQuickFilters_272a4e67fd7e842121feccc2f549a1f1 } from '../../../payload/admin/leads/lead-list-quick-filters'
 import { EraseMenuItem as EraseMenuItem_cb24a182e6596402cabe26f1671acc10 } from '../../../payload/admin/leads/erase-menu-item'
 import { LeadSummaryView as LeadSummaryView_8e9c9de4855ebc1a351c689bea99cc6d } from '../../../payload/admin/leads/lead-summary-view'
+import { LeadsKanbanView as LeadsKanbanView_db7536dd9dd2967c2af2eb5026d28dc4 } from '../../../payload/admin/leads/kanban/kanban-view'
 import { StatusCell as StatusCell_6a4396422208b3cd537e67b568c6c9b5 } from '../../../payload/admin/orders/cells/status-cell'
 import { LinkExpiryCell as LinkExpiryCell_c12b29996b6b3e70d1181cf4f749534f } from '../../../payload/admin/orders/cells/link-expiry-cell'
 import { OrderManageView as OrderManageView_1771195cb9aa76a83b23f6cb8761737b } from '../../../payload/admin/orders/order-manage-view'
@@ -64,9 +66,11 @@ export const importMap = {
   "/payload/admin/leads/cells/flags-cell#FlagsCell": FlagsCell_561f9a868e0ed1cd1957ee5165c83a6e,
   "/payload/admin/leads/cells/status-cell#StatusCell": StatusCell_6f149399eb232b960a8ba220e5fd9a3d,
   "/payload/admin/leads/cells/duplicate-cell#DuplicateCell": DuplicateCell_a2601ab884c88b00c614740934302c61,
+  "/payload/admin/leads/kanban/view-toggle#LeadsViewToggle": LeadsViewToggle_3a23fe7b3d34461f92e17f1d6011dc9b,
   "/payload/admin/leads/lead-list-quick-filters#LeadListQuickFilters": LeadListQuickFilters_272a4e67fd7e842121feccc2f549a1f1,
   "/payload/admin/leads/erase-menu-item#EraseMenuItem": EraseMenuItem_cb24a182e6596402cabe26f1671acc10,
   "/payload/admin/leads/lead-summary-view#LeadSummaryView": LeadSummaryView_8e9c9de4855ebc1a351c689bea99cc6d,
+  "/payload/admin/leads/kanban/kanban-view#LeadsKanbanView": LeadsKanbanView_db7536dd9dd2967c2af2eb5026d28dc4,
   "/payload/admin/orders/cells/status-cell#StatusCell": StatusCell_6a4396422208b3cd537e67b568c6c9b5,
   "/payload/admin/orders/cells/link-expiry-cell#LinkExpiryCell": LinkExpiryCell_c12b29996b6b3e70d1181cf4f749534f,
   "/payload/admin/orders/order-manage-view#OrderManageView": OrderManageView_1771195cb9aa76a83b23f6cb8761737b,

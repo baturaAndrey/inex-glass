@@ -98,6 +98,29 @@ const envSchema = z.object({
     .regex(INDEXNOW_KEY_PATTERN, "ожидается 32 hex-символа (openssl rand -hex 16)")
     .optional(),
 
+  // MAX messenger (task 06 admin-redesign)
+  /** Master switch of outgoing notifications (task 10). Linking works without it. */
+  MAX_ENABLED: booleanString,
+  /** Bot token from the MAX partner platform. Never logged. */
+  MAX_BOT_TOKEN: z.string().min(16).optional(),
+  /** Bot nickname for deep links: https://max.ru/<name>?start=<token>. */
+  MAX_BOT_NAME: z
+    .string()
+    .regex(/^[A-Za-z0-9_.-]{3,64}$/, "ник бота: латиница, цифры, _ . -")
+    .optional(),
+  /** Secret of the webhook subscription (header X-Max-Bot-Api-Secret). */
+  MAX_WEBHOOK_SECRET: z
+    .string()
+    .regex(/^[A-Za-z0-9_-]{32,256}$/, "32–256 символов A-Z a-z 0-9 _ -")
+    .optional(),
+  /** Not production: every notification goes to this chat (or nowhere when unset). */
+  MAX_INTERCEPT_CHAT_ID: z
+    .string()
+    .regex(/^-?\d{1,20}$/, "числовой ID чата MAX")
+    .optional(),
+  /** Bot API base URL, only for mocks (e2e). Unset → https://platform-api2.max.ru. */
+  MAX_API_BASE_URL: z.url().optional(),
+
   // Dev tools (scripts only; never present in prod images or prod env)
   KIE_AI_API_KEY: z.string().optional(),
   WORDKEEPER_API_KEY: z.string().optional(),
@@ -114,6 +137,15 @@ function productionIssues(raw: RawEnv): string[] {
 
   const required = ["SITE_URL", "FORM_HMAC_SECRET", "ORDER_TOKEN_SECRET"] as const;
   return required.filter((name) => !raw[name]).map((name) => `${name}: обязательна в production`);
+}
+
+/** MAX: sending notifications needs the bot token. Not enforced while building the image. */
+function maxIssues(raw: RawEnv): string[] {
+  if (raw.NEXT_PHASE === NEXT_BUILD_PHASE) return [];
+  if (raw.MAX_ENABLED === "true" && !raw.MAX_BOT_TOKEN) {
+    return ["MAX_BOT_TOKEN: обязательна при MAX_ENABLED=true"];
+  }
+  return [];
 }
 
 function normalize(source: NodeJS.ProcessEnv): RawEnv {
@@ -157,6 +189,7 @@ export function getEnv(): Env {
       ? []
       : parsed.error.issues.map((issue) => `${issue.path.join(".") || "(env)"}: ${issue.message}`)),
     ...productionIssues(raw),
+    ...maxIssues(raw),
   ];
 
   if (!parsed.success || problems.length > 0) {

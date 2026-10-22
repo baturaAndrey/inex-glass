@@ -85,11 +85,19 @@ export const Leads: CollectionConfig = {
     listSearchableFields: ["company", "name", "phone", "email", "inn", "sourceLabel", "comment"],
     pagination: { defaultLimit: LEADS_PAGE_SIZE },
     components: {
+      // «Канбан / Таблица» above the list (task 05 admin-redesign).
+      beforeList: [`${ADMIN_LEADS}/kanban/view-toggle#LeadsViewToggle`],
       beforeListTable: [`${ADMIN_LEADS}/lead-list-quick-filters#LeadListQuickFilters`],
       edit: {
         editMenuItems: [`${ADMIN_LEADS}/erase-menu-item#EraseMenuItem`],
       },
       views: {
+        // /admin/collections/leads/kanban/ — custom collection view (rendered inside DefaultTemplate).
+        kanban: {
+          Component: `${ADMIN_LEADS}/kanban/kanban-view#LeadsKanbanView`,
+          path: "/kanban",
+          exact: true,
+        },
         edit: {
           summary: {
             Component: `${ADMIN_LEADS}/lead-summary-view#LeadSummaryView`,

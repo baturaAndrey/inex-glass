@@ -21,8 +21,13 @@ export const ERASE_CONFIRM_WORD = "УДАЛИТЬ";
 export const LEADS_LIST_PATH = "/admin/collections/leads/";
 export const LEADS_REPORT_PATH = "/admin/leads-report/";
 export const LEADS_EXPORT_API_PATH = "/api/admin/leads/export/";
+/** Kanban of leads: custom collection view `views.kanban` (admin redesign, task 05). */
+export const LEADS_KANBAN_PATH = "/admin/collections/leads/kanban/";
 
 export const leadAdminPath = (id: string) => `/admin/collections/leads/${encodeURIComponent(id)}/`;
+/** «Сводка» tab of a lead: the card linked from the kanban, the dashboard and MAX messages. */
+export const leadSummaryPath = (id: string) =>
+  `/admin/collections/leads/${encodeURIComponent(id)}/summary/`;
 export const leadEraseApiPath = (id: string) => `/api/admin/leads/${encodeURIComponent(id)}/erase/`;
 export const leadFileDownloadPath = (id: string) =>
   `/api/lead-files/${encodeURIComponent(id)}/download/`;

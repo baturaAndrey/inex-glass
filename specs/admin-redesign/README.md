@@ -154,10 +154,10 @@ graph TD
 - Базовые классы `_base.scss`: `.iga-card`, `.iga-btn` (`--primary|--secondary|--ghost|--danger`, `--sm`), `.iga-badge` (`--new|--work|--kp|--ok|--no` + произвольный цвет через `--iga-badge-color`), `.iga-tag`, `.iga-chip` (`[aria-pressed=true]`), `.iga-seg`, `.iga-input`, `.iga-select`, `.iga-field`, `.iga-dl`, `.iga-bar`, `.iga-page-head`, `.iga-section-head`, `.iga-avatar` (`--sm`). Компоненты задач используют их и добавляют своё только в свой партиал.
 
 **MAX (task-06 → task-10)**
-- `src/lib/max/client.ts`: `maxSendMessage({ chatId?: string, userId?: string, text: string, buttons?: { text: string; url: string }[][], notify?: boolean }): Promise<{ messageId: string }>`; `maxDeleteMessage(messageId: string): Promise<void>`; `class MaxApiError extends Error { status: number; code?: string; permanent: boolean }` (401/403/404 → `permanent: true`).
+- `src/lib/max/client.ts`: `maxSendMessage({ chatId?: string, userId?: string, text: string, buttons?: { text: string; url: string }[][], notify?: boolean }): Promise<{ messageId: string }>`; `maxDeleteMessage(messageId: string): Promise<void>`; `class MaxApiError extends Error { status: number; code?: string; permanent: boolean }` (401/403/404 → `permanent: true`; 2xx без id сообщения → `permanent: true`, код `MAX_UNCONFIRMED_CODE`; `retryAfterMs` из `Retry-After` при 429/503).
 - `src/lib/max/target.ts`: `resolveMaxTarget({ chatId?, userId? })` — если `SITE_ENV !== 'production'`, подменяет адресата на `MAX_INTERCEPT_CHAT_ID` или возвращает `null` (не слать); если `MAX_ENABLED !== 'true'` — `null`.
 - `src/lib/max/html.ts`: `escapeHtml`, `truncateMaxText` (≤ 4000).
-- `src/lib/max/link-token.ts`: генерация одноразового токена (32 символа base64url), `hashToken` (SHA-256), проверка срока (30 мин).
+- `src/lib/max/link-token.ts`: генерация одноразового токена `ig_` + 32 символа base64url (бот реагирует только на свой префикс; без него — молчит), `hashToken` (SHA-256), проверка срока (30 мин); код группы — `INEX-XXXXXXXX`, засчитывается только отдельным сообщением.
 - Webhook: `POST /api/max/webhook/` (`src/app/api/max/webhook/route.ts`). Необязательная env `MAX_API_BASE_URL` (по умолчанию `https://platform-api2.max.ru`) — для моков. Токен привязки: `POST /api/max/link-token/`. Подписка: `pnpm payload run scripts/max-subscribe.ts`.
 
 **Карточка заявки (волна 3, контракт той же волны 08 ↔ 09)**
@@ -171,11 +171,11 @@ graph TD
 - [x] [task-02-admin-theme-foundation](./tasks/task-02-admin-theme-foundation.md) — Тема, шрифт, конфиг админки, зависимости, SCSS-каркас
 
 ### Wave 2
-- [ ] [task-03-admin-nav](./tasks/task-03-admin-nav.md) — Боковое меню с группами и счётчиками
-- [ ] [task-04-admin-dashboard](./tasks/task-04-admin-dashboard.md) — Дашборд
-- [ ] [task-05-leads-kanban](./tasks/task-05-leads-kanban.md) — Канбан заявок
-- [ ] [task-06-max-core](./tasks/task-06-max-core.md) — MAX: клиент, webhook, привязка лички и группы
-- [ ] [task-07-page-edit-form](./tasks/task-07-page-edit-form.md) — Форма страницы: SEO-счётчики, сниппет, «Кем изменена»
+- [x] [task-03-admin-nav](./tasks/task-03-admin-nav.md) — Боковое меню с группами и счётчиками
+- [x] [task-04-admin-dashboard](./tasks/task-04-admin-dashboard.md) — Дашборд
+- [x] [task-05-leads-kanban](./tasks/task-05-leads-kanban.md) — Канбан заявок
+- [x] [task-06-max-core](./tasks/task-06-max-core.md) — MAX: клиент, webhook, привязка лички и группы
+- [x] [task-07-page-edit-form](./tasks/task-07-page-edit-form.md) — Форма страницы: SEO-счётчики, сниппет, «Кем изменена»
 
 ### Wave 3
 - [ ] [task-08-lead-card-processing](./tasks/task-08-lead-card-processing.md) — Карточка заявки и панель обработки

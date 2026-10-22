@@ -32,6 +32,14 @@ export const E2E_DATABASE_URL =
   (process.env.CI ? process.env.DATABASE_URL : undefined) ??
   DEFAULT_E2E_DATABASE_URL;
 
+/**
+ * MAX webhook (task 06 admin-redesign): test-only secret and bot nickname. Against an external
+ * stand its own secret must be provided as `E2E_MAX_WEBHOOK_SECRET`.
+ */
+export const E2E_MAX_WEBHOOK_SECRET =
+  process.env.E2E_MAX_WEBHOOK_SECRET ?? "e2e-max-webhook-secret-e2e-max-webhook-0000";
+export const E2E_MAX_BOT_NAME = process.env.E2E_MAX_BOT_NAME ?? "inex_glass_e2e_bot";
+
 /** Env for `next start` / `payload migrate` / `pnpm seed` during e2e runs. */
 export function e2eServerEnv(): Record<string, string> {
   const siteUrl = `http://localhost:${E2E_PORT}`;
@@ -50,5 +58,15 @@ export function e2eServerEnv(): Record<string, string> {
     SMTP_PORT: process.env.SMTP_PORT ?? "1025",
     UPLOADS_DIR: path.join(".data", "e2e", "lead-files"),
     MEDIA_DIR: path.join(".data", "e2e", "media"),
+    // Nothing may reach the real MAX API from tests (the bot is shared with another live site).
+    // Explicit empty values: `next start` would otherwise load a developer's `.env` token
+    // (Next never overrides variables that are already set, even to ""). The base URL points at
+    // the discard port as a second guard.
+    MAX_ENABLED: "false",
+    MAX_BOT_TOKEN: "",
+    MAX_INTERCEPT_CHAT_ID: "",
+    MAX_API_BASE_URL: "http://127.0.0.1:9",
+    MAX_WEBHOOK_SECRET: E2E_MAX_WEBHOOK_SECRET,
+    MAX_BOT_NAME: E2E_MAX_BOT_NAME,
   };
 }
