@@ -90,6 +90,7 @@ export interface Config {
     'consent-log': ConsentLog;
     redirects: Redirect;
     'rate-limits': RateLimit;
+    'notification-log': NotificationLog;
     search: Search;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -132,6 +133,7 @@ export interface Config {
     'consent-log': ConsentLogSelect<false> | ConsentLogSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'rate-limits': RateLimitsSelect<false> | RateLimitsSelect<true>;
+    'notification-log': NotificationLogSelect<false> | NotificationLogSelect<true>;
     search: SearchSelect<false> | SearchSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -181,6 +183,8 @@ export interface Config {
       'expire-order-links': TaskExpireOrderLinks;
       'cleanup-rate-limits': TaskCleanupRateLimits;
       'indexnow-submit': TaskIndexnowSubmit;
+      'max-notify': TaskMaxNotify;
+      'max-unassigned-reminder': TaskMaxUnassignedReminder;
       inline: {
         input: unknown;
         output: unknown;
@@ -224,6 +228,11 @@ export interface User {
   messengerType?: ('telegram' | 'whatsapp' | 'max' | 'viber' | 'other') | null;
   photo?: (string | null) | Media;
   notifyNewLeads?: boolean | null;
+  maxUserId?: string | null;
+  maxLinkedAt?: string | null;
+  maxBotStopped?: boolean | null;
+  maxLinkTokenHash?: string | null;
+  maxLinkTokenExpiresAt?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -339,6 +348,7 @@ export interface Page {
   path?: string | null;
   breadcrumbLabel?: string | null;
   publishedAt?: string | null;
+  updatedBy?: (string | null) | User;
   layout?:
     | (
         | HeroBlock
@@ -3735,7 +3745,9 @@ export interface Lead {
   files?: (string | LeadFile)[] | null;
   status?: (string | null) | LeadStatus;
   statusChangedAt?: string | null;
+  refuseReasonCode?: ('expensive' | 'other_supplier' | 'needs_installation' | 'no_contact' | 'other') | null;
   refuseReason?: string | null;
+  kpAmount?: number | null;
   assignee?: (string | null) | User;
   internalComments?:
     | {
@@ -3756,6 +3768,7 @@ export interface Lead {
   };
   newLeadNotifiedAt?: string | null;
   assigneeNotifiedAt?: string | null;
+  updatedBy?: (string | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -3972,6 +3985,26 @@ export interface RateLimit {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notification-log".
+ */
+export interface NotificationLog {
+  id: string;
+  key: string;
+  channel: 'group' | 'user';
+  event: 'new_lead' | 'status_change' | 'assigned' | 'order_event' | 'unassigned_reminder';
+  lead?: (string | null) | Lead;
+  order?: (string | null) | Order;
+  recipient?: (string | null) | User;
+  chatId?: string | null;
+  messageId?: string | null;
+  status: 'pending' | 'sent' | 'failed' | 'skipped';
+  error?: string | null;
+  sentAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Индекс поиска по сайту обновляется автоматически при публикации документов. Приоритет влияет на порядок выдачи.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -4094,7 +4127,9 @@ export interface PayloadJob {
           | 'cleanup-tmp-uploads'
           | 'expire-order-links'
           | 'cleanup-rate-limits'
-          | 'indexnow-submit';
+          | 'indexnow-submit'
+          | 'max-notify'
+          | 'max-unassigned-reminder';
         taskID: string;
         input?:
           | {
@@ -4137,6 +4172,8 @@ export interface PayloadJob {
         | 'expire-order-links'
         | 'cleanup-rate-limits'
         | 'indexnow-submit'
+        | 'max-notify'
+        | 'max-unassigned-reminder'
       )
     | null;
   queue?: string | null;
@@ -4254,6 +4291,10 @@ export interface PayloadLockedDocument {
         value: string | RateLimit;
       } | null)
     | ({
+        relationTo: 'notification-log';
+        value: string | NotificationLog;
+      } | null)
+    | ({
         relationTo: 'search';
         value: string | Search;
       } | null);
@@ -4312,6 +4353,11 @@ export interface UsersSelect<T extends boolean = true> {
   messengerType?: T;
   photo?: T;
   notifyNewLeads?: T;
+  maxUserId?: T;
+  maxLinkedAt?: T;
+  maxBotStopped?: T;
+  maxLinkTokenHash?: T;
+  maxLinkTokenExpiresAt?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -4412,6 +4458,7 @@ export interface PagesSelect<T extends boolean = true> {
   path?: T;
   breadcrumbLabel?: T;
   publishedAt?: T;
+  updatedBy?: T;
   layout?:
     | T
     | {
@@ -6242,7 +6289,9 @@ export interface LeadsSelect<T extends boolean = true> {
   files?: T;
   status?: T;
   statusChangedAt?: T;
+  refuseReasonCode?: T;
   refuseReason?: T;
+  kpAmount?: T;
   assignee?: T;
   internalComments?:
     | T
@@ -6259,6 +6308,7 @@ export interface LeadsSelect<T extends boolean = true> {
   orders?: T;
   newLeadNotifiedAt?: T;
   assigneeNotifiedAt?: T;
+  updatedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -6410,6 +6460,25 @@ export interface RateLimitsSelect<T extends boolean = true> {
   key?: T;
   count?: T;
   windowStart?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notification-log_select".
+ */
+export interface NotificationLogSelect<T extends boolean = true> {
+  key?: T;
+  channel?: T;
+  event?: T;
+  lead?: T;
+  order?: T;
+  recipient?: T;
+  chatId?: T;
+  messageId?: T;
+  status?: T;
+  error?: T;
+  sentAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -7083,6 +7152,18 @@ export interface SiteSetting {
     fromName?: string | null;
     replyTo?: string | null;
     ccAssignee?: boolean | null;
+    max?: {
+      newLead?: boolean | null;
+      statusChange?: boolean | null;
+      assigned?: boolean | null;
+      orderEvents?: boolean | null;
+      unassignedReminder?: boolean | null;
+      groupChatId?: string | null;
+      groupChatTitle?: string | null;
+      groupLinkedAt?: string | null;
+      groupLinkTokenHash?: string | null;
+      groupLinkTokenExpiresAt?: string | null;
+    };
   };
   /**
    * Ровно 5 статусов. Тексты писем задаёт seed.
@@ -8073,6 +8154,20 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         fromName?: T;
         replyTo?: T;
         ccAssignee?: T;
+        max?:
+          | T
+          | {
+              newLead?: T;
+              statusChange?: T;
+              assigned?: T;
+              orderEvents?: T;
+              unassignedReminder?: T;
+              groupChatId?: T;
+              groupChatTitle?: T;
+              groupLinkedAt?: T;
+              groupLinkTokenHash?: T;
+              groupLinkTokenExpiresAt?: T;
+            };
       };
   orderStatuses?:
     | T
@@ -8439,6 +8534,30 @@ export interface TaskIndexnowSubmit {
   output: {
     submitted?: number | null;
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskMax-notify".
+ */
+export interface TaskMaxNotify {
+  input: {
+    event: 'new_lead' | 'status_change' | 'assigned' | 'order_event';
+    leadId?: string | null;
+    orderId?: string | null;
+    assigneeId?: string | null;
+    statusChangedAt?: string | null;
+    previousStatus?: string | null;
+    orderStatus?: string | null;
+  };
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskMax-unassigned-reminder".
+ */
+export interface TaskMaxUnassignedReminder {
+  input?: unknown;
+  output?: unknown;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

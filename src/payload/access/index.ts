@@ -39,3 +39,12 @@ export const publishedOrLoggedIn: Access = ({ req: { user } }) => {
 export const adminFieldAccess: FieldAccess = ({ req: { user } }) => getRole(user) === "admin";
 
 export const adminOrManagerFieldAccess: FieldAccess = ({ req: { user } }) => getRole(user) !== null;
+
+/** Field read: admin sees everyone's value, a manager only their own document. */
+export const adminOrSelfFieldAccess: FieldAccess = ({ req: { user }, id, doc }) => {
+  const role = getRole(user);
+  if (role === "admin") return true;
+  if (!role || !user) return false;
+  const docId = (doc as { id?: unknown } | undefined)?.id ?? id;
+  return docId !== undefined && docId !== null && String(docId) === String(user.id);
+};

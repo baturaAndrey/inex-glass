@@ -87,6 +87,43 @@ describe("validateLeadStatusReason", () => {
     await expect(validateLeadStatusReason(none.args)).resolves.toBe(none.args.data);
     expect(none.findByID).not.toHaveBeenCalled();
   });
+
+  it("accepts a specific reason code without text and without querying", async () => {
+    const { args, findByID } = statusArgs({
+      data: { status: "refused", refuseReasonCode: "expensive" },
+      requiresReason: true,
+    });
+    await expect(validateLeadStatusReason(args)).resolves.toBe(args.data);
+    expect(findByID).not.toHaveBeenCalled();
+  });
+
+  it("requires the text for the code «other»", async () => {
+    const { args } = statusArgs({
+      data: { status: "refused", refuseReasonCode: "other", refuseReason: " " },
+      requiresReason: true,
+    });
+    expect(await validationMessage(validateLeadStatusReason(args))).toBe(
+      REFUSE_REASON_REQUIRED_MESSAGE
+    );
+  });
+
+  it("accepts the code «other» with text", async () => {
+    const { args } = statusArgs({
+      data: { status: "refused", refuseReasonCode: "other", refuseReason: "Передумали" },
+      requiresReason: true,
+    });
+    await expect(validateLeadStatusReason(args)).resolves.toBe(args.data);
+  });
+
+  it("uses the stored reason code on partial updates", async () => {
+    const { args, findByID } = statusArgs({
+      data: { refuseReason: "" },
+      originalDoc: { status: "refused", refuseReasonCode: "no_contact" },
+      requiresReason: true,
+    });
+    await expect(validateLeadStatusReason(args)).resolves.toBe(args.data);
+    expect(findByID).not.toHaveBeenCalled();
+  });
 });
 
 // ---------------------------------------------------------------------------------------------

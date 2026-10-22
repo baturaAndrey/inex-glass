@@ -218,3 +218,4 @@ git checkout -- src/payload-types.ts src/app/(payload)/admin/importMap.js   # н
 - Тумблеры: `statusChange` управляет сообщением в группу; ответственный получает смену статуса в личку всегда (кроме случая, когда менял он сам); `assigned` — личка о назначении.
 - Ссылки на карточку — со слешем на конце: `/admin/collections/leads/<id>/summary/` (`trailingSlash: true`).
 - Каждый текст перед отправкой пропускать через `decorateMaxText` из `src/lib/max/target.ts` (task-06): вне production первая строка `[ТЕСТ] Inex Glass`, в production — `Inex Glass`. Бот GRATEC общий с другим сайтом, тестовый чат — их рабочий канал заявок: без пометки ничего не слать.
+- Дополнить комментарий формата ключей в `src/payload/collections/crm/notification-log.ts` суффиксом канала (`:group` / `:user:<userId>`) — файл можно править только в этом комментарии.

@@ -35,12 +35,16 @@ export const MAINTENANCE_RETRIES: RetryConfig = {
 /** Upper bound of records/files a housekeeping job touches per run. */
 export const CLEANUP_BATCH_LIMIT = 1000;
 
-/** Context for bookkeeping writes from jobs: no revalidation, no side-effect hooks of tasks 32/33. */
+/**
+ * Context for bookkeeping writes from jobs: no revalidation, no side-effect hooks of tasks 32/33,
+ * and `updatedBy` keeps the last human author (`setUpdatedBy`).
+ */
 export const JOB_WRITE_CONTEXT = {
   disableRevalidate: true,
   skipAssigneeNotify: true,
   skipOrderHooks: true,
   skipStatusEmail: true,
+  keepUpdatedBy: true,
 } as const;
 
 /** Id of a relationship value (`string` with depth 0, document with depth ≥ 1). */

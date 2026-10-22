@@ -47,10 +47,22 @@ export default buildConfig({
     // Russian day-first format for every date in the admin (list cells, fields); date-fns pattern.
     dateFormat: "dd.MM.yyyy HH:mm",
     importMap: { baseDir: path.resolve(dirname) },
+    // Light only (DESIGN.md): no theme switcher in the account view.
+    theme: "light",
+    meta: {
+      titleSuffix: " — Inex Glass",
+      icons: [{ rel: "icon", type: "image/x-icon", url: "/favicon.ico" }],
+    },
     components: {
-      // Leads report (task 32): sidebar link + the `/admin/leads-report` view.
-      afterNavLinks: ["/payload/admin/nav/reports-nav-link#ReportsNavLink"],
+      graphics: {
+        Logo: "/payload/admin/graphics/logo#AdminLogo",
+        Icon: "/payload/admin/graphics/icon#AdminIcon",
+      },
+      // Admin redesign: own sidebar (task 03) and dashboard (task 04); stubs render Payload's defaults.
+      Nav: "/payload/admin/nav/inex-nav#InexNav",
       views: {
+        dashboard: { Component: "/payload/admin/views/dashboard#InexDashboard" },
+        // Leads report (task 32): the `/admin/leads-report` view.
         leadsReport: {
           Component: "/payload/admin/views/leads-report#LeadsReportView",
           path: "/leads-report",

@@ -6,6 +6,7 @@ import {
 } from "@/payload/hooks/order-hooks";
 import type { StatusHistoryEntry } from "@/payload/hooks/order-hooks";
 import { orderLifecycleAfterChange, syncStatusHistory } from "@/payload/hooks/order-lifecycle";
+import { orderMaxNotify } from "@/payload/hooks/order-max-notify";
 import { rel } from "@/payload/slugs";
 import { ORDER_DOCUMENT_KINDS, ORDER_STATUSES, STAFF_ROLES, toOptions } from "./constants";
 import { neverReadable, systemOnly } from "./field-access";
@@ -73,7 +74,7 @@ export const Orders: CollectionConfig = {
   hooks: {
     // `syncStatusHistory` must run before `computeOrderState`, which derives the status from it.
     beforeChange: [assignOrderNumber, syncStatusHistory, computeOrderState],
-    afterChange: [orderLifecycleAfterChange],
+    afterChange: [orderLifecycleAfterChange, orderMaxNotify],
   },
   fields: [
     {

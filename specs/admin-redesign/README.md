@@ -90,7 +90,7 @@ graph TD
 | `src/app/(payload)/styles/_screens.scss` | 02 (пустой) | 12 (W3) |
 | `src/styles/ig-vars.css` | 02 (вынос `:root` из `ig-tokens.css`) | — |
 | `src/styles/ig-tokens.css` | — | 02 (W1: только `@import "./ig-vars.css"` вместо блока `:root`) |
-| `package.json`, `pnpm-lock.yaml` | — | 02 (W1) |
+| `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml` (`allowBuilds`) | — | 02 (W1) |
 | `src/payload/collections/crm/leads.ts` | — | 01 (W1: поля, хуки) → 05 (W2: только `admin` — `views.kanban` и переключатель в `beforeList`; вкладка «Сводка» остаётся как есть) → в W3 не меняется |
 | `src/payload/collections/crm/orders.ts` | — | 01 (W1: хук-заглушка `order-max-notify`) |
 | `src/payload/collections/content/pages.ts` | — | 01 (W1: `updatedBy`, `admin.preview` → заглушка `src/lib/preview/preview-url.ts`) |
@@ -167,8 +167,8 @@ graph TD
 ## Task Status
 
 ### Wave 1
-- [ ] [task-01-schema-and-stubs](./tasks/task-01-schema-and-stubs.md) — Схема `admin_redesign`, `notification-log`, job-slug-и, все заглушки
-- [ ] [task-02-admin-theme-foundation](./tasks/task-02-admin-theme-foundation.md) — Тема, шрифт, конфиг админки, зависимости, SCSS-каркас
+- [x] [task-01-schema-and-stubs](./tasks/task-01-schema-and-stubs.md) — Схема `admin_redesign`, `notification-log`, job-slug-и, все заглушки
+- [x] [task-02-admin-theme-foundation](./tasks/task-02-admin-theme-foundation.md) — Тема, шрифт, конфиг админки, зависимости, SCSS-каркас
 
 ### Wave 2
 - [ ] [task-03-admin-nav](./tasks/task-03-admin-nav.md) — Боковое меню с группами и счётчиками

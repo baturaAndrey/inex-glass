@@ -1,0 +1,12 @@
+// Inex Glass admin theme. Unlayered on purpose: beats Payload's `@layer payload-default`.
+// One partial per task (specs/admin-redesign/README.md, «Владение общими файлами»).
+// Tailwind is never loaded in the admin (its preflight breaks Payload).
+@use "./styles/base";
+@use "./styles/screens";
+@use "./styles/nav";
+@use "./styles/dashboard";
+@use "./styles/kanban";
+@use "./styles/edit-form";
+@use "./styles/lead-card";
+@use "./styles/lead-history";
+@use "./styles/max";

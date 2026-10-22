@@ -1,4 +1,5 @@
 import { adminOrManagerFieldAccess, isAdmin, isAdminOrManager } from "../access";
+import { neverReadable, systemOnly } from "../collections/crm/field-access";
 import { revalidateGlobal } from "../hooks/revalidate";
 import { rel } from "../slugs";
 import { arrayValidator, DAY_ONLY, GROUP_SETTINGS, options, uniqueBy } from "./shared";
@@ -34,6 +35,73 @@ const media = (name: string, label: string, description?: string): Field => ({
   relationTo: rel("media"),
   ...(description ? { admin: { description } } : {}),
 });
+
+/**
+ * `notifications.max` — MAX messenger notifications (admin redesign, tasks 06/10). The toggles
+ * are edited by the admin; the group chat binding is written only by the MAX webhook via the
+ * Local API (`systemOnly`), the one-time link token is never readable through the APIs. Read
+ * access is inherited from the `notifications` group (admin or manager).
+ */
+const maxNotificationsField: Field = {
+  name: "max",
+  type: "group",
+  label: "Мессенджер MAX",
+  fields: [
+    {
+      name: "maxGroupLink",
+      type: "ui",
+      admin: { components: { Field: "/payload/admin/max/group-link-panel#MaxGroupLinkPanel" } },
+    },
+    {
+      name: "newLead",
+      type: "checkbox",
+      label: "Новая заявка — в групповой чат",
+      defaultValue: true,
+    },
+    { name: "statusChange", type: "checkbox", label: "Смена статуса заявки", defaultValue: true },
+    {
+      name: "assigned",
+      type: "checkbox",
+      label: "Назначение ответственного — в личку",
+      defaultValue: true,
+    },
+    { name: "orderEvents", type: "checkbox", label: "События заказов", defaultValue: true },
+    {
+      name: "unassignedReminder",
+      type: "checkbox",
+      label: "Напоминание: новая заявка без ответственного > 2 ч",
+      defaultValue: true,
+    },
+    {
+      name: "groupChatId",
+      type: "text",
+      label: "ID группового чата",
+      access: systemOnly,
+      admin: { readOnly: true },
+    },
+    {
+      name: "groupChatTitle",
+      type: "text",
+      label: "Название группового чата",
+      access: systemOnly,
+      admin: { readOnly: true },
+    },
+    {
+      name: "groupLinkedAt",
+      type: "date",
+      label: "Чат подключён",
+      access: systemOnly,
+      admin: { readOnly: true },
+    },
+    { name: "groupLinkTokenHash", type: "text", access: neverReadable, admin: { hidden: true } },
+    {
+      name: "groupLinkTokenExpiresAt",
+      type: "date",
+      access: neverReadable,
+      admin: { hidden: true },
+    },
+  ],
+};
 
 export const SiteSettings: GlobalConfig = {
   slug: "site-settings",
@@ -245,6 +313,7 @@ export const SiteSettings: GlobalConfig = {
                   label: "Копия ответственному менеджеру",
                   defaultValue: false,
                 },
+                maxNotificationsField,
               ],
             },
             {

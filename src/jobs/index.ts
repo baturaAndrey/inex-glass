@@ -3,6 +3,8 @@ import { CLEANUP_RATE_LIMITS, cleanupRateLimitsTask } from "./cleanup-rate-limit
 import { CLEANUP_TMP_UPLOADS, cleanupTmpUploadsTask } from "./cleanup-tmp-uploads";
 import { EXPIRE_ORDER_LINKS, expireOrderLinksTask } from "./expire-order-links";
 import { INDEXNOW_SUBMIT, indexNowSubmitTask } from "./indexnow";
+import { MAX_NOTIFY, maxNotifyTask } from "./max-notify";
+import { MAX_UNASSIGNED_REMINDER, maxUnassignedReminderTask } from "./max-unassigned-reminder";
 import { NOTIFY_ASSIGNED, notifyAssignedTask } from "./notify-assigned";
 import { NOTIFY_NEW_LEAD, notifyNewLeadTask } from "./notify-new-lead";
 import { SEND_ORDER_STATUS, sendOrderStatusTask } from "./send-order-status";
@@ -11,15 +13,19 @@ import type { JobsConfig } from "payload";
 
 /**
  * Registry of ALL Payload Jobs tasks of the project (task 18). Task slugs end up in the
- * `payload_jobs` enums, so this list is frozen together with the `add_jobs_queue` migration:
- * later tasks change only handler bodies (task 36: `src/jobs/indexnow.ts`).
+ * `payload_jobs` enums, so this list is frozen together with the `add_jobs_queue` and
+ * `admin_redesign` migrations: later tasks change only handler bodies (task 36:
+ * `src/jobs/indexnow.ts`; admin redesign task 10: `src/jobs/max-*.ts`).
  *
  * Contract (input shapes) used by other tasks:
  * - `notify-new-lead`   `{ leadId }`              — task 17 (lead intake)
  * - `notify-assigned`   `{ leadId, assigneeId }`  — task 32 (leads admin)
  * - `send-order-status` `{ orderId, status }`     — task 33 (orders)
  * - `indexnow-submit`   `{ urls }`                — task 36 (IndexNow plugin)
- * Scheduled (no input): `cleanup-tmp-uploads`, `expire-order-links`, `cleanup-rate-limits`.
+ * - `max-notify`        `MaxNotifyInput` (`{ event, leadId?, orderId?, assigneeId?,
+ *                       statusChangedAt?, previousStatus?, orderStatus? }`) — admin redesign task 10
+ * Scheduled (no input): `cleanup-tmp-uploads`, `expire-order-links`, `cleanup-rate-limits`,
+ * `max-unassigned-reminder` (every 15 min, admin redesign task 10).
  */
 
 export const JOB_SLUGS = {
@@ -30,6 +36,8 @@ export const JOB_SLUGS = {
   expireOrderLinks: EXPIRE_ORDER_LINKS,
   cleanupRateLimits: CLEANUP_RATE_LIMITS,
   indexNowSubmit: INDEXNOW_SUBMIT,
+  maxNotify: MAX_NOTIFY,
+  maxUnassignedReminder: MAX_UNASSIGNED_REMINDER,
 } as const;
 
 export const jobTasks: NonNullable<JobsConfig["tasks"]> = [
@@ -40,6 +48,8 @@ export const jobTasks: NonNullable<JobsConfig["tasks"]> = [
   expireOrderLinksTask,
   cleanupRateLimitsTask,
   indexNowSubmitTask,
+  maxNotifyTask,
+  maxUnassignedReminderTask,
 ];
 
 /**

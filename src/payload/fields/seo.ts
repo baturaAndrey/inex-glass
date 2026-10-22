@@ -5,6 +5,9 @@ import type { Field, GroupField, TextFieldSingleValidation } from "payload";
 export const SEO_TITLE_SOFT_LIMIT = 70;
 export const SEO_DESCRIPTION_SOFT_LIMIT = 170;
 
+/** Admin components of the SEO group (task 07), paths relative to `importMap.baseDir` (src). */
+const ADMIN_SEO = "/payload/admin/seo";
+
 const INTERNAL_PATH = /^\/(?:[a-z0-9]+(?:-[a-z0-9]+)*\/)*$/;
 const ABSOLUTE_URL = /^https?:\/\/\S+$/i;
 
@@ -42,6 +45,7 @@ export function seoField(opts: SeoFieldOptions = {}): GroupField {
       label: "Title",
       admin: {
         description: `Рекомендуется до ${SEO_TITLE_SOFT_LIMIT} знаков (длиннее — допустимо). Метки {N}, {цена} подставляются при выводе.`,
+        components: { afterInput: [`${ADMIN_SEO}/seo-title-counter#SeoTitleCounter`] },
       },
     },
   ];
@@ -64,7 +68,14 @@ export function seoField(opts: SeoFieldOptions = {}): GroupField {
       label: "Description",
       admin: {
         description: `Рекомендуется до ${SEO_DESCRIPTION_SOFT_LIMIT} знаков (длиннее — допустимо).`,
+        components: { afterInput: [`${ADMIN_SEO}/seo-description-counter#SeoDescriptionCounter`] },
       },
+    },
+    {
+      // Search snippet preview (ui-field: no DB column).
+      name: "seoSnippet",
+      type: "ui",
+      admin: { components: { Field: `${ADMIN_SEO}/seo-snippet-preview#SeoSnippetPreview` } },
     },
     {
       type: "row",

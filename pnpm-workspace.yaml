@@ -1,4 +1,6 @@
 allowBuilds:
+  # sass's optional file watcher: prebuilt binaries, its node-gyp fallback is not needed.
+  "@parcel/watcher": false
   esbuild: true
   msw: false
   sharp: true

@@ -1,7 +1,15 @@
 import { getEnv } from "@/lib/env";
-import { adminFieldAccess, getRole, isAdmin, isAdminOrSelf, isLoggedIn } from "../access";
+import {
+  adminFieldAccess,
+  adminOrSelfFieldAccess,
+  getRole,
+  isAdmin,
+  isAdminOrSelf,
+  isLoggedIn,
+} from "../access";
 import { rel } from "../slugs";
 import { MESSENGER_TYPES, toOptions } from "./crm/constants";
+import { neverReadable, systemOnly } from "./crm/field-access";
 import type { Role } from "../access";
 import type { CollectionBeforeValidateHook, CollectionConfig, TextFieldValidation } from "payload";
 
@@ -47,6 +55,9 @@ export const validateMessengerUrl: TextFieldValidation = (value) => {
     return MESSENGER_URL_MESSAGE;
   }
 };
+
+/** MAX link state: readable by admins and by the user themself, never writable via the APIs. */
+const maxStateAccess = { read: adminOrSelfFieldAccess, ...systemOnly } as const;
 
 const env = getEnv();
 
@@ -129,6 +140,54 @@ export const Users: CollectionConfig = {
       type: "checkbox",
       label: "Получать письма о новых заявках",
       defaultValue: false,
+    },
+
+    // --- MAX messenger (task 06 links, task 10 notifies) ------------------------------------
+    // Written only by the MAX webhook / link routes via the Local API. `admin.hidden` hides the
+    // raw values in the form; the `maxConnect` ui-field shows the link state instead.
+    {
+      name: "maxConnect",
+      type: "ui",
+      label: "MAX",
+      admin: { components: { Field: "/payload/admin/max/connect-button#MaxConnectButton" } },
+    },
+    {
+      name: "maxUserId",
+      type: "text",
+      label: "MAX: ID пользователя",
+      // The webhook looks the user up by MAX id (`bot_stopped`).
+      index: true,
+      access: maxStateAccess,
+      admin: { readOnly: true, hidden: true },
+    },
+    {
+      name: "maxLinkedAt",
+      type: "date",
+      label: "MAX: подключён",
+      access: maxStateAccess,
+      admin: { readOnly: true, hidden: true },
+    },
+    {
+      name: "maxBotStopped",
+      type: "checkbox",
+      label: "MAX: бот остановлен",
+      defaultValue: false,
+      access: maxStateAccess,
+      admin: { readOnly: true, hidden: true },
+    },
+    {
+      name: "maxLinkTokenHash",
+      type: "text",
+      label: "MAX: хеш токена привязки",
+      access: neverReadable,
+      admin: { hidden: true },
+    },
+    {
+      name: "maxLinkTokenExpiresAt",
+      type: "date",
+      label: "MAX: токен действует до",
+      access: neverReadable,
+      admin: { hidden: true },
     },
   ],
 };

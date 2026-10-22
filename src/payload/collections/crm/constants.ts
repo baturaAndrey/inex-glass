@@ -108,6 +108,40 @@ export const REDIRECT_CODES = [
   { label: "308 — постоянный (с сохранением метода)", value: "308" },
 ] as const satisfies readonly Option<string>[];
 
+/** Refusal reason of a lead (admin redesign): drives the funnel breakdown on the dashboard. */
+export const LEAD_REFUSE_REASON_CODES = [
+  { label: "Дорого", value: "expensive" },
+  { label: "Выбрали другого поставщика", value: "other_supplier" },
+  { label: "Нужен монтаж", value: "needs_installation" },
+  { label: "Не дозвонились", value: "no_contact" },
+  { label: "Другое", value: "other" },
+] as const satisfies readonly Option<string>[];
+
+export type LeadRefuseReasonCode = (typeof LEAD_REFUSE_REASON_CODES)[number]["value"];
+
+/** `notification-log.channel`: the MAX group chat or a staff member's direct chat. */
+export const NOTIFICATION_CHANNELS = [
+  { label: "Групповой чат", value: "group" },
+  { label: "Личные сообщения", value: "user" },
+] as const satisfies readonly Option<string>[];
+
+/** `notification-log.event`. */
+export const NOTIFICATION_EVENTS = [
+  { label: "Новая заявка", value: "new_lead" },
+  { label: "Смена статуса", value: "status_change" },
+  { label: "Назначение ответственного", value: "assigned" },
+  { label: "Событие заказа", value: "order_event" },
+  { label: "Напоминание: без ответственного", value: "unassigned_reminder" },
+] as const satisfies readonly Option<string>[];
+
+/** `notification-log.status`. */
+export const NOTIFICATION_STATUSES = [
+  { label: "Отправляется", value: "pending" },
+  { label: "Отправлено", value: "sent" },
+  { label: "Ошибка", value: "failed" },
+  { label: "Пропущено", value: "skipped" },
+] as const satisfies readonly Option<string>[];
+
 /** Staff roles allowed as lead assignee / order manager. */
 export const STAFF_ROLES = ["admin", "manager"] as const;
 

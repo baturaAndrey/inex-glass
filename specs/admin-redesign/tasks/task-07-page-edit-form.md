@@ -163,3 +163,4 @@ git checkout src/app/\(payload\)/admin/importMap.js src/payload-types.ts
 
 - task-01 создаёт заглушку `src/payload/admin/pages/updated-by-field.tsx` (`UpdatedByField`, подключена как `admin.components.Field` у `pages.updatedBy` в сайдбаре). Эта задача её наполняет: «Изменена ДД.ММ.ГГГГ, ЧЧ:ММ» (`updatedAt` из формы) и «Кем» (имя пользователя по id отдельным запросом к `/api/users/<id>?depth=0`, `null` → «Система»). Файл добавить в «Files to Modify»; `pages.ts` не трогать.
 - Общие селекторы edit-view (`.collection-edit`, `.document-fields`, `.doc-controls`, `.doc-tabs`, `.blocks-field`, `.rich-text-lexical`) — только в `_edit-form.scss` этой задачи; task-12 стилизует лишь специфичные экраны.
+- Экран редактирования на 375 px сейчас прокручивается по горизонтали (кнопки «Сохранить/Опубликовать» обрезаны; заголовок аккаунта и строка метаданных документа шире экрана). Исправить в `_edit-form.scss` этой задачи: критерий — нет горизонтального скролла на 375.

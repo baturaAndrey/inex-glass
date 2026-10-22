@@ -118,3 +118,5 @@ git checkout -- src/payload-types.ts src/app/(payload)/admin/importMap.js   # н
 ## Поправки координатора (приоритет над текстом выше)
 
 - task-12 зависит также от task-05 (быстрые фильтры, переключатель Канбан/Таблица) и task-07 (общие стили edit-view в `_edit-form.scss`). Общие селекторы edit-view не переопределять; стилизовать только специфичные экраны.
+- Иконка-логотип в шапке/хлебных крошках (`.iga-icon`, 22 px) плохо читается; DESIGN.md — логотип не меньше 30 px на мобильных. Проверить и при необходимости увеличить в `_screens.scss`.
+- `/admin/leads-report/` не задаёт свой title («Payload — Inex Glass») — добавить `generateMetadata`/meta отчёта, если view это позволяет (файл `views/leads-report.tsx` в зоне этой задачи).

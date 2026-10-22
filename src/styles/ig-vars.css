@@ -1,0 +1,195 @@
+/* Inex Glass — значения токенов `--ig-*` (блок `:root` и его медиа-переопределения).
+   Вынесены из ig-tokens.css без изменений, чтобы их подключали двое:
+   - сайт — через ig-tokens.css (src/app/(site)/globals.css, слой `base`);
+   - админка Payload — src/app/(payload)/layout.tsx, без слоя (Tailwind и классы `.ig-*`
+     в админку не подключаются).
+   Значения не менять без правки DESIGN.md. */
+
+:root {
+  /* Бренд */
+  --ig-primary: #2b8c7e; /* брендовый: рамки, фокус, иконки, акценты */
+  --ig-primary-hover: #267d70;
+  --ig-primary-pressed: #1f6b60; /* + цвет текстовых ссылок */
+  --ig-primary-dark: #16403d;
+  --ig-primary-light: #eaf3f1;
+  /* Фон основной кнопки и любых заливок «белый текст на бирюзовом»: #267D70 даёт 4.9:1 */
+  --ig-btn-primary-bg: #267d70;
+  --ig-btn-primary-bg-hover: #1f6b60;
+  --ig-navy: #324b64; /* подвал, тёмные блоки */
+  --ig-on-navy: #ffffff;
+  --ig-on-navy-2: #c9d3dd;
+  /* Только логотип (буква X) — в интерфейсе не использовать */
+  --ig-logo-orange: #ef7f1a;
+  --ig-logo-blue: #0081af;
+
+  /* Нейтральные — тёплые, «лист чертежа» */
+  --ig-bg: #f4f5f3;
+  --ig-surface: #ffffff;
+  --ig-well: #eceeec;
+  --ig-line: #d9dcde;
+  --ig-hairline: #e6e8e6;
+  --ig-text: #1c1f22;
+  --ig-text-2: #5b636b;
+  --ig-text-muted: #9aa1a8; /* только плейсхолдеры и disabled */
+
+  /* Дополнительные цвета прототипов */
+  --ig-tint-green: #eef2f0; /* фон hero главной */
+  --ig-ink-2: #3e464d; /* вторичный текст на светлых/стеклянных плашках */
+  --ig-ink-3: #2a2f34; /* lead-абзацы */
+  --ig-line-teal: #cfe3df; /* рамки на primary-light */
+  --ig-gray-1: #aeb4ba; /* рамки чекбоксов, радио, hover карточек выбора */
+  --ig-gray-2: #bfc4c8; /* hover полей, пунктир загрузки */
+  --ig-teal-wash: #dcebe8; /* :active secondary-кнопки */
+  --ig-slate-blue: #9fb0c2;
+
+  /* Семантика: tone — рамки, точки, иконки; bg — заливка больших плашек; text — текст */
+  --ig-success: #a8dab4;
+  --ig-success-bg: #eef8f0;
+  --ig-success-text: #237a35;
+  --ig-warning: #f2d59c;
+  --ig-warning-bg: #fcf6ea;
+  --ig-warning-text: #8a5a00;
+  --ig-danger: #eaadad;
+  --ig-danger-bg: #fcefef;
+  --ig-danger-text: #b23b3b;
+  --ig-info: #aecae6;
+  --ig-info-bg: #eef4fa;
+  --ig-info-text: #2c5b86;
+
+  /* Фокус */
+  --ig-focus-ring: 0 0 0 3px rgba(43, 140, 126, 0.2);
+  /* Кольцо фокуса кнопок (≥3:1 к фону): #16403D к #F4F5F3/#FFF ≈ 10:1; на тёмных — белое */
+  --ig-focus-outline: var(--ig-primary-dark);
+  --ig-focus-outline-on-dark: var(--ig-on-navy);
+
+  /* Подзаголовок SectionHead; тёмные секции переопределяют (см. components/ig/section.tsx) */
+  --ig-section-sub: var(--ig-text-2);
+
+  /* Шрифт */
+  --ig-font: var(--font-rubik), system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Spacing, база 4 */
+  --ig-sp-1: 4px;
+  --ig-sp-2: 8px;
+  --ig-sp-3: 12px;
+  --ig-sp-4: 16px;
+  --ig-sp-5: 20px;
+  --ig-sp-6: 24px;
+  --ig-sp-8: 32px;
+  --ig-sp-10: 40px;
+  --ig-sp-12: 48px;
+  --ig-sp-16: 64px;
+  --ig-sp-20: 80px;
+  --ig-sp-30: 120px;
+
+  /* Radius */
+  --ig-r-sm: 6px; /* чипсы, бейджи */
+  --ig-r-md: 10px; /* инпуты */
+  --ig-r-lg: 16px; /* карточки, модалки */
+  --ig-r-xl: 24px; /* hero, крупные плашки */
+  --ig-r-pill: 999px; /* кнопки */
+
+  /* Тени — только мягкие */
+  --ig-shadow-card: 0 2px 8px rgba(28, 31, 34, 0.06);
+  --ig-shadow-card-hover: 0 8px 24px rgba(28, 31, 34, 0.12);
+  --ig-shadow-dropdown: 0 12px 32px rgba(28, 31, 34, 0.14);
+  --ig-shadow-modal: 0 24px 64px rgba(28, 31, 34, 0.2);
+
+  /* Движение */
+  --ig-dur-fast: 120ms;
+  --ig-dur-base: 200ms;
+  --ig-dur-slow: 320ms;
+  --ig-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Сетка: фон секции на всю ширину до 1920, контент — с полями --ig-gutter */
+  --ig-section-max: 1920px;
+  --ig-gutter: 70px;
+
+  /* Типографика — desktop: размер и line-height раздельно (для моста в Tailwind) */
+  --ig-h1-size: 54px;
+  --ig-h1-lh: 1.1;
+  --ig-h2-size: 40px;
+  --ig-h2-lh: 1.15;
+  --ig-h3-size: 32px;
+  --ig-h3-lh: 1.2;
+  --ig-h4-size: 24px;
+  --ig-h4-lh: 1.3;
+  --ig-h5-size: 18px;
+  --ig-h5-lh: 1.4;
+  --ig-h6-size: 16px;
+  --ig-h6-lh: 1.4;
+  --ig-body-size: 16px;
+  --ig-body-lh: 1.5;
+  --ig-small-size: 14px;
+  --ig-small-lh: 1.45;
+  --ig-micro-size: 12px;
+  --ig-micro-lh: 1.4;
+  --ig-price-l-size: 30px;
+  --ig-price-l-lh: 1.1;
+  --ig-price-m-size: 22px;
+  --ig-price-m-lh: 1.15;
+  --ig-price-s-size: 16px;
+  --ig-price-s-lh: 1.3;
+  --ig-stat-size: 48px;
+  --ig-stat-lh: 1;
+  /* Лид-абзацы и подписи прототипов (hero, подзаголовки блоков) */
+  --ig-lead-l-size: 20px; /* лид главной */
+  --ig-lead-l-lh: 1.5;
+  --ig-lead-m-size: 19px; /* лид .p5-top */
+  --ig-lead-m-lh: 1.55;
+  --ig-lead-size: 18px; /* факты hero, подзаголовок блока */
+  --ig-lead-lh: 1.55;
+  --ig-caption-size: 13px;
+  --ig-caption-lh: 1.4;
+  --ig-hero-stat-size: 48px; /* цифры в стеклянной панели hero */
+  --ig-hero-stat-lh: 1;
+
+  /* Шорткаты `font:` */
+  --ig-h1: 700 var(--ig-h1-size) / var(--ig-h1-lh) var(--ig-font);
+  --ig-h2: 700 var(--ig-h2-size) / var(--ig-h2-lh) var(--ig-font);
+  --ig-h3: 700 var(--ig-h3-size) / var(--ig-h3-lh) var(--ig-font);
+  --ig-h4: 600 var(--ig-h4-size) / var(--ig-h4-lh) var(--ig-font);
+  --ig-h5: 600 var(--ig-h5-size) / var(--ig-h5-lh) var(--ig-font);
+  --ig-h6: 600 var(--ig-h6-size) / var(--ig-h6-lh) var(--ig-font);
+  --ig-body: 400 var(--ig-body-size) / var(--ig-body-lh) var(--ig-font);
+  --ig-small: 400 var(--ig-small-size) / var(--ig-small-lh) var(--ig-font);
+  --ig-micro: 500 var(--ig-micro-size) / var(--ig-micro-lh) var(--ig-font);
+  --ig-price-l: 700 var(--ig-price-l-size) / var(--ig-price-l-lh) var(--ig-font);
+  --ig-price-m: 700 var(--ig-price-m-size) / var(--ig-price-m-lh) var(--ig-font);
+  --ig-price-s: 700 var(--ig-price-s-size) / var(--ig-price-s-lh) var(--ig-font);
+  --ig-stat: 700 var(--ig-stat-size) / var(--ig-stat-lh) var(--ig-font);
+}
+
+/* Поля сетки: 70 (≥1366) / 40 (1101–1365) / 24 (600–1100) / 16 (≤599) */
+@media (max-width: 1365px) {
+  :root {
+    --ig-gutter: 40px;
+  }
+}
+
+@media (max-width: 1100px) {
+  :root {
+    --ig-gutter: 24px;
+  }
+}
+
+@media (max-width: 599px) {
+  :root {
+    --ig-gutter: 16px;
+    --ig-h1-size: 32px;
+    --ig-h1-lh: 1.15;
+    --ig-h2-size: 28px;
+    --ig-h2-lh: 1.2;
+    --ig-h3-size: 22px;
+    --ig-h3-lh: 1.25;
+    --ig-h4-size: 20px;
+    --ig-h4-lh: 1.3;
+    --ig-price-l-size: 24px;
+    --ig-price-m-size: 20px;
+    --ig-stat-size: 36px;
+    --ig-lead-l-size: 17px;
+    --ig-lead-m-size: 16px;
+    --ig-lead-size: 16px;
+    --ig-hero-stat-size: 28px;
+  }
+}

@@ -93,6 +93,49 @@ describe("isJobsRunnerEnabled", () => {
   });
 });
 
+describe("job registry", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  async function loadRegistry() {
+    vi.resetModules();
+    vi.stubEnv("DATABASE_URL", "postgresql://test:test@127.0.0.1:1/test");
+    vi.stubEnv("PAYLOAD_SECRET", "test-payload-secret-test-payload-secret");
+    const registry = await import("./index");
+    const shared = await import("./shared");
+    return { ...registry, ...shared };
+  }
+
+  it("registers the MAX jobs under their contract slugs", async () => {
+    const { JOB_SLUGS, jobTasks } = await loadRegistry();
+    expect(JOB_SLUGS.maxNotify).toBe("max-notify");
+    expect(JOB_SLUGS.maxUnassignedReminder).toBe("max-unassigned-reminder");
+
+    const slugs = jobTasks.map((task) => task.slug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+    expect([...slugs].sort()).toEqual(Object.values(JOB_SLUGS).sort());
+  });
+
+  it("keeps the retries and schedule of the MAX jobs", async () => {
+    const { jobTasks, MAIL_RETRIES, MAINTENANCE_QUEUE } = await loadRegistry();
+    const bySlug = (slug: string) => jobTasks.find((task) => task.slug === slug);
+    expect(bySlug("max-unassigned-reminder")?.schedule).toEqual([
+      { cron: "*/15 * * * *", queue: MAINTENANCE_QUEUE },
+    ]);
+    expect(bySlug("max-notify")?.retries).toEqual(MAIL_RETRIES);
+  });
+
+  it("MAX handlers are no-op stubs", async () => {
+    const { maxNotifyTask } = await import("./max-notify");
+    const { maxUnassignedReminderTask } = await import("./max-unassigned-reminder");
+    const handlerArgs = { input: { event: "new_lead" }, req: {} } as any;
+    expect(await (maxNotifyTask.handler as any)(handlerArgs)).toEqual({ output: {} });
+    expect(await (maxUnassignedReminderTask.handler as any)(handlerArgs)).toEqual({ output: {} });
+  });
+});
+
 describe("describeError (job logs)", () => {
   it("logs a Postgres/SMTP error without its message", async () => {
     const { describeError } = await import("./shared");

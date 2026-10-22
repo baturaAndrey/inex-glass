@@ -195,12 +195,18 @@ export const validateLeadStatus: RelationshipFieldSingleValidation = (
   return "Выберите статус заявки";
 };
 
-/** `refuseReason` is required when the selected status has `requiresReason` (e.g. «Отказ»). */
+/**
+ * `refuseReason` is required when the selected status has `requiresReason` (e.g. «Отказ»),
+ * unless a `refuseReasonCode` other than «Другое» (`other`) is set: a specific code alone is a
+ * sufficient reason. Mirrors `validateLeadStatusReason` (the server-side guarantee).
+ */
 export const validateRefuseReason: TextareaFieldValidation = async (
   value,
   { req, siblingData }
 ) => {
   if (!isBlank(value)) return true;
+  const code = (siblingData as { refuseReasonCode?: unknown }).refuseReasonCode;
+  if (typeof code === "string" && code !== "" && code !== "other") return true;
 
   const statusValue = (siblingData as { status?: unknown }).status;
   if (typeof statusValue === "object" && statusValue !== null && "requiresReason" in statusValue) {

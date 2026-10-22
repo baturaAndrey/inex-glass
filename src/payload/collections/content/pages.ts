@@ -1,4 +1,5 @@
 import { ValidationError } from "payload";
+import { buildPreviewUrl } from "@/lib/preview/preview-url";
 import { isAdmin, publishedOrLoggedIn } from "../../access";
 import { faqField } from "../../fields/faq";
 import {
@@ -19,6 +20,7 @@ import { quizPrefillField } from "../../fields/quiz-prefill";
 import { seoField } from "../../fields/seo";
 import { slugField } from "../../fields/slug";
 import { revalidateCollection } from "../../hooks/revalidate";
+import { setUpdatedBy, updatedByField } from "../../hooks/set-updated-by";
 import { rel } from "../../slugs";
 import { DRAFT_VERSIONS, GROUP_CONTENT, layoutField, legacyUrlsField } from "../shared";
 import type { CollectionBeforeValidateHook, CollectionConfig, Where } from "payload";
@@ -97,6 +99,7 @@ export const Pages: CollectionConfig = {
     useAsTitle: "title",
     defaultColumns: ["title", "path", "template", "_status", "updatedAt"],
     listSearchableFields: ["title", "slug", "path"],
+    preview: buildPreviewUrl,
   },
   /** When populated from another document: link and card fields only, never `layout`. */
   defaultPopulate: {
@@ -117,7 +120,7 @@ export const Pages: CollectionConfig = {
   versions: DRAFT_VERSIONS,
   hooks: {
     beforeValidate: [computePagePath],
-    beforeChange: [capturePublishedPath(SLUG)],
+    beforeChange: [capturePublishedPath(SLUG), setUpdatedBy],
     afterChange: [cascadePathsAfterChange(SLUG), revalidate.afterChange],
     beforeDelete: [preventDeleteWithChildren(SLUG)],
     afterDelete: [revalidate.afterDelete],
@@ -186,6 +189,14 @@ export const Pages: CollectionConfig = {
       type: "date",
       label: "Дата публикации",
       admin: { position: "sidebar" },
+    },
+    {
+      ...updatedByField(),
+      admin: {
+        readOnly: true,
+        position: "sidebar",
+        components: { Field: "/payload/admin/pages/updated-by-field#UpdatedByField" },
+      },
     },
     {
       type: "tabs",

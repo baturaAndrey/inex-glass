@@ -11,14 +11,17 @@ import {
   validatePhone,
   validateRefuseReason,
 } from "@/payload/hooks/lead-hooks";
+import { leadMaxNotify } from "@/payload/hooks/lead-max-notify";
 import { validateLeadStatusReason } from "@/payload/hooks/lead-status-validation";
 import { orderFromLead } from "@/payload/hooks/order-from-lead";
+import { setUpdatedBy, updatedByField } from "@/payload/hooks/set-updated-by";
 import { rel } from "@/payload/slugs";
 import {
   DUPLICATE_REASONS,
   LEAD_FLAGS,
   LEAD_FORM_TYPES,
   LEAD_PRODUCT_TYPES,
+  LEAD_REFUSE_REASON_CODES,
   LEAD_ROLES,
   STAFF_ROLES,
   toOptions,
@@ -112,9 +115,10 @@ export const Leads: CollectionConfig = {
       touchStatusChangedAt,
       detectDuplicate,
       stampInternalComments,
+      setUpdatedBy,
     ],
-    // Order matters: the assignee e-mail job first, then the order (task 33).
-    afterChange: [notifyAssigneeChange, orderFromLead],
+    // Order matters: the assignee e-mail job first, then the order (task 33), then MAX (task 10).
+    afterChange: [notifyAssigneeChange, orderFromLead, leadMaxNotify],
   },
   fields: [
     // --- Source ---------------------------------------------------------------------------
@@ -243,11 +247,19 @@ export const Leads: CollectionConfig = {
       admin: { ...computed, date: { pickerAppearance: "dayAndTime" } },
     },
     {
+      // A code alone satisfies a `requiresReason` status, except «Другое», which needs the text.
+      name: "refuseReasonCode",
+      type: "select",
+      label: "Причина отказа (код)",
+      options: toOptions(LEAD_REFUSE_REASON_CODES),
+    },
+    {
       name: "refuseReason",
       type: "textarea",
       label: "Причина отказа",
       validate: validateRefuseReason,
     },
+    { name: "kpAmount", type: "number", label: "Сумма КП, ₽", min: 0 },
     {
       name: "assignee",
       type: "relationship",
@@ -350,5 +362,8 @@ export const Leads: CollectionConfig = {
       access: systemOnly,
       admin: { ...computed, date: { pickerAppearance: "dayAndTime" } },
     },
+
+    // --- Audit (stamped by setUpdatedBy) --------------------------------------------------
+    updatedByField(),
   ],
 };
