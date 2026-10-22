@@ -185,7 +185,7 @@ graph TD
 - [x] [task-12-admin-screens-theme](./tasks/task-12-admin-screens-theme.md) — Остальные экраны в теме
 
 ### Wave 4
-- [ ] [task-13-acceptance](./tasks/task-13-acceptance.md) — Приёмка, документация, Docker CA
+- [x] [task-13-acceptance](./tasks/task-13-acceptance.md) — Приёмка, документация, Docker CA
 
 ## Решения, принятые при декомпозиции
 

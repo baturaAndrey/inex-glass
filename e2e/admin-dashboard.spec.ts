@@ -35,6 +35,52 @@ const SECTION_TITLES = [
   "Последние заявки",
 ] as const;
 
+/** The quiz fixture checked in «Последние заявки» (also its copies, see `showInLatest`). */
+const quizFixture = () => ({
+  formType: "quiz" as const,
+  company: COMPANY,
+  name: "Дашборд Первый",
+  phone: uniquePhone(),
+  area: 120,
+  productType: "facade" as const,
+});
+
+/** «Последние заявки» shows this many newest leads (`LATEST_LEADS_LIMIT` of the loader). */
+const LATEST_ROWS = 5;
+const LATEST_ATTEMPTS = 3;
+
+/**
+ * Opens `/admin/` with `lead` among «Последние заявки» and returns the lead that is shown.
+ *
+ * Parallel specs keep adding leads — in a full run mostly `orders.spec.ts`, whose leads carry the
+ * temporary statuses «E2E Новая» / «E2E Договор». They are newer than the fixture and can push it
+ * out of the five rows. A missing fixture is accepted only when the table is full (it was really
+ * displaced by newer leads); then a fresh copy of the fixture is created and the page reloaded.
+ */
+async function showInLatest(page: Page, lead: Lead, copy: () => Promise<Lead>): Promise<Lead> {
+  let current = lead;
+  for (let attempt = 1; ; attempt++) {
+    await page.goto("/admin/");
+    const latest = page.locator('section[aria-labelledby="iga-dash-latest-h"]');
+    await expect(latest.getByRole("heading", { name: "Последние заявки" })).toBeVisible();
+    if ((await latest.locator(`tr[data-lead="${current.id}"]`).count()) > 0) return current;
+
+    const rows = latest.locator("tbody tr");
+    expect(await rows.count(), "the fixture is missing although the table is not full").toBe(
+      LATEST_ROWS
+    );
+    const shown = await rows.locator("td:nth-child(6)").allInnerTexts();
+    test.info().annotations.push({
+      type: "displaced",
+      description: `attempt ${attempt}: fixture pushed out by newer leads (${shown.join(", ")})`,
+    });
+    expect(attempt, "the fixture keeps being displaced by parallel specs").toBeLessThan(
+      LATEST_ATTEMPTS
+    );
+    current = await copy();
+  }
+}
+
 async function expectSections(page: Page) {
   for (const title of SECTION_TITLES) {
     await expect(page.getByRole("heading", { name: title, exact: true })).toBeVisible();
@@ -57,14 +103,7 @@ test.describe("dashboard (1366)", () => {
       skipOnMissingAdmin(error);
     }
     // Two new leads without an assignee (the default status is set by the collection hook).
-    leadQuiz = await createLead(admin, {
-      formType: "quiz",
-      company: COMPANY,
-      name: "Дашборд Первый",
-      phone: uniquePhone(),
-      area: 120,
-      productType: "facade",
-    });
+    leadQuiz = await createLead(admin, quizFixture());
     const second = await createLead(admin, {
       formType: "callback",
       company: `${COMPANY} второй`,
@@ -108,14 +147,18 @@ test.describe("dashboard (1366)", () => {
 
   test("«Последние заявки» link to the lead summary", async ({ page, context, baseURL }) => {
     await signInBrowser(context, admin, baseURL!);
-    await page.goto("/admin/");
-    const row = page.locator(`tr[data-lead="${leadQuiz.id}"]`);
+    const lead = await showInLatest(page, leadQuiz, async () => {
+      const copy = await createLead(admin, quizFixture());
+      leadIds.add(copy.id);
+      return copy;
+    });
+    const row = page.locator(`tr[data-lead="${lead.id}"]`);
     await expect(row).toBeVisible();
     await expect(row).toContainText("Квиз");
     await expect(row).toContainText("120 м²");
     await expect(row).toContainText("не назначен");
     const link = row.getByRole("link", { name: COMPANY });
-    await expect(link).toHaveAttribute("href", `/admin/collections/leads/${leadQuiz.id}/summary/`);
+    await expect(link).toHaveAttribute("href", `/admin/collections/leads/${lead.id}/summary/`);
   });
 
   test("period switch keeps the report period", async ({ page, context, baseURL }) => {

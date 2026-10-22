@@ -84,6 +84,10 @@ WORKDIR /app
 COPY --from=build --chown=node:node /app/public ./public
 COPY --from=build --chown=node:node /app/.next/standalone ./
 COPY --from=build --chown=node:node /app/.next/static ./.next/static
+# Russian Trusted Root CA (public Минцифры root, committed in docker/certs/): required for TLS
+# to platform-api2.max.ru (MAX Bot API). Node adds it to its bundled roots.
+COPY --chown=node:node docker/certs/ ./certs/
+ENV NODE_EXTRA_CA_CERTS=/app/certs/russian_trusted_root_ca.pem
 # Named volumes inherit ownership from the image, so `node` can write to them.
 # (Bind mounts owned by root would not — see docs/deploy.md, "Тома".)
 # Only `.next/cache/images` goes on a volume; the data/ISR cache stays per container.

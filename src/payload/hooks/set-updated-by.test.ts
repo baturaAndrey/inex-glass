@@ -50,4 +50,12 @@ describe("updatedByField", () => {
     expect(field.access?.create?.({} as any)).toBe(false);
     expect(field.access?.update?.({} as any)).toBe(false);
   });
+
+  it("is readable by staff only (no staff UUID for anonymous REST/GraphQL)", () => {
+    const read = updatedByField().access?.read;
+    const as = (user: unknown) => read?.({ req: { user } } as any);
+    expect(as(null)).toBe(false);
+    expect(as({ id: "u", role: "manager" })).toBe(true);
+    expect(as({ id: "u", role: "admin" })).toBe(true);
+  });
 });

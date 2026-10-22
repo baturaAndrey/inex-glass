@@ -16,6 +16,7 @@ async function loadClient(env: Record<string, string> = {}) {
   vi.stubEnv("DATABASE_URL", "postgresql://user:pass@localhost:5432/db");
   vi.stubEnv("PAYLOAD_SECRET", "test-secret-test-secret-test-secret-00");
   vi.stubEnv("MAX_API_BASE_URL", "");
+  vi.stubEnv("SITE_ENV", "");
   vi.stubEnv("MAX_BOT_TOKEN", TOKEN);
   for (const [key, value] of Object.entries(env)) vi.stubEnv(key, value);
   return import("./client");
@@ -118,6 +119,30 @@ describe("maxSendMessage", () => {
     await maxSendMessage({ chatId: "1", text: "t" });
 
     expect(lastCall().url.href).toBe("http://127.0.0.1:4010/messages?chat_id=1");
+  });
+
+  it("ignores MAX_API_BASE_URL in production (always the real host)", async () => {
+    const { maxSendMessage } = await loadClient({
+      SITE_ENV: "production",
+      MAX_API_BASE_URL: "http://127.0.0.1:4010/",
+    });
+    fetchMock.mockResolvedValue(jsonResponse({ message: { body: { mid: "m" } } }));
+
+    await maxSendMessage({ chatId: "1", text: "t" });
+
+    expect(lastCall().url.href).toBe("https://platform-api2.max.ru/messages?chat_id=1");
+  });
+
+  it("resolveMaxApiBase: override only outside production", async () => {
+    const { resolveMaxApiBase } = await loadClient();
+    const mock = "http://127.0.0.1:4010";
+    expect(resolveMaxApiBase({ SITE_ENV: "staging", MAX_API_BASE_URL: mock })).toBe(mock);
+    expect(resolveMaxApiBase({ SITE_ENV: "development", MAX_API_BASE_URL: undefined })).toBe(
+      "https://platform-api2.max.ru"
+    );
+    expect(resolveMaxApiBase({ SITE_ENV: "production", MAX_API_BASE_URL: mock })).toBe(
+      "https://platform-api2.max.ru"
+    );
   });
 
   it.each([

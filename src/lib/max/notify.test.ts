@@ -53,6 +53,27 @@ function fakePayload(initial: Row[] = []) {
         return row;
       }
     ),
+    db: {
+      // Compare-and-set like the drizzle adapter's `options.atomic` path: null when no row matches.
+      updateOne: vi.fn(
+        async ({
+          where,
+          data,
+        }: {
+          where: { and: Record<string, { equals: unknown }>[] };
+          data: object;
+        }) => {
+          const match = (row: Row) =>
+            where.and.every((clause) =>
+              Object.entries(clause).every(([field, cond]) => row[field] === cond.equals)
+            );
+          const row = rows.find(match);
+          if (!row) return null;
+          Object.assign(row, data);
+          return { ...row };
+        }
+      ),
+    },
     logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
   };
   return payload;
@@ -159,6 +180,49 @@ describe("deliverMaxNotification", () => {
     expect(payload.create).not.toHaveBeenCalled();
     expect(payload.rows).toHaveLength(1);
     expect(payload.rows[0]).toMatchObject({ id: "r1", status: "sent", messageId: "mid.1" });
+    expect(payload.db.updateOne).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: "notification-log",
+        where: { and: [{ id: { equals: "r1" } }, { status: { equals: "failed" } }] },
+        data: expect.objectContaining({ status: "pending", error: null, chatId: "-100" }),
+        options: { atomic: true },
+      })
+    );
+  });
+
+  it("reuses a failed row only once: a parallel retry that lost the claim is a duplicate", async () => {
+    const payload = fakePayload([
+      { id: "r1", key: GROUP.key, status: "failed", error: "retry: 429" },
+    ]);
+    // Both deliveries read the row as `failed` before either claims it.
+    const seen = await payload.find({ where: { key: { equals: GROUP.key } } });
+    payload.find.mockResolvedValueOnce(seen).mockResolvedValueOnce(structuredClone(seen));
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    maxSendMessage.mockImplementationOnce(async () => {
+      await gate;
+      return { messageId: "mid.1" };
+    });
+
+    const first = deliverMaxNotification(asPayload(payload), GROUP);
+    const second = deliverMaxNotification(asPayload(payload), GROUP);
+    await expect(second).resolves.toBe("duplicate");
+    release();
+    await expect(first).resolves.toBe("sent");
+
+    expect(maxSendMessage).toHaveBeenCalledTimes(1);
+    expect(payload.db.updateOne).toHaveBeenCalledTimes(2);
+    expect(payload.rows).toHaveLength(1);
+    expect(payload.rows[0]).toMatchObject({ id: "r1", status: "sent" });
+  });
+
+  it("a journal error while claiming a failed row is transient (nothing is sent)", async () => {
+    const payload = fakePayload([{ id: "r1", key: GROUP.key, status: "skipped" }]);
+    payload.db.updateOne.mockRejectedValueOnce(new Error("db down"));
+    await expect(deliverMaxNotification(asPayload(payload), GROUP)).rejects.toBeInstanceOf(
+      MaxTransientError
+    );
+    expect(maxSendMessage).not.toHaveBeenCalled();
   });
 
   it("marks the user's bot as stopped on a permanent 403 in a direct chat", async () => {

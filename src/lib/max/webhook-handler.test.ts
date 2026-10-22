@@ -13,6 +13,7 @@ import type { Payload } from "payload";
 
 const env = vi.hoisted(() => ({
   MAX_BOT_TOKEN: "token-0123456789abcdef" as string | undefined,
+  MAX_ENABLED: true,
   SITE_ENV: "development",
 }));
 vi.mock("@/lib/env", () => ({ getEnv: () => env }));
@@ -98,6 +99,7 @@ let reply: ReturnType<typeof vi.fn<MaxReply>>;
 
 beforeEach(() => {
   env.MAX_BOT_TOKEN = "token-0123456789abcdef";
+  env.MAX_ENABLED = true;
   reply = vi.fn<MaxReply>(async () => undefined);
   maxGetChat.mockReset();
   maxSendMessage.mockReset();
@@ -548,5 +550,17 @@ describe("bot replies", () => {
       await handleMaxUpdate({ payload: fake().payload, update, now: NOW });
     }
     expect(maxSendMessage).not.toHaveBeenCalled();
+  });
+
+  it("nothing is sent while MAX is switched off, even with a bot token (shared bot)", async () => {
+    env.MAX_ENABLED = false;
+    const scenarios = speakingScenarios();
+    const results = [];
+    for (const { fake, update } of scenarios) {
+      results.push(await handleMaxUpdate({ payload: fake().payload, update, now: NOW }));
+    }
+    expect(maxSendMessage).not.toHaveBeenCalled();
+    // Linking itself is not gated: the first scenario (valid token) still links the user.
+    expect(results[0]).toBe("user-linked");
   });
 });

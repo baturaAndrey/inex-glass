@@ -1,3 +1,4 @@
+import { adminOrManagerFieldAccess } from "@/payload/access";
 import { systemOnly } from "@/payload/collections/crm/field-access";
 import { rel } from "@/payload/slugs";
 import type { CollectionBeforeChangeHook, RelationshipField } from "payload";
@@ -18,6 +19,9 @@ export const setUpdatedBy: CollectionBeforeChangeHook = ({ data, req, context })
 /**
  * `updatedBy` field shared by leads and pages. `maxDepth: 0` keeps the staff document (e-mail)
  * out of the public page loaders; the admin resolves the author's name separately.
+ *
+ * Read access is staff only: pages are publicly readable through REST/GraphQL, and a staff UUID
+ * must not leak to anonymous clients. Local API reads (`overrideAccess`) are unaffected.
  */
 export function updatedByField(label = "Кем изменена"): RelationshipField {
   return {
@@ -26,7 +30,7 @@ export function updatedByField(label = "Кем изменена"): RelationshipF
     label,
     relationTo: rel("users"),
     maxDepth: 0,
-    access: systemOnly,
+    access: { read: adminOrManagerFieldAccess, ...systemOnly },
     admin: { readOnly: true, position: "sidebar" },
   };
 }

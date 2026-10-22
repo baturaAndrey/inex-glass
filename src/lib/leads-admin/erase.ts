@@ -2,6 +2,7 @@ import { access } from "node:fs/promises";
 import path from "node:path";
 import { commitTransaction, createLocalReq, initTransaction, killTransaction } from "payload";
 import { getEnv } from "@/lib/env";
+import type { Env } from "@/lib/env";
 import { maxDeleteMessage } from "@/lib/max/client";
 import { ERASE_CONFIRM_WORD } from "@/payload/admin/leads/constants";
 import { consentEmailHash, consentPhoneHash } from "@/payload/utils/normalize";
@@ -19,7 +20,8 @@ import type { Payload, PayloadRequest, Where } from "payload";
  *  4. links `duplicateOf → lead` of other leads are cleared (no hooks, no new versions);
  *  5. the lead is deleted;
  *  6. its attachments (`lead-files`, Payload removes the files from `UPLOADS_DIR`) are deleted;
- *  7. its MAX notification journal (`notification-log`) is deleted; the message ids are kept.
+ *  7. its MAX notification journal (`notification-log`) is deleted; the message ids are kept
+ *     (outside production only those of the `MAX_INTERCEPT_CHAT_ID` chat).
  * After the commit (best effort, outside the transaction so a failure cannot abort it): pending
  * jobs carrying the lead id are removed, the disk is checked for leftovers and the MAX messages
  * (they quote the phone) are deleted from the chats.
@@ -111,10 +113,27 @@ export function consentRecordsWhere(args: {
   return { or };
 }
 
-/** Unique non-empty MAX message ids of journal rows (what to delete in the chats). */
-export function collectMaxMessageIds(rows: readonly { messageId?: unknown }[]): string[] {
+type MaxDeletionEnv = Pick<Env, "SITE_ENV" | "MAX_INTERCEPT_CHAT_ID">;
+
+/**
+ * Unique non-empty MAX message ids of journal rows (what to delete in the chats).
+ *
+ * Outside production (`SITE_ENV !== "production"`) only rows whose `chatId` equals
+ * `MAX_INTERCEPT_CHAT_ID` qualify: the bot is shared with another live site, and a staging or
+ * dev database (e.g. a copy of prod) may hold journal rows of real chats; a test stand must never
+ * touch messages outside its own intercept chat. Without an intercept chat nothing qualifies.
+ */
+export function collectMaxMessageIds(
+  rows: readonly { messageId?: unknown; chatId?: unknown }[],
+  env: MaxDeletionEnv
+): string[] {
+  const interceptChatId = env.SITE_ENV === "production" ? null : (env.MAX_INTERCEPT_CHAT_ID ?? "");
   const ids = new Set<string>();
   for (const row of rows) {
+    if (interceptChatId !== null) {
+      const chatId = typeof row.chatId === "string" ? row.chatId.trim() : "";
+      if (interceptChatId === "" || chatId !== interceptChatId) continue;
+    }
     const id = row.messageId;
     if (typeof id === "string" && id.trim() !== "") ids.add(id.trim());
   }
@@ -240,10 +259,10 @@ async function eraseInTransaction(
     depth: 0,
     pagination: false,
     overrideAccess: true,
-    select: { messageId: true },
+    select: { messageId: true, chatId: true },
     req,
   });
-  stored.maxMessageIds = collectMaxMessageIds(journal.docs);
+  stored.maxMessageIds = collectMaxMessageIds(journal.docs, getEnv());
   let notifications = 0;
   if (journal.docs.length > 0) {
     const removed = await payload.delete({
@@ -315,14 +334,20 @@ async function removePendingJobs(payload: Payload, leadId: string): Promise<numb
 /**
  * Best effort after the commit: deletes the lead's MAX messages one by one. Old messages may be
  * beyond what the platform lets a bot delete; such failures only show up in the counters.
+ *
+ * Gated on the bot token only, NOT on `MAX_ENABLED`: deleting is not sending. The ids are of
+ * messages this site already sent (their journal rows are gone after the commit), so with MAX
+ * switched off later the messages — with the client's phone — would stay in the chats and the
+ * ids would be lost for good. Without a token nothing can be deleted: only the count is logged.
+ * Exported for unit tests.
  */
-async function deleteMaxMessages(
+export async function deleteMaxMessages(
   payload: Payload,
   leadId: string,
   messageIds: readonly string[]
 ): Promise<void> {
   if (messageIds.length === 0) return;
-  if (!getEnv().MAX_ENABLED) {
+  if (!getEnv().MAX_BOT_TOKEN) {
     payload.logger.warn({ event: "lead-erase-max-skipped", leadId, count: messageIds.length });
     return;
   }

@@ -241,11 +241,10 @@ async function loadAttention(
     now
   );
   if (statuses !== null) return cards;
-  return cards.map(
-    (card): AttentionCard =>
-      STATUS_DEPENDENT_ATTENTION.has(card.key)
-        ? { ...card, value: null, tone: "neutral", sub: STATUSES_FAILED_SUB }
-        : card
+  return cards.map((card): AttentionCard =>
+    STATUS_DEPENDENT_ATTENTION.has(card.key)
+      ? { ...card, value: null, tone: "neutral", sub: STATUSES_FAILED_SUB }
+      : card
   );
 }
 

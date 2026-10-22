@@ -14,6 +14,7 @@ import {
 } from "../helpers/acceptance-admin";
 import { onlyProject } from "../helpers/acceptance-env";
 import { loginAdmin, skipOnMissingAdmin } from "../helpers/admin";
+import { E2E_BASE_URL, e2eServerEnv } from "../helpers/env";
 import { dateKey, PDF_BYTES } from "../helpers/orders-fixtures";
 import type { APIRequestContext, TestInfo } from "@playwright/test";
 
@@ -32,8 +33,10 @@ import type { APIRequestContext, TestInfo } from "@playwright/test";
  * - Lead erase (152-ФЗ): the lead, its versions and its file (record + file on disk) are gone.
  *
  * Mutates shared data (TEST documents, cleaned up): desktop-1366 only; tests are independent.
- * Disk checks need the server's uploads dir: `ACCEPTANCE_UPLOADS_DIR`, or the local stand's
- * `.data/w8/lead-files` when testing localhost; otherwise they are `[ЧЕЛОВЕК]`.
+ * Disk checks need the server's uploads dir (see `uploadsDir`): `ACCEPTANCE_UPLOADS_DIR`; else
+ * the e2e server's `UPLOADS_DIR` from `e2eServerEnv()` (`.data/e2e/lead-files`) when Playwright
+ * serves the app itself (no `E2E_BASE_URL`); else the local stand's `.data/w8/lead-files`
+ * (`scripts/acceptance/local-stand.sh`) for an external localhost stand. Otherwise `[ЧЕЛОВЕК]`.
  */
 
 const MIB = 1024 * 1024;
@@ -110,10 +113,23 @@ async function errorMessages(response: { text(): Promise<string> }): Promise<str
   return response.text();
 }
 
+/**
+ * Uploads dir of the server under test, or `null` when the test cannot see its disk:
+ * 1. `ACCEPTANCE_UPLOADS_DIR` — explicit, always wins;
+ * 2. no `E2E_BASE_URL` — the server is Playwright's own `next start` (`webServer` of
+ *    `playwright.config.ts`, also when an already running one is reused) with `e2eServerEnv()`;
+ *    its relative `UPLOADS_DIR` resolves against the repo root, the cwd of server and runner;
+ * 3. `E2E_BASE_URL` on localhost — the local acceptance stand (`scripts/acceptance/local-stand.sh`
+ *    exports `UPLOADS_DIR=.data/w8/lead-files`).
+ */
 function uploadsDir(): string | null {
   if (process.env.ACCEPTANCE_UPLOADS_DIR) return process.env.ACCEPTANCE_UPLOADS_DIR;
-  const local = path.resolve(".data", "w8", "lead-files");
-  return new URL(siteURL).hostname === "localhost" && existsSync(local) ? local : null;
+  let candidate: string | null = null;
+  if (!E2E_BASE_URL) candidate = path.resolve(e2eServerEnv().UPLOADS_DIR!);
+  else if (new URL(siteURL).hostname === "localhost") {
+    candidate = path.resolve(".data", "w8", "lead-files");
+  }
+  return candidate && existsSync(candidate) ? candidate : null;
 }
 
 function manualDisk(testInfo: TestInfo, what: string) {

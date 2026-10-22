@@ -118,7 +118,7 @@ const envSchema = z.object({
     .string()
     .regex(/^-?\d{1,20}$/, "числовой ID чата MAX")
     .optional(),
-  /** Bot API base URL, only for mocks (e2e). Unset → https://platform-api2.max.ru. */
+  /** Bot API base URL, only for mocks (e2e). Unset or SITE_ENV=production → https://platform-api2.max.ru. */
   MAX_API_BASE_URL: z.url().optional(),
 
   // Dev tools (scripts only; never present in prod images or prod env)

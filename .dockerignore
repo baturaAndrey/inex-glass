@@ -48,6 +48,10 @@ Dockerfile
 .dockerignore
 docker-compose*.yml
 docker
+# Re-include only the public root CA for the runner image (see Dockerfile) and the directory
+# placeholder. The last matching rule wins, so these follow `docker` and `*.pem`.
+!docker/certs/russian_trusted_root_ca.pem
+!docker/certs/.gitkeep
 
 # Misc
 .DS_Store

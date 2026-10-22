@@ -61,6 +61,9 @@
 - E2E specs that need an admin use `loginAdmin` / `adminToken` / `adminApi` from `e2e/helpers/admin.ts` (one default admin via `E2E_ADMIN_EMAIL`/`E2E_ADMIN_PASSWORD`); never call `/api/users/login/` directly or reset passwords — parallel logins of one user wipe each other's Payload sessions (403). Fixture-mutating tests run serially in the `desktop-1366` project only
 - `next.config.ts` must keep `serverExternalPackages: ["payload"]`: without it the prod (Turbopack) build bundles a separate `payload` copy per entry and REST validation errors lose `name`/`data` (field errors, Russian messages)
 - Postgres needs `max_locks_per_transaction=256` for migration rollbacks (~600 tables in one transaction); set in `docker-compose.yml`
+- The admin is Payload with a custom light theme (`DESIGN.md` §14). Never load Tailwind in the admin (its preflight breaks Payload); admin styles are SCSS, one partial per feature in `src/app/(payload)/styles/`, `custom.scss` holds only `@use`
+- MAX notifications: `src/lib/max/*`, jobs `max-notify` / `max-unassigned-reminder` (`src/jobs/`). Delivery is idempotent through `notification-log` (one `key` = one message to one recipient). Outside production a message goes only to `MAX_INTERCEPT_CHAT_ID` (or nowhere). The bot is shared with another live site: never subscribe its webhook or send real messages without the user's approval (`docs/deploy.md`, "MAX")
+- Page draft preview: `/api/preview/` (Draft Mode, staff only, `safeInternalPath`); the site reads drafts through the `getPageByPath` loader
 
 <!-- BEGIN:nextjs-agent-rules -->
 

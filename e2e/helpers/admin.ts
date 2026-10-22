@@ -3,6 +3,7 @@ import { mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:f
 import os from "node:os";
 import path from "node:path";
 import { test } from "@playwright/test";
+import { E2E_BASE_URL, E2E_PORT } from "./env";
 import type { User } from "../../src/payload-types";
 import type { APIRequestContext } from "@playwright/test";
 
@@ -23,8 +24,8 @@ import type { APIRequestContext } from "@playwright/test";
  * ONE session for the whole run: Payload stores sessions in the user document with a
  * read-modify-write, so two concurrent logins of the same user can drop each other's session
  * (its JWT then answers 401/403). Workers therefore share the admin JWT through a token file in
- * the OS temp dir, guarded by a cross-process lock; a cached token is verified with
- * `GET /api/users/me/` and a fresh one is verified right after the login.
+ * the OS temp dir (one file per server), guarded by a cross-process lock; a cached token is
+ * verified with `GET /api/users/me/` and a fresh one right after the login.
  *
  * Extra staff users (a manager for rights checks) are throwaway accounts with a random e-mail
  * and password (`createStaffUser`), deleted by the spec that created them.
@@ -46,8 +47,15 @@ const RETRY_DELAY_MS = 2_000;
 /** Re-logins when a fresh session was dropped by a concurrent login of another process. */
 const SESSION_ATTEMPTS = 4;
 
-const SESSION_FILE = path.join(os.tmpdir(), "inex-glass-e2e-admin-session.json");
-const SESSION_LOCK_DIR = path.join(os.tmpdir(), "inex-glass-e2e-admin-session.lock");
+/**
+ * A JWT is valid only on the server that issued it (its database and `PAYLOAD_SECRET`): the
+ * token file and its lock are per server, so a run against the dev server (:3000) and one
+ * against the e2e server (:3100) never hand each other a foreign token (→ 403 as anonymous).
+ */
+const SESSION_SERVER = E2E_BASE_URL ?? `http://localhost:${E2E_PORT}`;
+const SESSION_KEY = SESSION_SERVER.replace(/[^a-z0-9]+/gi, "-");
+const SESSION_FILE = path.join(os.tmpdir(), `inex-glass-e2e-admin-session-${SESSION_KEY}.json`);
+const SESSION_LOCK_DIR = path.join(os.tmpdir(), `inex-glass-e2e-admin-session-${SESSION_KEY}.lock`);
 const SESSION_LOCK_TIMEOUT_MS = 5 * 60_000;
 /** A crashed holder's lock expires: a sign-in never takes this long. */
 const SESSION_LOCK_STALE_MS = 3 * 60_000;

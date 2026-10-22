@@ -18,7 +18,8 @@ import type { Payload } from "payload";
  *    one for a shared bot;
  *  - `failed` with `MAX_UNCONFIRMED_CODE` → `duplicate`: the API took the message but did not
  *    confirm it, a resend could deliver it twice;
- *  - any other `failed` / `skipped` → the row is reused and the message is sent again.
+ *  - any other `failed` / `skipped` → the row is reused (compare-and-set to `pending`, so two
+ *    parallel retries cannot both win it) and the message is sent again.
  *
  * Only `maxSendMessage` is retryable: when it succeeded but the `sent` mark cannot be written,
  * the result is still `sent` (the row stays `pending` and is never sent again).
@@ -174,9 +175,29 @@ async function updateRow(
 }
 
 /**
- * Reserves the key: an existing `failed`/`skipped` row is reused, otherwise a new `pending` row
- * is created. `null` = someone else owns the key (already sent, in flight, or a parallel insert
- * won the unique index).
+ * Compare-and-set `failed`/`skipped` → `pending` of one row: a single
+ * `UPDATE … WHERE id = $id AND status = $seen RETURNING`, so of two parallel deliveries that both
+ * read the same failed row only one gets it back (Postgres re-checks the WHERE after the row
+ * lock). `payload.update({ where })` would not do: it finds the ids first and then updates them
+ * by id unconditionally. `options.atomic` is the drizzle adapter's single-statement path; the
+ * collection has no hooks, so going around the Local API skips nothing. `false` = lost the race.
+ */
+async function claimRow(payload: Payload, row: LogRow, chatId: string | null): Promise<boolean> {
+  const claimed: unknown = await payload.db.updateOne({
+    collection: COLLECTION,
+    where: { and: [{ id: { equals: row.id } }, { status: { equals: row.status } }] },
+    data: { status: "pending", error: null, chatId, updatedAt: new Date().toISOString() },
+    options: { atomic: true },
+    returning: true,
+  });
+  return claimed !== null && claimed !== undefined;
+}
+
+/**
+ * Reserves the key: an existing `failed`/`skipped` row is reused (atomically, see `claimRow`),
+ * otherwise a new `pending` row is created. `null` = someone else owns the key (already sent,
+ * in flight, a parallel delivery claimed the same failed row first, or a parallel insert won the
+ * unique index).
  */
 async function reserve(
   payload: Payload,
@@ -189,8 +210,13 @@ async function reserve(
     if (existing.status === "sent" || existing.status === "pending" || isUnconfirmed(existing)) {
       return null;
     }
-    await updateRow(payload, existing.id, { status: "pending", error: null, chatId });
-    return existing.id;
+    let claimed: boolean;
+    try {
+      claimed = await claimRow(payload, existing, chatId);
+    } catch (error) {
+      throw new MaxTransientError(`notification-log reserve failed: ${errorName(error)}`);
+    }
+    return claimed ? existing.id : null;
   }
   try {
     const created = await payload.create({

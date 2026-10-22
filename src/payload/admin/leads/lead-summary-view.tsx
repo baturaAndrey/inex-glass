@@ -6,6 +6,7 @@ import { formatDateRu, formatNumber, formatRub } from "@/lib/domain/format";
 import { QUIZ_FLAG_LABELS } from "@/lib/domain/quiz-flags";
 import type { QuizFlag } from "@/lib/domain/quiz-flags";
 import { formatDateTime, relationIdOf } from "@/lib/leads-admin/export-rows";
+import { safeInternalPath } from "@/lib/preview/safe-path";
 import { getRole } from "@/payload/access";
 import {
   LEAD_FLAGS,
@@ -27,6 +28,7 @@ import {
 import { loadLeadStatuses, loadStaffNames } from "./data";
 import { LeadComments } from "./history/lead-comments";
 import { LeadHistory } from "./history/lead-history";
+import { formatPhoneDisplay } from "./kanban/format";
 import type { ProcessingPanelProps } from "./card/processing";
 import type { StatusOption } from "./data";
 import type { DocumentViewServerProps, Payload, TypedUser, Where } from "payload";
@@ -133,9 +135,6 @@ function nameOf(names: ReadonlyMap<string, string>, value: unknown): string | nu
   return id ? (names.get(id) ?? id) : null;
 }
 
-/** Site-relative path (not protocol-relative), safe to render as a link. */
-const isSitePath = (value: string) => value.startsWith("/") && !value.startsWith("//");
-
 async function loadRepeats(payload: Payload, user: TypedUser | null, lead: Lead) {
   const or: Where[] = [];
   if (text(lead.phone)) or.push({ phone: { equals: lead.phone } });
@@ -201,6 +200,10 @@ export async function LeadSummaryView({ doc, initPageResult }: DocumentViewServe
   const phoneRaw = text(lead.phoneRaw);
   const email = text(lead.email);
   const entryPage = text(lead.entryPage);
+  // `entryPage` comes from the public form, so it is untrusted: only a path `safeInternalPath`
+  // accepts (no `//host`, `/\host`, scheme, encoded slash or control char) becomes a link;
+  // anything else is shown as plain text.
+  const entryPageHref = entryPage ? safeInternalPath(entryPage) : null;
   const title = text(lead.company) ?? text(lead.name) ?? "Заявка";
   const flags = lead.flags ?? [];
   const files = (lead.files ?? []).filter(
@@ -294,8 +297,8 @@ export async function LeadSummaryView({ doc, initPageResult }: DocumentViewServe
               {entryPage ? (
                 <>
                   {" · со страницы "}
-                  {isSitePath(entryPage) ? (
-                    <a href={entryPage} target="_blank" rel="noopener noreferrer">
+                  {entryPageHref ? (
+                    <a href={entryPageHref} target="_blank" rel="noopener noreferrer">
                       {entryPage}
                     </a>
                   ) : (
@@ -336,7 +339,11 @@ export async function LeadSummaryView({ doc, initPageResult }: DocumentViewServe
                     label: "Роль",
                     value: lead.role ? (ROLE_LABELS.get(lead.role) ?? lead.role) : null,
                   },
-                  { label: "Телефон", value: phone ? <a href={telHref(phone)}>{phone}</a> : null },
+                  {
+                    label: "Телефон",
+                    // Shown as on the kanban card («+7 925 859-38-73»); `tel:` keeps the stored number.
+                    value: phone ? <a href={telHref(phone)}>{formatPhoneDisplay(phone)}</a> : null,
+                  },
                   {
                     label: "Телефон (как ввёл)",
                     value: phoneRaw !== phone ? phoneRaw : null,

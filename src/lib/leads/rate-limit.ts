@@ -87,3 +87,34 @@ export async function rateLimit(
     retryAfterSec: allowed ? 0 : Math.max(1, Math.ceil((windowEndsAt - Date.now()) / 1000)),
   };
 }
+
+/**
+ * Reads the counter of `key` WITHOUT incrementing it and reports whether one more counted
+ * attempt would still fit into the limit (`count < limit`; a missing row or an expired window
+ * counts as 0). Pair it with `rateLimit()` on the counted outcome only: a check that must not
+ * even be attempted once the bucket is full (e.g. a secret comparison) peeks first, so at most
+ * `limit` counted attempts happen per window. Read-only, so it never writes a row.
+ */
+export async function peekRateLimit(
+  { key, limit, windowSec }: RateLimitOptions,
+  payloadInstance?: Payload
+): Promise<RateLimitResult> {
+  const payload = payloadInstance ?? (await getPayload({ config }));
+  const result = await payload.db.drizzle.execute(sql`
+    SELECT count, window_start FROM rate_limits
+    WHERE key = ${key}
+      AND window_start >= now() - make_interval(secs => ${windowSec})
+    LIMIT 1`);
+
+  const row = (result as unknown as { rows: CounterRow[] }).rows[0];
+  if (!row) return { allowed: true, remaining: limit, retryAfterSec: 0 };
+
+  const count = Number(row.count);
+  const windowEndsAt = new Date(row.window_start).getTime() + windowSec * 1000;
+  const allowed = count < limit;
+  return {
+    allowed,
+    remaining: Math.max(0, limit - count),
+    retryAfterSec: allowed ? 0 : Math.max(1, Math.ceil((windowEndsAt - Date.now()) / 1000)),
+  };
+}

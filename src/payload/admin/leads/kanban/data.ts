@@ -25,6 +25,12 @@ import type { Payload, TypedUser, Where } from "payload";
  * `LeadListQuickFilters`).
  */
 
+/**
+ * Error name only: Payload errors may carry query values (lead names, phones), so the error
+ * object itself is never logged (same rule as the dashboard and the lead history).
+ */
+const errorName = (error: unknown): string => (error instanceof Error ? error.name : typeof error);
+
 /** Cards per column, and in the column opened with «Ещё N» (`expand`). */
 export const COLUMN_CARD_LIMIT = 20;
 export const EXPANDED_CARD_LIMIT = 200;
@@ -177,7 +183,7 @@ async function countLeads(ctx: Ctx, where: Where): Promise<number | undefined> {
     });
     return totalDocs;
   } catch (error) {
-    ctx.payload.logger.error({ err: error }, "kanban: lead count failed");
+    ctx.payload.logger.error({ errorName: errorName(error) }, "kanban: lead count failed");
     return undefined;
   }
 }
@@ -207,7 +213,7 @@ async function loadOrders(
       }
     }
   } catch (error) {
-    ctx.payload.logger.error({ err: error }, "kanban: orders lookup failed");
+    ctx.payload.logger.error({ errorName: errorName(error) }, "kanban: orders lookup failed");
   }
   return result;
 }
@@ -384,7 +390,7 @@ async function loadStats(ctx: Ctx, statuses: readonly StatusOption[]): Promise<K
       value = formatNumber(totalDocs);
       sub = `${formatNumber(Math.round(area))}${NBSP}м² в заказах`;
     } catch (error) {
-      ctx.payload.logger.error({ err: error }, "kanban: contracts summary failed");
+      ctx.payload.logger.error({ errorName: errorName(error) }, "kanban: contracts summary failed");
     }
     stats.push({ key: "contracts-month", label: "Договоры за месяц", value, sub, tone: "success" });
   } else {

@@ -175,9 +175,14 @@ $tablet: 1100px;
 
     .iga-select {
       width: auto;
+      // An auto-width <select> takes the width of its longest option (a long source label made
+      // it ~195 px), which pushed both selects to their own row at 1366. Capped near the
+      // mockup's `.sel` (160 px) they fit next to the chips; the chosen label still fits.
+      max-width: 150px;
       height: 36px;
       padding: 0 10px;
       font-size: 13px;
+      text-overflow: ellipsis;
     }
   }
 
@@ -345,7 +350,12 @@ $tablet: 1100px;
     align-items: flex-start;
     justify-content: space-between;
     gap: 8px;
-    // Room for the «Перенести в…» button in the corner.
+  }
+
+  // Room for the «Перенести в…» button in the corner, only on cards that have it (no move
+  // targets → no menu). Reserved permanently, not on hover: a hover-only gap would reflow the
+  // title and contacts under the pointer.
+  &:has(.iga-kcard__menu) &__top {
     padding-right: 26px;
   }
 
@@ -386,6 +396,9 @@ $tablet: 1100px;
 
     a {
       font-variant-numeric: tabular-nums;
+      // `anywhere` is for long names only: the phone moves to its own line as a whole
+      // instead of breaking inside the digits («+7 925 859-⏎38-73»).
+      white-space: nowrap;
     }
   }
 
@@ -788,6 +801,8 @@ $tablet: 1100px;
 
     .iga-select {
       flex: 1 1 140px;
+      // The selects share the full row here; the desktop cap would leave a gap.
+      max-width: none;
       height: 44px;
     }
   }

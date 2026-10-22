@@ -3,7 +3,7 @@ import { createHash, timingSafeEqual } from "node:crypto";
 import { getPayload } from "payload";
 import { getEnv } from "@/lib/env";
 import { getClientIp } from "@/lib/leads/client-ip";
-import { rateLimit } from "@/lib/leads/rate-limit";
+import { peekRateLimit, rateLimit } from "@/lib/leads/rate-limit";
 import { NO_STORE_HEADERS } from "@/lib/leads-admin/auth";
 import { parseMaxJson, parseMaxUpdate } from "@/lib/max/updates";
 import { handleMaxUpdate } from "@/lib/max/webhook-handler";
@@ -15,8 +15,16 @@ import type { Payload } from "payload";
  * subscribed URL: without it Next answers 308 and MAX does not repeat a POST after a redirect.
  *
  * - No `MAX_WEBHOOK_SECRET` → 404 (integration off).
- * - Rate limit per client IP (120 / min) → 429; wrong `X-Max-Bot-Api-Secret` → 401
- *   (constant-time comparison); body over 64 KB → 413; invalid JSON → 400.
+ * - Per-IP failed-secret counter: it is READ (not incremented) before the secret comparison; a
+ *   client IP that already has 120 failed attempts in the current minute gets 429 at once,
+ *   without the secret being compared, so at most 120 guesses per IP and minute are evaluated.
+ * - Wrong `X-Max-Bot-Api-Secret` (constant-time comparison) → the counter is incremented → 401
+ *   (429 if that attempt overflowed the limit). Only failures are counted: the bot is shared
+ *   with another live site, so every `message_created` of its chats reaches this URL from the
+ *   same MAX addresses; counting authenticated traffic would let a busy period of the other
+ *   site 429 our own `bot_started` (a lost link). Valid-secret requests never write a counter
+ *   row and are blocked only while their IP already has a full failure bucket.
+ * - Body over 64 KB → 413; invalid JSON → 400.
  * - Otherwise 200 `{ ok: true }` at once, also for update types the site ignores; processing
  *   runs in `after()` and its errors never change the answer (MAX must not retry).
  * - Neither the body nor the headers are logged: only `{ event, type, result }`.
@@ -26,7 +34,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const MAX_BODY_BYTES = 64 * 1024;
-const WEBHOOK_RATE_LIMIT = { limit: 120, windowSec: 60 } as const;
+/** Failed-secret attempts per client IP (authenticated requests are not counted, see above). */
+const WEBHOOK_FAILED_SECRET_LIMIT = { limit: 120, windowSec: 60 } as const;
 
 /** Compare via fixed-length SHA-256 digests so timing leaks neither length nor content. */
 function safeEqual(a: string, b: string): boolean {
@@ -47,13 +56,19 @@ export async function POST(request: Request): Promise<Response> {
   if (!env.MAX_WEBHOOK_SECRET) return new Response(null, { status: 404 });
 
   const payload = await getPayload({ config });
-  const limit = await rateLimit(
-    { key: `max:webhook:ip:${getClientIp(request.headers)}`, ...WEBHOOK_RATE_LIMIT },
-    payload
-  );
-  if (!limit.allowed) return reject(429, { "Retry-After": String(limit.retryAfterSec) });
+
+  // Only failures count; the key names that, so no old all-traffic counter is reused.
+  const failedSecretLimit = {
+    key: `max:webhook:bad-secret:ip:${getClientIp(request.headers)}`,
+    ...WEBHOOK_FAILED_SECRET_LIMIT,
+  };
+  // Peek first: once the bucket is full no secret is compared at all (no oracle for guesses).
+  const peek = await peekRateLimit(failedSecretLimit, payload);
+  if (!peek.allowed) return reject(429, { "Retry-After": String(peek.retryAfterSec) });
 
   if (!safeEqual(request.headers.get("x-max-bot-api-secret") ?? "", env.MAX_WEBHOOK_SECRET)) {
+    const limit = await rateLimit(failedSecretLimit, payload);
+    if (!limit.allowed) return reject(429, { "Retry-After": String(limit.retryAfterSec) });
     return reject(401);
   }
 

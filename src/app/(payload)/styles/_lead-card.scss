@@ -266,10 +266,33 @@ $tablet: 1100px;
       font-weight: 600;
       cursor: pointer;
       border-radius: var(--ig-r-sm);
+      // `display: flex` drops the native disclosure triangle, so the fold had no visible
+      // affordance: draw the same chevron as the kanban «Отказ» strip (`.iga-kstrip__summary`).
+      gap: 10px;
+      list-style: none;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+
+      &::before {
+        content: "";
+        flex: none;
+        width: 6px;
+        height: 6px;
+        border-right: 2px solid var(--ig-text-2);
+        border-bottom: 2px solid var(--ig-text-2);
+        transform: rotate(-45deg);
+        transition: transform var(--ig-dur-fast) var(--iga-ease);
+      }
     }
 
     details[open] > summary {
       margin-bottom: 20px;
+
+      &::before {
+        transform: rotate(45deg);
+      }
     }
   }
 
@@ -514,7 +537,8 @@ $tablet: 1100px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .iga-lead-file {
+  .iga-lead-file,
+  .iga-lead__source summary::before {
     transition: none;
   }
 }

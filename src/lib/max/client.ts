@@ -1,4 +1,5 @@
 import { getEnv } from "@/lib/env";
+import type { Env } from "@/lib/env";
 import { truncateMaxText } from "./html";
 
 /**
@@ -16,10 +17,21 @@ import { truncateMaxText } from "./html";
  *   or edit the message later) cannot be honoured; the job records the failure and moves on.
  * - Neither the token, nor message texts, nor whole responses ever get into errors or logs.
  *
- * The base URL is overridable (`MAX_API_BASE_URL`) only to point tests at a local mock.
+ * The base URL is overridable (`MAX_API_BASE_URL`) only to point tests at a local mock; with
+ * `SITE_ENV=production` the variable is ignored, so a stray value can never redirect the bot
+ * token of the live site to another host.
  */
 
-export const MAX_API_BASE = process.env.MAX_API_BASE_URL || "https://platform-api2.max.ru";
+/** The real MAX Bot API host; the only one production ever talks to. */
+export const MAX_API_DEFAULT_BASE = "https://platform-api2.max.ru";
+
+/** Base URL of the Bot API: `MAX_API_BASE_URL` outside production (mocks), else the real host. */
+export function resolveMaxApiBase(
+  env: Pick<Env, "SITE_ENV" | "MAX_API_BASE_URL"> = getEnv()
+): string {
+  if (env.SITE_ENV === "production" || !env.MAX_API_BASE_URL) return MAX_API_DEFAULT_BASE;
+  return env.MAX_API_BASE_URL;
+}
 
 const REQUEST_TIMEOUT_MS = 10_000;
 /** API error messages are short; anything longer is cut so a log line stays a line. */
@@ -81,7 +93,7 @@ function requireToken(): string {
 }
 
 function buildUrl(path: string, query: Query | undefined): URL {
-  const url = new URL(`${MAX_API_BASE.replace(/\/+$/, "")}${path}`);
+  const url = new URL(`${resolveMaxApiBase().replace(/\/+$/, "")}${path}`);
   for (const [key, value] of Object.entries(query ?? {})) url.searchParams.set(key, value);
   return url;
 }

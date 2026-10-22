@@ -211,6 +211,45 @@ $tablet: 1100px;
     }
   }
 
+  // One-row header above Payload's `mid-break` (≤ 1024 px stacks the strip itself): the
+  // controls shrank with the meta, so at 1366 the two save buttons stacked, «⋮» drifted away
+  // and the dates took two lines. The buttons keep their width; the meta gives way instead and
+  // truncates with an ellipsis (Payload's `.doc-controls__value` already has `text-overflow`).
+  // Below 1025 px the existing wrapping (and the phone layout of section 8) stays as it was.
+  @media (min-width: 1025px) {
+    .doc-controls {
+      &__content {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      &__meta {
+        flex-wrap: nowrap;
+        min-width: 0;
+      }
+
+      &__list-item {
+        flex: 0 1 auto;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      // The status badge never truncates.
+      &__status {
+        flex: none;
+        overflow: visible;
+      }
+
+      &__controls-wrapper {
+        flex: none;
+      }
+
+      &__controls {
+        flex-wrap: nowrap;
+      }
+    }
+  }
+
   // Document status («Опубликовано» / «Изменено» / «Черновик») as a badge.
   .status {
     &__value-wrap {

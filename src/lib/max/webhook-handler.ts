@@ -61,12 +61,16 @@ export type MaxUpdateResult =
   | "ignored";
 
 /**
- * Default reply: sends via the Bot API when a token is configured, otherwise does nothing.
+ * Default reply: sends via the Bot API only when MAX is switched on (`MAX_ENABLED`) and a token
+ * is configured, otherwise does nothing. The bot is shared with another live site, so a token
+ * alone (e.g. copied into a dev/staging env) must not make this site speak in it: `MAX_ENABLED`
+ * is the single switch for everything this site sends. Linking itself still works without it.
  * `text` arrives already decorated (`handleMaxUpdate` does it, so an injected `reply` gets the
  * same final text).
  */
 export const sendMaxReply: MaxReply = async (target, text) => {
-  if (!getEnv().MAX_BOT_TOKEN) return;
+  const env = getEnv();
+  if (!env.MAX_ENABLED || !env.MAX_BOT_TOKEN) return;
   try {
     await maxSendMessage({ ...target, text });
   } catch (error) {
