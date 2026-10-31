@@ -60,6 +60,8 @@ export default buildConfig({
       },
       // Admin redesign: own sidebar (task 03) and dashboard (task 04); stubs render Payload's defaults.
       Nav: "/payload/admin/nav/inex-nav#InexNav",
+      // «Показать пароль» eye toggle on the auth screens (login, reset, create first user).
+      providers: ["/payload/admin/auth/password-toggle#PasswordToggleProvider"],
       views: {
         dashboard: { Component: "/payload/admin/views/dashboard#InexDashboard" },
         // Leads report (task 32): the `/admin/leads-report` view.

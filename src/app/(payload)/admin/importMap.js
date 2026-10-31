@@ -36,6 +36,7 @@ import { MaxGroupLinkPanel as MaxGroupLinkPanel_61a578352b3d35037675ed579b486c56
 import { InexNav as InexNav_f98b58e01901528d58dbaa1c00bda497 } from '../../../payload/admin/nav/inex-nav'
 import { AdminIcon as AdminIcon_ee633e723f8b9791f1615014743c1551 } from '../../../payload/admin/graphics/icon'
 import { AdminLogo as AdminLogo_66af202eb74370c12520481923be2979 } from '../../../payload/admin/graphics/logo'
+import { PasswordToggleProvider as PasswordToggleProvider_6b85cbd9b2844276b84030fa1a794876 } from '../../../payload/admin/auth/password-toggle'
 import { InexDashboard as InexDashboard_890e5ef9a7e9fd2e32d2c94d0765822e } from '../../../payload/admin/views/dashboard'
 import { LeadsReportView as LeadsReportView_46223cd483499ef4b006adf811cffd93 } from '../../../payload/admin/views/leads-report'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -80,6 +81,7 @@ export const importMap = {
   "/payload/admin/nav/inex-nav#InexNav": InexNav_f98b58e01901528d58dbaa1c00bda497,
   "/payload/admin/graphics/icon#AdminIcon": AdminIcon_ee633e723f8b9791f1615014743c1551,
   "/payload/admin/graphics/logo#AdminLogo": AdminLogo_66af202eb74370c12520481923be2979,
+  "/payload/admin/auth/password-toggle#PasswordToggleProvider": PasswordToggleProvider_6b85cbd9b2844276b84030fa1a794876,
   "/payload/admin/views/dashboard#InexDashboard": InexDashboard_890e5ef9a7e9fd2e32d2c94d0765822e,
   "/payload/admin/views/leads-report#LeadsReportView": LeadsReportView_46223cd483499ef4b006adf811cffd93,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1

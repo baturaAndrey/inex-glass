@@ -915,6 +915,65 @@ $overlay: rgb(28 31 34 / 0.4);
     border-color: var(--ig-danger-text);
   }
 
+  // «Показать пароль» toggle (`src/payload/admin/auth/password-toggle.tsx`): the button sits in
+  // the input's wrapper `<div>` (`.iga-pw-field`), over the right edge of the input.
+  .iga-pw-field {
+    position: relative;
+
+    input[type] {
+      padding-right: 48px;
+    }
+
+    // Edge / IE draw their own reveal eye in password inputs: one toggle only.
+    input::-ms-reveal,
+    input::-ms-clear {
+      display: none;
+    }
+  }
+
+  .iga-pw-toggle {
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    display: inline-flex;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--ig-r-sm);
+    background: transparent;
+    color: var(--ig-text-2);
+    cursor: pointer;
+    transform: translateY(-50%);
+    transition:
+      color var(--ig-dur-fast) var(--ig-ease),
+      background-color var(--ig-dur-fast) var(--ig-ease);
+
+    // Hover only for real pointers: on touch screens it would stick after a tap.
+    @media (hover: hover) {
+      &:hover {
+        background: var(--ig-primary-light);
+        color: var(--ig-primary-pressed);
+      }
+    }
+
+    &:focus-visible {
+      border-color: var(--ig-primary);
+      box-shadow: var(--ig-focus-ring);
+      outline: none;
+    }
+
+    &[aria-pressed="true"] {
+      color: var(--ig-primary-pressed);
+    }
+
+    svg {
+      flex: none;
+    }
+  }
+
   a:not(.btn) {
     color: var(--ig-primary-pressed);
     font-size: 14px;
@@ -945,6 +1004,13 @@ $overlay: rgb(28 31 34 / 0.4);
       padding: 16px;
       border: 0;
       box-shadow: none;
+    }
+
+    // Touch target ≥ 44 px (DESIGN.md §11); it overhangs the 42 px input by 1 px, invisibly.
+    .iga-pw-toggle {
+      right: 0;
+      width: 44px;
+      height: 44px;
     }
   }
 }
