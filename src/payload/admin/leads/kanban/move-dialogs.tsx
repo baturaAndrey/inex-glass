@@ -34,9 +34,14 @@ function useShowModal(ref: RefObject<HTMLDialogElement | null>) {
 /**
  * `close` handler: fires after Escape, `dialog.close()` and a `method="dialog"` form alike
  * (events of nested elements are ignored).
+ *
+ * A `close` that arrives while the dialog is open again is stale and ignored: the browser queues
+ * the event as a task, and React's Strict Mode (development) runs `useShowModal` as
+ * showModal → cleanup `close()` → showModal, so the cleanup's event lands on the reopened dialog
+ * and would unmount it right away.
  */
 const closeHandler = (onClose: () => void) => (event: SyntheticEvent<HTMLDialogElement>) => {
-  if (event.target === event.currentTarget) onClose();
+  if (event.target === event.currentTarget && !event.currentTarget.open) onClose();
 };
 
 export interface RefuseDialogProps {
