@@ -1,0 +1,113 @@
+/* Inex Glass — токены цвета, типографики, пространства, формы, движения.
+   Источник: res/inex-glass-handoff/design-system/colors_and_type.css (+ принятые правки:
+   доступный фон кнопки, success-text, доп. цвета прототипов, сетка 70/40/24/16,
+   раздельные переменные размера/line-height для моста в Tailwind).
+   Подключается из src/app/(site)/globals.css в слой `base`.
+   Значения токенов (`:root` и медиа-переопределения) — в ig-vars.css: его же подключает
+   админка Payload. Здесь — базовые стили сайта.
+   Шрифт Rubik 400–700 — локальный, через next/font/local (src/app/(site)/fonts.ts),
+   переменная --font-rubik. Google Fonts не используются. */
+
+@import "./ig-vars.css";
+
+/* Базовые стили */
+body {
+  margin: 0;
+  background: var(--ig-bg);
+  color: var(--ig-text);
+  font: var(--ig-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--ig-primary-pressed);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+a:hover {
+  color: var(--ig-primary-dark);
+}
+
+.ig-h1 {
+  font: var(--ig-h1);
+  margin: 0;
+  text-wrap: balance;
+}
+.ig-h1--caps {
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.ig-h2 {
+  font: var(--ig-h2);
+  margin: 0;
+  text-wrap: balance;
+}
+.ig-h3 {
+  font: var(--ig-h3);
+  margin: 0;
+}
+.ig-h4 {
+  font: var(--ig-h4);
+  margin: 0;
+}
+.ig-h5 {
+  font: var(--ig-h5);
+  margin: 0;
+}
+.ig-h6 {
+  font: var(--ig-h6);
+  margin: 0;
+}
+.ig-body {
+  font: var(--ig-body);
+  margin: 0;
+  text-wrap: pretty;
+}
+.ig-small {
+  font: var(--ig-small);
+  margin: 0;
+}
+.ig-micro {
+  font: var(--ig-micro);
+  margin: 0;
+}
+.ig-label {
+  font: var(--ig-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ig-text-2);
+}
+.ig-price-l {
+  font: var(--ig-price-l);
+  font-variant-numeric: tabular-nums;
+}
+.ig-price-m {
+  font: var(--ig-price-m);
+  font-variant-numeric: tabular-nums;
+}
+.ig-price-s {
+  font: var(--ig-price-s);
+  font-variant-numeric: tabular-nums;
+}
+.ig-stat {
+  font: var(--ig-stat);
+  font-variant-numeric: tabular-nums;
+}
+.ig-muted {
+  color: var(--ig-text-2);
+}
+
+/* Секция — фон до 1920; контейнер — те же 1920 с полями --ig-gutter */
+.ig-section {
+  width: 100%;
+  max-width: var(--ig-section-max);
+  margin: 0 auto;
+}
+.ig-container {
+  max-width: var(--ig-section-max);
+  margin-inline: auto;
+  padding-inline: var(--ig-gutter);
+  box-sizing: border-box;
+}

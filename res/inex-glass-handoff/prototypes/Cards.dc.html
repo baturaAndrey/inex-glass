@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Inex Glass — карточки</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../design-system/colors_and_type.css">
+<link rel="stylesheet" href="../design-system/components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F6B60}a:hover{color:#16403D}
+.mono{font:400 12px/1.4 ui-monospace,Menlo,monospace;color:#5B636B}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1800px; box-sizing: border-box; padding: 64px; background: #F4F5F3; font-family: 'Rubik', system-ui, sans-serif; color: #1C1F22; display: flex; flex-direction: column; gap: 40px">
+  <div style="display: flex; flex-direction: column; gap: 12px">
+    <span class="ig-label">Дизайн-система Inex Glass · 07</span>
+    <h1 class="ig-h2">Карточки, шаги, статистика</h1>
+  </div>
+
+  <section style="display: flex; flex-direction: column; gap: 16px">
+    <span class="ig-h6">Карточка раздела — фото 4:3, заголовок, подпись, стрелка · вторая — hover</span>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px">
+      <a class="ig-card" href="#"><div class="ig-ph"><span>фото объекта</span></div><div class="ig-card__body"><h3 class="ig-card__title">Закалённое стекло</h3><p class="ig-card__sub">4–19 мм по вашим размерам</p><div class="ig-card__foot"><span style="display: flex; flex-direction: column; gap: 2px"><span class="ig-price-m">от 700 ₽/м²</span><span class="ig-micro ig-muted">ориентировочная цена на 01.11.2026</span></span><span class="ig-card__arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></div></div></a>
+      <a class="ig-card is-hover" href="#"><div class="ig-ph"><span>фото объекта</span></div><div class="ig-card__body"><h3 class="ig-card__title">Триплекс</h3><p class="ig-card__sub">Закалённый, для ограждений и козырьков</p><div class="ig-card__foot"><span></span><span class="ig-card__arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></div></div></a>
+      <a class="ig-card" href="#"><div class="ig-ph"><span>фото объекта</span></div><div class="ig-card__body"><h3 class="ig-card__title">Виды стекла</h3><p class="ig-card__sub">Матовое, тонированное, крашеное, осветлённое, рифлёное</p><div class="ig-card__foot"><span></span><span class="ig-card__arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></div></div></a>
+      <a class="ig-card" href="#"><div class="ig-ph"><span>фото объекта</span></div><div class="ig-card__body"><h3 class="ig-card__title">Для производителей мебели</h3><p class="ig-card__sub">Серии стекла для фасадов и столешниц</p><div class="ig-card__foot"><span></span><span class="ig-card__arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></div></div></a>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 40px">
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <span class="ig-h6">Карточка толщины — с ценой и «по расчёту»</span>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px">
+        <a class="ig-card ig-thick" href="#">
+          <span class="ig-thick__mm">10<small>мм</small></span>
+          <span style="display: flex; flex-direction: column; gap: 4px"><span class="ig-price-m">от 1 400 ₽/м²</span><span class="ig-thick__note">ориентировочная цена на 01.11.2026</span></span>
+          <dl class="ig-thick__specs"><div><dt>Вес</dt><dd>25 кг/м²</dd></div><div><dt>Размеры</dt><dd>до 3000 × 2000 мм</dd></div></dl>
+        </a>
+        <a class="ig-card ig-thick" href="#">
+          <span class="ig-thick__mm">19<small>мм</small></span>
+          <span style="display: flex; flex-direction: column; gap: 4px"><span class="ig-price-m">Цена по расчёту</span><span class="ig-thick__note">пришлём в КП за 2–3 рабочих дня</span></span>
+          <dl class="ig-thick__specs"><div><dt>Вес</dt><dd>47,5 кг/м²</dd></div><div><dt>Размеры</dt><dd>[макс. размер]</dd></div></dl>
+        </a>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <span class="ig-h6">Карточка объекта — спецификации в чипсах (пример данных)</span>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px">
+        <a class="ig-card" href="#"><div class="ig-ph"><span>фото объекта</span></div><div class="ig-card__body"><h3 class="ig-card__title">ТРЦ «Алмаз»</h3><p class="ig-card__sub">Челябинск · торговый центр</p><div class="ig-chips" style="margin-top: 8px"><span class="ig-chip ig-chip--static">закалённый триплекс 8+8</span><span class="ig-chip ig-chip--static">осветлённое 12 мм</span></div></div></a>
+        <a class="ig-card" href="#"><div class="ig-ph"><span>фото объекта</span></div><div class="ig-card__body"><h3 class="ig-card__title">«РМК-Арена»</h3><p class="ig-card__sub">Челябинск · арена</p><div class="ig-chips" style="margin-top: 8px"><span class="ig-chip ig-chip--static">[изделие]</span><span class="ig-chip ig-chip--static">[толщина, вид]</span></div></div></a>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 16px">
+    <span class="ig-h6">Карточка статьи и инструмента</span>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px">
+      <a class="ig-card" href="#"><div class="ig-ph ig-ph--16x9"><span>иллюстрация</span></div><div class="ig-card__body"><span class="ig-label">Инструмент</span><h3 class="ig-card__title" style="font-size: 18px">Калькулятор веса стекла</h3></div></a>
+      <a class="ig-card" href="#"><div class="ig-ph ig-ph--16x9"><span>иллюстрация</span></div><div class="ig-card__body"><span class="ig-label">Справка</span><h3 class="ig-card__title" style="font-size: 18px">Допуски по ГОСТ</h3></div></a>
+      <a class="ig-card" href="#"><div class="ig-ph ig-ph--16x9"><span>иллюстрация</span></div><div class="ig-card__body"><span class="ig-label">Статья</span><h3 class="ig-card__title" style="font-size: 18px">Можно ли резать закалённое стекло</h3></div></a>
+      <a class="ig-card" href="#"><div class="ig-ph ig-ph--16x9"><span>иллюстрация</span></div><div class="ig-card__body"><span class="ig-label">Статья</span><h3 class="ig-card__title" style="font-size: 18px">Как снять размеры</h3></div></a>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 16px">
+    <span class="ig-h6">Шаги процесса 1–6 (заголовки — пример, финальные из 04-kak-zakazat.md)</span>
+    <div class="ig-steps" style="background: #fff; border-radius: 24px; padding: 28px; box-shadow: 0 2px 8px rgba(28,31,34,.06)">
+      <div class="ig-step"><span class="ig-step__line" aria-hidden="true"></span><span class="ig-step__num">1</span><p class="ig-step__title">Отправляете чертёж</p><p class="ig-step__text">DWG, DXF или PDF</p></div>
+      <div class="ig-step"><span class="ig-step__line" aria-hidden="true"></span><span class="ig-step__num">2</span><p class="ig-step__title">Проверяем чертёж</p><p class="ig-step__text">Отверстия, кромки, допуски</p></div>
+      <div class="ig-step"><span class="ig-step__line" aria-hidden="true"></span><span class="ig-step__num">3</span><p class="ig-step__title">Присылаем КП</p><p class="ig-step__text">В среднем за 2–3 рабочих дня</p></div>
+      <div class="ig-step"><span class="ig-step__line" aria-hidden="true"></span><span class="ig-step__num">4</span><p class="ig-step__title">Договор</p><p class="ig-step__text">Цена фиксируется</p></div>
+      <div class="ig-step"><span class="ig-step__line" aria-hidden="true"></span><span class="ig-step__num">5</span><p class="ig-step__title">Производство и упаковка</p><p class="ig-step__text">От 10 рабочих дней</p></div>
+      <div class="ig-step"><span class="ig-step__num">6</span><p class="ig-step__title">Отгрузка на объект</p><p class="ig-step__text">Фото упаковки и накладная</p></div>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <span class="ig-h6">Плитки статистики — в контенте</span>
+      <div class="ig-stats">
+        <div class="ig-stat-tile"><span class="ig-stat">21 год</span><p class="ig-stat-tile__text">опыт специалистов Inex</p></div>
+        <div class="ig-stat-tile"><span class="ig-stat">1500+</span><p class="ig-stat-tile__text">проектов по всей России</p></div>
+        <div class="ig-stat-tile"><span class="ig-stat">4–19 мм</span><p class="ig-stat-tile__text">толщины закалённого стекла</p></div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <span class="ig-h6">Frosted glass — только в hero, поверх фото</span>
+      <div style="border-radius: 24px; padding: 20px; background: linear-gradient(120deg, #B9CEC9 0%, #DCE6E3 45%, #A9C2BD 100%)">
+        <div class="ig-stats ig-stats--glass">
+          <div class="ig-stat-tile"><span class="ig-stat" style="font-size: 40px">21 год</span><p class="ig-stat-tile__text">опыт специалистов Inex</p></div>
+          <div class="ig-stat-tile"><span class="ig-stat" style="font-size: 40px">1500+</span><p class="ig-stat-tile__text">проектов: ТРК, банки, заводы, офисы</p></div>
+          <div class="ig-stat-tile"><span class="ig-stat" style="font-size: 40px">4–19 мм</span><p class="ig-stat-tile__text">паспорт и ГОСТ 30698 на партию</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

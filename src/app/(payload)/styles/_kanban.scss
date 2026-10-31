@@ -1,0 +1,907 @@
+// Leads kanban (`/admin/collections/leads/kanban/`) — owner: task-05 (admin redesign).
+// Values follow the approved mockup res/admin-mockup/Leads.dc.html (`.page`, `.stat`, `.chip`,
+// `.sel`, `.board`, `.col`, `.lc`, `.mini`, `.more`, `<details class="card">`).
+// Colours: `--ig-*` tokens only; a status colour arrives as `--iga-status-color` (sanitized hex).
+// Classes: `.iga-kanban*`, `.iga-kcard*`, `.iga-kstrip*`, `.iga-kdialog*`, `.iga-kmenu*`, `.iga-ktabs*`.
+
+$phone: 599px;
+$tablet: 1100px;
+
+// ---------------------------------------------------------------------------------------------
+// Page
+// ---------------------------------------------------------------------------------------------
+
+.iga-kanban {
+  --iga-status-color: var(--ig-text-2);
+
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: var(--ig-text);
+  font-size: 14px;
+
+  a:not(.iga-btn, .iga-chip, .iga-kanban__more, .iga-kcard__title, .iga-seg > a) {
+    color: var(--ig-primary-pressed);
+
+    &:hover {
+      color: var(--ig-primary-dark);
+    }
+  }
+
+  :is(a, button, input, select, summary, textarea):focus-visible {
+    outline: 2px solid var(--ig-primary);
+    outline-offset: 2px;
+  }
+
+  &__head {
+    // The mockup's `.top`: title left, search and export right.
+    gap: 16px;
+  }
+
+  &__title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-right: auto;
+  }
+
+  &__search {
+    display: flex;
+    flex: 0 1 320px;
+    align-items: center;
+    gap: 8px;
+    min-width: 200px;
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--ig-line);
+    border-radius: var(--ig-r-pill);
+    background: var(--ig-bg);
+    color: var(--ig-text-2);
+
+    &:focus-within {
+      border-color: var(--ig-primary);
+      box-shadow: var(--ig-focus-ring);
+    }
+
+    svg {
+      flex: none;
+      width: 16px;
+      height: 16px;
+    }
+
+    input {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      background: transparent;
+      color: var(--ig-text);
+      font: inherit;
+      font-size: 14px;
+
+      &::placeholder {
+        color: var(--ig-text-muted);
+      }
+
+      // The field shows the focus ring on the whole pill instead.
+      &:focus,
+      &:focus-visible {
+        outline: none;
+      }
+    }
+  }
+
+  &__page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+    padding: 24px 32px 56px;
+  }
+
+  // Summary tiles.
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  &__stat {
+    gap: 4px;
+    padding: 16px 18px;
+  }
+
+  &__stat-label {
+    font-size: 13px;
+    color: var(--ig-text-2);
+  }
+
+  &__stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+
+    &[data-tone="info"] {
+      color: var(--ig-info-text);
+    }
+
+    &[data-tone="success"] {
+      color: var(--ig-success-text);
+    }
+  }
+
+  &__stat-sub {
+    font-size: 12px;
+    color: var(--ig-text-2);
+  }
+
+  // Filters row.
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__divider {
+    width: 1px;
+    height: 24px;
+    background: var(--ig-line);
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    // Chips are links: the active one is `aria-current` (`aria-pressed` is for buttons only).
+    .iga-chip {
+      text-decoration: none;
+
+      &[aria-current="true"] {
+        background: var(--ig-primary-light);
+        border-color: var(--ig-primary);
+        color: var(--ig-primary-dark);
+        font-weight: 500;
+      }
+    }
+  }
+
+  &__selects {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-left: auto;
+
+    .iga-select {
+      width: auto;
+      // An auto-width <select> takes the width of its longest option (a long source label made
+      // it ~195 px), which pushed both selects to their own row at 1366. Capped near the
+      // mockup's `.sel` (160 px) they fit next to the chips; the chosen label still fits.
+      max-width: 150px;
+      height: 36px;
+      padding: 0 10px;
+      font-size: 13px;
+      text-overflow: ellipsis;
+    }
+  }
+
+  // List page: the switch above Payload's list (`beforeList`).
+  &__list-toggle {
+    margin-bottom: 12px;
+  }
+
+  // Board.
+  &__board-area {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+
+  // Below ~1366 the columns no longer fit and the board scrolls sideways.
+  &__scroller {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  &__board {
+    display: grid;
+    // `--iga-kanban-cols` (the number of board columns) is set inline. 4 × 240 + 3 × 14 =
+    // 1002 px fits the 1366 content box (1366 − 248 menu − 2 × 32 padding − scrollbar ≈ 1039).
+    grid-template-columns: repeat(var(--iga-kanban-cols, 4), minmax(240px, 1fr));
+    gap: 14px;
+    align-items: start;
+  }
+
+  &__col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    padding: 10px;
+    border: 2px dashed transparent;
+    border-radius: var(--ig-r-lg);
+    background: var(--ig-well);
+    transition: border-color var(--ig-dur-fast) var(--iga-ease);
+
+    &[data-over="true"] {
+      border-color: var(--ig-primary);
+    }
+  }
+
+  &__col-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 6px 2px;
+  }
+
+  // `tabindex="-1"`: takes the focus when a column's last card is refused.
+  &__col-title {
+    margin: 0;
+    border-radius: var(--ig-r-sm);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+
+    &:focus-visible {
+      outline: 2px solid var(--ig-primary);
+      outline-offset: 2px;
+    }
+  }
+
+  &__col-count {
+    margin-left: auto;
+    font-size: 13px;
+    color: var(--ig-text-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--iga-status-color);
+  }
+
+  &__empty {
+    margin: 0;
+    padding: 8px 6px;
+    font-size: 13px;
+    color: var(--ig-text-2);
+  }
+
+  &__more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    border: 1px dashed var(--ig-gray-2);
+    border-radius: var(--ig-r-md);
+    color: var(--ig-text-2);
+    font-size: 13px;
+    text-decoration: none;
+
+    &:hover {
+      border-color: var(--ig-primary);
+      color: var(--ig-primary-pressed);
+    }
+  }
+
+  &__sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Card
+// ---------------------------------------------------------------------------------------------
+
+.iga-kcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 14px;
+  border: 1px solid var(--ig-hairline);
+  border-radius: 12px;
+  background: var(--ig-surface);
+  cursor: grab;
+  // No browser gestures fight the long-press drag on tablets.
+  -webkit-touch-callout: none;
+  transition:
+    border-color var(--ig-dur-fast) var(--iga-ease),
+    box-shadow var(--ig-dur-base) var(--iga-ease),
+    opacity var(--ig-dur-fast) var(--iga-ease);
+
+  &:hover,
+  &:focus-within {
+    border-color: var(--ig-primary);
+    box-shadow: var(--ig-shadow-card-hover);
+  }
+
+  &[data-dragging="true"] {
+    opacity: 0.4;
+  }
+
+  &[aria-busy="true"] {
+    cursor: progress;
+    opacity: 0.7;
+  }
+
+  &.is-dragging {
+    border-color: var(--ig-primary);
+    box-shadow: var(--ig-shadow-dropdown);
+    cursor: grabbing;
+  }
+
+  &__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  // Room for the «Перенести в…» button in the corner, only on cards that have it (no move
+  // targets → no menu). Reserved permanently, not on hover: a hover-only gap would reflow the
+  // title and contacts under the pointer.
+  &:has(.iga-kcard__menu) &__top {
+    padding-right: 26px;
+  }
+
+  &__title {
+    color: var(--ig-text);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+
+    &:hover {
+      color: var(--ig-primary-pressed);
+      text-decoration: underline;
+    }
+  }
+
+  &__age {
+    flex: none;
+    font-size: 12px;
+    white-space: nowrap;
+    color: var(--ig-text-2);
+    font-variant-numeric: tabular-nums;
+
+    &[data-tone="late"] {
+      color: var(--ig-danger-text);
+    }
+
+    &[data-tone="waiting"] {
+      color: var(--ig-warning-text);
+    }
+  }
+
+  &__contact {
+    font-size: 13px;
+    color: var(--ig-text-2);
+    overflow-wrap: anywhere;
+
+    a {
+      font-variant-numeric: tabular-nums;
+      // `anywhere` is for long names only: the phone moves to its own line as a whole
+      // instead of breaking inside the digits («+7 925 859-⏎38-73»).
+      white-space: nowrap;
+    }
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    .iga-tag {
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  &__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 39px; // 28 px controls + 10 px padding + border
+    padding-top: 10px;
+    border-top: 1px solid var(--ig-hairline);
+  }
+
+  &__sum {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__muted {
+    font-size: 13px;
+    color: var(--ig-text-2);
+  }
+
+  &__order {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  // «Взять себе» (mockup `.mini`).
+  &__take {
+    position: relative;
+    height: 28px;
+    padding: 0 10px;
+    border: 1px solid var(--ig-primary);
+    border-radius: var(--ig-r-pill);
+    background: var(--ig-surface);
+    color: var(--ig-primary-pressed);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+
+    &:hover {
+      background: var(--ig-primary-light);
+    }
+
+    &:disabled {
+      border-color: var(--ig-line);
+      color: var(--ig-text-muted);
+      cursor: progress;
+    }
+  }
+
+  // Drag handle: top-left edge, shown on hover / keyboard focus.
+  &__handle {
+    position: absolute;
+    top: 12px;
+    left: -1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: 0 var(--ig-r-sm) var(--ig-r-sm) 0;
+    background: var(--ig-primary-light);
+    color: var(--ig-primary-pressed);
+    cursor: grab;
+    opacity: 0;
+    transition: opacity var(--ig-dur-fast) var(--iga-ease);
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    &:focus-visible {
+      opacity: 1;
+    }
+  }
+
+  &:hover &__handle {
+    opacity: 1;
+  }
+
+  &__menu {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    opacity: 0;
+    transition: opacity var(--ig-dur-fast) var(--iga-ease);
+  }
+
+  // The open list is portalled out of the card, so `:focus-within` no longer holds it.
+  &:hover &__menu,
+  &:focus-within &__menu,
+  &__menu:has([aria-expanded="true"]) {
+    opacity: 1;
+  }
+
+  &:has(.iga-kmenu__button[aria-expanded="true"]) {
+    border-color: var(--ig-primary);
+  }
+}
+
+// Touch devices have no hover: the menu is always visible there.
+@media (hover: none) {
+  .iga-kcard__menu,
+  .iga-kcard__handle {
+    opacity: 1;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// «Перенести в…» menu
+// ---------------------------------------------------------------------------------------------
+
+.iga-kmenu {
+  position: relative;
+
+  &__button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--ig-r-pill);
+    background: var(--ig-surface);
+    color: var(--ig-text-2);
+    cursor: pointer;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover,
+    &[aria-expanded="true"] {
+      border-color: var(--ig-line);
+      background: var(--ig-bg);
+      color: var(--ig-text);
+    }
+  }
+
+  // Portalled to <body> and placed by `move-menu.tsx` (`top`/`left`): never clipped by the
+  // horizontally scrolling board. Payload's popup layer: above its sticky header and nav.
+  &__list {
+    position: fixed;
+    z-index: var(--z-popup);
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    min-width: 220px;
+    padding: 6px;
+    border: 1px solid var(--ig-line);
+    border-radius: var(--ig-r-md);
+    background: var(--ig-surface);
+    box-shadow: var(--ig-shadow-dropdown);
+    cursor: default;
+  }
+
+  &__caption {
+    padding: 4px 10px 6px;
+    font-size: 12px;
+    color: var(--ig-text-2);
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 36px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: var(--ig-r-sm);
+    background: transparent;
+    color: var(--ig-text);
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--ig-primary-light);
+      outline: none;
+    }
+  }
+
+  &__dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--iga-status-color, var(--ig-text-2));
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Refusal strip
+// ---------------------------------------------------------------------------------------------
+
+.iga-kstrip {
+  border: 2px dashed transparent;
+  border-radius: calc(var(--ig-r-lg) + 2px);
+  transition: border-color var(--ig-dur-fast) var(--iga-ease);
+
+  &[data-over="true"] {
+    border-color: var(--ig-primary);
+  }
+
+  &__details {
+    gap: 12px;
+    padding: 14px 18px;
+  }
+
+  &__summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-right: 2px solid var(--ig-text-2);
+      border-bottom: 2px solid var(--ig-text-2);
+      transform: rotate(-45deg);
+      transition: transform var(--ig-dur-fast) var(--iga-ease);
+    }
+  }
+
+  &__details[open] &__summary::before {
+    transform: rotate(45deg);
+  }
+
+  &__hint {
+    font-weight: 400;
+    color: var(--ig-text-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__reasons {
+    margin: 0;
+    font-size: 13px;
+    color: var(--ig-text-2);
+  }
+
+  &__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 10px;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Dialogs (native modal <dialog>)
+// ---------------------------------------------------------------------------------------------
+
+.iga-kdialog {
+  width: min(480px, calc(100vw - 32px));
+  padding: 0;
+  border: 0;
+  border-radius: var(--ig-r-lg);
+  background: var(--ig-surface);
+  color: var(--ig-text);
+  box-shadow: var(--ig-shadow-modal);
+
+  &::backdrop {
+    background: color-mix(in srgb, var(--ig-text) 45%, transparent);
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  &__text {
+    margin: 0;
+    color: var(--ig-text-2);
+    line-height: 1.5;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+
+  // The base `--danger` is a text button; a confirming action needs a filled one.
+  .iga-btn.iga-kdialog__danger {
+    height: 40px;
+    padding: 0 18px;
+    background: var(--ig-danger-text);
+    color: var(--ig-on-navy);
+
+    &:hover {
+      background: var(--ig-danger-text);
+      filter: brightness(0.92);
+    }
+
+    &:disabled {
+      background: var(--ig-well);
+      color: var(--ig-text-muted);
+      filter: none;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Phone tabs (≤ 599 px): one lane at a time
+// ---------------------------------------------------------------------------------------------
+
+.iga-ktabs {
+  display: none;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Responsive
+// ---------------------------------------------------------------------------------------------
+
+@media (max-width: $tablet) {
+  .iga-kanban__page {
+    padding: 24px 24px 48px;
+  }
+
+  .iga-kanban__head {
+    padding-inline: 24px;
+  }
+}
+
+@media (max-width: $phone) {
+  .iga-kanban__page {
+    gap: 16px;
+    padding: 16px 16px 40px;
+  }
+
+  .iga-kanban__head {
+    padding-inline: 16px;
+  }
+
+  .iga-kanban__search {
+    flex: 1 1 100%;
+    min-width: 0;
+    height: 44px;
+  }
+
+  .iga-kanban__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .iga-kanban__stat-value {
+    font-size: 24px;
+  }
+
+  .iga-kanban__divider {
+    display: none;
+  }
+
+  .iga-kanban__selects {
+    width: 100%;
+    margin-left: 0;
+
+    .iga-select {
+      flex: 1 1 140px;
+      // The selects share the full row here; the desktop cap would leave a gap.
+      max-width: none;
+      height: 44px;
+    }
+  }
+
+  .iga-kanban__more {
+    height: 44px;
+  }
+
+  .iga-ktabs {
+    display: flex;
+    gap: 8px;
+    margin-inline: -16px;
+    padding: 0 16px 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &__tab {
+      flex: none;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--ig-line);
+      border-radius: var(--ig-r-pill);
+      background: var(--ig-surface);
+      color: var(--ig-text);
+      font: inherit;
+      font-size: 14px;
+      white-space: nowrap;
+      cursor: pointer;
+
+      b {
+        margin-left: 4px;
+        font-weight: 600;
+        color: var(--ig-text-2);
+        font-variant-numeric: tabular-nums;
+      }
+
+      &[aria-selected="true"] {
+        border-color: var(--ig-primary);
+        background: var(--ig-primary-light);
+        color: var(--ig-primary-dark);
+        font-weight: 500;
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--ig-primary);
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  // The grid is replaced by one lane; the server marks lane 0 active, so the layout holds
+  // before hydration too.
+  .iga-kanban__scroller {
+    overflow: visible;
+  }
+
+  .iga-kanban__board {
+    display: block;
+  }
+
+  .iga-kanban__col,
+  .iga-kstrip {
+    &:not([data-active="true"]) {
+      display: none;
+    }
+  }
+
+  // Strips' cards in one column.
+  .iga-kstrip__cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  // Touch targets ≥ 44 px without changing the drawn size.
+  .iga-kmenu__button,
+  .iga-kcard__take {
+    &::after {
+      content: "";
+      position: absolute;
+      inset: -8px;
+    }
+  }
+
+  .iga-kcard__menu {
+    opacity: 1;
+  }
+
+  .iga-kdialog__actions .iga-btn {
+    flex: 1 1 auto;
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iga-kanban__col,
+  .iga-kcard,
+  .iga-kcard__handle,
+  .iga-kcard__menu,
+  .iga-kstrip,
+  .iga-kstrip__summary::before {
+    transition: none;
+  }
+}

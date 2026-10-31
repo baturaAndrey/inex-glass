@@ -1,451 +1,335 @@
-# Design System
+# Design System — Inex Glass
 
-This document defines the visual design system for the project. All new components and pages **must** follow these tokens, patterns, and conventions.
+Все новые компоненты и страницы **обязаны** следовать этому документу.
 
----
+Источники истины:
+- токены и компоненты — `res/inex-glass-handoff/design-system/` (`colors_and_type.css`, `components.css`, `README.md`, `SKILL.md`), с принятыми правками из этого документа;
+- копирайт — `res/inex-glass-handoff/teksty/`;
+- функциональность — ТЗ `docs/inex/16-tz-razrabotka.md`;
+- вёрстка страниц — прототипы `res/inex-glass-handoff/prototypes/`.
 
-## Stack
+При расхождении `design-system/README.md` или `res/inex-glass-handoff/CLAUDE.md` с этим документом приоритет у этого документа (сетка 70 px, кнопка `#267D70`, success-text `#237A35`).
 
-- **Framework:** Next.js (App Router) + React + TypeScript
-- **Styling:** Tailwind CSS v4 (CSS-first config via `@theme inline` in `globals.css` — no `tailwind.config.ts`)
-- **Components:** shadcn/ui (new-york style, neutral base)
-- **Icons:** Lucide React
-- **Fonts:** Geist (sans) + Geist Mono (mono) via `next/font/google`
-- **Dark mode:** next-themes (class-based, system default)
-- **Utilities:** `cn()` from `@/lib/utils` (clsx + tailwind-merge)
+Файлы, помеченные «создаёт задача NN», реализуются задачами спека `specs/inex-glass-site/` и могут отсутствовать, пока задача не выполнена. Этот документ описывает их как целевое состояние.
 
 ---
 
-## Colors
+## 1. Стек
 
-All values use the **oklch** color space. Colors are defined as CSS custom properties in `globals.css` and bridged to Tailwind via `@theme inline`.
+- Next.js 16.4 (App Router) + React 19.2 + TypeScript.
+- Tailwind CSS v4: CSS-first, `@theme inline` в CSS, **без** `tailwind.config.ts`.
+- shadcn/ui — база примитивов, перекрашена под токены `--ig-*`.
+- Иконки: Lucide React, линия 2 px, размер 20–24 px (16–18 px внутри кнопок и полей).
+- Шрифт: **Rubik 300/400/500/600/700** через `next/font/local` (woff2, subset latin + cyrillic), CSS-переменная `--font-rubik`.
+- Утилита `cn()` из `@/lib/utils`.
+- **Только светлая тема.** `next-themes` и класс `.dark` удалены.
 
-### Semantic Tokens
+## 2. Файлы системы
 
-| Token | Light | Dark | Usage |
+| Файл | Назначение |
+|---|---|
+| `src/styles/ig-tokens.css` | токены `--ig-*` (создаёт задача 05) |
+| `src/styles/ig-components.css` | классы `.ig-*` из `components.css` handoff (создаёт задача 05) |
+| `src/app/(site)/globals.css` | Tailwind, `@theme inline`, импорты со слоями |
+| `src/app/(site)/fonts.ts` | Rubik через `next/font/local` |
+| `src/app/(site)/ui-kit/page.tsx` | каталог компонентов (создаёт задача 05) |
+| `src/components/ig/*` | React-обёртки над `.ig-*` (каркас — задача 05, формы — 12, контент — 13) |
+| `src/components/layout/*` | макет страниц: шапка, подвал и т. п. (создаёт задача 14) |
+
+Импорты в `globals.css` — **строго со слоями**:
+
+```css
+@import "../../styles/ig-tokens.css" layer(base);
+@import "../../styles/ig-components.css" layer(components);
+```
+
+Незаслойный CSS в Tailwind v4 перебивает утилиты. Слои обязательны.
+
+Правила:
+- `.ig-*` классы остаются в CSS; React-обёртки типизируют пропсы и состояния (через `aria-*`).
+- CSS страниц прототипов (префиксы `ct-`, `p5-`, `th-`, `qz-`, `ob-`, `od-`, `wc-`, `ar-`, `pg-`) переписывается на Tailwind внутри компонентов. В глобальный CSS его не переносить.
+- Демо-панели прототипов на сайт не переносятся.
+- Каталог компонентов `/ui-kit/` существует только вне production (`SITE_ENV !== 'production'`, иначе `notFound()`).
+
+## 3. Цвета
+
+Значения — из `colors_and_type.css` с принятыми правками. Не придумывать новых.
+
+### Бренд
+
+| Токен | HEX | Применение |
+|---|---|---|
+| `--ig-primary` | `#2B8C7E` | бренд, иконки, рамки, фокус (не фон основной кнопки) |
+| `--ig-primary-hover` | `#267D70` | hover бренд-элементов |
+| `--ig-primary-pressed` | `#1F6B60` | pressed, цвет текстовых ссылок |
+| `--ig-primary-dark` | `#16403D` | акцентные тёмные блоки |
+| `--ig-primary-light` | `#EAF3F1` | светлые плашки, hover фона |
+| `--ig-navy` | `#324B64` | подвал, тёмные блоки |
+| `--ig-on-navy` | `#FFFFFF` | текст на navy |
+| `--ig-on-navy-2` | `#C9D3DD` | вторичный текст на navy |
+| `--ig-logo-orange` | `#EF7F1A` | **только логотип** |
+| `--ig-logo-blue` | `#0081AF` | **только логотип** |
+
+**Принятые правки контраста (AA):**
+- основная кнопка: `--ig-btn-primary-bg #267D70`, hover `--ig-btn-primary-bg-hover #1F6B60` (в Tailwind — `primary` / `primary-hover`);
+- `--ig-success-text #237A35` (в исходнике `#2B8A3E`).
+
+### Нейтральные
+
+| Токен | HEX | Применение |
+|---|---|---|
+| `--ig-bg` | `#F4F5F3` | фон страницы |
+| `--ig-surface` | `#FFFFFF` | карточки, чередующиеся секции |
+| `--ig-well` | `#ECEEEC` | утопленные области, плейсхолдеры |
+| `--ig-line` | `#D9DCDE` | рамки |
+| `--ig-hairline` | `#E6E8E6` | тонкие разделители |
+| `--ig-text` | `#1C1F22` | основной текст |
+| `--ig-text-2` | `#5B636B` | вторичный текст |
+| `--ig-text-muted` | `#9AA1A8` | **только** плейсхолдеры и disabled |
+
+### Семантика
+
+`tone` — рамки, точки, иконки; `bg` — заливка плашек; `text` — текст.
+
+| Статус | tone | bg | text |
 |---|---|---|---|
-| `background` | `oklch(1 0 0)` | `oklch(0.141 0.005 285.823)` | Page background |
-| `foreground` | `oklch(0.141 0.005 285.823)` | `oklch(0.985 0 0)` | Primary text |
-| `primary` | `oklch(0.21 0.034 270)` | `oklch(0.92 0.02 270)` | Buttons, links, accents |
-| `primary-foreground` | `oklch(0.985 0 0)` | `oklch(0.21 0.006 285.885)` | Text on primary |
-| `secondary` | `oklch(0.967 0.001 286.375)` | `oklch(0.274 0.006 286.033)` | Secondary buttons, subtle bg |
-| `secondary-foreground` | `oklch(0.21 0.006 285.885)` | `oklch(0.985 0 0)` | Text on secondary |
-| `muted` | `oklch(0.967 0.001 286.375)` | `oklch(0.274 0.006 286.033)` | Subdued backgrounds |
-| `muted-foreground` | `oklch(0.552 0.016 285.938)` | `oklch(0.705 0.015 286.067)` | Subdued text, placeholders |
-| `accent` | `oklch(0.96 0.012 270)` | `oklch(0.28 0.018 270)` | Hover backgrounds, highlights |
-| `accent-foreground` | `oklch(0.21 0.006 285.885)` | `oklch(0.985 0 0)` | Text on accent |
-| `destructive` | `oklch(0.577 0.245 27.325)` | `oklch(0.704 0.191 22.216)` | Error states, delete actions |
-| `card` | `oklch(1 0 0)` | `oklch(0.21 0.006 285.885)` | Card backgrounds |
-| `card-foreground` | `oklch(0.141 0.005 285.823)` | `oklch(0.985 0 0)` | Card text |
-| `popover` | `oklch(1 0 0)` | `oklch(0.21 0.006 285.885)` | Popover/dropdown bg |
-| `popover-foreground` | `oklch(0.141 0.005 285.823)` | `oklch(0.985 0 0)` | Popover/dropdown text |
-| `border` | `oklch(0.92 0.004 286.32)` | `oklch(1 0 0 / 10%)` | Borders, dividers |
-| `input` | `oklch(0.92 0.004 286.32)` | `oklch(1 0 0 / 15%)` | Input borders |
-| `ring` | `oklch(0.705 0.06 270)` | `oklch(0.552 0.05 270)` | Focus rings |
+| success | `#A8DAB4` | `#EEF8F0` | `#237A35` (правка) |
+| warning | `#F2D59C` | `#FCF6EA` | `#8A5A00` |
+| danger | `#EAADAD` | `#FCEFEF` | `#B23B3B` |
+| info | `#AECAE6` | `#EEF4FA` | `#2C5B86` |
 
-### Chart Colors
+### Дополнительные цвета прототипов (вынесены в токены)
 
-| Token | Light | Dark |
-|---|---|---|
-| `chart-1` | `oklch(0.646 0.222 41.116)` | `oklch(0.488 0.243 264.376)` |
-| `chart-2` | `oklch(0.6 0.118 184.704)` | `oklch(0.696 0.17 162.48)` |
-| `chart-3` | `oklch(0.398 0.07 227.392)` | `oklch(0.769 0.188 70.08)` |
-| `chart-4` | `oklch(0.828 0.189 84.429)` | `oklch(0.627 0.265 303.9)` |
-| `chart-5` | `oklch(0.769 0.188 70.08)` | `oklch(0.645 0.246 16.439)` |
+`#EEF2F0`, `#3E464D`, `#2A2F34`, `#CFE3DF`, `#AEB4BA`, `#BFC4C8`, `#DCEBE8`, `#9FB0C2`. Имена токенов задаёт задача 05 в `ig-tokens.css`; использовать только через токены.
 
-### Sidebar Colors
+### Фокус
 
-| Token | Light | Dark |
-|---|---|---|
-| `sidebar` | `oklch(0.985 0 0)` | `oklch(0.21 0.006 285.885)` |
-| `sidebar-foreground` | `oklch(0.141 0.005 285.823)` | `oklch(0.985 0 0)` |
-| `sidebar-primary` | `oklch(0.21 0.006 285.885)` | `oklch(0.488 0.243 264.376)` |
-| `sidebar-primary-foreground` | `oklch(0.985 0 0)` | `oklch(0.985 0 0)` |
-| `sidebar-accent` | `oklch(0.967 0.001 286.375)` | `oklch(0.274 0.006 286.033)` |
-| `sidebar-accent-foreground` | `oklch(0.21 0.006 285.885)` | `oklch(0.985 0 0)` |
-| `sidebar-border` | `oklch(0.92 0.004 286.32)` | `oklch(1 0 0 / 10%)` |
-| `sidebar-ring` | `oklch(0.705 0.015 286.067)` | `oklch(0.552 0.016 285.938)` |
+Рамка `--ig-primary` + кольцо `--ig-focus-ring: 0 0 0 3px rgba(43, 140, 126, .2)`.
 
-### Ad-hoc Status Colors
+## 4. Мост в Tailwind (`@theme inline`)
 
-Use these Tailwind utilities for status indicators — they are not part of the token system but are used consistently:
+Токены `--ig-*` пробрасываются в Tailwind через `@theme inline`.
 
-- **Success:** `text-green-600` / `dark:text-green-400`, `bg-green-500`
-- **Error:** `text-red-600`, `text-destructive`
+- **Цвета:** `primary` (= `--ig-btn-primary-bg #267D70`, заливка основной кнопки, доступна по контрасту), `primary-hover` (= `--ig-btn-primary-bg-hover #1F6B60`), `primary-pressed` (= `--ig-primary-pressed`), `primary-dark`, `primary-light`, `brand` (= `--ig-primary #2B8C7E`: рамки, иконки, фокус), `navy`, `on-navy`, `on-navy-2`, `bg`, `surface`, `well`, `line`, `hairline`, `text`, `text-2`, `muted` (= `--ig-text-muted`, **цвет текста плейсхолдеров и disabled**, а не поверхность shadcn), `tint-green`, `ink-2`, `ink-3`, `line-teal`, `gray-1`, `gray-2`, `teal-wash`, `slate-blue`, `success|warning|danger|info` (+ `-bg`, `-text`). Примеры: `bg-surface`, `text-text-2`, `border-line`, `bg-primary-light`.
+- **Радиусы:** `rounded-sm` 6, `rounded-md` 10, `rounded-lg` 16, `rounded-xl` 24, `rounded-full` для кнопок.
+- **Тени:** `card`, `card-hover`, `dropdown`, `modal`.
+- **Движение:** `--ease-ig: cubic-bezier(.4, 0, .2, 1)` (в `ig-tokens.css` — `--ig-ease`); длительности `--duration-fast|base|slow` = 120 / 200 / 320 мс.
+- **Сетка:** утилита `px-gutter` (см. раздел 7).
+- **Размеры текста:** `h1…h6`, `body`, `small`, `micro`, `price-l/m/s`, `stat` — отдельные переменные размера и line-height; на ≤599 px значения меняются.
+- Токены shadcn (`--primary` = `--ig-btn-primary-bg`, `--border`, `--ring` = `--ig-primary`, `--background`, …) переназначены на `--ig-*`; `--muted`/`--muted-foreground` shadcn — `well`/`text-2`, но Tailwind-цвет `muted` — это `--ig-text-muted`. Токены `.dark`, `chart-*`, `sidebar-*` удалены.
 
----
+## 5. Типографика
 
-## Typography
-
-### Font Families
-
-| Token | Font | Usage |
-|---|---|---|
-| `--font-geist-sans` | Geist | All UI text (applied to body) |
-| `--font-geist-mono` | Geist Mono | Code, monospace content |
-
-Body has `font-feature-settings: "rlig" 1, "calt" 1` and `antialiased` enabled.
-
-### Type Scale
-
-| Class | Size | Usage |
-|---|---|---|
-| `text-xs` | 12px | Timestamps, shortcuts, helper text, code |
-| `text-sm` | 14px | Descriptions, labels, body copy, card descriptions |
-| `text-base` | 16px | Base text, inputs (mobile) |
-| `text-lg` | 18px | Dialog titles, sub-headings |
-| `text-xl` | 20px | Section titles, header logo |
-| `text-2xl` | 24px | Page titles, card titles |
-| `text-3xl` | 30px | Dashboard/profile headings |
-| `text-4xl` | 36px | Large display text |
-| `text-5xl` | 48px | Hero title |
-
-### Font Weights
-
-| Class | Weight | Usage |
-|---|---|---|
-| `font-medium` | 500 | Buttons, labels, nav items |
-| `font-semibold` | 600 | Card titles, section headings, badges, dialog titles |
-| `font-bold` | 700 | Page titles, hero heading |
-
-### Line Heights & Tracking
-
-| Class | Usage |
-|---|---|
-| `leading-none` | Labels, card titles |
-| `leading-5` | Code blocks |
-| `leading-6` | List items |
-| `leading-7` | Paragraphs (markdown) |
-| `tracking-tight` | Hero/display text |
-| `tracking-widest` | Keyboard shortcuts |
-
----
-
-## Spacing
-
-### Container Pattern
-
-```
-container mx-auto px-4
-```
-
-Responsive overrides where needed:
-- Header: `px-3 sm:px-4`
-- Footer: `px-4 sm:px-6 lg:px-8`
-
-### Max Widths
-
-| Class | Value | Usage |
-|---|---|---|
-| `max-w-sm` | 24rem | Auth forms |
-| `max-w-md` | 28rem | Login/register cards, error pages |
-| `max-w-lg` | 32rem | Dialog content (sm+) |
-| `max-w-2xl` | 42rem | Large dialogs |
-| `max-w-3xl` | 48rem | Embeds, protected state |
-| `max-w-4xl` | 56rem | Main content pages |
-
-### Vertical Spacing (space-y)
-
-| Class | Usage |
-|---|---|
-| `space-y-1` | Tight lists, inline stacks |
-| `space-y-1.5` | Card header |
-| `space-y-2` | Form field groups, small stacks |
-| `space-y-3` | Footer stacks |
-| `space-y-4` | Form sections, dialog content |
-| `space-y-6` | Card content sections |
-| `space-y-8` | Page-level sections |
-
-### Padding
-
-| Class | Usage |
-|---|---|
-| `p-1` | Dropdown content, icon buttons |
-| `p-2` | Code blocks, muted backgrounds |
-| `p-3` | Chat bubbles, inputs |
-| `p-4` | Grid items, action buttons, list items |
-| `p-6` | Cards, dialog content |
-
-### Page Vertical Padding
-
-| Class | Usage |
-|---|---|
-| `py-3 sm:py-4` | Header |
-| `py-4 sm:py-6` | Footer |
-| `py-8` | Standard content pages |
-| `py-12` | Home page, dashboard |
-| `py-16` | Error/not-found pages |
-
----
-
-## Border Radius
-
-| Token | Value | Class |
-|---|---|---|
-| `--radius` | `0.625rem` (10px) | Base |
-| `--radius-sm` | `calc(--radius - 4px)` = 6px | `rounded-sm` |
-| `--radius-md` | `calc(--radius - 2px)` = 8px | `rounded-md` |
-| `--radius-lg` | `var(--radius)` = 10px | `rounded-lg` |
-| `--radius-xl` | `calc(--radius + 4px)` = 14px | `rounded-xl` |
-| — | 9999px | `rounded-full` |
-
-**Usage:**
-- `rounded-md` — Buttons, inputs, textarea, code blocks, dropdowns
-- `rounded-lg` — Cards, dialogs, feature cards, chat bubbles
-- `rounded-xl` — Hero logo container
-- `rounded-full` — Badges, avatars
-
----
-
-## Shadows
-
-| Class | Usage |
-|---|---|
-| `shadow-xs` | Inputs, textarea, secondary/outline buttons |
-| `shadow-sm` | Card base |
-| `shadow-md` | Card hover, dropdown content |
-| `shadow-lg` | Dialogs, dropdown sub-content |
-
-No custom shadow definitions — all Tailwind defaults.
-
----
-
-## Animations
-
-### Custom Keyframes
-
-| Name | Effect | Duration | Easing |
+| Стиль | Desktop | ≤599 px | Вес |
 |---|---|---|---|
-| `fade-in` | Opacity 0 → 1 | 0.3s | ease-out |
-| `fade-up` | Opacity 0 → 1 + translateY(8px → 0) | 0.4s | ease-out |
-| `scale-in` | Opacity 0 → 1 + scale(0.97 → 1) | 0.2s | ease-out |
+| H1 | 54 / 1.1 | 32 / 1.15 | 700 |
+| H2 | 40 / 1.15 | 28 / 1.2 | 700 |
+| H3 | 32 / 1.2 | 22 / 1.25 | 700 |
+| H4 | 24 / 1.3 | 20 / 1.3 | 600 |
+| H5 | 18 / 1.4 | то же | 600 |
+| H6 | 16 / 1.4 | то же | 600 |
+| body | 16 / 1.5 | то же | 400 |
+| small | 14 / 1.45 | то же | 400 |
+| micro | 12 / 1.4 | то же | 500 |
+| цена L / M / S | 30 / 22 / 16 | 24 / 20 / 16 | 700 |
+| stat | 48 / 1 | 36 / 1 | 700 |
 
-Use via: `animate-fade-in`, `animate-fade-up`, `animate-scale-in`
+- КАПС — только H1 первого экрана главной и метки до 3 слов (`.ig-label`, `.ig-h1--caps`).
+- Веса: 700 заголовки H1–H3, 600 H4–H6, 500 кнопки и метки, 400 текст.
+- Цены и статистика: `tabular-nums`.
 
-### tw-animate-css Animations
+## 6. Брейкпоинты
 
-Used on dialogs and dropdowns:
-- `animate-in` / `animate-out`
-- `fade-in-0` / `fade-out-0`
-- `zoom-in-95` / `zoom-out-95`
-- `slide-in-from-{top|bottom|left|right}-2`
-
-### Transition Classes
-
-| Class | Usage |
-|---|---|
-| `transition-colors` | Links, hover color changes |
-| `transition-opacity` | Avatar hover, reveal-on-hover |
-| `transition-all duration-200` | Card interactive hover, buttons |
-| `transition-[color,box-shadow]` | Input/textarea focus |
-
-### Utility Classes
+Заменяют дефолтные Tailwind (в `@theme`):
 
 ```css
-.card-interactive {
-  @apply transition-all duration-200 ease-out;
-}
-.card-interactive:hover {
-  @apply shadow-md -translate-y-0.5;
-}
-```
-
-```css
-.auth-bg {
-  background-image: radial-gradient(
-    circle at 50% 0%,
-    var(--accent) 0%,
-    transparent 50%
-  );
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 1101px;
+  --breakpoint-lg: 1366px;
+  --breakpoint-xl: 1536px;
+  --breakpoint-2xl: 1920px;
 }
 ```
 
----
+Смысл: `max-sm:` = ≤599 (телефон), `max-md:` = ≤1100 (планшет и меньше), `max-lg:` = ≤1365.
 
-## Layout
-
-### Root Structure
-
-```
-<body class="antialiased min-h-screen flex flex-col">
-  <SiteHeader />
-  <main id="main-content" class="flex-1">{children}</main>
-  <SiteFooter />
-  <Toaster />
-</body>
-```
-
-### Page Layout Patterns
-
-**Auth pages:**
-```
-flex min-h-[calc(100vh-4rem)] items-center justify-center p-4
-  → Card w-full max-w-md
-```
-
-**Standard content pages:**
-```
-container mx-auto px-4 py-8
-  → max-w-4xl mx-auto
-```
-
-**Error/not-found pages:**
-```
-container mx-auto px-4 py-16
-  → max-w-md mx-auto text-center
-```
-
-### Grid Patterns
-
-| Pattern | Usage |
+| Диапазон | Поведение |
 |---|---|
-| `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6` | Feature cards (4-col) |
-| `grid grid-cols-1 md:grid-cols-2 gap-6` | Dashboard cards |
-| `grid grid-cols-1 md:grid-cols-2 gap-4` | Profile info |
-| `grid grid-cols-1 md:grid-cols-3 gap-4` | Quick actions |
+| ≤599 | 2 колонки карточек, sticky-CTA, таблицы → карточки |
+| ≤1100 | гамбургер, CTA иконкой, фильтры в дровере |
+| 1100–1365 | строка разделов «5 + Ещё ▾» |
+| ≥1366 | 4 колонки карточек |
 
-### Responsive Breakpoints
+Проверочные ширины для скриншотов: 375, 1366, 1920.
 
-Standard Tailwind breakpoints:
-- `sm:` (640px) — Padding adjustments, text alignment, button sizing
-- `md:` (768px) — Grid column changes (→ 2 col), input font size
-- `lg:` (1024px) — Grid column changes (→ 4 col), wide padding
+## 7. Сетка
 
----
+Токен `--ig-gutter` (боковое поле):
 
-## Icons
+| Ширина | Поле |
+|---|---|
+| ≥1366 | 70 px |
+| 1101–1365 | 40 px |
+| 600–1100 | 24 px |
+| ≤599 | 16 px |
 
-**Library:** Lucide React
+- Фон секции — на всю ширину, максимум до 1920 px.
+- Контент — `Container`: `mx-auto w-full max-w-[1920px] px-(--ig-gutter)`. Только боковое поле без ограничения ширины — утилита `px-gutter` (`padding-inline: var(--ig-gutter)`, `@utility` в `globals.css`).
+- Контейнер 1440 px из исходного README дизайн-системы (`--ig-container`) **не используется**.
+- Ритм секций (`Section`, утилиты `py-24 max-md:py-[72px] max-sm:py-12`): вертикальные отступы 96 / 72 / 48 px (desktop / ≤1100 / ≤599); фоны чередуются `bg` ↔ `surface`.
+- Тёмные блоки: только подвал (`navy`) и акцентные (`primary-dark`, например «Расчёт под снег»).
 
-### Sizing Convention
+## 8. Пространство, радиусы, тени, движение
 
-| Size | Classes | Usage |
+- **Пространство:** база 4 px — 4 / 8 / 12 / 16 / 20 / 24 / 32 / 40 / 48 / 64 / 80 / 120.
+- **Радиусы:** sm 6 (чипсы, бейджи), md 10 (инпуты), lg 16 (карточки, модалки), xl 24 (hero, плашки), pill (кнопки).
+- **Тени:** только токенами `card`, `card-hover`, `dropdown`, `modal`.
+- **Движение:** 120 / 200 / 320 мс, `--ease-ig` (`--ig-ease`).
+  - наведение на карточку: `translateY(-2px)` + `card-hover`;
+  - нажатие: `scale(.98)`;
+  - блик на primary-кнопке — один проход;
+  - **бесконечных анимаций нет.**
+
+## 9. Компоненты
+
+React-обёртки лежат в `src/components/ig/`. Файлы создаются указанными задачами.
+
+### Каркас (задача 05)
+
+| Компонент | Файл | CSS-класс | Примечания |
+|---|---|---|---|
+| `Container` | `container.tsx` | — (утилиты Tailwind; в `ig-tokens.css` есть и `.ig-container`) | проп `as`: `div\|section\|header\|footer\|nav\|article\|aside`; поля по `--ig-gutter` |
+| `Section`, `SectionHead` | `section.tsx` | — (утилиты Tailwind) | `Section`: `variant` `bg\|sf\|dark\|primary-dark`, `as` `section\|div`, `contained`, `containerClassName`; `SectionHead`: `title`, `sub`, `action`, `headingId` |
+| `PageHero` (+ `PageHeroTerm`, `PageHeroStat`) | `page-hero.tsx` | `.ig-terms`, `.ig-stats--glass` | `variant`: `ct-hero\|p5-top\|home` (обязателен); `title`, `titleId`, `breadcrumbs`, `eyebrow`, `lead`, `facts`, `strong`, `actions`, `terms`, `aside`, `media`, `stats` |
+| `Button` (+ `buttonVariants`) | `button.tsx` | `.ig-btn` | `variant`: `primary\|secondary\|ghost\|onDark`; `size`: `l\|m\|s\|icon` (для `icon` обязателен `aria-label`); `asChild`, `block`, `loading`, `leftIcon`, `rightIcon` |
+| `TextLink` | `text-link.tsx` | `.ig-link` | `variant`: `default\|arrow\|dashed` (классы `--arrow`, `--dashed`); `external` |
+
+### Формы (задача 12)
+
+| Компонент | Файл | CSS-класс |
 |---|---|---|
-| XS | `h-3 w-3` | Inline badge icons |
-| SM | `h-3.5 w-3.5` | Copy buttons |
-| Default | `h-4 w-4` or `size-4` | Standard UI icons |
-| MD | `h-5 w-5` | Header logo icon |
-| LG | `h-7 w-7` | Hero logo icon |
-| XL | `h-16 w-16` | Error/empty state illustrations |
+| `Field` | `field.tsx` | `.ig-field` |
+| `Input` | `input.tsx` | `.ig-input` |
+| `Textarea` | `textarea.tsx` | `.ig-textarea` |
+| `Select` | `select.tsx` | `.ig-select` |
+| `ConsentCheckbox` | `consent-checkbox.tsx` | `.ig-check` |
+| `Chip`, `ChipGroup` | `chip.tsx`, `chip-group.tsx` | `.ig-chip`, `.ig-chips` |
+| `RadioCard`, `RadioCardGroup` | `radio-card.tsx` | `.ig-radio-card` |
+| `FileUpload` (empty / drag / done / fmt / size) | `file-upload.tsx` | `.ig-upload`, `.ig-file` |
+| `PhoneInput` | `phone-input.tsx` | `.ig-input` |
+| `DatePicker` | `date-picker.tsx` | `.ig-input` |
 
-### Commonly Used Icons
+### Контент (задача 13)
 
-`Bot`, `User`, `Lock`, `Shield`, `Mail`, `Calendar`, `Copy`, `Check`, `Loader2`, `LogOut`, `Sun`, `Moon`, `Github`, `ArrowLeft`, `RefreshCw`, `AlertCircle`, `FileQuestion`, `Database`, `Palette`, `Video`
-
----
-
-## Components (shadcn/ui)
-
-All components live in `src/components/ui/`. They use `data-slot` attributes, accept `className` for overrides via `cn()`, and follow either `React.forwardRef` or functional component patterns.
-
-### Button
-
-6 variants, 4 sizes (CVA-based):
-
-| Variant | Usage |
-|---|---|
-| `default` | Primary actions |
-| `secondary` | Secondary actions |
-| `outline` | Tertiary actions |
-| `ghost` | Subtle/icon actions |
-| `destructive` | Delete/danger actions |
-| `link` | Inline text links |
-
-| Size | Height | Padding |
+| Компонент | Файл | CSS-класс |
 |---|---|---|
-| `sm` | h-8 | px-3 |
-| `default` | h-9 | px-4 |
-| `lg` | h-10 | px-6 |
-| `icon` | size-9 | — |
+| `Badge` | `badge.tsx` | `.ig-badge` |
+| `Breadcrumbs` | `breadcrumbs.tsx` | `.ig-crumbs` |
+| `DataTable` (≤599 → карточки) | `data-table.tsx` | `.ig-table`, `.ig-mcard` |
+| `Compare` (≤599 → пары) | `compare.tsx` | `.ig-compare`, `.ig-pair` |
+| `Terms` | `terms.tsx` | `.ig-terms` |
+| `Callout` | `callout.tsx` | `.ig-callout` |
+| `Steps` | `steps.tsx` | `.ig-steps`, `.ig-step` |
+| `StatsTiles` | `stats-tiles.tsx` | `.ig-stats`, `.ig-stat` |
+| `Timeline` | `timeline.tsx` | `.ig-tl` |
+| `Accordion`, `Faq` | `accordion.tsx`, `faq.tsx` | `.ig-acc` |
+| `Card` | `card.tsx` | `.ig-card` |
+| `ThickCard` | `thick-card.tsx` | `.ig-thick` |
+| `Placeholder` | `placeholder.tsx` | `.ig-ph` |
+| `CookieBanner` | `cookie-banner.tsx` | `.ig-cookie` |
+| `StickyCta` | `sticky-cta.tsx` | `.ig-sticky-cta` |
+| `Lightbox` | `lightbox.tsx` | — |
+| `Drawer` | `drawer.tsx` | — |
 
-### Card
+### Правила компонентов
 
-6 sub-components: `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`
+- `className` мержится через `cn()`; остальные нативные атрибуты пробрасываются.
+- Состояния — через `aria-*` / `data-*`; ошибка поля — `aria-invalid` + класс `is-error`.
+- Никаких inline-стилей с цветами.
+- `forwardRef`, где нужен ref.
+- Серверные компоненты по умолчанию; `'use client'` только при состоянии и эффектах.
+- Недостающий стиль — Tailwind-классами в компоненте; не править чужие файлы системы без разрешения задачи.
 
-Base: `rounded-lg border bg-card text-card-foreground shadow-sm`
+## 10. Правила продукта (из handoff)
 
-### Input / Textarea
+- Главное действие «Рассчитать стоимость» (primary, иконка `calculator`) — на первом экране **каждой** страницы. Второе — «Отправить чертёж» (secondary, `file-text`).
+- На ≤599 px — закреплённая кнопка `.ig-sticky-cta` (`StickyCta`).
+- Под первым экраном и перед формами — полоса условий `.ig-terms` (4 пункта).
+- Таблицы на ≤599 → карточки, сравнение → пары.
+- Frosted glass — **только** `.ig-stats--glass` в hero главной.
+- Нет корзины, избранного, личного кабинета, бейджей «Хит/Новинка», эмодзи.
+- Иконки Lucide: `calculator`, `file-text`, `clipboard-list` («Мой расчёт»), `upload`, `triangle-alert`, `info`.
+- Логотип: тёмный на светлом, светлый на navy; минимальная высота 30 px (моб.) / 44 px (шапка).
+- Изображения до появления фото — `.ig-ph` (`Placeholder`).
+- Цены: «от 1 400 ₽/м²» с неразрывным пробелом (U+00A0) и подписью «ориентировочная цена на ДД.ММ.ГГГГ».
+- Размеры: «3000 × 2000 мм».
+- Тексты — дословно из `res/inex-glass-handoff/teksty/`; отсутствующий текст — заглушка `[…]`, ничего не придумывать.
 
-- Height: `h-9` (input), `min-h-16` (textarea)
-- Border: `border bg-transparent rounded-md shadow-xs`
-- Focus: `focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]`
-- Validation: `aria-invalid:border-destructive aria-invalid:ring-destructive/20`
-- Responsive font: `text-base md:text-sm`
+## 11. Доступность
 
-### Badge
+- Контраст не ниже AA.
+- Видимый фокус (`outline`/кольцо primary), не убирать.
+- `aria-live` для результатов калькуляторов.
+- `prefers-reduced-motion` отключает блик и подъём карточки.
+- Alt у каждого изображения (декоративные — `alt=""`).
+- Размер касаний на мобильных не меньше 44 px.
 
-4 variants: `default`, `secondary`, `destructive`, `outline`
+## 12. Изображения и шрифты
 
-Base: `rounded-full border px-2.5 py-0.5 text-xs font-semibold`
+- `next/image` с относительным `src`; форматы AVIF/WebP.
+- `sizes` обязателен; hero-изображение — `preload` (в Next 16 вместо `priority`).
+- Временные изображения (`isPlaceholder`) заменяются реальными, когда они поступят.
+- Шрифты только локальные (`next/font/local`), без запросов к сторонним хостам в рантайме.
 
-### Dialog
+## 13. Что нельзя
 
-Radix-based with overlay (`bg-black/50`), fade + zoom animations, optional close button.
+- Возвращать `next-themes` или `.dark`.
+- Подключать Google Fonts в рантайме.
+- Добавлять цвета вне токенов.
+- Использовать оранжевый и голубой цвета логотипа в интерфейсе.
+- Подключать незаслойный CSS системы (см. раздел 2).
+- Использовать контейнер 1440 px.
+- Добавлять бесконечные анимации.
 
-### DropdownMenu
+## 14. Админка
 
-Radix-based. Content: `rounded-md border p-1 shadow-md min-w-[8rem]`. Items support a `destructive` variant.
+Админка — Payload 3.91 со своей светлой темой (`admin.theme: 'light'`, Rubik, логотип). Эталон — одобренный макет `res/admin-mockup/*.dc.html` (`Main`, `Leads`, `Lead`, `PageEdit`).
 
-### Spinner
+- **Без Tailwind.** Его preflight ломает вёрстку Payload; в админку Tailwind не подключать.
+- **Токены общие с сайтом:** `src/styles/ig-vars.css` (вынесенный `:root`). Его импортируют `ig-tokens.css` сайта и `src/app/(payload)/layout.tsx` админки. Цвета — только через `--ig-*`.
+- **Стили — SCSS.** `src/app/(payload)/custom.scss` содержит только `@use` партиалов `src/app/(payload)/styles/_*.scss`. Файл не слоёный: он перебивает `@layer payload-default`.
 
-Sizes: `sm` (h-4 w-4), `md` (h-6 w-6), `lg` (h-8 w-8). Uses `Loader2` with `animate-spin`.
+| Партиал              | Назначение                                                          |
+| -------------------- | ------------------------------------------------------------------- |
+| `_base.scss`         | переменные Payload, `--iga-*` и общие классы `.iga-*`               |
+| `_nav.scss`          | боковое меню (navy `#324B64`)                                       |
+| `_dashboard.scss`    | дашборд `/admin/`                                                   |
+| `_kanban.scss`       | канбан заявок                                                       |
+| `_max.scss`          | привязка MAX: кнопка в профиле, панель группы                       |
+| `_edit-form.scss`    | форма редактирования документа, SEO-счётчики, «Изменена / Кем»      |
+| `_lead-card.scss`    | карточка заявки, вкладка «Сводка»                                   |
+| `_lead-history.scss` | комментарии и история заявки                                        |
+| `_screens.scss`      | остальные экраны: списки, заказ, глобалы, логин, медиатека, модалки |
 
-### Toast (Sonner)
+**Общие классы `_base.scss`:**
 
-Custom icons per state (success, info, warning, error, loading). Themed via CSS variable overrides.
+| Класс                                                                                       | Варианты                                                                           |
+| ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `.iga-card`                                                                                 | —                                                                                  |
+| `.iga-btn`                                                                                  | `--primary`, `--secondary`, `--ghost`, `--danger`, `--sm`                          |
+| `.iga-badge`                                                                                | `--new`, `--work`, `--kp`, `--ok`, `--no`; произвольный цвет — `--iga-badge-color` |
+| `.iga-tag`, `.iga-input`, `.iga-select`, `.iga-field`, `.iga-dl`, `.iga-bar`, `.iga-avatar` | `.iga-avatar--sm`                                                                  |
+| `.iga-chip`                                                                                 | состояние `[aria-pressed="true"]`                                                  |
+| `.iga-seg`                                                                                  | сегментированный переключатель, активный — `[aria-pressed="true"]`                 |
+| `.iga-page-head`, `.iga-section-head`                                                       | заголовки экрана и секции                                                          |
 
----
+**Правила:**
 
-## Focus & Interaction States
-
-### Focus Ring (Global)
-
-```css
-outline-2 outline-offset-2 outline-ring/70
-```
-
-Component-level override:
-```
-focus-visible:ring-ring/50 focus-visible:ring-[3px]
-```
-
-### Disabled
-
-```
-disabled:pointer-events-none disabled:opacity-50
-```
-
-### Interactive Card Hover
-
-```
-transition-all duration-200 ease-out
-hover:shadow-md hover:-translate-y-0.5
-```
-
----
-
-## Dark Mode
-
-- **Method:** Class-based via `next-themes` with `attribute="class"` and `disableTransitionOnChange`
-- **Default:** System preference
-- **Toggle:** 3-way dropdown — Light / Dark / System
-- All semantic color tokens swap automatically via `.dark` CSS selector
-- Use `dark:` prefix for component-specific overrides (e.g., `dark:bg-input/30`)
-
----
-
-## Branding
-
-### Logo Text
-
-```
-bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent
-```
-
-### Logo Icon Container
-
-```
-w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center
-```
-
-Hero variant: `w-12 h-12 rounded-xl`
+- новые компоненты админки используют `.iga-*`; собственные классы — с префиксом экрана (`.iga-kanban*`, `.iga-lead*`, `.iga-max*`) и только в своём партиале;
+- никаких inline-цветов и `var(--theme-*)` в `style`; динамический цвет передаётся CSS-переменной (`--iga-badge-color`, `--iga-bar-color`, `--iga-status-color`);
+- ссылки — `<a>`, не `next/link`; server components по умолчанию;
+- изменения заявок из UI — `PATCH /api/leads/:id/` + `router.refresh()`;
+- адаптив проверять на 375 / 1366 / 1920;
+- основная кнопка `#267D70`; цвета логотипа — только в логотипе; бесконечных анимаций нет.

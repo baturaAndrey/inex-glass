@@ -1,0 +1,447 @@
+﻿old_url;new_url;action;note
+/;;stay;не про стекло
+/kompaniya;;stay;не про стекло
+/kompaniya/rekvizity;;stay;не про стекло
+/kompaniya/sotrudniki;;stay;не про стекло
+/kontakty;;stay;не про стекло
+/kontakty/callback;;stay;не про стекло
+/kontakty/chel;;stay;не про стекло
+/kontakty/ekat;;stay;не про стекло
+/kontakty/omsk;;stay;не про стекло
+/kontakty/sur;;stay;не про стекло
+/materialy/ral;;stay;не про стекло
+/materialy/shpon;;stay;не про стекло
+/materialy/steklo;/zakalennoe-steklo/;301;
+/portfolio;;stay;не про стекло
+/portfolio/dushevye;/obekty/dushevye/;301;
+/portfolio/dushevye/pryamye;/obekty/pryamye/;301;
+/portfolio/dushevye/pryamye/dushevaya-pryamaya-02;/obekty/dushevaya-pryamaya-02/;301;
+/portfolio/dushevye/pryamye/dushevaya-pryamaya-03;/obekty/dushevaya-pryamaya-03/;301;
+/portfolio/dushevye/pryamye/dushevaya-pryamaya-04;/obekty/dushevaya-pryamaya-04/;301;
+/portfolio/dushevye/pryamye/dushevaya-pryamaya-05;/obekty/dushevaya-pryamaya-05/;301;
+/portfolio/dushevye/pryamye/dushevaya-pryamaya-07;/obekty/dushevaya-pryamaya-07/;301;
+/portfolio/dushevye/pryamye/dushevaya-pryamaya-08;/obekty/dushevaya-pryamaya-08/;301;
+/portfolio/dushevye/pryamye/dushevaya-pryamaya-09;/obekty/dushevaya-pryamaya-09/;301;
+/portfolio/dushevye/pryamye/dushevayapryamaya01;/obekty/dushevayapryamaya01/;301;
+/portfolio/dushevye/pryamye/dushevayapryamaya02;/obekty/dushevayapryamaya02/;301;
+/portfolio/dushevye/pryamye/gostinica;/obekty/gostinica/;301;
+/portfolio/dushevye/pryamye/kottedzh-16;/obekty/kottedzh-16/;301;
+/portfolio/dushevye/pryamye/kottedzh-18;/obekty/kottedzh-18/;301;
+/portfolio/dushevye/pryamye/kottedzh-19;/obekty/kottedzh-19/;301;
+/portfolio/dushevye/pryamye/kottedzh-25-pryamaya;/obekty/kottedzh-25-pryamaya/;301;
+/portfolio/dushevye/pryamye/kottedzh-26-pryamaya;/obekty/kottedzh-26-pryamaya/;301;
+/portfolio/dushevye/pryamye/kottedzh-27-pryamaya;/obekty/kottedzh-27-pryamaya/;301;
+/portfolio/dushevye/pryamye/kottedzh-pryamaya-2;/obekty/kottedzh-pryamaya-2/;301;
+/portfolio/dushevye/pryamye/kvartira-pryamaya-1;/obekty/kvartira-pryamaya-1/;301;
+/portfolio/dushevye/pryamye/pryamay-dushevay-s-otkatnoy-stvorkoy;/obekty/pryamay-dushevay-s-otkatnoy-stvorkoy/;301;
+/portfolio/dushevye/pryamye/pryamay-dushevay-v-gostinize-berezka;/obekty/pryamay-dushevay-v-gostinize-berezka/;301;
+/portfolio/dushevye/trepecevidnye;/obekty/trepecevidnye/;301;
+/portfolio/dushevye/trepecevidnye/dushevay-trapeziya-01;/obekty/dushevay-trapeziya-01/;301;
+/portfolio/dushevye/trepecevidnye/dushevay-trapeziya-02;/obekty/dushevay-trapeziya-02/;301;
+/portfolio/dushevye/trepecevidnye/dushevayatrapeziya01;/obekty/dushevayatrapeziya01/;301;
+/portfolio/dushevye/trepecevidnye/dushevayatrapeziya03;/obekty/dushevayatrapeziya03/;301;
+/portfolio/dushevye/trepecevidnye/kottedzh-13-sauna;/obekty/kottedzh-13-sauna/;301;
+/portfolio/dushevye/trepecevidnye/kottedzh-17;/obekty/kottedzh-17/;301;
+/portfolio/dushevye/trepecevidnye/kottedzh-21;/obekty/kottedzh-21/;301;
+/portfolio/dushevye/trepecevidnye/kottedzh-28-uglovaya;/obekty/kottedzh-28-uglovaya/;301;
+/portfolio/dushevye/uglovye;/obekty/uglovye/;301;
+/portfolio/dushevye/uglovye/dushevay-uglovaya-01;/obekty/dushevay-uglovaya-01/;301;
+/portfolio/dushevye/uglovye/dushevay-uglovaya-02;/obekty/dushevay-uglovaya-02/;301;
+/portfolio/dushevye/uglovye/dushevaya-pryamaya-10;/obekty/dushevaya-pryamaya-10/;301;
+/portfolio/dushevye/uglovye/dushevaya-uglovaya;/obekty/dushevaya-uglovaya/;301;
+/portfolio/dushevye/uglovye/dushevaya-uglovaya-prozrachnaya;/obekty/dushevaya-uglovaya-prozrachnaya/;301;
+/portfolio/dushevye/uglovye/dushevaya-ugol-01;/obekty/dushevaya-ugol-01/;301;
+/portfolio/dushevye/uglovye/dushevaya-ugol-02;/obekty/dushevaya-ugol-02/;301;
+/portfolio/dushevye/uglovye/dushevaya-ugol-03;/obekty/dushevaya-ugol-03/;301;
+/portfolio/dushevye/uglovye/dushevayaugol01;/obekty/dushevayaugol01/;301;
+/portfolio/dushevye/uglovye/dushevayaugol03;/obekty/dushevayaugol03/;301;
+/portfolio/dushevye/uglovye/kottedzh-14-sauna;/obekty/kottedzh-14-sauna/;301;
+/portfolio/dushevye/uglovye/kottedzh-15;/obekty/kottedzh-15/;301;
+/portfolio/dushevye/uglovye/kottedzh-20;/obekty/kottedzh-20/;301;
+/portfolio/dushevye/uglovye/kottedzh-6;/obekty/kottedzh-6/;301;
+/portfolio/dushevye/uglovye/kottedzh-7;/obekty/kottedzh-7/;301;
+/portfolio/dushevye/uglovye/kvartira-4;/obekty/kvartira-4/;301;
+/portfolio/dushevye/uglovye/uglovayadushevaya01;/obekty/uglovayadushevaya01/;301;
+/portfolio/dushevye/uglovye/uglovayadushevaya02;/obekty/uglovayadushevaya02/;301;
+/portfolio/dveri;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/2;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/3;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/5;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/dveri-01;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/dveri-011;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/dveri-05;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/dveri-07;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/dveri-steklyannye-v-gostinize-berezka;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/dveri-steklyannye-v-gostinize-berezka-belye;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/gostinica-dveri-2;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/kottedzh-11-dushevaya;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/kottedzh-22;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/kottedzh-4;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/kottedzh-8;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/kottedzh-dveri-01;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/kvartira-5;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/sokol-fit-dveri-1;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/sokol-fit-dveri-2;;stay;двери остаются на inex.su
+/portfolio/dveri/celnosteklyannye/torgovoe-zdanie;;stay;двери остаются на inex.su
+/portfolio/dveri/dlya-ban-i-saun;;stay;двери остаются на inex.su
+/portfolio/dveri/dlya-ban-i-saun/dveri-012;;stay;двери остаются на inex.su
+/portfolio/dveri/dlya-ban-i-saun/dveri-sauna-03;;stay;двери остаются на inex.su
+/portfolio/dveri/dlya-ban-i-saun/dveri-sauna-04;;stay;двери остаются на inex.su
+/portfolio/dveri/dlya-ban-i-saun/dveri-steklyannye-dlya-bani-i-sauny;;stay;двери остаются на inex.su
+/portfolio/dveri/dlya-ban-i-saun/dveri-steklyannye-dlya-bani-i-sauny-1;;stay;двери остаются на inex.su
+/portfolio/dveri/otkatnye;;stay;двери остаются на inex.su
+/portfolio/dveri/otkatnye/dveri-02;;stay;двери остаются на inex.su
+/portfolio/dveri/otkatnye/dveri-03;;stay;двери остаются на inex.su
+/portfolio/dveri/otkatnye/dveri-04;;stay;двери остаются на inex.su
+/portfolio/dveri/otkatnye/dveri-razdvigka-01;;stay;двери остаются на inex.su
+/portfolio/dveri/otkatnye/kvartira-lesoparkovaya-7k2;;stay;двери остаются на inex.su
+/portfolio/dveri/otkatnye/zerkalo-razdvignay-peregorodka;;stay;двери остаются на inex.su
+/portfolio/dveri/s-derevyannoi-korobkoi;;stay;двери остаются на inex.su
+/portfolio/dveri/s-derevyannoi-korobkoi/dveri-010;;stay;двери остаются на inex.su
+/portfolio/dveri/s-derevyannoi-korobkoi/dveri-sauna-01;;stay;двери остаются на inex.su
+/portfolio/dveri/s-derevyannoi-korobkoi/dveri-sauna-02;;stay;двери остаются на inex.su
+/portfolio/dveri/s-derevyannoi-korobkoi/kvartira-lesoparkovaya-7k2;;stay;двери остаются на inex.su
+/portfolio/dveri/v-aluminievom-profile;;stay;двери остаются на inex.su
+/portfolio/dveri/v-aluminievom-profile/agropromproekt;;stay;двери остаются на inex.su
+/portfolio/dveri/v-aluminievom-profile/dveri-06;;stay;двери остаются на inex.su
+/portfolio/dveri/v-aluminievom-profile/dveri-09;;stay;двери остаются на inex.su
+/portfolio/dveri/v-aluminievom-profile/dveri-profil-01;;stay;двери остаются на inex.su
+/portfolio/dveri/v-aluminievom-profile/dveri-profil-02;;stay;двери остаются на inex.su
+/portfolio/dveri/v-aluminievom-profile/gostinica-dveri-1;;stay;двери остаются на inex.su
+/portfolio/fasady;/obekty/fasady/;301;
+/portfolio/fasady/aluminievyi-vitrag-01;/obekty/aluminievyi-vitrag-01/;301;
+/portfolio/fasady/aluminievyi-vitrag-010;/obekty/aluminievyi-vitrag-010/;301;
+/portfolio/fasady/aluminievyi-vitrag-02;/obekty/aluminievyi-vitrag-02/;301;
+/portfolio/fasady/aluminievyi-vitrag-03;/obekty/aluminievyi-vitrag-03/;301;
+/portfolio/fasady/aluminievyi-vitrag-04;/obekty/aluminievyi-vitrag-04/;301;
+/portfolio/fasady/aluminievyi-vitrag-05;/obekty/aluminievyi-vitrag-05/;301;
+/portfolio/fasady/aluminievyi-vitrag-06;/obekty/aluminievyi-vitrag-06/;301;
+/portfolio/fasady/aluminievyi-vitrag-07;/obekty/aluminievyi-vitrag-07/;301;
+/portfolio/fasady/aluminievyi-vitrag-08;/obekty/aluminievyi-vitrag-08/;301;
+/portfolio/fasady/aluminievyi-vitrag-09;/obekty/aluminievyi-vitrag-09/;301;
+/portfolio/fasady/fasad-kozyrek-berezka;/obekty/fasad-kozyrek-berezka/;301;
+/portfolio/garderobnye-komnaty;;stay;не про стекло
+/portfolio/garderobnye-komnaty/garderob-01;;stay;не про стекло
+/portfolio/garderobnye-komnaty/proyekt-garderobnaya;;stay;не про стекло
+/portfolio/geografiya;;stay;не про стекло
+/portfolio/kolonny;;stay;не про стекло
+/portfolio/kolonny/kolonna-02;;stay;не про стекло
+/portfolio/kolonny/kolonna-03;;stay;не про стекло
+/portfolio/kolonny/kolonna-05;;stay;не про стекло
+/portfolio/kolonny/kolonna-06;;stay;не про стекло
+/portfolio/kolonny/kolonna-08;;stay;не про стекло
+/portfolio/kolonny/kolоnna-09;;stay;не про стекло
+/portfolio/kolonny/tk-kolco-kolonny;;stay;не про стекло
+/portfolio/kozyrki;/obekty/kozyrki/;301;
+/portfolio/kozyrki/Steklyannyy-kozyrek;/obekty/Steklyannyy-kozyrek/;301;
+/portfolio/kozyrki/berezka-plast-kozyrek;/obekty/berezka-plast-kozyrek/;301;
+/portfolio/kozyrki/cokol-kozyrek;/obekty/cokol-kozyrek/;301;
+/portfolio/kozyrki/energoinvest;/obekty/energoinvest/;301;
+/portfolio/kozyrki/kottedzh-1;/obekty/kottedzh-1/;301;
+/portfolio/lestnicy;/obekty/lestnicy/;301;
+/portfolio/lestnicy/betonnye;/obekty/betonnye/;301;
+/portfolio/lestnicy/betonnye/kottedzh-32-beton;/obekty/kottedzh-32-beton/;301;
+/portfolio/lestnicy/betonnye/kottedzh-33-beton-spiral;/obekty/kottedzh-33-beton-spiral/;301;
+/portfolio/lestnicy/betonnye/kottedzh-34-beton-ulica;/obekty/kottedzh-34-beton-ulica/;301;
+/portfolio/lestnicy/bolcovye;/obekty/bolcovye/;301;
+/portfolio/lestnicy/bolcovye/kottedzh-23;/obekty/kottedzh-23/;301;
+/portfolio/lestnicy/bolcovye/kottedzh-30-bolcovaya;/obekty/kottedzh-30-bolcovaya/;301;
+/portfolio/lestnicy/bolcovye/kottedzh-31-vintovaya;/obekty/kottedzh-31-vintovaya/;301;
+/portfolio/lestnicy/bolcovye/kvartira-6-lestnica;/obekty/kvartira-6-lestnica/;301;
+/portfolio/lestnicy/bolcovye/micubishi-centr-chelyabinsk;/obekty/micubishi-centr-chelyabinsk/;301;
+/portfolio/lestnicy/bolcovye/oc-vipr-mizar;/obekty/oc-vipr-mizar/;301;
+/portfolio/lestnicy/kombinirovannye;/obekty/kombinirovannye/;301;
+/portfolio/lestnicy/marshevye;/obekty/marshevye/;301;
+/portfolio/lestnicy/marshevye/2;/obekty/2/;301;
+/portfolio/lestnicy/marshevye/avtokompleks-mersedes-benz;/obekty/avtokompleks-mersedes-benz/;301;
+/portfolio/lestnicy/marshevye/bystrinskneft-marshevaya;/obekty/bystrinskneft-marshevaya/;301;
+/portfolio/lestnicy/marshevye/kottedzh-1;/obekty/kottedzh-1/;301;
+/portfolio/lestnicy/marshevye/kottedzh-12-lestnica;/obekty/kottedzh-12-lestnica/;301;
+/portfolio/lestnicy/marshevye/kottedzh-2;/obekty/kottedzh-2/;301;
+/portfolio/lestnicy/marshevye/kottedzh-24;/obekty/kottedzh-24/;301;
+/portfolio/lestnicy/marshevye/kottedzh-29-marshevaya;/obekty/kottedzh-29-marshevaya/;301;
+/portfolio/lestnicy/marshevye/kottedzh-5;/obekty/kottedzh-5/;301;
+/portfolio/lestnicy/marshevye/kottedzh-lestnica-seklo;/obekty/kottedzh-lestnica-seklo/;301;
+/portfolio/lestnicy/marshevye/lestnica-derevo-steklo;/obekty/lestnica-derevo-steklo/;301;
+/portfolio/lestnicy/marshevye/lestnica-steklo-samonesuchshie;/obekty/lestnica-steklo-samonesuchshie/;301;
+/portfolio/lestnicy/marshevye/nissan-avtocentr-lestnica;/obekty/nissan-avtocentr-lestnica/;301;
+/portfolio/lestnicy/marshevye/ogragdeniya-01;/obekty/ogragdeniya-01/;301;
+/portfolio/lestnicy/marshevye/penthaus-1-lestnica;/obekty/penthaus-1-lestnica/;301;
+/portfolio/lestnicy/marshevye/surgutneftegaz-lestnica;/obekty/surgutneftegaz-lestnica/;301;
+/portfolio/lestnicy/metallokarkas-dlya-lestnicy;/obekty/metallokarkas-dlya-lestnicy/;301;
+/portfolio/lestnicy/metallokarkas-dlya-lestnicy/avtozentr-metalokarkas-01;/obekty/avtozentr-metalokarkas-01/;301;
+/portfolio/lestnicy/metallokarkas-dlya-lestnicy/kottedzh-35-metallokarkas;/obekty/kottedzh-35-metallokarkas/;301;
+/portfolio/lestnicy/metallokarkas-dlya-lestnicy/metallokarkas-dlya-lestnitsy;/obekty/metallokarkas-dlya-lestnitsy/;301;
+/portfolio/lestnicy/metallokarkas-dlya-lestnicy/metallokarkas-kottedzh-01;/obekty/metallokarkas-kottedzh-01/;301;
+/portfolio/lestnicy/metallokarkas-dlya-lestnicy/metalokarkas-;/obekty/metalokarkas-/;301;
+/portfolio/lestnicy/vintovye;/obekty/vintovye/;301;
+/portfolio/lestnicy/vintovye/audi-center-chelyabinsk;/obekty/audi-center-chelyabinsk/;301;
+/portfolio/lestnicy/vintovye/bystrinskneft-vintovaya;/obekty/bystrinskneft-vintovaya/;301;
+/portfolio/lestnicy/vintovye/mitcubishi-centr-surgut;/obekty/mitcubishi-centr-surgut/;301;
+/portfolio/lestnicy/vintovye/oc-sdm;/obekty/oc-sdm/;301;
+/portfolio/lestnicy/vintovye/skandinaviya;/obekty/skandinaviya/;301;
+/portfolio/ograzhdeniya;/obekty/ograzhdeniya/;301;
+/portfolio/ograzhdeniya/atriumnye;/obekty/atriumnye/;301;
+/portfolio/ograzhdeniya/atriumnye/arkaim-plaza-atrium;/obekty/arkaim-plaza-atrium/;301;
+/portfolio/ograzhdeniya/atriumnye/festival-atrium;/obekty/festival-atrium/;301;
+/portfolio/ograzhdeniya/atriumnye/fokus-atrium;/obekty/fokus-atrium/;301;
+/portfolio/ograzhdeniya/atriumnye/kolоnna-08;/obekty/kolоnna-08/;301;
+/portfolio/ograzhdeniya/atriumnye/koncertnyi-zal-omsk;/obekty/koncertnyi-zal-omsk/;301;
+/portfolio/ograzhdeniya/atriumnye/rostiks-omsk;/obekty/rostiks-omsk/;301;
+/portfolio/ograzhdeniya/atriumnye/sberbank-ishim-atrium;/obekty/sberbank-ishim-atrium/;301;
+/portfolio/ograzhdeniya/atriumnye/surgutneftegaz-atrium;/obekty/surgutneftegaz-atrium/;301;
+/portfolio/ograzhdeniya/atriumnye/trk-gorki;/obekty/trk-gorki/;301;
+/portfolio/ograzhdeniya/atriumnye/trk-rodnik;/obekty/trk-rodnik/;301;
+/portfolio/ograzhdeniya/atriumnye/trk-ural-eskalator;/obekty/trk-ural-eskalator/;301;
+/portfolio/ograzhdeniya/balkonnye;/obekty/balkonnye/;301;
+/portfolio/ograzhdeniya/balkonnye/balkonnyye-ograzhdeniya;/obekty/balkonnyye-ograzhdeniya/;301;
+/portfolio/ograzhdeniya/balkonnye/stanciya-pavlika-morozova;/obekty/stanciya-pavlika-morozova/;301;
+/portfolio/ograzhdeniya/grand-forge;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/grand-forge/ogragdeniya-03;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/grand-forge/ogragdeniya-04;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/grand-forge/ogragdeniya-05;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/grand-forge/ogragdeniya-06;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/interernye;/obekty/interernye/;301;
+/portfolio/ograzhdeniya/interernye/arkaim-plaza-resepshn;/obekty/arkaim-plaza-resepshn/;301;
+/portfolio/ograzhdeniya/interernye/koncertnyi-zal-omsk-drugoe;/obekty/koncertnyi-zal-omsk-drugoe/;301;
+/portfolio/ograzhdeniya/interernye/sberbank-ishim;/obekty/sberbank-ishim/;301;
+/portfolio/ograzhdeniya/interernye/sberbank-omsk;/obekty/sberbank-omsk/;301;
+/portfolio/ograzhdeniya/lestnichnye;/obekty/lestnichnye/;301;
+/portfolio/ograzhdeniya/lestnichnye/administraciya-omska;/obekty/administraciya-omska/;301;
+/portfolio/ograzhdeniya/lestnichnye/arkaim-plaza-lestnica;/obekty/arkaim-plaza-lestnica/;301;
+/portfolio/ograzhdeniya/lestnichnye/bd-slavyanskii;/obekty/bd-slavyanskii/;301;
+/portfolio/ograzhdeniya/lestnichnye/chelyabenergo;/obekty/chelyabenergo/;301;
+/portfolio/ograzhdeniya/lestnichnye/detskii-mir-omsk;/obekty/detskii-mir-omsk/;301;
+/portfolio/ograzhdeniya/lestnichnye/energosbyt-chelyabinsk;/obekty/energosbyt-chelyabinsk/;301;
+/portfolio/ograzhdeniya/lestnichnye/izhevsk-samonesushchie;/obekty/izhevsk-samonesushchie/;301;
+/portfolio/ograzhdeniya/lestnichnye/kolonna-07;/obekty/kolonna-07/;301;
+/portfolio/ograzhdeniya/lestnichnye/koncertnyi-zal-omsk-lestnica;/obekty/koncertnyi-zal-omsk-lestnica/;301;
+/portfolio/ograzhdeniya/lestnichnye/kottedzh-3-grande-forge;/obekty/kottedzh-3-grande-forge/;301;
+/portfolio/ograzhdeniya/lestnichnye/la-traktor-arena;/obekty/la-traktor-arena/;301;
+/portfolio/ograzhdeniya/lestnichnye/ogragdeniya-02;/obekty/ogragdeniya-02/;301;
+/portfolio/ograzhdeniya/lestnichnye/profilaktorii-izumrud;/obekty/profilaktorii-izumrud/;301;
+/portfolio/ograzhdeniya/lestnichnye/progimnaziya-133;/obekty/progimnaziya-133/;301;
+/portfolio/ograzhdeniya/lestnichnye/rekkom-ulica;/obekty/rekkom-ulica/;301;
+/portfolio/ograzhdeniya/lestnichnye/restostar;/obekty/restostar/;301;
+/portfolio/ograzhdeniya/lestnichnye/sokol-fit;/obekty/sokol-fit/;301;
+/portfolio/ograzhdeniya/lestnichnye/surgutneftegaz-samonesushchie;/obekty/surgutneftegaz-samonesushchie/;301;
+/portfolio/ograzhdeniya/lestnichnye/tc-komsomolskii;/obekty/tc-komsomolskii/;301;
+/portfolio/ograzhdeniya/lestnichnye/td-bovid;/obekty/td-bovid/;301;
+/portfolio/ograzhdeniya/lestnichnye/tk-kolco;/obekty/tk-kolco/;301;
+/portfolio/ograzhdeniya/lestnichnye/tk-krasnoderevschik-steklo;/obekty/tk-krasnoderevschik-steklo/;301;
+/portfolio/ograzhdeniya/lestnichnye/tk-krasnoderevschik-trosy;/obekty/tk-krasnoderevschik-trosy/;301;
+/portfolio/ograzhdeniya/lestnichnye/tk-paroplaza;/obekty/tk-paroplaza/;301;
+/portfolio/ograzhdeniya/lestnichnye/triumf;/obekty/triumf/;301;
+/portfolio/ograzhdeniya/lestnichnye/trk-ural-lestnica;/obekty/trk-ural-lestnica/;301;
+/portfolio/ograzhdeniya/lestnichnye/ugorskaya-shahmatnaya-akademiya;/obekty/ugorskaya-shahmatnaya-akademiya/;301;
+/portfolio/ograzhdeniya/lestnichnye/uzk-vostochnaya;/obekty/uzk-vostochnaya/;301;
+/portfolio/ograzhdeniya/lestnichnye/zavod-ograzhdeniya;/obekty/zavod-ograzhdeniya/;301;
+/portfolio/ograzhdeniya/lestnichnye/zhaso;/obekty/zhaso/;301;
+/portfolio/ograzhdeniya/poruchni;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/poruchni-dlya-invalidov;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/poruchni-dlya-invalidov/poruchni-01;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/poruchni/2;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/poruchni/fiera;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/poruchni/kolonna-01;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/poruchni/miassmebel-poruchni;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/poruchni/micubishi-centr-poruchen-chelyabinsk;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/terrasnye;/obekty/terrasnye/;301;
+/portfolio/ograzhdeniya/terrasnye/penthaus-1-terrasa;/obekty/penthaus-1-terrasa/;301;
+/portfolio/ograzhdeniya/torgovye-otboiniki-telezhek;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/torgovye-otboiniki-telezhek/trk-ural-kolonny;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/ulichnye;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/ulichnye/arkaim-plaza-pandus;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/ulichnye/festival-pandus;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/ulichnye/makdonalds-novorossiisk;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/ulichnye/makdonalds-terrasa;;stay;решение 30.09: остаётся на inex.su
+/portfolio/ograzhdeniya/ulichnye/us-agat;;stay;решение 30.09: остаётся на inex.su
+/portfolio/osteklenie;/obekty/;301;решение 30.09: на Inex Glass
+/portfolio/osteklenie/osteklenie-besedki;/obekty/;301;решение 30.09: на Inex Glass
+/portfolio/osteklenie/osteklenie-besedki/osteklenie-besedka;/obekty/osteklenie-besedka/;301;решение 30.09: на Inex Glass
+/portfolio/osteklenie/osteklenie-besedki/osteklenie-besedka-02;/obekty/osteklenie-besedka-02/;301;решение 30.09: на Inex Glass
+/portfolio/osteklenie/osteklenie-besedki/osteklenie-besedka-03;/obekty/osteklenie-besedka-03/;301;решение 30.09: на Inex Glass
+/portfolio/osteklenie/osteklenie-terrasy;/obekty/;301;решение 30.09: на Inex Glass
+/portfolio/osteklenie/osteklenie-verandy;/obekty/;301;решение 30.09: на Inex Glass
+/portfolio/osteklenie/osteklenie-verandy/osteklenie-tveranda-01;/obekty/osteklenie-tveranda-01/;301;решение 30.09: на Inex Glass
+/portfolio/osteklenie/osteklenie-verandy/osteklenie-veranda;/obekty/osteklenie-veranda/;301;решение 30.09: на Inex Glass
+/portfolio/osteklenie/osteklenie-verandy/osteklenie-veranda-01;/obekty/osteklenie-veranda-01/;301;решение 30.09: на Inex Glass
+/portfolio/osteklenie/osteklenie-verandy/veranda-steklo;/obekty/veranda-steklo/;301;решение 30.09: на Inex Glass
+/portfolio/otdelka-interera;/obekty/otdelka-interera/;301;
+/portfolio/otdelka-interera/2;/obekty/2/;301;
+/portfolio/otdelka-interera/energosbyt-chelyabinsk-steklo;/obekty/energosbyt-chelyabinsk-steklo/;301;
+/portfolio/otdelka-interera/kvartira-2;/obekty/kvartira-2/;301;
+/portfolio/otdelka-interera/oblizovka-cteklom;/obekty/oblizovka-cteklom/;301;
+/portfolio/otdelka-interera/peregorodka-01;/obekty/peregorodka-01/;301;
+/portfolio/otdelka-interera/truboprovod;/obekty/truboprovod/;301;
+/portfolio/otdelka-interera/vip-studiya;/obekty/vip-studiya/;301;
+/portfolio/otdelka-interera/vitrag-01;/obekty/vitrag-01/;301;
+/portfolio/otdelka-interera/vitrag-02;/obekty/vitrag-02/;301;
+/portfolio/peregorodki;/obekty/;301;листинг портфолио
+/portfolio/peregorodki/celnosteklyannye;/obekty/celnosteklyannye/;301;
+/portfolio/peregorodki/celnosteklyannye/2;/obekty/2/;301;
+/portfolio/peregorodki/celnosteklyannye/3;/obekty/3/;301;
+/portfolio/peregorodki/celnosteklyannye/4;/obekty/4/;301;
+/portfolio/peregorodki/celnosteklyannye/bank-snejinskii;/obekty/bank-snejinskii/;301;
+/portfolio/peregorodki/celnosteklyannye/chuk;/obekty/chuk/;301;
+/portfolio/peregorodki/celnosteklyannye/dushevaya-pryamaya-01;/obekty/dushevaya-pryamaya-01/;301;
+/portfolio/peregorodki/celnosteklyannye/dveri-08;/obekty/dveri-08/;301;
+/portfolio/peregorodki/celnosteklyannye/dveri-mayatnik-01;/obekty/dveri-mayatnik-01/;301;
+/portfolio/peregorodki/celnosteklyannye/kottedzh-10-sauna;/obekty/kottedzh-10-sauna/;301;
+/portfolio/peregorodki/celnosteklyannye/kvartira-1;/obekty/kvartira-1/;301;
+/portfolio/peregorodki/celnosteklyannye/kvartira-3;/obekty/kvartira-3/;301;
+/portfolio/peregorodki/celnosteklyannye/linda-dver;/obekty/linda-dver/;301;
+/portfolio/peregorodki/celnosteklyannye/mts-omsk;/obekty/mts-omsk/;301;
+/portfolio/peregorodki/celnosteklyannye/orto-lend;/obekty/orto-lend/;301;
+/portfolio/peregorodki/celnosteklyannye/restostar;/obekty/restostar/;301;
+/portfolio/peregorodki/celnosteklyannye/sk-stroikom;/obekty/sk-stroikom/;301;
+/portfolio/peregorodki/celnosteklyannye/snezhnaya-koroleva;/obekty/snezhnaya-koroleva/;301;
+/portfolio/peregorodki/celnosteklyannye/sokol-fit-peregorodki;/obekty/sokol-fit-peregorodki/;301;
+/portfolio/peregorodki/celnosteklyannye/stroimehanizaciya;/obekty/stroimehanizaciya/;301;
+/portfolio/peregorodki/celnosteklyannye/stroimehanizaciya-lift;/obekty/stroimehanizaciya-lift/;301;
+/portfolio/peregorodki/celnosteklyannye/surgutneftegaz-pozharnye;/obekty/surgutneftegaz-pozharnye/;301;
+/portfolio/peregorodki/celnosteklyannye/surgutneftegaz-razdvizhnaya;/obekty/surgutneftegaz-razdvizhnaya/;301;
+/portfolio/peregorodki/celnosteklyannye/tc-bum;/obekty/tc-bum/;301;
+/portfolio/peregorodki/celnosteklyannye/tc-kristal;/obekty/tc-kristal/;301;
+/portfolio/peregorodki/celnosteklyannye/td-miras-pavlodar;/obekty/td-miras-pavlodar/;301;
+/portfolio/peregorodki/celnosteklyannye/tk-kolco;/obekty/tk-kolco/;301;
+/portfolio/peregorodki/celnosteklyannye/tk-komsomolskii;/obekty/tk-komsomolskii/;301;
+/portfolio/peregorodki/celnosteklyannye/tk-panorama-zlatoust;/obekty/tk-panorama-zlatoust/;301;
+/portfolio/peregorodki/celnosteklyannye/trc-kuba;/obekty/trc-kuba/;301;
+/portfolio/peregorodki/celnosteklyannye/trk-gorki-lift;/obekty/trk-gorki-lift/;301;
+/portfolio/peregorodki/celnosteklyannye/trk-rodnik-peregorodki;/obekty/trk-rodnik-peregorodki/;301;
+/portfolio/peregorodki/celnosteklyannye/uglemet;/obekty/uglemet/;301;
+/portfolio/peregorodki/celnosteklyannye/ugorskaya-shahmatnaya-akademiya-lift;/obekty/ugorskaya-shahmatnaya-akademiya-lift/;301;
+/portfolio/peregorodki/celnosteklyannye/ugorskaya-shahmatnaya-akademiya-peregorodki;/obekty/ugorskaya-shahmatnaya-akademiya-peregorodki/;301;
+/portfolio/peregorodki/celnosteklyannye/usps;/obekty/usps/;301;
+/portfolio/peregorodki/santehnicheskie;;stay;решение 30.09: остаётся на inex.su
+/portfolio/peregorodki/santehnicheskie/Peregorodka-02;;stay;решение 30.09: остаётся на inex.su
+/portfolio/peregorodki/santehnicheskie/dushevaya-pryamaya-06;;stay;решение 30.09: остаётся на inex.su
+/portfolio/peregorodki/santehnicheskie/gagarin-park;;stay;решение 30.09: остаётся на inex.su
+/portfolio/peregorodki/santehnicheskie/la-traktor-kabiny;;stay;решение 30.09: остаётся на inex.su
+/portfolio/peregorodki/santehnicheskie/paraplaza-omsk-santeh;;stay;решение 30.09: остаётся на inex.su
+/portfolio/peregorodki/santehnicheskie/sokol-fit-dushevaya;;stay;решение 30.09: остаётся на inex.su
+/portfolio/peregorodki/santehnicheskie/sportivnaia-shkola;;stay;решение 30.09: остаётся на inex.su
+/portfolio/peregorodki/skladnye;;stay;решение 30.09: остаётся на inex.su
+/portfolio/peregorodki/skladnye/2;;stay;решение 30.09: остаётся на inex.su
+/portfolio/peregorodki/skladnye/3;;stay;решение 30.09: остаётся на inex.su
+/portfolio/peregorodki/skladnye/kottedzh-9;;stay;решение 30.09: остаётся на inex.su
+/portfolio/peregorodki/skladnye/kottedzh-garmoshka-01;;stay;решение 30.09: остаётся на inex.su
+/portfolio/peregorodki/skladnye/peregorodkaSDT150;;stay;решение 30.09: остаётся на inex.su
+/portfolio/peregorodki/v-aluminievom-profile;/obekty/v-aluminievom-profile/;301;
+/portfolio/peregorodki/v-aluminievom-profile/Peregorodka-01;/obekty/Peregorodka-01/;301;
+/portfolio/peregorodki/v-aluminievom-profile/bank-mmb;/obekty/bank-mmb/;301;
+/portfolio/peregorodki/v-aluminievom-profile/fristail-surgut;/obekty/fristail-surgut/;301;
+/portfolio/peregorodki/v-aluminievom-profile/khp-varna;/obekty/khp-varna/;301;
+/portfolio/peregorodki/v-aluminievom-profile/kolonna-04;/obekty/kolonna-04/;301;
+/portfolio/peregorodki/v-aluminievom-profile/la-traktor-peregorodki;/obekty/la-traktor-peregorodki/;301;
+/portfolio/peregorodki/v-aluminievom-profile/medcentr-chelyabinsk;/obekty/medcentr-chelyabinsk/;301;
+/portfolio/peregorodki/v-aluminievom-profile/oc-prospekt;/obekty/oc-prospekt/;301;
+/portfolio/peregorodki/v-aluminievom-profile/prigorodnyi-zhd-vokzal;/obekty/prigorodnyi-zhd-vokzal/;301;
+/portfolio/peregorodki/v-aluminievom-profile/promsvyazbank-chelyabinsk;/obekty/promsvyazbank-chelyabinsk/;301;
+/portfolio/peregorodki/v-aluminievom-profile/rossiiskaya-277;/obekty/rossiiskaya-277/;301;
+/portfolio/peregorodki/v-aluminievom-profile/sberbank-ishim-pozharnye;/obekty/sberbank-ishim-pozharnye/;301;
+/portfolio/peregorodki/v-aluminievom-profile/tk-mayak;/obekty/tk-mayak/;301;
+/portfolio/peregorodki/v-aluminievom-profile/zavod-peregorodka-1;/obekty/zavod-peregorodka-1/;301;
+/portfolio/peregorodki/v-aluminievom-profile/zavod-peregorodka-2;/obekty/zavod-peregorodka-2/;301;
+/portfolio/pozharnye-pregrady;;stay;не про стекло
+/portfolio/pozharnye-pregrady/trk-ural-pazharnye;;stay;не про стекло
+/portfolio/zerkala;/obekty/zerkala/;301;
+/portfolio/zerkala/zerkalo-na-manetah;/obekty/zerkalo-na-manetah/;301;
+/portfolio/zerkala/zerkalo-panno-figurnoe;/obekty/zerkalo-panno-figurnoe/;301;
+/portfolio/zerkala/zerkalo-panno-romby;/obekty/zerkalo-panno-romby/;301;
+/portfolio/zerkala/zerkalo-panno-romby-bez-fazeta;/obekty/zerkalo-panno-romby-bez-fazeta/;301;
+/produkciya;;stay;не про стекло
+/produkciya/dushevye;/dushevye-peregorodki/;301;
+/produkciya/dushevye/p-obraznaya-s-raspashnoi-dveryu-dopolnitelnymi-sekciyami-na-shtange;/dushevye-peregorodki/;301;
+/produkciya/dushevye/p-obraznaya-s-raspashnoi-dveryu-na-shtange;/dushevye-peregorodki/;301;
+/produkciya/dushevye/pryamaya-peregorodka;/dushevye-peregorodki/;301;
+/produkciya/dushevye/pryamaya-peregorodka-s-uglovym-doborom;/dushevye-peregorodki/;301;
+/produkciya/dushevye/pryamaya-s-otkanyi-dveryu-v-obramlenii;/dushevye-peregorodki/;301;
+/produkciya/dushevye/pryamaya-s-otkatnoi-dveryu-gluhoi-stvorkoi-i-shtangoi;/dushevye-peregorodki/;301;
+/produkciya/dushevye/pryamaya-s-otkatnoi-dveryu-gluhoi-stvorkoi-i-zazhimnym-profilem;/dushevye-peregorodki/;301;
+/produkciya/dushevye/pryamaya-s-raspashnoi-dveryu;/dushevye-peregorodki/;301;
+/produkciya/dushevye/pryamaya-s-raspashnoi-dveryu-dvumya-gluhimi-stvorkami-i-shtangoi;/dushevye-peregorodki/;301;
+/produkciya/dushevye/pryamaya-s-raspashnoi-dveryu-gluhoi-stvorkoi-i-framugoi;/dushevye-peregorodki/;301;
+/produkciya/dushevye/pryamaya-s-raspashnoi-dveryu-gluhoi-stvorkoi-i-shtangoi;/dushevye-peregorodki/;301;
+/produkciya/dushevye/pryamaya-s-raspashnoi-dveryu-gluhoi-stvorkoi-uglovym-uporom;/dushevye-peregorodki/;301;
+/produkciya/dushevye/pryamaya-s-raspashnoi-dveryu-i-framugoi;/dushevye-peregorodki/;301;
+/produkciya/dushevye/trapecevidnaya-s-raspashnoi-dveryu-na-profilnoi-trube;/dushevye-peregorodki/;301;
+/produkciya/dushevye/trapecevidnaya-s-raspashnoi-dveryu-na-shtange;/dushevye-peregorodki/;301;
+/produkciya/dushevye/uglovaya-s-otkanymi-dvercami-v-obramlenii;/dushevye-peregorodki/;301;
+/produkciya/dushevye/uglovaya-s-raspashnoi-dveryu-dopolnitelnoi-sekciei-i-shtangoi;/dushevye-peregorodki/;301;
+/produkciya/dushevye/uglovaya-s-raspashnoi-dveryu-i-uglovym-uporom;/dushevye-peregorodki/;301;
+/produkciya/dushevye/uglovaya-s-raspashnoi-dveryu-na-profilnoi-trube;/dushevye-peregorodki/;301;
+/produkciya/dushevye/uglovaya-s-raspashnoi-dveryu-na-profilnoi-trube-s-dopolnitelnoi-sekciei;/dushevye-peregorodki/;301;
+/produkciya/dushevye/uglovaya-s-raspashnoi-dveryu-na-shtange;/dushevye-peregorodki/;301;
+/produkciya/dveri-dlya-bani-sauny;;stay;двери остаются на inex.su
+/produkciya/dveri-dlya-bani-sauny/econom;;stay;двери остаются на inex.su
+/produkciya/dveri-dlya-bani-sauny/hamam;;stay;двери остаются на inex.su
+/produkciya/dveri-dlya-bani-sauny/lux;;stay;двери остаются на inex.su
+/produkciya/dveri-dlya-bani-sauny/premium;;stay;двери остаются на inex.su
+/produkciya/dveri-dlya-bani-sauny/standart;;stay;двери остаются на inex.su
+/produkciya/dveri-otkatnye;;stay;двери остаются на inex.su
+/produkciya/dveri-otkatnye/otkatnaia-dver-s-gluhimi-peregorodkami;;stay;двери остаются на inex.su
+/produkciya/dveri-otkatnye/otkatnaia-dvukhstvorchataya-dver-s-gluhimi-peregorodkami;;stay;двери остаются на inex.su
+/produkciya/dveri-otkatnye/otkatnaya-dver-otkrytaya-sistema;;stay;двери остаются на inex.su
+/produkciya/dveri-otkatnye/otkatnaya-dver-slaider-peregorodka;;stay;двери остаются на inex.su
+/produkciya/dveri-otkatnye/otkatnaya-dver-ultra-tonkii-profil;;stay;двери остаются на inex.su
+/produkciya/dveri-otkatnye/otkatnaya-dver-zakrytaya-sistema;;stay;двери остаются на inex.su
+/produkciya/dveri-otkatnye/otkatnye-dveri-v-peregorodke;;stay;двери остаются на inex.su
+/produkciya/dveri-otkatnye/scladnaya-dver-peregorodka-garmoshka;;stay;двери остаются на inex.su
+/produkciya/dveri-otkatnye/scladnaya-dver-peregorodka-garmoshka-na-shine;;stay;двери остаются на inex.su
+/produkciya/dveri-raspashnye;;stay;двери остаются на inex.su
+/produkciya/dveri-raspashnye/celnosteklyannye-mayatnikovye;;stay;двери остаются на inex.su
+/produkciya/dveri-raspashnye/celnosteklyannye-v-aluminievoi-korobke;;stay;двери остаются на inex.su
+/produkciya/dveri-raspashnye/celnosteklyannye-v-derevyannoi-korobke;;stay;двери остаются на inex.su
+/produkciya/dveri-raspashnye/dostupnaya-sreda;;stay;двери остаются на inex.su
+/produkciya/dveri-raspashnye/dvoinoe-osteklenie;;stay;двери остаются на inex.su
+/produkciya/dveri-raspashnye/naruzhnoe-osteklenie;;stay;двери остаются на inex.su
+/produkciya/dveri-raspashnye/odinarnoe-osteklenie;;stay;двери остаются на inex.su
+/produkciya/dveri-raspashnye/ultratonkii-profil;;stay;двери остаются на inex.su
+/produkciya/dveri-raspashnye/ultratonkii-profil-s-impostom;;stay;двери остаются на inex.su
+/produkciya/fasady;/osteklenie/fasadov/;301;
+/produkciya/garderobnye-komnaty;;stay;не про стекло
+/produkciya/kolonny;;stay;не про стекло
+/produkciya/kozyrki;/steklyannye-kozyrki/;301;
+/produkciya/lestnicy;;stay;не про стекло
+/produkciya/lestnicy/betonnye;;stay;не про стекло
+/produkciya/lestnicy/bolcovye;;stay;не про стекло
+/produkciya/lestnicy/kombinirovannye;;stay;не про стекло
+/produkciya/lestnicy/marshevye;;stay;не про стекло
+/produkciya/lestnicy/metallokarkas-dlya-lestnicy;;stay;не про стекло
+/produkciya/lestnicy/vintovye;;stay;не про стекло
+/produkciya/ograzhdeniya;/steklyannye-ograzhdeniya/;301;
+/produkciya/ograzhdeniya/atriumnye;/steklyannye-ograzhdeniya/;301;
+/produkciya/ograzhdeniya/balkonnye;/steklyannye-ograzhdeniya/;301;
+/produkciya/ograzhdeniya/grand-forge;;stay;решение 30.09: остаётся на inex.su
+/produkciya/ograzhdeniya/interernye;/steklyannye-ograzhdeniya/;301;
+/produkciya/ograzhdeniya/lestnichnye;/steklyannye-ograzhdeniya/;301;
+/produkciya/ograzhdeniya/poruchni;;stay;решение 30.09: остаётся на inex.su
+/produkciya/ograzhdeniya/poruchni-dlya-invalidov;;stay;решение 30.09: остаётся на inex.su
+/produkciya/ograzhdeniya/terrasnye;/steklyannye-ograzhdeniya/;301;
+/produkciya/ograzhdeniya/torgovye-otboiniki-telezhek;;stay;решение 30.09: остаётся на inex.su
+/produkciya/ograzhdeniya/ulichnye;;stay;решение 30.09: остаётся на inex.su
+/produkciya/osteklenie;/osteklenie/verand-terras-besedok/;301;решение 30.09: на Inex Glass
+/produkciya/osteklenie/osteklenie-besedki;/osteklenie/verand-terras-besedok/;301;решение 30.09: на Inex Glass
+/produkciya/osteklenie/osteklenie-terrasy;/osteklenie/verand-terras-besedok/;301;решение 30.09: на Inex Glass
+/produkciya/osteklenie/osteklenie-verandy;/osteklenie/verand-terras-besedok/;301;решение 30.09: на Inex Glass
+/produkciya/otdelka-interera;;stay;не про стекло
+/produkciya/peregorodki;/steklyannye-peregorodki/;301;
+/produkciya/peregorodki/celnosteklyannye;/steklyannye-peregorodki/;301;
+/produkciya/peregorodki/santehnicheskie;;stay;решение 30.09: остаётся на inex.su
+/produkciya/peregorodki/skladnye;;stay;решение 30.09: остаётся на inex.su
+/produkciya/peregorodki/v-aluminievom-profile;/steklyannye-peregorodki/;301;
+/produkciya/pozharnye-pregrady;;stay;не про стекло
+/produkciya/revizionnye-luki;;stay;не про стекло
+/produkciya/steklo-proizvodstvo;/zakalennoe-steklo/;301;
+/produkciya/zerkala;/zerkala/;301;
+/produkciya/zerkala/zerkala-s-podsvetkoi;;stay;решение 30.09: остаётся на inex.su
+/shop/basket;;stay;не про стекло
+/uslugi;;stay;не про стекло
+/uslugi/dostavka;;stay;не про стекло
+/uslugi/komplektaciya;;stay;не про стекло
+/uslugi/montazh;;stay;не про стекло
+/uslugi/proektirovanie;;stay;не про стекло
+/uslugi/proizvodstvo;;stay;не про стекло
+/video;;stay;не про стекло

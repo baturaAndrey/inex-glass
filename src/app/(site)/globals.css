@@ -1,0 +1,246 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+/* Design system Inex Glass. Layers matter: Tailwind utilities always override .ig-* classes. */
+@import "../../styles/ig-tokens.css" layer(base);
+@import "../../styles/ig-components.css" layer(components);
+
+/*
+ * Breakpoints of the design system (min-width). The prototypes are written desktop-first,
+ * so the `max-*` variants map 1:1 to their media queries:
+ *   max-sm: ≤599 · max-md: ≤1100 · max-lg: ≤1365 · xl: ≥1536 · 2xl: ≥1920
+ */
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 1101px;
+  --breakpoint-lg: 1366px;
+  --breakpoint-xl: 1536px;
+  --breakpoint-2xl: 1920px;
+}
+
+/* Bridge --ig-* tokens (and the shadcn variables below) into Tailwind utilities. */
+@theme inline {
+  --font-sans: var(--ig-font);
+
+  /* Brand. `primary` is the contrast-safe button fill (#267D70, 4.9:1 with white text);
+     the brand teal #2B8C7E is `brand` (borders, focus, icons). */
+  --color-primary: var(--ig-btn-primary-bg);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--ig-btn-primary-bg-hover);
+  --color-primary-pressed: var(--ig-primary-pressed);
+  --color-primary-dark: var(--ig-primary-dark);
+  --color-primary-light: var(--ig-primary-light);
+  --color-brand: var(--ig-primary);
+  --color-navy: var(--ig-navy);
+  --color-on-navy: var(--ig-on-navy);
+  --color-on-navy-2: var(--ig-on-navy-2);
+
+  /* Neutrals */
+  --color-bg: var(--ig-bg);
+  --color-surface: var(--ig-surface);
+  --color-well: var(--ig-well);
+  --color-line: var(--ig-line);
+  --color-hairline: var(--ig-hairline);
+  --color-text: var(--ig-text);
+  --color-text-2: var(--ig-text-2);
+  /* NB: `muted` is the design-system "placeholder/disabled" text colour, not a shadcn surface. */
+  --color-muted: var(--ig-text-muted);
+
+  /* Extra colours of the prototypes */
+  --color-tint-green: var(--ig-tint-green);
+  --color-ink-2: var(--ig-ink-2);
+  --color-ink-3: var(--ig-ink-3);
+  --color-line-teal: var(--ig-line-teal);
+  --color-gray-1: var(--ig-gray-1);
+  --color-gray-2: var(--ig-gray-2);
+  --color-teal-wash: var(--ig-teal-wash);
+  --color-slate-blue: var(--ig-slate-blue);
+
+  /* Semantic */
+  --color-success: var(--ig-success);
+  --color-success-bg: var(--ig-success-bg);
+  --color-success-text: var(--ig-success-text);
+  --color-warning: var(--ig-warning);
+  --color-warning-bg: var(--ig-warning-bg);
+  --color-warning-text: var(--ig-warning-text);
+  --color-danger: var(--ig-danger);
+  --color-danger-bg: var(--ig-danger-bg);
+  --color-danger-text: var(--ig-danger-text);
+  --color-info: var(--ig-info);
+  --color-info-bg: var(--ig-info-bg);
+  --color-info-text: var(--ig-info-text);
+
+  /* shadcn/ui names (src/components/ui/*), values come from :root below */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Radii: 6 chips/badges · 10 inputs/buttons · 16 cards/dialogs · 24 hero/large panels */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Shadows (soft only) */
+  --shadow-card: var(--ig-shadow-card);
+  --shadow-card-hover: var(--ig-shadow-card-hover);
+  --shadow-dropdown: var(--ig-shadow-dropdown);
+  --shadow-modal: var(--ig-shadow-modal);
+
+  /* Motion */
+  --ease-ig: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+
+  /* Type scale: size + line-height (+ weight) as separate variables, responsive via --ig-* */
+  --text-h1: var(--ig-h1-size);
+  --text-h1--line-height: var(--ig-h1-lh);
+  --text-h1--font-weight: 700;
+  --text-h2: var(--ig-h2-size);
+  --text-h2--line-height: var(--ig-h2-lh);
+  --text-h2--font-weight: 700;
+  --text-h3: var(--ig-h3-size);
+  --text-h3--line-height: var(--ig-h3-lh);
+  --text-h3--font-weight: 700;
+  --text-h4: var(--ig-h4-size);
+  --text-h4--line-height: var(--ig-h4-lh);
+  --text-h4--font-weight: 600;
+  --text-h5: var(--ig-h5-size);
+  --text-h5--line-height: var(--ig-h5-lh);
+  --text-h5--font-weight: 600;
+  --text-h6: var(--ig-h6-size);
+  --text-h6--line-height: var(--ig-h6-lh);
+  --text-h6--font-weight: 600;
+  --text-body: var(--ig-body-size);
+  --text-body--line-height: var(--ig-body-lh);
+  --text-small: var(--ig-small-size);
+  --text-small--line-height: var(--ig-small-lh);
+  --text-micro: var(--ig-micro-size);
+  --text-micro--line-height: var(--ig-micro-lh);
+  --text-micro--font-weight: 500;
+  --text-price-l: var(--ig-price-l-size);
+  --text-price-l--line-height: var(--ig-price-l-lh);
+  --text-price-l--font-weight: 700;
+  --text-price-m: var(--ig-price-m-size);
+  --text-price-m--line-height: var(--ig-price-m-lh);
+  --text-price-m--font-weight: 700;
+  --text-price-s: var(--ig-price-s-size);
+  --text-price-s--line-height: var(--ig-price-s-lh);
+  --text-price-s--font-weight: 700;
+  --text-stat: var(--ig-stat-size);
+  --text-stat--line-height: var(--ig-stat-lh);
+  --text-stat--font-weight: 700;
+  --text-lead-l: var(--ig-lead-l-size);
+  --text-lead-l--line-height: var(--ig-lead-l-lh);
+  --text-lead-m: var(--ig-lead-m-size);
+  --text-lead-m--line-height: var(--ig-lead-m-lh);
+  --text-lead: var(--ig-lead-size);
+  --text-lead--line-height: var(--ig-lead-lh);
+  --text-caption: var(--ig-caption-size);
+  --text-caption--line-height: var(--ig-caption-lh);
+  --text-hero-stat: var(--ig-hero-stat-size);
+  --text-hero-stat--line-height: var(--ig-hero-stat-lh);
+  --text-hero-stat--font-weight: 700;
+}
+
+/* Horizontal page gutter: 70 / 40 / 24 / 16 px (see --ig-gutter in ig-tokens.css). */
+@utility px-gutter {
+  padding-inline: var(--ig-gutter);
+}
+
+@layer base {
+  /* shadcn/ui variables, re-pointed to the Inex Glass palette (light theme only). */
+  :root {
+    --radius: 10px;
+    --background: var(--ig-bg);
+    --foreground: var(--ig-text);
+    --card: var(--ig-surface);
+    --card-foreground: var(--ig-text);
+    --popover: var(--ig-surface);
+    --popover-foreground: var(--ig-text);
+    --primary: var(--ig-btn-primary-bg);
+    --primary-foreground: #fff;
+    --secondary: var(--ig-well);
+    --secondary-foreground: var(--ig-text);
+    --muted: var(--ig-well);
+    --muted-foreground: var(--ig-text-2);
+    --accent: var(--ig-primary-light);
+    --accent-foreground: var(--ig-text);
+    --destructive: var(--ig-danger-text);
+    --destructive-foreground: #fff;
+    --border: var(--ig-line);
+    --input: var(--ig-line);
+    --ring: var(--ig-primary);
+  }
+
+  /*
+   * Site header heights (task 14). --ig-header-h is the full header (the spacer that keeps the
+   * page from jumping): top 36 + main 72 + sections 44 = 152 at ≥1101; top 36 + main 64 at
+   * 600–1100; main 56 on phones. --ig-header-compact-h is the header after scrolling — offset for
+   * sticky sidebars: `top: calc(var(--ig-header-compact-h) + 16px)`.
+   */
+  :root {
+    --ig-header-h: 152px;
+    --ig-header-compact-h: 64px;
+  }
+
+  @media (max-width: 1100px) {
+    :root {
+      --ig-header-h: 100px;
+    }
+  }
+
+  @media (max-width: 599px) {
+    :root {
+      --ig-header-h: 56px;
+      --ig-header-compact-h: 56px;
+    }
+  }
+
+  /* Anchors (#ceny, #rekvizity) must not hide under the fixed header. */
+  main [id] {
+    scroll-margin-top: calc(var(--ig-header-compact-h) + 16px);
+  }
+
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    font-feature-settings:
+      "kern" 1,
+      "liga" 1;
+  }
+
+  /* Fallback focus style for elements without their own (.ig-* define a softer ring). */
+  :focus-visible {
+    outline: 2px solid var(--ig-primary);
+    outline-offset: 2px;
+  }
+}

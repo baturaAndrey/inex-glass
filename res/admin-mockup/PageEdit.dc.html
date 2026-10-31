@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Редактирование страницы</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&amp;display=swap">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F4F5F3;font-family:'Rubik',system-ui,sans-serif;color:#1C1F22;font-size:14px}
+a{color:#1F6B60}a:hover{color:#16403D}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #2B8C7E;outline-offset:2px}
+.app{display:flex;flex-wrap:wrap;min-height:100vh;align-items:stretch}
+.sb{flex:1 1 248px;background:#324B64;color:#FFFFFF;display:flex;flex-direction:column;gap:12px;padding:20px 14px}
+.sb-brand{display:flex;align-items:center;gap:12px;padding:4px 8px 18px;border-bottom:1px solid rgba(255,255,255,.12)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.sb-g{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#C9D3DD;padding:14px 10px 6px}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:#FFFFFF;text-decoration:none;font-size:14px;min-height:40px}
+.nav a:hover{background:rgba(255,255,255,.08);color:#FFFFFF}
+.nav a.on{background:#267D70;font-weight:500}
+.nav svg{width:18px;height:18px;flex:none;opacity:.9}
+.cnt{margin-left:auto;min-width:22px;padding:2px 7px;border-radius:999px;background:#FFFFFF;color:#324B64;font-size:12px;font-weight:600;text-align:center;font-variant-numeric:tabular-nums}
+.cnt.soft{background:rgba(255,255,255,.16);color:#FFFFFF}
+.sb-user{margin-top:auto;display:flex;align-items:center;gap:10px;padding:14px 8px 4px;border-top:1px solid rgba(255,255,255,.12)}
+.av{width:34px;height:34px;border-radius:999px;background:#EAF3F1;color:#16403D;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex:none}
+.main{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
+.top{background:#FFFFFF;border-bottom:1px solid #E6E8E6;padding:14px 32px;display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.ttl{font-size:22px;font-weight:700;margin:0;line-height:1.2}
+.page{padding:24px 32px 56px;display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.col-main{flex:999 1 520px;min-width:0;display:flex;flex-direction:column;gap:16px}
+.col-side{flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:16px}
+.card{background:#FFFFFF;border:1px solid #E6E8E6;border-radius:16px;padding:20px 22px;box-shadow:0 1px 2px rgba(28,31,34,.05);display:flex;flex-direction:column;gap:14px}
+.card h2{font-size:16px;font-weight:600;margin:0}
+.mut{color:#5B636B}
+.num{font-variant-numeric:tabular-nums}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 18px;border-radius:999px;font:inherit;font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;border:1px solid transparent;white-space:nowrap}
+.btn svg{width:16px;height:16px}
+.btn-p{background:#267D70;color:#FFFFFF}.btn-p:hover{background:#1F6B60;color:#FFFFFF}
+.btn-s{background:#FFFFFF;color:#1F6B60;border-color:#2B8C7E}.btn-s:hover{background:#EAF3F1;color:#1F6B60}
+.btn-g{background:#FFFFFF;color:#1C1F22;border-color:#D9DCDE}.btn-g:hover{background:#F4F5F3;color:#1C1F22}
+.bdg{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:500;white-space:nowrap}
+.s-ok{background:#EEF8F0;color:#237A35}.s-work{background:#FCF6EA;color:#8A5A00}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;font-size:12px;background:#ECEEEC;color:#5B636B;white-space:nowrap}
+.fld{display:flex;flex-direction:column;gap:6px}
+.fld label{font-size:13px;color:#5B636B;display:flex;justify-content:space-between;gap:8px}
+.inp{height:42px;border:1px solid #D9DCDE;border-radius:10px;padding:0 12px;font:inherit;font-size:14px;background:#FFFFFF;color:#1C1F22;width:100%}
+.inp:focus{border-color:#2B8C7E;box-shadow:0 0 0 3px rgba(43,140,126,.2);outline:none}
+textarea.inp{height:auto;min-height:84px;padding:10px 12px;resize:vertical;line-height:1.5}
+.pre{display:flex;align-items:center;border:1px solid #D9DCDE;border-radius:10px;overflow:hidden;height:42px}
+.pre span{padding:0 10px;background:#F4F5F3;color:#5B636B;height:100%;display:flex;align-items:center;border-right:1px solid #D9DCDE;font-size:13px;white-space:nowrap}
+.pre input{border:0;font:inherit;font-size:14px;padding:0 12px;height:100%;flex:1;min-width:0;outline:none}
+.blk{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #E6E8E6;border-radius:12px;background:#FFFFFF}
+.blk:hover{border-color:#BFC4C8}
+.grip{color:#9AA1A8;cursor:grab;flex:none}
+.bi{width:34px;height:34px;border-radius:8px;background:#EAF3F1;color:#16403D;display:flex;align-items:center;justify-content:center;flex:none}
+.bi svg{width:18px;height:18px}
+.ib{width:32px;height:32px;border:0;background:transparent;border-radius:8px;color:#5B636B;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.ib:hover{background:#F4F5F3;color:#1C1F22}
+.tb{display:flex;flex-wrap:wrap;gap:2px;padding:6px;border-bottom:1px solid #E6E8E6;background:#F4F5F3}
+.tb button{min-width:32px;height:32px;border:0;background:transparent;border-radius:6px;font:inherit;font-size:14px;color:#1C1F22;cursor:pointer;padding:0 8px}
+.tb button:hover{background:#FFFFFF}
+.tb .sep{width:1px;background:#D9DCDE;margin:4px 4px}
+.ok{color:#237A35}.warn{color:#8A5A00}
+</style>
+</helmet>
+<div class="app">
+
+<aside class="sb" aria-label="Главное меню">
+<div class="sb-brand">
+<img src="/_blob/7fe0d1b7dc096c3d902aceee83ccb72a" alt="Inex Glass" style="height: 36px; width: auto">
+<span style="font-size: 12px; color: #C9D3DD; line-height: 1.3">панель<br>управления</span>
+</div>
+<nav class="nav">
+<div class="sb-g">Работа</div>
+<a href="Main.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>Дашборд</a>
+<a href="Leads.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>Заявки<span class="cnt" aria-label="новых: 5">5</span></a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg>Заказы<span class="cnt soft" aria-label="в работе: 12">12</span></a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg>Отчёты</a>
+<div class="sb-g">Сайт</div>
+<a href="PageEdit.dc.html" class="on" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>Страницы</a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>Статьи</a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path></svg>Объекты</a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>Медиатека</a>
+<div class="sb-g">Каталог и цены</div>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 10 5-10 5L2 7z"></path><path d="m2 17 10 5 10-5"></path><path d="m2 12 10 5 10-5"></path></svg>Каталог</a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path><circle cx="7.5" cy="7.5" r=".5"></circle></svg>Цены и акция</a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>Условия и контакты</a>
+<div class="sb-g">Система</div>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>Пользователи</a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>Настройки</a>
+</nav>
+<div class="sb-user">
+<span class="av">СМ</span>
+<div style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 14px; font-weight: 500">Сергей Морозов</span><span style="font-size: 12px; color: #C9D3DD">Менеджер</span></div>
+</div>
+</aside>
+
+<main class="main">
+<header class="top">
+<div style="display: flex; flex-direction: column; gap: 6px; margin-right: auto; min-width: 0">
+<a href="#" style="font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>Страницы</a>
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap"><h1 class="ttl">Закалённое стекло</h1><span class="bdg s-ok">Опубликована</span><span class="bdg s-work">Есть несохранённые изменения</span></div>
+</div>
+<a href="#" class="btn btn-g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>Превью</a>
+<button type="button" class="btn btn-s">Сохранить черновик</button>
+<button type="button" class="btn btn-p">Опубликовать</button>
+</header>
+
+<div class="page">
+<div class="col-main">
+
+<section class="card" aria-labelledby="m-h">
+<h2 id="m-h">Основное</h2>
+<div class="fld"><label for="h1">Заголовок H1</label><input id="h1" class="inp" value="Закалённое (калёное) стекло на заказ по размерам"></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px">
+<div class="fld"><label for="url">Адрес страницы</label><div class="pre"><span>inexglass.ru/</span><input id="url" value="zakalennoe-steklo/"></div></div>
+<div class="fld"><label for="tpl">Шаблон</label><select id="tpl" class="inp"><option>Хаб раздела</option><option>Карточка толщины</option><option>Статья</option></select></div>
+</div>
+</section>
+
+<section class="card" aria-labelledby="b-h">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap"><h2 id="b-h">Блоки страницы</h2><span class="mut" style="font-size: 13px">перетащите, чтобы изменить порядок</span></div>
+
+<div class="blk">
+<svg class="grip" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"></circle><circle cx="15" cy="6" r="1.6"></circle><circle cx="9" cy="12" r="1.6"></circle><circle cx="15" cy="12" r="1.6"></circle><circle cx="9" cy="18" r="1.6"></circle><circle cx="15" cy="18" r="1.6"></circle></svg>
+<span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path></svg></span>
+<div style="flex: 1; min-width: 0"><div style="font-weight: 500">Первый экран</div><div class="mut" style="font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Проверяем чертёж до закалки — после неё стекло уже не изменить.</div></div>
+<button type="button" class="ib" aria-label="Развернуть блок «Первый экран»"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+</div>
+
+<div class="blk">
+<svg class="grip" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"></circle><circle cx="15" cy="6" r="1.6"></circle><circle cx="9" cy="12" r="1.6"></circle><circle cx="15" cy="12" r="1.6"></circle><circle cx="9" cy="18" r="1.6"></circle><circle cx="15" cy="18" r="1.6"></circle></svg>
+<span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path><circle cx="7.5" cy="7.5" r=".5"></circle></svg></span>
+<div style="flex: 1; min-width: 0"><div style="font-weight: 500">Цены на закалённое стекло</div><div class="mut" style="font-size: 13px">Цены подставляются из раздела «Цены и акция» · <a href="#">изменить цены</a></div></div>
+<button type="button" class="ib" aria-label="Развернуть блок «Цены»"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+</div>
+
+<div style="border: 1px solid #2B8C7E; border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 3px rgba(43,140,126,.12)">
+<div class="blk" style="border: 0; border-radius: 0; border-bottom: 1px solid #E6E8E6">
+<svg class="grip" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"></circle><circle cx="15" cy="6" r="1.6"></circle><circle cx="9" cy="12" r="1.6"></circle><circle cx="15" cy="12" r="1.6"></circle><circle cx="9" cy="18" r="1.6"></circle><circle cx="15" cy="18" r="1.6"></circle></svg>
+<span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 6.1H3"></path><path d="M21 12.1H3"></path><path d="M15.1 18H3"></path></svg></span>
+<div style="flex: 1; min-width: 0"><div style="font-weight: 500">Текст</div><div class="mut" style="font-size: 13px">Что входит в цену</div></div>
+<button type="button" class="ib" aria-label="Свернуть блок «Текст»"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"></path></svg></button>
+</div>
+<div class="tb" role="toolbar" aria-label="Форматирование">
+<button type="button" style="min-width: 110px; text-align: left">Абзац ▾</button><span class="sep"></span>
+<button type="button" aria-label="Жирный" style="font-weight: 700">Ж</button><button type="button" aria-label="Курсив" style="font-style: italic">К</button><button type="button" aria-label="Подчёркнутый" style="text-decoration: underline">Ч</button><span class="sep"></span>
+<button type="button" aria-label="Маркированный список"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h13"></path><path d="M8 12h13"></path><path d="M8 18h13"></path><path d="M3 6h.01"></path><path d="M3 12h.01"></path><path d="M3 18h.01"></path></svg></button>
+<button type="button" aria-label="Ссылка"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button>
+<button type="button" aria-label="Изображение"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg></button>
+</div>
+<div style="padding: 18px 20px; font-size: 15px; line-height: 1.6; display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-weight: 600">Входит в цену «от»</p>
+<ul style="margin: 0; padding-left: 20px"><li>Листовое стекло выбранной толщины</li><li>Термическая закалка</li></ul>
+<p style="margin: 0; font-weight: 600">Считается отдельно</p>
+<ul style="margin: 0; padding-left: 20px"><li>Фигурная резка и сложная форма</li><li>Шлифовка, полировка кромки</li></ul>
+</div>
+</div>
+
+<div class="blk">
+<svg class="grip" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"></circle><circle cx="15" cy="6" r="1.6"></circle><circle cx="9" cy="12" r="1.6"></circle><circle cx="15" cy="12" r="1.6"></circle><circle cx="9" cy="18" r="1.6"></circle><circle cx="15" cy="18" r="1.6"></circle></svg>
+<span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg></span>
+<div style="flex: 1; min-width: 0"><div style="font-weight: 500">Вопросы и ответы</div><div class="mut" style="font-size: 13px">6 вопросов</div></div>
+<button type="button" class="ib" aria-label="Развернуть блок «Вопросы и ответы»"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+</div>
+
+<div class="blk">
+<svg class="grip" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"></circle><circle cx="15" cy="6" r="1.6"></circle><circle cx="9" cy="12" r="1.6"></circle><circle cx="15" cy="12" r="1.6"></circle><circle cx="9" cy="18" r="1.6"></circle><circle cx="15" cy="18" r="1.6"></circle></svg>
+<span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><path d="M8 6h8"></path><path d="M16 14v4"></path><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01"></path></svg></span>
+<div style="flex: 1; min-width: 0"><div style="font-weight: 500">Форма «Рассчитать стоимость»</div><div class="mut" style="font-size: 13px">Заявки попадают в раздел «Заявки»</div></div>
+<button type="button" class="ib" aria-label="Развернуть блок «Форма»"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+</div>
+
+<button type="button" style="height: 44px; border: 1px dashed #BFC4C8; border-radius: 12px; background: transparent; font: inherit; font-size: 14px; color: #1F6B60; font-weight: 500; cursor: pointer">+ Добавить блок</button>
+</section>
+
+</div>
+
+<div class="col-side">
+
+<section class="card" aria-labelledby="pub-h">
+<h2 id="pub-h">Публикация</h2>
+<div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px">
+<div style="display: flex; justify-content: space-between; gap: 8px"><span class="mut">Статус</span><span class="ok" style="font-weight: 500">Опубликована</span></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span class="mut">Изменена</span><span class="num">21.10.2026, 18:05</span></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span class="mut">Кем</span><span>Ольга Кузнецова</span></div>
+</div>
+<a href="#" style="font-size: 13px; display: inline-flex; align-items: center; gap: 6px">Открыть на сайте<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg></a>
+</section>
+
+<section class="card" aria-labelledby="seo-h">
+<h2 id="seo-h">Поиск (SEO)</h2>
+<div class="fld"><label for="st">Title <span class="num ok">58 / 60</span></label><input id="st" class="inp" value="Закалённое стекло на заказ 4–19 мм по чертежу | Inex Glass"></div>
+<div class="fld"><label for="sd">Description <span class="num ok">117 / 160</span></label><textarea id="sd" class="inp">Проверим чертёж и согласуем спецификацию до закалки, упакуем в обрешётку с фото при отгрузке. Заказы от 50 м².</textarea></div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; background: #F4F5F3; border-radius: 10px">
+<span class="mut" style="font-size: 12px">Так страница выглядит в поиске</span>
+<span style="font-size: 12px; color: #237A35">inexglass.ru › zakalennoe-steklo</span>
+<span style="font-size: 16px; color: #2C5B86; line-height: 1.3">Закалённое стекло на заказ 4–19 мм по чертежу | Inex Glass</span>
+<span style="font-size: 13px; line-height: 1.45; color: #3E464D">Проверим чертёж и согласуем спецификацию до закалки, упакуем в обрешётку с фото при отгрузке. Заказы от 50 м².</span>
+</div>
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px"><span style="width: 8px; height: 8px; border-radius: 999px; background: #237A35"></span>Разметка Schema.org заполнена</div>
+</section>
+
+<section class="card" aria-labelledby="v-h">
+<h2 id="v-h">Версии</h2>
+<div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px">
+<div style="display: flex; justify-content: space-between; gap: 8px"><span>21.10, 18:05 · Ольга К.</span><a href="#">сравнить</a></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span>18.10, 11:40 · Сергей М.</span><a href="#">сравнить</a></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span>02.10, 09:12 · Администратор</span><a href="#">сравнить</a></div>
+</div>
+</section>
+
+</div>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1320}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

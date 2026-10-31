@@ -1,0 +1,1051 @@
+[
+  {
+    "id": "a-chem-otlichaetsya",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/a-chem-otlichaetsya.avif",
+      "webp": "/generated/a-chem-otlichaetsya.webp"
+    },
+    "alt": "Сравнение осколков обычного и закалённого стекла",
+    "target": {
+      "kind": "doc",
+      "collection": "articles",
+      "slug": "chem-otlichaetsya-zakalennoe-steklo-ot-obychnogo",
+      "field": "card.image"
+    },
+    "width": 1280,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:12:45.081Z"
+  },
+  {
+    "id": "a-kak-snyat-razmery",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/a-kak-snyat-razmery.avif",
+      "webp": "/generated/a-kak-snyat-razmery.webp"
+    },
+    "alt": "Проём под стекло и рулетка для замера",
+    "target": {
+      "kind": "doc",
+      "collection": "articles",
+      "slug": "kak-snyat-razmery-dlya-stekla",
+      "field": "card.image"
+    },
+    "width": 1280,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:12:56.318Z",
+    "needsRedo": true,
+    "redoReason": "Review: stray text in the image or off-brief subject; regenerate before upload"
+  },
+  {
+    "id": "a-kak-vybrat-tolshchinu",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/a-kak-vybrat-tolshchinu.avif",
+      "webp": "/generated/a-kak-vybrat-tolshchinu.webp"
+    },
+    "alt": "Образцы стекла разной толщины",
+    "target": {
+      "kind": "doc",
+      "collection": "articles",
+      "slug": "kak-vybrat-tolshchinu-stekla",
+      "field": "card.image"
+    },
+    "width": 1280,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:12:47.903Z",
+    "needsRedo": true,
+    "redoReason": "Review: stray text in the image or off-brief subject; regenerate before upload"
+  },
+  {
+    "id": "a-markirovka",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/a-markirovka.avif",
+      "webp": "/generated/a-markirovka.webp"
+    },
+    "alt": "Угол закалённого стекла крупным планом",
+    "target": {
+      "kind": "doc",
+      "collection": "articles",
+      "slug": "markirovka-zakalennogo-stekla",
+      "field": "card.image"
+    },
+    "width": 1280,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:16:22.405Z",
+    "needsRedo": true,
+    "redoReason": "Review: stray text in the image or off-brief subject; regenerate before upload"
+  },
+  {
+    "id": "a-mozhno-li-rezat",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/a-mozhno-li-rezat.avif",
+      "webp": "/generated/a-mozhno-li-rezat.webp"
+    },
+    "alt": "Закалённое стекло и стеклорез на столе",
+    "target": {
+      "kind": "doc",
+      "collection": "articles",
+      "slug": "mozhno-li-rezat-zakalennoe-steklo",
+      "field": "card.image"
+    },
+    "width": 1280,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:12:44.345Z"
+  },
+  {
+    "id": "a-tripleks-ili-zakalennoe",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/a-tripleks-ili-zakalennoe.avif",
+      "webp": "/generated/a-tripleks-ili-zakalennoe.webp"
+    },
+    "alt": "Триплекс и закалённое стекло в ограждении",
+    "target": {
+      "kind": "doc",
+      "collection": "articles",
+      "slug": "tripleks-ili-zakalennoe-dlya-ograzhdenij",
+      "field": "card.image"
+    },
+    "width": 1280,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:12:56.934Z"
+  },
+  {
+    "id": "bg-404",
+    "kind": "background",
+    "files": {
+      "avif": "/generated/bg-404.avif",
+      "webp": "/generated/bg-404.webp",
+      "avif1280": "/generated/bg-404-1280.avif",
+      "webp1280": "/generated/bg-404-1280.webp"
+    },
+    "alt": "Фон: расходящиеся линии стеклянных граней",
+    "target": {
+      "kind": "template",
+      "slug": "not-found",
+      "field": "heroImage"
+    },
+    "width": 1344,
+    "height": 756,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:10:56.366Z"
+  },
+  {
+    "id": "bg-forms",
+    "kind": "background",
+    "files": {
+      "avif": "/generated/bg-forms.avif",
+      "webp": "/generated/bg-forms.webp",
+      "avif1280": "/generated/bg-forms-1280.avif",
+      "webp1280": "/generated/bg-forms-1280.webp"
+    },
+    "alt": "Фон: светлые полупрозрачные стеклянные плоскости",
+    "target": {
+      "kind": "section",
+      "slug": "forms",
+      "field": "backgroundKey"
+    },
+    "width": 1344,
+    "height": 756,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:10:44.130Z"
+  },
+  {
+    "id": "bg-section-dark-teal",
+    "kind": "background",
+    "files": {
+      "avif": "/generated/bg-section-dark-teal.avif",
+      "webp": "/generated/bg-section-dark-teal.webp",
+      "avif1280": "/generated/bg-section-dark-teal-1280.avif",
+      "webp1280": "/generated/bg-section-dark-teal-1280.webp"
+    },
+    "alt": "Фон: тёмные сине-зелёные отражения стекла",
+    "target": {
+      "kind": "section",
+      "slug": "dark-teal",
+      "field": "backgroundKey"
+    },
+    "width": 1344,
+    "height": 756,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:10:44.257Z"
+  },
+  {
+    "id": "bg-section-light",
+    "kind": "background",
+    "files": {
+      "avif": "/generated/bg-section-light.avif",
+      "webp": "/generated/bg-section-light.webp",
+      "avif1280": "/generated/bg-section-light-1280.avif",
+      "webp1280": "/generated/bg-section-light-1280.webp"
+    },
+    "alt": "Фон: светлые блики на матовом стекле",
+    "target": {
+      "kind": "section",
+      "slug": "light",
+      "field": "backgroundKey"
+    },
+    "width": 1344,
+    "height": 756,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:10:31.682Z"
+  },
+  {
+    "id": "bg-snow-calc",
+    "kind": "background",
+    "files": {
+      "avif": "/generated/bg-snow-calc.avif",
+      "webp": "/generated/bg-snow-calc.webp",
+      "avif1280": "/generated/bg-snow-calc-1280.avif",
+      "webp1280": "/generated/bg-snow-calc-1280.webp"
+    },
+    "alt": "Стеклянный козырёк со снегом в сумерках",
+    "target": {
+      "kind": "section",
+      "slug": "snow-calc",
+      "field": "backgroundKey"
+    },
+    "width": 1344,
+    "height": 756,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:10:43.821Z",
+    "needsRedo": true,
+    "redoReason": "Review: stray text in the image or off-brief subject; regenerate before upload"
+  },
+  {
+    "id": "c-dushevye",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/c-dushevye.avif",
+      "webp": "/generated/c-dushevye.webp"
+    },
+    "alt": "Душевая перегородка из стекла в ванной комнате",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "dushevye-peregorodki",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:11:08.927Z"
+  },
+  {
+    "id": "c-furnitura",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/c-furnitura.avif",
+      "webp": "/generated/c-furnitura.webp"
+    },
+    "alt": "Фурнитура для стекла: спайдер и зажимной профиль",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "furnitura",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:11:20.699Z"
+  },
+  {
+    "id": "c-konstrukcii-hub",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/c-konstrukcii-hub.avif",
+      "webp": "/generated/c-konstrukcii-hub.webp"
+    },
+    "alt": "Стеклянные конструкции в современном интерьере",
+    "target": {
+      "kind": "doc",
+      "collection": "pages",
+      "slug": "steklyannye-konstrukcii",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:10:56.204Z"
+  },
+  {
+    "id": "c-kozyrki",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/c-kozyrki.avif",
+      "webp": "/generated/c-kozyrki.webp"
+    },
+    "alt": "Стеклянный козырёк над входом",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "steklyannye-kozyrki",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:11:08.773Z"
+  },
+  {
+    "id": "c-ograzhdeniya",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/c-ograzhdeniya.avif",
+      "webp": "/generated/c-ograzhdeniya.webp"
+    },
+    "alt": "Стеклянное ограждение на профиле",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "steklyannye-ograzhdeniya",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:11:08.545Z"
+  },
+  {
+    "id": "c-peregorodki",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/c-peregorodki.avif",
+      "webp": "/generated/c-peregorodki.webp"
+    },
+    "alt": "Цельностеклянная перегородка в офисе",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "steklyannye-peregorodki",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:10:56.417Z"
+  },
+  {
+    "id": "c-torgovye-vitriny",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/c-torgovye-vitriny.avif",
+      "webp": "/generated/c-torgovye-vitriny.webp"
+    },
+    "alt": "Стеклянная торговая витрина",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "torgovye-vitriny",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:11:20.531Z"
+  },
+  {
+    "id": "g-fasadov",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/g-fasadov.avif",
+      "webp": "/generated/g-fasadov.webp"
+    },
+    "alt": "Структурное остекление фасада",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "fasadov",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:11:57.556Z"
+  },
+  {
+    "id": "g-liftovyh-shaht",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/g-liftovyh-shaht.avif",
+      "webp": "/generated/g-liftovyh-shaht.webp"
+    },
+    "alt": "Прозрачная лифтовая шахта из стекла",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "liftovyh-shaht",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:12:12.358Z"
+  },
+  {
+    "id": "g-osteklenie-hub",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/g-osteklenie-hub.avif",
+      "webp": "/generated/g-osteklenie-hub.webp"
+    },
+    "alt": "Остекление современного здания",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "osteklenie",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:11:56.454Z"
+  },
+  {
+    "id": "g-spajdernoe",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/g-spajdernoe.avif",
+      "webp": "/generated/g-spajdernoe.webp"
+    },
+    "alt": "Спайдерное крепление стеклянного фасада",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "spajdernoe",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:12:08.535Z",
+    "needsRedo": true,
+    "redoReason": "Review: stray text in the image or off-brief subject; regenerate before upload"
+  },
+  {
+    "id": "g-verand-terras-besedok",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/g-verand-terras-besedok.avif",
+      "webp": "/generated/g-verand-terras-besedok.webp"
+    },
+    "alt": "Безрамное остекление веранды",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "verand-terras-besedok",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:12:20.450Z"
+  },
+  {
+    "id": "g-vitrin-i-magazinov",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/g-vitrin-i-magazinov.avif",
+      "webp": "/generated/g-vitrin-i-magazinov.webp"
+    },
+    "alt": "Витринное остекление магазина",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "vitrin-i-magazinov",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:12:09.776Z",
+    "needsRedo": true,
+    "redoReason": "Review: stray text in the image or off-brief subject; regenerate before upload"
+  },
+  {
+    "id": "gt-dlya-mebeli",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/gt-dlya-mebeli.avif",
+      "webp": "/generated/gt-dlya-mebeli.webp"
+    },
+    "alt": "Закалённое стекло в мебели: столешница и фасад",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "dlya-mebeli",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:11:33.496Z"
+  },
+  {
+    "id": "gt-matovoe",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/gt-matovoe.avif",
+      "webp": "/generated/gt-matovoe.webp"
+    },
+    "alt": "Матовое закалённое стекло",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "matovoe",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:09:28.574Z",
+    "needsRedo": true,
+    "redoReason": "Review: stray text in the image or off-brief subject; regenerate before upload"
+  },
+  {
+    "id": "gt-mollirovannoe",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/gt-mollirovannoe.avif",
+      "webp": "/generated/gt-mollirovannoe.webp"
+    },
+    "alt": "Моллированное изогнутое закалённое стекло",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "mollirovannoe",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:12:00.619Z"
+  },
+  {
+    "id": "gt-okrashennoe",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/gt-okrashennoe.avif",
+      "webp": "/generated/gt-okrashennoe.webp"
+    },
+    "alt": "Крашеное закалённое стекло разных цветов",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "okrashennoe",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:16:22.229Z",
+    "needsRedo": true,
+    "redoReason": "Review: stray text in the image or off-brief subject; regenerate before upload"
+  },
+  {
+    "id": "gt-osvetlennoe",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/gt-osvetlennoe.avif",
+      "webp": "/generated/gt-osvetlennoe.webp"
+    },
+    "alt": "Осветлённое стекло рядом с обычным: сравнение торцов",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "osvetlennoe",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:11:32.605Z"
+  },
+  {
+    "id": "gt-riflenoe",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/gt-riflenoe.avif",
+      "webp": "/generated/gt-riflenoe.webp"
+    },
+    "alt": "Рифлёное стекло с вертикальными рёбрами",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "riflenoe",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:11:44.622Z"
+  },
+  {
+    "id": "gt-tonirovannoe",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/gt-tonirovannoe.avif",
+      "webp": "/generated/gt-tonirovannoe.webp"
+    },
+    "alt": "Тонированное стекло: бронза, графит, серое",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "tonirovannoe",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:11:32.772Z"
+  },
+  {
+    "id": "gt-tripleks",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/gt-tripleks.avif",
+      "webp": "/generated/gt-tripleks.webp"
+    },
+    "alt": "Торец триплекса с видимыми слоями",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "tripleks",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:11:45.313Z",
+    "needsRedo": true,
+    "redoReason": "Review: stray text in the image or off-brief subject; regenerate before upload"
+  },
+  {
+    "id": "h-kak-zakazat",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/h-kak-zakazat.avif",
+      "webp": "/generated/h-kak-zakazat.webp"
+    },
+    "alt": "Абстрактная схема: свет проходит через стеклянные панели",
+    "target": {
+      "kind": "doc",
+      "collection": "pages",
+      "slug": "kak-zakazat",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:12:35.994Z"
+  },
+  {
+    "id": "h-zakalennoe-steklo",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/h-zakalennoe-steklo.avif",
+      "webp": "/generated/h-zakalennoe-steklo.webp"
+    },
+    "alt": "Закалённое стекло разной толщины",
+    "target": {
+      "kind": "doc",
+      "collection": "pages",
+      "slug": "zakalennoe-steklo",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:12:33.333Z"
+  },
+  {
+    "id": "hero-article",
+    "kind": "background",
+    "files": {
+      "avif": "/generated/hero-article.avif",
+      "webp": "/generated/hero-article.webp",
+      "avif1280": "/generated/hero-article-1280.avif",
+      "webp1280": "/generated/hero-article-1280.webp"
+    },
+    "alt": "Фон: отражения света на стекле",
+    "target": {
+      "kind": "template",
+      "slug": "article",
+      "field": "heroImage"
+    },
+    "width": 1344,
+    "height": 756,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:10:30.727Z"
+  },
+  {
+    "id": "hero-construction",
+    "kind": "background",
+    "files": {
+      "avif": "/generated/hero-construction.avif",
+      "webp": "/generated/hero-construction.webp",
+      "avif1280": "/generated/hero-construction-1280.avif",
+      "webp1280": "/generated/hero-construction-1280.webp"
+    },
+    "alt": "Атриум со стеклянными ограждениями галерей",
+    "target": {
+      "kind": "template",
+      "slug": "construction",
+      "field": "heroImage"
+    },
+    "width": 1344,
+    "height": 756,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:10:19.038Z"
+  },
+  {
+    "id": "hero-glass-type",
+    "kind": "background",
+    "files": {
+      "avif": "/generated/hero-glass-type.avif",
+      "webp": "/generated/hero-glass-type.webp",
+      "avif1280": "/generated/hero-glass-type-1280.avif",
+      "webp1280": "/generated/hero-glass-type-1280.webp"
+    },
+    "alt": "Фон: стеклянные панели разной фактуры",
+    "target": {
+      "kind": "template",
+      "slug": "glass-type",
+      "field": "heroImage"
+    },
+    "width": 1344,
+    "height": 756,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:10:05.404Z",
+    "needsRedo": true,
+    "redoReason": "Review: stray text in the image or off-brief subject; regenerate before upload"
+  },
+  {
+    "id": "hero-home",
+    "kind": "background",
+    "files": {
+      "avif": "/generated/hero-home.avif",
+      "webp": "/generated/hero-home.webp",
+      "avif1280": "/generated/hero-home-1280.avif",
+      "webp1280": "/generated/hero-home-1280.webp"
+    },
+    "alt": "Стеллажи с листами закалённого стекла на складе",
+    "target": {
+      "kind": "template",
+      "slug": "home",
+      "field": "heroImage"
+    },
+    "width": 1344,
+    "height": 756,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:46:38.534Z",
+    "needsRedo": true,
+    "redoReason": "Review: stray text in the image or off-brief subject; regenerate before upload"
+  },
+  {
+    "id": "hero-objects",
+    "kind": "background",
+    "files": {
+      "avif": "/generated/hero-objects.avif",
+      "webp": "/generated/hero-objects.webp",
+      "avif1280": "/generated/hero-objects-1280.avif",
+      "webp1280": "/generated/hero-objects-1280.webp"
+    },
+    "alt": "Стеклянный фасад торгового центра",
+    "target": {
+      "kind": "template",
+      "slug": "objects",
+      "field": "heroImage"
+    },
+    "width": 1344,
+    "height": 756,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:10:31.250Z"
+  },
+  {
+    "id": "hero-processing",
+    "kind": "background",
+    "files": {
+      "avif": "/generated/hero-processing.avif",
+      "webp": "/generated/hero-processing.webp",
+      "avif1280": "/generated/hero-processing-1280.avif",
+      "webp1280": "/generated/hero-processing-1280.webp"
+    },
+    "alt": "Полированная кромка и отверстие в стекле",
+    "target": {
+      "kind": "template",
+      "slug": "processing",
+      "field": "heroImage"
+    },
+    "width": 1344,
+    "height": 756,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:10:18.306Z",
+    "needsRedo": true,
+    "redoReason": "Review: stray text in the image or off-brief subject; regenerate before upload"
+  },
+  {
+    "id": "hero-service",
+    "kind": "background",
+    "files": {
+      "avif": "/generated/hero-service.avif",
+      "webp": "/generated/hero-service.webp",
+      "avif1280": "/generated/hero-service-1280.avif",
+      "webp1280": "/generated/hero-service-1280.webp"
+    },
+    "alt": "Фон: стекло на светлом чертёжном столе",
+    "target": {
+      "kind": "template",
+      "slug": "service",
+      "field": "heroImage"
+    },
+    "width": 1344,
+    "height": 756,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:10:18.585Z"
+  },
+  {
+    "id": "hero-thickness",
+    "kind": "background",
+    "files": {
+      "avif": "/generated/hero-thickness.avif",
+      "webp": "/generated/hero-thickness.webp",
+      "avif1280": "/generated/hero-thickness-1280.avif",
+      "webp1280": "/generated/hero-thickness-1280.webp"
+    },
+    "alt": "Торец толстого стекла крупным планом",
+    "target": {
+      "kind": "template",
+      "slug": "thickness",
+      "field": "heroImage"
+    },
+    "width": 1344,
+    "height": 756,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:10:05.935Z"
+  },
+  {
+    "id": "hero-zak-hub",
+    "kind": "background",
+    "files": {
+      "avif": "/generated/hero-zak-hub.avif",
+      "webp": "/generated/hero-zak-hub.webp",
+      "avif1280": "/generated/hero-zak-hub-1280.avif",
+      "webp1280": "/generated/hero-zak-hub-1280.webp"
+    },
+    "alt": "Стопка закалённого стекла с видимым торцом",
+    "target": {
+      "kind": "template",
+      "slug": "zak-hub",
+      "field": "heroImage"
+    },
+    "width": 1344,
+    "height": 756,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:10:05.564Z"
+  },
+  {
+    "id": "m-dlya-salonov",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/m-dlya-salonov.avif",
+      "webp": "/generated/m-dlya-salonov.webp"
+    },
+    "alt": "Зеркало с фацетом в интерьере салона",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "dlya-salonov",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:12:32.564Z"
+  },
+  {
+    "id": "m-dlya-zalov",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/m-dlya-zalov.avif",
+      "webp": "/generated/m-dlya-zalov.webp"
+    },
+    "alt": "Зеркальная стена в пустом зале",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "dlya-zalov",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:12:24.106Z"
+  },
+  {
+    "id": "m-zerkala",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/m-zerkala.avif",
+      "webp": "/generated/m-zerkala.webp"
+    },
+    "alt": "Зеркало по размеру в интерьере",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "zerkala",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:12:21.629Z"
+  },
+  {
+    "id": "p-facet",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/p-facet.avif",
+      "webp": "/generated/p-facet.webp"
+    },
+    "alt": "Фацет на зеркале крупным планом",
+    "target": {
+      "kind": "doc",
+      "collection": "processing-services",
+      "slug": "facet",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:13:11.450Z",
+    "needsRedo": true,
+    "redoReason": "Review: stray text in the image or off-brief subject; regenerate before upload"
+  },
+  {
+    "id": "p-kromka",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/p-kromka.avif",
+      "webp": "/generated/p-kromka.webp"
+    },
+    "alt": "Полированная кромка стекла крупным планом",
+    "target": {
+      "kind": "doc",
+      "collection": "processing-services",
+      "slug": "kromka",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:09:27.929Z"
+  },
+  {
+    "id": "p-matirovanie",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/p-matirovanie.avif",
+      "webp": "/generated/p-matirovanie.webp"
+    },
+    "alt": "Пескоструйное матирование стекла: полосы",
+    "target": {
+      "kind": "doc",
+      "collection": "processing-services",
+      "slug": "matirovanie",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:13:20.006Z"
+  },
+  {
+    "id": "p-obrabotka-hub",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/p-obrabotka-hub.avif",
+      "webp": "/generated/p-obrabotka-hub.webp"
+    },
+    "alt": "Образцы обработки стекла: кромка, отверстие, фацет, матирование",
+    "target": {
+      "kind": "doc",
+      "collection": "pages",
+      "slug": "obrabotka-stekla",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:13:08.119Z"
+  },
+  {
+    "id": "p-otverstiya-i-vyrezy",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/p-otverstiya-i-vyrezy.avif",
+      "webp": "/generated/p-otverstiya-i-vyrezy.webp"
+    },
+    "alt": "Отверстие и вырез в стекле",
+    "target": {
+      "kind": "doc",
+      "collection": "processing-services",
+      "slug": "otverstiya-i-vyrezy",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:13:08.732Z"
+  },
+  {
+    "id": "p-pechat",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/p-pechat.avif",
+      "webp": "/generated/p-pechat.webp"
+    },
+    "alt": "Керамическая печать на стекле: точечный растр",
+    "target": {
+      "kind": "doc",
+      "collection": "processing-services",
+      "slug": "pechat",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:13:23.113Z"
+  },
+  {
+    "id": "p-plenki",
+    "kind": "card-illustration",
+    "files": {
+      "avif": "/generated/p-plenki.avif",
+      "webp": "/generated/p-plenki.webp"
+    },
+    "alt": "Матовая плёнка на стекле — полоса приватности",
+    "target": {
+      "kind": "doc",
+      "collection": "processing-services",
+      "slug": "plenki",
+      "field": "card.image"
+    },
+    "width": 960,
+    "height": 720,
+    "model": "google/nano-banana",
+    "generatedAt": "2026-10-20T11:13:20.446Z",
+    "needsRedo": true,
+    "redoReason": "Review: stray text in the image or off-brief subject; regenerate before upload"
+  }
+]

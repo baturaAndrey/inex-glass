@@ -1,0 +1,3 @@
+# Shell scripts are streamed to Linux hosts (`ssh … 'bash -s' < script.sh`, task 41). A CRLF
+# checkout on Windows (core.autocrlf=true) would break them with "$'\r': command not found".
+*.sh text eol=lf
