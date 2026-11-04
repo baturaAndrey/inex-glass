@@ -147,7 +147,7 @@ export default async function DrawingRequirementsPage() {
               ) : null}
               <OrderedChecks items={checkItems} />
               {responsibility ? (
-                <div className="bg-bg rounded-lg px-6 py-5 max-sm:px-5 max-sm:py-4">
+                <div className="bg-surface rounded-lg px-6 py-5 max-sm:px-5 max-sm:py-4">
                   <RichText data={responsibility.content} ctx={ctx} />
                 </div>
               ) : null}

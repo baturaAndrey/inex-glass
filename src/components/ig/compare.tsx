@@ -166,6 +166,13 @@ function PairLabel({ tone, children }: { tone: "self" | "inex"; children: ReactN
 const TOPIC_GRID =
   "grid grid-cols-[220px_minmax(0,1fr)_minmax(0,1.12fr)] gap-x-2 max-md:grid-cols-[160px_minmax(0,1fr)_minmax(0,1.12fr)] max-[761px]:grid-cols-1 max-[761px]:gap-x-0";
 
+/**
+ * Header cell of the «сами» / «через Inex Glass» columns: an uppercase label without the round
+ * icon (the icons stay on every row), as in the revised Home mockup.
+ */
+const TOPIC_HEAD =
+  "flex items-center rounded-t-lg px-6 py-[18px] text-base leading-[1.3] font-semibold uppercase";
+
 /** Three columns with a topic (rowheader); every row is a card ≤760. */
 function TopicCompare({
   rows,
@@ -190,18 +197,10 @@ function TopicCompare({
         <div role="columnheader" className="flex items-center px-6 py-[18px]">
           <span className="text-micro text-text-2 tracking-[.06em] uppercase">{topicTitle}</span>
         </div>
-        <div
-          role="columnheader"
-          className="bg-warning-bg text-warning-text flex items-center gap-2.5 rounded-t-lg px-6 py-[18px] text-base leading-[1.3] font-semibold"
-        >
-          <SelfIcon />
+        <div role="columnheader" className={`bg-warning-bg text-warning-text ${TOPIC_HEAD}`}>
           {selfTitle}
         </div>
-        <div
-          role="columnheader"
-          className="bg-primary-light text-primary-dark flex items-center gap-2.5 rounded-t-lg px-6 py-[18px] text-base leading-[1.3] font-semibold"
-        >
-          <InexIcon />
+        <div role="columnheader" className={`bg-primary-light text-primary-dark ${TOPIC_HEAD}`}>
           {inexTitle}
         </div>
       </div>

@@ -11,10 +11,11 @@ import type { QuizController } from "../use-quiz";
 export const QUIZ_CARD_GRID = cn(
   "gap-2 sm:gap-3",
   "[&_.ig-radio-card]:min-h-0 [&_.ig-radio-card]:gap-2.5 [&_.ig-radio-card]:p-4",
-  "[&_.ig-radio-card__icon]:size-10",
-  "[&_.ig-radio-card__mark]:top-3 [&_.ig-radio-card__mark]:right-3 [&_.ig-radio-card__mark]:size-5",
-  "max-sm:[&_.ig-radio-card]:p-3 max-sm:[&_.ig-radio-card__icon]:hidden",
-  "max-sm:[&_.ig-radio-card__title]:pr-[22px] max-sm:[&_.ig-radio-card__title]:text-[14px]"
+  // `\_` keeps the underscores of `.ig-radio-card__*`: a bare `_` means a space in arbitrary variants.
+  String.raw`[&_.ig-radio-card\_\_icon]:size-10`,
+  String.raw`[&_.ig-radio-card\_\_mark]:top-3 [&_.ig-radio-card\_\_mark]:right-3 [&_.ig-radio-card\_\_mark]:size-5`,
+  String.raw`max-sm:[&_.ig-radio-card]:p-3 max-sm:[&_.ig-radio-card\_\_icon]:hidden`,
+  String.raw`max-sm:[&_.ig-radio-card\_\_title]:pr-[22px] max-sm:[&_.ig-radio-card\_\_title]:text-[14px]`
 );
 
 /** Props of every step component. */

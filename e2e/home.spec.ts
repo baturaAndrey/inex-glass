@@ -185,13 +185,17 @@ test.describe("home page", () => {
       "href",
       "/obekty/"
     );
-    const list = objects.locator("ul[data-objects]");
-    if ((await list.getAttribute("data-objects")) === "fallback") {
-      await expect(list.locator("li")).toHaveCount(8);
-      await expect(list.locator("a")).toHaveCount(0);
-      await expect(list).toContainText("ТРК «Родник»");
+    // Marquee columns: each object is listed once in the accessible lists; the `aria-hidden` +
+    // `inert` lists are purely visual repeats of the loop and are not counted.
+    const columns = objects.locator("[data-objects]");
+    const items = columns.locator("ul:not([aria-hidden]) > li");
+    if ((await columns.getAttribute("data-objects")) === "fallback") {
+      await expect(items).toHaveCount(8);
+      await expect(columns.locator("a")).toHaveCount(0);
+      await expect(items.filter({ hasText: "ТРК «Родник»" })).toHaveCount(1);
     } else {
-      expect(await list.locator("li").count()).toBeLessThanOrEqual(8);
+      expect(await items.count()).toBeLessThanOrEqual(8);
+      await expect(columns.locator("ul[aria-hidden='true']:not([inert])")).toHaveCount(0);
     }
   });
 

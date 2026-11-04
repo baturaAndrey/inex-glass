@@ -13,18 +13,18 @@ const media = (url: string, card?: string): Media =>
   }) as Media;
 
 describe("sectionVariant", () => {
-  it("alternates bg ↔ sf by index for `auto` / empty background", () => {
+  it("puts every light section on the page background (no bg ↔ sf rhythm)", () => {
     expect([0, 1, 2, 3].map((index) => sectionVariant("auto", index))).toEqual([
       "bg",
-      "sf",
       "bg",
-      "sf",
+      "bg",
+      "bg",
     ]);
-    expect(sectionVariant(null, 1)).toBe("sf");
+    expect(sectionVariant(null, 1)).toBe("bg");
+    expect(sectionVariant("sf", 1)).toBe("bg");
   });
 
-  it("keeps an explicit background", () => {
-    expect(sectionVariant("sf", 0)).toBe("sf");
+  it("keeps an explicit accent background", () => {
     expect(sectionVariant("primaryDark", 1)).toBe("primary-dark");
     expect(sectionVariant("dark", 2)).toBe("dark");
   });

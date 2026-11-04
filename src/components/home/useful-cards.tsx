@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 
 /** Caption of the illustration placeholder (prototype). */
 const ILLUSTRATION_LABEL = "иллюстрация";
+/** 19 px title; `\_` keeps the underscores of `.ig-card__title` (a bare `_` is a space). */
+const CARD_CLASS = String.raw`w-full [&_.ig-card\_\_title]:text-[19px]`;
 
 /**
  * Block 9 — «Полезное для инженеров»: 4 link cards to tools and articles, 16:9 illustration
@@ -34,7 +36,7 @@ export function HomeUsefulCards({ block, ctx, section }: BlockProps<"cards">) {
           return (
             <li key={item.id ?? index} className="flex">
               <Card
-                className="w-full [&_.ig-card__title]:text-[19px]"
+                className={CARD_CLASS}
                 href={href}
                 arrow={false}
                 title={fill(item.title, ctx)}

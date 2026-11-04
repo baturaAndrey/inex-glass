@@ -4,21 +4,29 @@ import { Container } from "./container";
 
 export type SectionVariant = "bg" | "sf" | "dark" | "primary-dark";
 
+/** Light sections: the single page background (DESIGN.md §7, no `bg` ↔ `sf` alternation). */
+const LIGHT_CLASS = "bg-bg [--ig-section-sub:var(--ig-text-2)]";
+
 /**
- * Full-width background of a page block (`.blk--*` in the prototypes).
+ * Background of a page block (`.blk--*` in the prototypes).
+ * All light sections sit on the one page background: `sf` is kept as a value (CMS blocks and
+ * templates still produce it) but renders like `bg` — white belongs to cards inside a section.
  * Dark variants re-point `--ig-section-sub` so `SectionHead` sub stays ≥4.5:1 (WCAG AA):
  * on-navy-2 #C9D3DD is ≈6:1 on navy #324B64 and ≈7.5:1 on primary-dark #16403D.
  * Light variants reset it, so a light section nested in a dark one is correct too.
  */
 const VARIANT_CLASS: Record<SectionVariant, string> = {
-  bg: "bg-bg [--ig-section-sub:var(--ig-text-2)]",
-  sf: "bg-surface [--ig-section-sub:var(--ig-text-2)]",
+  bg: LIGHT_CLASS,
+  sf: LIGHT_CLASS,
   dark: "bg-navy text-on-navy [--ig-section-sub:var(--ig-on-navy-2)]",
   "primary-dark": "bg-primary-dark text-on-navy [--ig-section-sub:var(--ig-on-navy-2)]",
 };
 
 export type SectionProps = ComponentPropsWithoutRef<"section"> & {
-  /** Background: page `bg` (default), white `sf`, navy `dark`, deep teal `primary-dark`. */
+  /**
+   * Background: page `bg` (default), `sf` (same page background since the single-background
+   * rule), accent navy `dark`, accent deep teal `primary-dark`.
+   */
   variant?: SectionVariant;
   /** Rendered element; `section` by default. */
   as?: "section" | "div";
@@ -30,7 +38,8 @@ export type SectionProps = ComponentPropsWithoutRef<"section"> & {
 
 /**
  * Page block with the design-system vertical rhythm: 96 / 72 / 48 px
- * (desktop / ≤1100 / ≤599). The background spans the full width, content is limited by `Container`.
+ * (desktop / ≤1100 / ≤599). The block itself is bounded by the 1920 px frame, so an accent
+ * background never runs past it on wider screens; content is limited by `Container`.
  * Pass `id` for anchors (e.g. `ceny`) and `aria-labelledby` pointing at the block heading.
  */
 export function Section({
@@ -44,7 +53,11 @@ export function Section({
 }: SectionProps) {
   return (
     <Element
-      className={cn("py-24 max-md:py-[72px] max-sm:py-12", VARIANT_CLASS[variant], className)}
+      className={cn(
+        "mx-auto w-full max-w-[1920px] py-24 max-md:py-[72px] max-sm:py-12",
+        VARIANT_CLASS[variant],
+        className
+      )}
       {...props}
     >
       {contained ? <Container className={containerClassName}>{children}</Container> : children}

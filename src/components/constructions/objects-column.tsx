@@ -24,6 +24,9 @@ const IMAGE_SIZES = {
   row: "(max-width: 599px) 100vw, (max-width: 1100px) 50vw, (max-width: 1365px) 33vw, 25vw",
 } as const;
 
+/** Card body 16/20/20 px, 18 px title; `\_` keeps the underscores of `.ig-card__*` (bare `_` = space). */
+const OBJECT_CARD_CLASS = String.raw`h-full w-full shadow-none [&_.ig-card\_\_body]:px-5 [&_.ig-card\_\_body]:pt-4 [&_.ig-card\_\_body]:pb-5 [&_.ig-card\_\_title]:text-[18px]`;
+
 /** Object cards with a resolvable URL (published objects always have a path). */
 export function objectCards(
   objects: PortfolioObject[]
@@ -49,7 +52,7 @@ function ObjectCard({
   return (
     <Card
       href={href}
-      className="h-full w-full shadow-none [&_.ig-card__body]:px-5 [&_.ig-card__body]:pt-4 [&_.ig-card__body]:pb-5 [&_.ig-card__title]:text-[18px]"
+      className={OBJECT_CARD_CLASS}
       title={doc.name}
       arrow={false}
       image={

@@ -104,7 +104,8 @@ export function RequisitesCard({
       <div
         className={cn(
           "flex flex-wrap items-start justify-between gap-6 rounded-xl p-8 max-sm:p-5",
-          variant === "bg" ? "bg-surface shadow-card" : "bg-bg"
+          // Light sections share the page background (DESIGN.md §7): the card is white there.
+          variant === "bg" || variant === "sf" ? "bg-surface shadow-card" : "bg-bg"
         )}
       >
         <div className="flex min-w-0 flex-col gap-4">

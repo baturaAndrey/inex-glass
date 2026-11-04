@@ -11,7 +11,7 @@ export type PageHeroProps = {
    * - `ct-hero` — catalog pages (ZakHub, Thick10, Osvetl): crumbs on top, 2 columns with `aside`,
    *   terms strip under the first screen;
    * - `p5-top` — processing/constructions (Holes, Constr, Partitions): one column, crumbs inside;
-   * - `home` — Home `.hero`: full-width photo, eyebrow, caps H1, glass stats.
+   * - `home` — Home `.hero`: photo inside the 1920 px frame, eyebrow, caps H1, glass stats.
    */
   variant: PageHeroVariant;
   /** The only `<h1>` of the page. */
@@ -174,8 +174,11 @@ function P5Hero({
   );
 }
 
-/** The photo spans the full width on phones and the right 58% from 600 px. */
-const HOME_MEDIA_SIZES = "(max-width: 599px) 100vw, 58vw";
+/**
+ * The photo spans the full width on phones and the right 58% of the hero from 600 px; the hero
+ * never grows past 1920 px, so neither does the photo (58% of 1920 ≈ 1114 px).
+ */
+const HOME_MEDIA_SIZES = "(max-width: 599px) 100vw, (min-width: 1920px) 1114px, 58vw";
 
 /**
  * Indent of the hero content under the H1 (`.ind`): the gutter on desktop, none ≤1100.
@@ -185,7 +188,9 @@ const HOME_MEDIA_SIZES = "(max-width: 599px) 100vw, 58vw";
 const HOME_INDENT = "ml-(--ig-gutter) max-md:ml-0";
 
 /**
- * Home first screen (`.hero`): photo with a soft fade, caps H1, glass stats.
+ * Home first screen (`.hero`): photo with a soft fade, caps H1, glass stats. The whole block,
+ * photo included, is bounded by the 1920 px frame (not full-bleed): wider screens show the page
+ * background on both sides. The H1 starts at the gutter, the rest is indented (`HOME_INDENT`).
  * One `<img>` only (task 39): the former blurred backdrop copy of the photo duplicated the LCP
  * image in the HTML and was hidden on the home page anyway (task 22).
  */
@@ -204,7 +209,10 @@ function HomeHero({
   return (
     <section
       aria-labelledby={titleId}
-      className={cn("bg-tint-green relative overflow-hidden", className)}
+      className={cn(
+        "bg-tint-green relative mx-auto w-full max-w-[1920px] overflow-hidden",
+        className
+      )}
     >
       {media ? (
         <>

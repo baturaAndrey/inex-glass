@@ -8,9 +8,10 @@ import { cn } from "@/lib/utils";
 const TILE_BASE =
   "flex min-h-[132px] flex-col justify-between gap-7 rounded-lg px-[22px] pt-[22px] pb-5 text-lg leading-[1.3] font-semibold no-underline transition-[background-color,color,transform] duration-200 ease-ig hover:-translate-y-0.5 motion-reduce:hover:translate-y-0 max-sm:min-h-[112px] max-sm:gap-4 max-sm:p-4 max-sm:text-[15px] [&_svg]:size-[22px] [&_svg]:self-end";
 
+/** White tiles on the page background (single-background rule, DESIGN.md §7). */
 const TILE_TONE = {
   default:
-    "bg-bg text-text hover:bg-primary-light hover:text-primary-dark [&_svg]:text-primary-pressed",
+    "bg-surface text-text hover:bg-primary-light hover:text-primary-dark [&_svg]:text-primary-pressed",
   accent: "bg-primary-dark text-white hover:bg-primary-pressed hover:text-white",
 } as const;
 

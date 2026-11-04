@@ -157,6 +157,24 @@
   --text-hero-stat--font-weight: 700;
 }
 
+/*
+ * Endless vertical marquee of the home «Объекты» columns (approved exception to «no infinite
+ * animations»): the track holds two equal halves, -50% is one seamless loop. Duration comes from
+ * --objects-marquee-duration set on the track; `prefers-reduced-motion` is handled in the component.
+ */
+@theme {
+  --animate-objects-marquee: objects-marquee var(--objects-marquee-duration, 60s) linear infinite;
+
+  @keyframes objects-marquee {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-50%);
+    }
+  }
+}
+
 /* Horizontal page gutter: 70 / 40 / 24 / 16 px (see --ig-gutter in ig-tokens.css). */
 @utility px-gutter {
   padding-inline: var(--ig-gutter);

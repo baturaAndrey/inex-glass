@@ -155,7 +155,7 @@ function IncludedColumn({
   if (!title && items.length === 0) return null;
   return (
     <div
-      className={cn("rounded-lg p-7 max-sm:p-5", tone === "in" ? "bg-primary-light" : "bg-bg")}
+      className={cn("rounded-lg p-7 max-sm:p-5", tone === "in" ? "bg-primary-light" : "bg-surface")}
       data-included={tone}
     >
       {title ? <h3 className="m-0 mb-3 text-[22px] leading-[1.3] font-semibold">{title}</h3> : null}

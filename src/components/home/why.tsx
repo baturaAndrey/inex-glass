@@ -5,15 +5,10 @@ import { Container } from "@/components/ig/container";
 import { TextLink } from "@/components/ig/text-link";
 
 /**
- * «Glass» background of the section (`.why` of `Home.dc.html`). The table itself sits on a white
- * .95 panel without `backdrop-filter`: frosted glass is reserved for the hero stats.
- */
-const WHY_BACKGROUND =
-  "bg-[radial-gradient(55%_70%_at_62%_38%,rgba(232,242,239,.95)_0%,rgba(232,242,239,0)_70%),radial-gradient(40%_60%_at_12%_85%,rgba(210,230,225,.7)_0%,rgba(210,230,225,0)_70%),linear-gradient(135deg,#5A968E_0%,#A9CBC5_42%,#C9DEDA_58%,#6FA39B_100%)]";
-
-/**
  * Block 2 — «Почему через нас, а не напрямую с завода»: 8-row comparison (topic / by yourself /
- * through Inex Glass); ≤760 px every row becomes a «Сами → Через Inex Glass» card.
+ * through Inex Glass); ≤760 px every row becomes a «Сами → Через Inex Glass» card. Sits on the
+ * page background like every section (the former teal «glass» gradient was dropped in the
+ * revised mockup); the table keeps its own white panel.
  */
 export function HomeWhy({ block, ctx, section }: BlockProps<"compare">) {
   const heading = fill(block.heading, ctx);
@@ -30,7 +25,7 @@ export function HomeWhy({ block, ctx, section }: BlockProps<"compare">) {
     <section
       id={hasText(block.anchorId) ? block.anchorId : undefined}
       aria-labelledby={heading ? section.headingId : undefined}
-      className={`${WHY_BACKGROUND} scroll-mt-24 py-24 max-md:py-[72px] max-sm:py-12`}
+      className="scroll-mt-24 py-24 max-md:py-[72px] max-sm:py-12"
     >
       <Container className="flex flex-col gap-10 max-[761px]:gap-6">
         {heading || sub ? (

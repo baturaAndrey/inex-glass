@@ -49,24 +49,25 @@ export const hasText = (text: string | null | undefined): text is string =>
 // Section chrome
 // ---------------------------------------------------------------------------------------------
 
+/** Light choices (`bg`, `sf`) collapse to the single page background (DESIGN.md §7). */
 const BACKGROUND_VARIANT: Record<Exclude<BlockBackground, "auto">, SectionVariant> = {
   bg: "bg",
-  sf: "sf",
+  sf: "bg",
   dark: "dark",
   primaryDark: "primary-dark",
 };
 
 /**
- * Section background of the block at `index`: the editor's explicit choice, otherwise the
- * `bg` ↔ `sf` rhythm. The first block (usually the hero, always on `bg`) is even, so the next
- * section starts on `sf`.
+ * Section background of a block: the accent the editor chose (`dark`, `primaryDark`), otherwise
+ * the page background. Sections no longer alternate `bg` ↔ `sf`, so `auto`, `bg` and `sf` all
+ * give `bg`. The block position stays in the signature for the existing call sites.
  */
 export function sectionVariant(
   background: BlockBackground | null | undefined,
-  index: number
+  _index: number
 ): SectionVariant {
   if (background && background !== "auto") return BACKGROUND_VARIANT[background];
-  return index % 2 === 0 ? "bg" : "sf";
+  return "bg";
 }
 
 export const isDarkVariant = (variant: SectionVariant) =>

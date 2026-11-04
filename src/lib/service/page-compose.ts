@@ -148,17 +148,17 @@ export function listItemsOf(value: unknown): string[] {
 /* ------------------------------------------------------------------------------------------ */
 
 /**
- * Fixes the `bg` ↔ `sf` rhythm of a layout into each block's `background`. `RenderBlocks`
- * alternates by the position inside the array it receives; a route that renders blocks one by
- * one (to put its own component between them) would otherwise restart the rhythm every time.
+ * Fixes the section background of a layout into each block's `background`, so a route that
+ * renders blocks one by one (to put its own component between them) gets the same result as
+ * `RenderBlocks`. `auto` becomes the single page background `bg` (no `bg` ↔ `sf` rhythm).
  */
 export function withExplicitBackgrounds(layout: Layout): LayoutBlock[] {
-  return (layout ?? []).map((block, index) => {
+  return (layout ?? []).map((block) => {
     // The hero is the only block without section chrome (`sectionFields()`).
     if (block.blockType === "hero") return block;
     const current = "background" in block ? block.background : null;
     if (current && current !== "auto") return block;
-    // Same rule as `sectionVariant` of the blocks: even positions on `bg`, odd on `sf`.
-    return { ...block, background: index % 2 === 0 ? "bg" : "sf" } as LayoutBlock;
+    // Same rule as `sectionVariant` of the blocks: every light section on the page background.
+    return { ...block, background: "bg" } as LayoutBlock;
   });
 }

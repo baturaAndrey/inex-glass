@@ -117,10 +117,10 @@ describe("listItemsOf", () => {
 });
 
 describe("withExplicitBackgrounds", () => {
-  it("freezes the bg ↔ sf rhythm and keeps explicit choices", () => {
+  it("puts auto blocks on the page background and keeps explicit choices", () => {
     const result = withExplicitBackgrounds(layout).map((block) =>
       "background" in block ? block.background : "—"
     );
-    expect(result).toEqual(["—", "sf", "bg", "dark"]);
+    expect(result).toEqual(["—", "bg", "bg", "dark"]);
   });
 });
