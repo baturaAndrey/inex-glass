@@ -1,35 +1,19 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { FileText } from "lucide-react";
-import { resolveLink } from "@/components/blocks/shared";
-import type { FormKey } from "@/components/forms/form-dialog-provider";
-import { FormTrigger } from "@/components/forms/form-trigger";
-import { Accordion } from "@/components/ig/accordion";
-import { Button } from "@/components/ig/button";
-import { Callout } from "@/components/ig/callout";
 import { Section, type SectionVariant } from "@/components/ig/section";
-import { TextLink } from "@/components/ig/text-link";
-import { DRAWING_CTA_LABEL, QuizLink, fillLabel } from "@/components/page/quiz-cta";
-import { RichText, safeExternalHref } from "@/components/rich-text/rich-text";
+import { safeExternalHref } from "@/components/rich-text/rich-text";
 import { replacePlaceholders, type PlaceholderContext } from "@/lib/domain";
-import { JsonLd, faqLd } from "@/lib/seo/jsonld";
 import { cn } from "@/lib/utils";
-import { lexicalToPlainText } from "@/payload/utils/lexical-text";
 import type { GlassType } from "@/payload-types";
 
 /**
- * Typed sections of the glass-type template (`GlassTypePage`): tables, «Что важно знать»,
- * «Где применяют», FAQ and the closing buttons. Markup and spacing follow the `ct-*` classes of
+ * Site tables of the glass-type template (`GlassTypePage`, `tables[]` entries other than the spec
+ * tiles) and the inline markup of plain-text CMS fields (`InlineText`, also used by the about
+ * table of `src/components/processing/about-table.tsx`). Markup follows the `ct-*` classes of
  * `Osvetl.dc.html` / `Riflenoe.dc.html`, rewritten with Tailwind and the `ig-*` primitives.
- * The section background (`variant`) is chosen by the template, which keeps the bg ↔ sf rhythm.
  */
 
 export type GlassTypeTable = NonNullable<GlassType["tables"]>[number];
-export type GlassTypeImportantItem = NonNullable<GlassType["importantItems"]>[number];
-export type GlassTypeApplication = NonNullable<GlassType["applications"]>[number];
-export type GlassTypeRelatedLink = NonNullable<GlassType["relatedLinks"]>[number];
-export type GlassTypeFaqItem = NonNullable<GlassType["faq"]>[number];
-export type GlassTypeQuizPrefill = GlassType["quizPrefill"];
 
 /* ------------------------------------------------------------------------------------------ */
 /* Inline text                                                                                */
@@ -97,7 +81,7 @@ const hasText = (value: string | null | undefined): value is string =>
 /** `.ct-h2`: section heading with the prototype's 16 px gap below. */
 export function SectionTitle({ id, children }: { id?: string | undefined; children: ReactNode }) {
   return (
-    <h2 id={id} className="ig-h2 mb-6 max-w-[900px] max-sm:mb-4">
+    <h2 id={id} className="ig-h2 text-primary-dark mb-6 max-w-[900px] max-sm:mb-4">
       {children}
     </h2>
   );
@@ -299,7 +283,13 @@ export function TableSection({ table, ctx, variant, headingId }: TableSectionPro
   const labelledBy = heading ? headingId : undefined;
 
   return (
-    <TypedSection variant={variant} headingId={labelledBy}>
+    // The rhythm of the template sections around it (specs, about: 64 / 48 / 32 px), not the
+    // 96 px of a standalone site section.
+    <TypedSection
+      variant={variant}
+      headingId={labelledBy}
+      className="py-16 max-md:py-12 max-sm:py-8"
+    >
       <div data-glass-table={table.role ?? "other"}>
         {heading ? <SectionTitle id={headingId}>{heading}</SectionTitle> : null}
         {hasText(table.lead) ? (
@@ -317,222 +307,6 @@ export function TableSection({ table, ctx, variant, headingId }: TableSectionPro
           <p className="text-small text-text-2 mt-4 mb-0 max-w-[900px]">
             <InlineText text={table.footnote} ctx={ctx} />
           </p>
-        ) : null}
-      </div>
-    </TypedSection>
-  );
-}
-
-/* ------------------------------------------------------------------------------------------ */
-/* «Что важно знать»                                                                          */
-/* ------------------------------------------------------------------------------------------ */
-
-export interface ImportantSectionProps {
-  title: string;
-  items: GlassTypeImportantItem[];
-  ctx: PlaceholderContext;
-  variant: SectionVariant;
-}
-
-/** Warning callout with «**lead.** text» items (`importantItems`). */
-export function ImportantSection({ title, items, ctx, variant }: ImportantSectionProps) {
-  if (items.length === 0) return null;
-  return (
-    <TypedSection variant={variant}>
-      <Callout
-        variant="warning"
-        className="max-w-[1100px]"
-        title={replacePlaceholders(title, ctx)}
-        items={items.map((item, index) => (
-          // Paragraphs of the item are inlined so the bold lead runs into the text.
-          <div key={item.id ?? index} className="[&>p]:inline">
-            {hasText(item.lead) ? <strong>{replacePlaceholders(item.lead, ctx)} </strong> : null}
-            <RichText data={item.text} ctx={ctx} disableContainer />
-          </div>
-        ))}
-      />
-    </TypedSection>
-  );
-}
-
-/* ------------------------------------------------------------------------------------------ */
-/* «Где применяют»                                                                            */
-/* ------------------------------------------------------------------------------------------ */
-
-/** A `linkField()` value with a resolvable href and a visible label, or `null`. */
-function labelledLink(link: GlassTypeApplication["link"] | null | undefined) {
-  const resolved = resolveLink(link);
-  return resolved?.label ? { href: resolved.href, label: resolved.label } : null;
-}
-
-export interface ApplicationsSectionProps {
-  applications: GlassTypeApplication[];
-  relatedLinks: GlassTypeRelatedLink[];
-  ctx: PlaceholderContext;
-  variant: SectionVariant;
-  headingId: string;
-}
-
-const APPLICATIONS_TITLE = "Где применяют";
-
-/** Uses of the glass (list, each with an optional arrow link) and the related-pages row. */
-export function ApplicationsSection({
-  applications,
-  relatedLinks,
-  ctx,
-  variant,
-  headingId,
-}: ApplicationsSectionProps) {
-  const related = relatedLinks.flatMap((item, index) => {
-    const link = labelledLink(item.link);
-    return link ? [{ key: item.id ?? String(index), ...link, item }] : [];
-  });
-  if (applications.length === 0 && related.length === 0) return null;
-
-  return (
-    <TypedSection variant={variant} headingId={headingId}>
-      <SectionTitle id={headingId}>{APPLICATIONS_TITLE}</SectionTitle>
-      {applications.length > 0 ? (
-        <ul
-          className="ig-body marker:text-brand m-0 flex max-w-[1100px] list-disc flex-col gap-2 pl-6"
-          data-applications=""
-        >
-          {applications.map((item, index) => {
-            const link = labelledLink(item.link);
-            return (
-              <li key={item.id ?? index} className="pl-1">
-                <span>{replacePlaceholders(item.text, ctx)}</span>
-                {hasText(item.description) ? (
-                  <span className="text-text-2">
-                    {" "}
-                    — {replacePlaceholders(item.description, ctx)}
-                  </span>
-                ) : null}
-                {link ? (
-                  <>
-                    {" "}
-                    <TextLink href={link.href} variant="arrow" className="ml-2 align-baseline">
-                      {replacePlaceholders(link.label, ctx)}
-                    </TextLink>
-                  </>
-                ) : null}
-              </li>
-            );
-          })}
-        </ul>
-      ) : null}
-      {related.length > 0 ? (
-        <ul
-          className={cn(
-            "m-0 flex list-none flex-wrap gap-x-6 gap-y-2 p-0",
-            applications.length > 0 && "mt-6"
-          )}
-          data-related-links=""
-        >
-          {related.map(({ key, href, label, item }) => (
-            <li key={key}>
-              <TextLink
-                href={href}
-                variant="arrow"
-                {...(hasText(item.description)
-                  ? { title: replacePlaceholders(item.description, ctx) }
-                  : {})}
-              >
-                {replacePlaceholders(label, ctx)}
-              </TextLink>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </TypedSection>
-  );
-}
-
-/* ------------------------------------------------------------------------------------------ */
-/* FAQ                                                                                        */
-/* ------------------------------------------------------------------------------------------ */
-
-const FAQ_TITLE = "Частые вопросы";
-
-export interface FaqSectionProps {
-  items: GlassTypeFaqItem[];
-  ctx: PlaceholderContext;
-  variant: SectionVariant;
-  headingId: string;
-  /** Emit the page's `FAQPage` JSON-LD (off when a layout FAQ block already does). */
-  jsonLd: boolean;
-}
-
-/** «Частые вопросы»: accordion with the first answer open + `FAQPage` JSON-LD. */
-export function FaqSection({ items, ctx, variant, headingId, jsonLd }: FaqSectionProps) {
-  const questions = items.filter((item) => hasText(item.question));
-  if (questions.length === 0) return null;
-
-  return (
-    <TypedSection variant={variant} headingId={headingId}>
-      <SectionTitle id={headingId}>{FAQ_TITLE}</SectionTitle>
-      <Accordion
-        type="multiple"
-        defaultOpen={["faq-0"]}
-        headingLevel={3}
-        className="max-w-[1100px]"
-        items={questions.map((item, index) => ({
-          id: `faq-${index}`,
-          title: replacePlaceholders(item.question, ctx),
-          content: <RichText data={item.answer} ctx={ctx} />,
-        }))}
-      />
-      {jsonLd ? (
-        <JsonLd
-          data={faqLd(
-            questions.map((item) => ({
-              question: replacePlaceholders(item.question, ctx),
-              answer: replacePlaceholders(lexicalToPlainText(item.answer), ctx),
-            }))
-          )}
-        />
-      ) : null}
-    </TypedSection>
-  );
-}
-
-/* ------------------------------------------------------------------------------------------ */
-/* Closing buttons                                                                            */
-/* ------------------------------------------------------------------------------------------ */
-
-export interface FinalCtaSectionProps {
-  prefill: GlassTypeQuizPrefill;
-  /** Page path: quiz `src`. */
-  path: string;
-  /** Document slug: `source` of the form lead. */
-  slug: string;
-  ctx: PlaceholderContext;
-  variant: SectionVariant;
-}
-
-/** «Рассчитать стоимость» + the secondary form («Отправить чертёж» by default). */
-export function FinalCtaSection({ prefill, path, slug, ctx, variant }: FinalCtaSectionProps) {
-  const secondaryForm = prefill?.secondaryForm ?? "drawing";
-  const formKey: FormKey | null = secondaryForm === "none" ? null : secondaryForm;
-  const secondaryLabel = fillLabel(prefill?.secondaryLabel, ctx) || DRAWING_CTA_LABEL;
-
-  return (
-    <TypedSection variant={variant}>
-      <div
-        className="flex flex-wrap gap-3 max-sm:flex-col max-sm:items-stretch max-sm:[&_.ig-btn]:w-full"
-        data-final-cta=""
-      >
-        <QuizLink prefill={prefill} src={path} size="l" ctx={ctx} />
-        {formKey ? (
-          <FormTrigger formKey={formKey} params={{ label: secondaryLabel, source: slug }} asChild>
-            <Button
-              variant="secondary"
-              size="l"
-              leftIcon={<FileText aria-hidden="true" strokeWidth={2} />}
-            >
-              {secondaryLabel}
-            </Button>
-          </FormTrigger>
         ) : null}
       </div>
     </TypedSection>

@@ -1,19 +1,19 @@
-import type { JSX, ReactNode } from "react";
-import Image from "next/image";
+import type { JSX } from "react";
+import { FileText } from "lucide-react";
 import { faqJsonLdIndex } from "@/components/blocks/faq-block";
 import { ObjectsFeedBlock } from "@/components/blocks/objects-feed-block";
 import { RenderBlocks } from "@/components/blocks/render-blocks";
-import { asMedia, mediaSrc, resolveLink } from "@/components/blocks/shared";
-import type { BlockBackground, BlockPageContext, LayoutBlock } from "@/components/blocks/types";
+import { asMedia, fill, hasText, mediaSrc, resolveLink } from "@/components/blocks/shared";
+import type { BlockOf, BlockPageContext, LayoutBlock } from "@/components/blocks/types";
+import type { FormKey } from "@/components/forms/form-dialog-provider";
+import { FormTrigger } from "@/components/forms/form-trigger";
 import { EdgeCompare, type HeroPhotoView } from "@/components/glass-types/edge-compare";
+import { TableSection } from "@/components/glass-types/glass-type-sections";
 import {
-  ApplicationsSection,
-  FaqSection,
-  FinalCtaSection,
-  ImportantSection,
-  SectionTitle,
-  TableSection,
-} from "@/components/glass-types/glass-type-sections";
+  MAX_SWATCHES,
+  RelatedGlassTypes,
+  type RelatedGlassTypeCard,
+} from "@/components/glass-types/related-glass-types";
 import { SamplesSnippet } from "@/components/glass-types/samples-snippet";
 import type { SwatchData } from "@/components/glass-types/swatch";
 import { toSwatchColor, toSwatchPatternKey } from "@/components/glass-types/swatch-patterns";
@@ -22,37 +22,58 @@ import {
   VariantsPicker,
   type VariantView,
 } from "@/components/glass-types/variants-picker";
+import { Button } from "@/components/ig/button";
 import { Callout } from "@/components/ig/callout";
-import { PageHero, PageHeroTerm } from "@/components/ig/page-hero";
-import { Section, type SectionVariant } from "@/components/ig/section";
+import { Container } from "@/components/ig/container";
 import { NOT_FOUND_METADATA, NotFoundResponse } from "@/components/page/not-found-response";
 import { PageShell } from "@/components/page/page-shell";
-import { QuizLink } from "@/components/page/quiz-cta";
+import { DRAWING_CTA_LABEL, QUIZ_CTA_LABEL, QuizLink, fillLabel } from "@/components/page/quiz-cta";
+import { InfoPanels, type InfoPanel } from "@/components/processing/info-panels";
+import { ProcessingHero } from "@/components/processing/processing-hero";
+import {
+  ServiceCallouts,
+  splitButton,
+  type CalloutButton,
+  type ServiceCallout,
+} from "@/components/processing/service-callouts";
+import { ServiceFaq } from "@/components/processing/service-faq";
+import { ServiceLayout, hasAboutSection } from "@/components/processing/service-layout";
+import { SpecTiles, isSpecTable, specTilesFrom } from "@/components/processing/spec-tiles";
+import { UseCases } from "@/components/processing/use-cases";
 import { RichText } from "@/components/rich-text/rich-text";
 import { getConditions, getPlaceholderContext, getSnippets } from "@/lib/cms/globals";
 import { getDocBySlug, listPublished, redirectIfExists } from "@/lib/cms/queries";
 import { replacePlaceholders, type PlaceholderContext } from "@/lib/domain";
 import { buildMetadata, resolveH1, resolveSeoText } from "@/lib/seo/metadata";
 import { pickOgImage } from "@/lib/seo/og-image";
-import type { Condition, GlassType } from "@/payload-types";
+import type { GlassType } from "@/payload-types";
 import type { Metadata } from "next";
 
 /**
- * Template «вид стекла» (task 24): матовое, тонированное, крашеное по RAL, осветлённое, для
- * мебели, рифлёное, гнутое under `/zakalennoe-steklo/<slug>/` (route of task 23) and триплекс at
- * `/tripleks/` (own route). Prototypes: `Osvetl.dc.html`, `Riflenoe.dc.html`.
+ * Template «вид стекла» (task 24, restyled to the Paper mockup `2560_glass_matovoe`): матовое,
+ * тонированное, крашеное по RAL, осветлённое, для мебели, рифлёное, гнутое under
+ * `/zakalennoe-steklo/<slug>/` (route of task 23) and триплекс at `/tripleks/` (own route).
+ * Field → section mapping and the seed rules: `src/seed/content/glass-types/README.md`.
  *
- * Section order (typed fields first, then the free `layout`):
- *  1. hero — H1, intro (`{условия}` substituted), «Рассчитать стоимость», short terms strip,
- *     photos (`heroPhotos`) or the background illustration (`heroImage`);
- *  2. «Варианты» — interactive picker when variants say where they are used, else a static grid;
- *     `variantsNote`, `variantsCallout`;
- *  3. `tables[]`;  4. «Что важно знать» (`importantItems`);  5. `layout` blocks;
- *  6. «Где применяют» (`applications`, `relatedLinks`);  7. «Образцы и цветопроба» (`showSamples`);
- *  8. objects feed (`showObjects`);  9. FAQ (+ FAQPage JSON-LD);
- *  10. closing buttons — unless the layout already has a `cta` block.
- * Backgrounds alternate bg ↔ sf from the hero on; `layout` blocks with `background: auto` join
- * the same rhythm (explicit backgrounds are kept and the rhythm continues after them).
+ * Section order (the design of the processing service pages, `src/components/processing/`):
+ *  1. hero — H1, intro, terms checklist (`conditions`), «Рассчитать стоимость» + the secondary
+ *     form, `heroImage` behind a white fade (no image yet → the `.ig-ph` placeholder);
+ *  2. hero photos (`heroPhotos`, captioned photo pair) — when the type has them;
+ *  3. specs — the `tables[]` entry with the columns «Параметр | Значение | Пояснение» as tiles;
+ *  4. variants («Цвета», «Узоры»: picker or grid, note, plaque) — right after the first «about»
+ *     section of the layout, or here when the layout has none;
+ *  5. the other `tables[]` entries (site table section);
+ *  6. `layout` (`ServiceLayout`): about (+ diagram / comparison table), use-cases (`cards`),
+ *     other blocks as on any page; `twoColumns` blocks go to 13;
+ *  7. «Где применяют» from `applications` (numbered cards);
+ *  8. «Что важно знать до заказа» (`importantItems`: plaque with bold-lead lines; a last item
+ *     without a lead made of one link is the pill button);
+ *  9. «Образцы и цветопроба» (`showSamples`); 10. objects feed (`showObjects`);
+ *  11. FAQ (two columns + FAQPage JSON-LD);
+ *  12. «Другие виды стекла» — `relatedLinks` to glass types, topped up with the next types by
+ *      `order`; other `relatedLinks` stay a link list;
+ *  13. how-to-order — the `twoColumns` blocks as the cream panels, meeting the footer.
+ * No conditions section and no closing buttons: the hero carries both.
  *
  * Static + ISR: no request APIs. Unknown / unpublished slug → `redirectIfExists` + 404 body
  * (`<NotFoundResponse />`, never a bare `notFound()` — see its docs).
@@ -109,67 +130,35 @@ export async function generateGlassTypeMetadata(slug: string): Promise<Metadata>
 }
 
 /* ------------------------------------------------------------------------------------------ */
-/* Section rhythm                                                                             */
-/* ------------------------------------------------------------------------------------------ */
-
-const BLOCK_BACKGROUND: Record<SectionVariant, BlockBackground> = {
-  bg: "bg",
-  sf: "sf",
-  dark: "dark",
-  "primary-dark": "primaryDark",
-};
-
-const VARIANT_OF_BACKGROUND: Record<Exclude<BlockBackground, "auto">, SectionVariant> = {
-  bg: "bg",
-  sf: "sf",
-  dark: "dark",
-  primaryDark: "primary-dark",
-};
-
-/** bg ↔ sf alternation; the hero is `bg`, so the first section after it is `sf`. */
-function createRhythm() {
-  let current: SectionVariant = "bg";
-  return {
-    next(): SectionVariant {
-      current = current === "bg" ? "sf" : "bg";
-      return current;
-    },
-    /** A section with its own background: the alternation continues from it. */
-    set(variant: SectionVariant) {
-      current = variant;
-    },
-  };
-}
-
-type Rhythm = ReturnType<typeof createRhythm>;
-
-/**
- * Layout blocks with `background: auto` get the next background of the page rhythm (on their
- * own `RenderBlocks` would restart the alternation at index 0).
- */
-function withRhythm(blocks: LayoutBlock[], rhythm: Rhythm): LayoutBlock[] {
-  return blocks.map((block) => {
-    if (!("background" in block)) {
-      rhythm.next();
-      return block;
-    }
-    const background = block.background;
-    if (background && background !== "auto") {
-      rhythm.set(VARIANT_OF_BACKGROUND[background]);
-      return block;
-    }
-    return { ...block, background: BLOCK_BACKGROUND[rhythm.next()] } as LayoutBlock;
-  });
-}
-
-/* ------------------------------------------------------------------------------------------ */
 /* Data → view                                                                                */
 /* ------------------------------------------------------------------------------------------ */
 
-const hasText = (value: string | null | undefined): value is string =>
-  typeof value === "string" && value.trim() !== "";
+const HERO_PLACEHOLDER = "фото готовится";
+const VARIANTS_HEADING_ID = "glass-variants-title";
+const DEFAULT_VARIANTS_HEADING = "Варианты";
+const DEFAULT_IMPORTANT_TITLE = "Что важно знать до заказа";
+const APPLICATIONS_HEADING = "Где применяют";
+const FAQ_HEADING = "Частые вопросы";
+const DEFAULT_SAMPLES_KEY = "samples";
+const OBJECTS_HEADING = "Объекты";
+const OBJECTS_LIMIT = 4;
+const RELATED_COUNT = 3;
 
 type Variant = NonNullable<GlassType["variants"]>[number];
+type RelatedLink = NonNullable<GlassType["relatedLinks"]>[number];
+
+/** Hero photo: the original upload (the hero spans up to 1920 px; `next/image` resizes it). */
+function heroMedia(value: unknown): { src: string; alt: string } | null {
+  const media = asMedia(value);
+  const src = media ? mediaSrc(media) : null;
+  return media && src ? { src, alt: media.alt || "" } : null;
+}
+
+/** Terms checklist of the hero: the `conditions` terms bar, placeholders filled. */
+async function heroTerms(ctx: PlaceholderContext): Promise<string[]> {
+  const conditions = await getConditions();
+  return (conditions?.termsBar ?? []).map((item) => fill(item.text, ctx)).filter(Boolean);
+}
 
 function toSwatch(variant: Variant): SwatchData {
   switch (variant.swatchKind) {
@@ -225,16 +214,6 @@ function heroPhotoViews(photos: GlassType["heroPhotos"]): HeroPhotoView[] {
   });
 }
 
-/** Short terms strip of the glass-type pages (`conditions.termsBarShort`, else `termsBar`). */
-function heroTerms(conditions: Condition | null, ctx: PlaceholderContext): ReactNode {
-  const items = conditions?.termsBarShort?.length
-    ? conditions.termsBarShort
-    : (conditions?.termsBar ?? []);
-  const texts = items.map((item) => replacePlaceholders(item.text, ctx).trim()).filter(Boolean);
-  if (texts.length === 0) return null;
-  return texts.map((text, index) => <PageHeroTerm key={index}>{text}</PageHeroTerm>);
-}
-
 const relationId = (value: unknown): string | null =>
   typeof value === "string"
     ? value
@@ -242,7 +221,7 @@ const relationId = (value: unknown): string | null =>
       ? String((value as { id: unknown }).id)
       : null;
 
-/** Product whose published objects feed section 8, when there is at least one such object. */
+/** Product whose published objects feed the objects section, when there is such an object. */
 async function objectsProductId(doc: GlassType): Promise<string | null> {
   if (!doc.showObjects) return null;
   const productId = relationId(doc.objectsProduct);
@@ -255,79 +234,232 @@ async function objectsProductId(doc: GlassType): Promise<string | null> {
   return found.docs.length > 0 ? productId : null;
 }
 
-/* ------------------------------------------------------------------------------------------ */
-/* Hero                                                                                       */
-/* ------------------------------------------------------------------------------------------ */
-
-const HERO_TITLE_ID = "page-title";
-
-interface GlassTypeHeroProps {
-  doc: GlassType;
-  title: string;
-  path: string;
-  ctx: PlaceholderContext;
-  terms: ReactNode;
+/** Id of a `relatedLinks` item that points at a glass type, else `null`. */
+function relatedGlassTypeId(item: RelatedLink): string | null {
+  const target = item.link?.type === "custom" ? null : item.link?.doc;
+  if (!target || target.relationTo !== "glass-types") return null;
+  return relationId(target.value);
 }
 
-function GlassTypeHero({ doc, title, path, ctx, terms }: GlassTypeHeroProps) {
-  const photos = heroPhotoViews(doc.heroPhotos);
-  // The background illustration only on the one-column hero (photos take the right column).
-  const background = photos.length === 0 ? asMedia(doc.heroImage) : null;
-  const backgroundSrc = background ? mediaSrc(background, "hero") : null;
+/** Card text with a capital first letter (hub card texts are lower-case phrases of teksty/02). */
+const capitalize = (text: string) => (text ? text[0]!.toUpperCase() + text.slice(1) : text);
 
-  const hero = (
-    <PageHero
-      variant="ct-hero"
-      title={title}
-      titleId={HERO_TITLE_ID}
-      actions={<QuizLink prefill={doc.quizPrefill} src={path} size="l" ctx={ctx} />}
-      terms={terms}
-      aside={photos.length > 0 ? <EdgeCompare photos={photos} /> : undefined}
-      className={backgroundSrc ? "bg-transparent" : undefined}
-    >
-      {doc.intro ? (
-        <RichText
-          data={doc.intro}
-          ctx={ctx}
-          className="[&_p]:text-lead [&_p]:text-ink-2 max-w-[820px] gap-3 [&_p]:max-w-none"
-        />
-      ) : null}
-    </PageHero>
+/**
+ * «Другие виды стекла»: the glass types pinned in `relatedLinks` (in their order), topped up
+ * with the next published types by `order` (wrapping around) — three cards, never the page itself.
+ */
+async function relatedGlassTypes(
+  doc: GlassType,
+  ctx: PlaceholderContext
+): Promise<RelatedGlassTypeCard[]> {
+  const { docs } = await listPublished("glass-types", { sort: "order", limit: 50, depth: 0 });
+  const others = docs.filter((type) => Boolean(type.path));
+  const position = others.findIndex((type) => type.id === doc.id);
+  // The types after the current one first, then from the start: neighbours, not always the top.
+  const ordered = [...others.slice(position + 1), ...others.slice(0, Math.max(position, 0))].filter(
+    (type) => type.id !== doc.id
   );
+  const byId = new Map(ordered.map((type) => [type.id, type]));
+  const pinned = (doc.relatedLinks ?? [])
+    .map(relatedGlassTypeId)
+    .flatMap((id) => (id && byId.has(id) ? [byId.get(id)!] : []));
+  return [...new Set([...pinned, ...ordered])].slice(0, RELATED_COUNT).map((type) => ({
+    key: type.id,
+    href: type.path!,
+    title: fill(type.card?.title, ctx) || fill(type.title, ctx),
+    text: capitalize(fill(type.card?.text, ctx).trim()),
+    swatches: (type.variants ?? [])
+      .filter((variant) => variant.swatchKind === "color" || !variant.swatchKind)
+      .map(toSwatch)
+      .filter((swatch) => swatch.kind === "color")
+      .slice(0, MAX_SWATCHES),
+  }));
+}
 
-  if (!backgroundSrc) return hero;
+/** `relatedLinks` that do not point at a glass type: the site link list (bridge / buttons). */
+function otherRelatedLinks(doc: GlassType): BlockOf<"linkList"> | null {
+  const items = (doc.relatedLinks ?? []).filter(
+    (item) => !relatedGlassTypeId(item) && resolveLink(item.link)
+  );
+  if (items.length === 0) return null;
+  const withDescriptions = items.some((item) => hasText(item.description));
+  return {
+    blockType: "linkList",
+    id: "glass-related-links",
+    variant: withDescriptions ? "bridge" : "buttons",
+    items,
+  };
+}
+
+const hasContent = (state: { root?: { children?: unknown[] } } | null | undefined) =>
+  (state?.root?.children?.length ?? 0) > 0;
+
+/**
+ * «Что важно знать до заказа» as a plaque: items with a lead are the lines; the last item
+ * without a lead whose text is a single link (`→ [Матирование](/obrabotka-stekla/matirovanie/)`)
+ * becomes the pill button. Other lead-less items stay lines.
+ */
+function importantCallout(doc: GlassType, ctx: PlaceholderContext): ServiceCallout | null {
+  const items = (doc.importantItems ?? []).filter(
+    (item) => hasText(item.lead) || hasContent(item.text)
+  );
+  if (items.length === 0) return null;
+  let button: CalloutButton | null = null;
+  const last = items.at(-1)!;
+  if (!hasText(last.lead)) {
+    const split = splitButton(last.text);
+    if (split.button && !split.body) {
+      button = split.button;
+      items.pop();
+    }
+  }
+  return {
+    key: "important",
+    tone: "warning",
+    title: fill(doc.importantTitle, ctx) || DEFAULT_IMPORTANT_TITLE,
+    body: null,
+    items: items.map((item, index) => ({
+      key: item.id ?? String(index),
+      lead: fill(item.lead, ctx).trim(),
+      body: item.text ?? null,
+    })),
+    button,
+  };
+}
+
+/** `twoColumns` blocks → panels of the closing cream block (left, then right; empty skipped). */
+function columnPanels(layout: readonly LayoutBlock[], ctx: PlaceholderContext): InfoPanel[] {
+  return layout
+    .filter((block): block is BlockOf<"twoColumns"> => block.blockType === "twoColumns")
+    .flatMap((block, index): InfoPanel[] => {
+      const key = block.id ?? String(index);
+      return (["left", "right"] as const).flatMap((side) => {
+        const column = block[side];
+        if (!column || (!hasText(column.heading) && !hasContent(column.body))) return [];
+        return [
+          {
+            key: `${key}-${side}`,
+            heading: fill(column.heading, ctx) || null,
+            headingId: `glass-info-${key}-${side}-title`,
+            body: column.body ?? null,
+            lead: true,
+          },
+        ];
+      });
+    });
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Sections                                                                                   */
+/* ------------------------------------------------------------------------------------------ */
+
+interface GlassButtonsProps {
+  doc: GlassType;
+  slug: string;
+  path: string;
+  ctx: PlaceholderContext;
+}
+
+/** «Рассчитать стоимость» + the secondary form («Отправить чертёж» by default). */
+function GlassButtons({ doc, slug, path, ctx }: GlassButtonsProps) {
+  const prefill = doc.quizPrefill;
+  const primaryLabel = fillLabel(prefill?.ctaLabel, ctx) || QUIZ_CTA_LABEL;
+  const form = prefill?.secondaryForm ?? "drawing";
+  const formKey: FormKey | null = form === "none" ? null : form;
+  const secondaryLabel = fillLabel(prefill?.secondaryLabel, ctx) || DRAWING_CTA_LABEL;
   return (
-    <div className="bg-bg relative isolate overflow-hidden">
-      <div
-        aria-hidden="true"
-        className="absolute inset-y-0 right-0 -z-10 w-[45%] [mask-image:linear-gradient(90deg,transparent_0%,black_55%)] max-md:hidden"
-      >
-        {/* Hidden ≤1100 px: the 1px slot makes the phone preload pick the smallest candidate
-            instead of a full image nobody sees (task 39). */}
-        <Image
-          src={backgroundSrc}
-          alt=""
-          fill
-          preload
-          sizes="(max-width: 1100px) 1px, 45vw"
-          className="object-cover"
-        />
-      </div>
-      {hero}
-    </div>
+    <>
+      <QuizLink prefill={prefill} src={path} ctx={ctx}>
+        {primaryLabel}
+      </QuizLink>
+      {formKey ? (
+        <FormTrigger formKey={formKey} params={{ label: secondaryLabel, source: slug }} asChild>
+          <Button
+            variant="secondary"
+            size="l"
+            leftIcon={<FileText aria-hidden="true" strokeWidth={2} />}
+          >
+            {secondaryLabel}
+          </Button>
+        </FormTrigger>
+      ) : null}
+    </>
+  );
+}
+
+/** Captioned photo pair of `heroPhotos` (осветлённое: «Торец обычного / осветлённого стекла»). */
+function HeroPhotos({ photos }: { photos: HeroPhotoView[] }) {
+  if (photos.length === 0) return null;
+  return (
+    <section aria-label="Фото" className="pt-16 max-md:pt-12 max-sm:pt-8">
+      <Container>
+        <EdgeCompare photos={photos} className="max-w-[640px]" />
+      </Container>
+    </section>
+  );
+}
+
+/** «Цвета» / «Узоры»: picker (variants say where they are used) or grid, note and plaque. */
+function VariantsSection({ doc, ctx }: { doc: GlassType; ctx: PlaceholderContext }) {
+  const variants = variantViews(doc.variants, ctx);
+  const callout = doc.variantsCallout;
+  const hasCallout = hasContent(callout?.body) || hasText(callout?.title);
+  if (variants.length === 0) return null;
+  const interactive = variants.some((variant) => variant.application !== null);
+  return (
+    <section
+      aria-labelledby={VARIANTS_HEADING_ID}
+      className="py-16 max-md:py-12 max-sm:py-8"
+      data-testid="glass-variants"
+    >
+      <Container className="flex flex-col gap-10 max-sm:gap-6">
+        <h2 id={VARIANTS_HEADING_ID} className="ig-h2 text-primary-dark m-0 text-balance">
+          {fill(doc.variantsHeading, ctx).trim() || DEFAULT_VARIANTS_HEADING}
+        </h2>
+        {interactive ? (
+          <VariantsPicker items={variants} labelledBy={VARIANTS_HEADING_ID} />
+        ) : (
+          <VariantsGrid items={variants} />
+        )}
+        {hasContent(doc.variantsNote) ? (
+          <RichText data={doc.variantsNote} ctx={ctx} className="max-w-[880px]" />
+        ) : null}
+        {hasCallout ? (
+          <Callout
+            variant="info"
+            className="max-w-[1100px]"
+            {...(hasText(callout?.title) ? { title: fill(callout.title, ctx) } : {})}
+          >
+            <RichText data={callout?.body} ctx={ctx} disableContainer />
+          </Callout>
+        ) : null}
+      </Container>
+    </section>
+  );
+}
+
+/** «Где применяют» from `applications`: numbered cards, 4 in a row for four items. */
+function Applications({ doc, ctx }: { doc: GlassType; ctx: PlaceholderContext }) {
+  const items = (doc.applications ?? []).filter((item) => hasText(item.text));
+  if (items.length === 0) return null;
+  return (
+    <UseCases
+      heading={APPLICATIONS_HEADING}
+      headingId="glass-applications-title"
+      columns={items.length === 4 ? 4 : 3}
+      items={items.map((item, index) => ({
+        key: item.id ?? String(index),
+        title: fill(item.text, ctx),
+        text: fill(item.description, ctx),
+        href: resolveLink(item.link)?.href ?? null,
+      }))}
+    />
   );
 }
 
 /* ------------------------------------------------------------------------------------------ */
 /* Page                                                                                       */
 /* ------------------------------------------------------------------------------------------ */
-
-const VARIANTS_HEADING_ID = "glass-variants-title";
-const DEFAULT_VARIANTS_HEADING = "Варианты";
-const DEFAULT_IMPORTANT_TITLE = "Что важно знать до заказа";
-const DEFAULT_SAMPLES_KEY = "samples";
-const OBJECTS_HEADING = "Объекты";
-const OBJECTS_LIMIT = 4;
 
 /** Glass-type page (server component). Signature is the contract consumed by task 23. */
 export async function GlassTypePage({ slug }: { slug: string }): Promise<JSX.Element> {
@@ -338,180 +470,117 @@ export async function GlassTypePage({ slug }: { slug: string }): Promise<JSX.Ele
     return <NotFoundResponse />;
   }
 
-  const [ctx, conditions, snippets, objectsProduct] = await Promise.all([
-    getPlaceholderContext(),
-    getConditions(),
+  const ctx = await getPlaceholderContext();
+  const [terms, snippets, objectsProduct, related] = await Promise.all([
+    heroTerms(ctx),
     doc.showSamples ? getSnippets() : Promise.resolve(null),
     objectsProductId(doc),
+    relatedGlassTypes(doc, ctx),
   ]);
 
   const title = resolveH1(doc.seo, doc.title, ctx);
   const crumbLabel = resolveSeoText(doc.breadcrumbLabel || doc.title, ctx);
-  const rhythm = createRhythm();
-  const sections: ReactNode[] = [];
-
-  // 2. Variants.
-  const variants = variantViews(doc.variants, ctx);
-  const variantsNote = doc.variantsNote ?? null;
-  const callout = doc.variantsCallout;
-  const hasVariantsCallout = Boolean(callout?.body || hasText(callout?.title));
-  if (variants.length > 0) {
-    const interactive = variants.some((variant) => variant.application !== null);
-    sections.push(
-      <Section key="variants" variant={rhythm.next()} aria-labelledby={VARIANTS_HEADING_ID}>
-        <SectionTitle id={VARIANTS_HEADING_ID}>
-          {replacePlaceholders(doc.variantsHeading?.trim() || DEFAULT_VARIANTS_HEADING, ctx)}
-        </SectionTitle>
-        {interactive ? (
-          <VariantsPicker items={variants} labelledBy={VARIANTS_HEADING_ID} />
-        ) : (
-          <VariantsGrid items={variants} />
-        )}
-        {variantsNote ? (
-          <RichText data={variantsNote} ctx={ctx} className="mt-6 max-w-[880px]" />
-        ) : null}
-        {hasVariantsCallout ? (
-          <Callout
-            variant="info"
-            className="mt-6 max-w-[1100px]"
-            {...(hasText(callout?.title) ? { title: replacePlaceholders(callout.title, ctx) } : {})}
-          >
-            <RichText data={callout?.body} ctx={ctx} disableContainer />
-          </Callout>
-        ) : null}
-      </Section>
-    );
-  }
-
-  // 3. Tables.
-  (doc.tables ?? []).forEach((table, index) => {
-    if ((table.columns ?? []).length === 0 || (table.rows ?? []).length === 0) return;
-    sections.push(
-      <TableSection
-        key={`table-${table.id ?? index}`}
-        table={table}
-        ctx={ctx}
-        variant={rhythm.next()}
-        headingId={`glass-table-${index + 1}-title`}
-      />
-    );
-  });
-
-  // 4. «Что важно знать».
-  const importantItems = doc.importantItems ?? [];
-  if (importantItems.length > 0) {
-    sections.push(
-      <ImportantSection
-        key="important"
-        title={doc.importantTitle?.trim() || DEFAULT_IMPORTANT_TITLE}
-        items={importantItems}
-        ctx={ctx}
-        variant={rhythm.next()}
-      />
-    );
-  }
-
-  // 5. Layout blocks. The typed FAQ below owns `doc.faq`: the blocks get no `faq`, so a FAQ
-  // block in `doc` mode cannot duplicate it.
+  const media = heroMedia(doc.heroImage);
+  const layout = (doc.layout ?? []) as LayoutBlock[];
+  // The typed FAQ below owns `doc.faq`: the blocks get no `faq`, so a FAQ block in `doc` mode
+  // cannot duplicate it.
   const blockPage: BlockPageContext = { path, title, quizPrefill: doc.quizPrefill };
-  const layout = withRhythm(doc.layout ?? [], rhythm);
-  if (layout.length > 0) {
-    sections.push(<RenderBlocks key="layout" blocks={layout} ctx={ctx} page={blockPage} />);
-  }
-
-  // 6. «Где применяют».
-  const applications = doc.applications ?? [];
-  const relatedLinks = doc.relatedLinks ?? [];
-  const hasRelated = relatedLinks.some((item) => resolveLink(item.link)?.label);
-  if (applications.length > 0 || hasRelated) {
-    sections.push(
-      <ApplicationsSection
-        key="applications"
-        applications={applications}
-        relatedLinks={relatedLinks}
-        ctx={ctx}
-        variant={rhythm.next()}
-        headingId="glass-applications-title"
-      />
-    );
-  }
-
-  // 7. «Образцы и цветопроба».
-  if (doc.showSamples) {
-    const key = doc.samplesSnippetKey?.trim() || DEFAULT_SAMPLES_KEY;
-    const snippet = snippets?.items?.find((item) => item.key === key);
-    const vid = doc.quizPrefill?.kind;
-    sections.push(
-      <Section key="samples" variant={rhythm.next()} aria-labelledby="glass-samples-title">
-        <SamplesSnippet
-          content={snippet?.content ?? null}
-          title={snippet?.title ? replacePlaceholders(snippet.title, ctx) : undefined}
-          ctaLabel={snippet?.ctaLabel ? replacePlaceholders(snippet.ctaLabel, ctx) : undefined}
-          formParams={{ source: slug, ...(vid ? { vid } : {}) }}
-          ctx={ctx}
-          headingId="glass-samples-title"
-        />
-      </Section>
-    );
-  }
-
-  // 8. Objects (hidden when there is no published object of the product).
-  if (objectsProduct) {
-    sections.push(
-      <ObjectsFeedBlock
-        key="objects"
-        block={{
-          blockType: "objectsFeed",
-          mode: "byProduct",
-          product: objectsProduct,
-          limit: OBJECTS_LIMIT,
-          heading: OBJECTS_HEADING,
-        }}
-        ctx={ctx}
-        section={{ index: 0, variant: rhythm.next(), headingId: "glass-objects-title" }}
-      />
-    );
-  }
-
-  // 9. FAQ. One FAQPage per page: a layout FAQ block that emits its own JSON-LD wins.
+  const tables = doc.tables ?? [];
+  const otherTables = tables.filter(
+    (table) =>
+      !isSpecTable(table) && (table.columns ?? []).length > 0 && (table.rows ?? []).length > 0
+  );
+  const variants = <VariantsSection doc={doc} ctx={ctx} />;
+  const aboutFirst = hasAboutSection(layout);
+  const important = importantCallout(doc, ctx);
   const faq = (doc.faq ?? []).filter((item) => hasText(item.question));
-  if (faq.length > 0) {
-    sections.push(
-      <FaqSection
-        key="faq"
-        items={faq}
-        ctx={ctx}
-        variant={rhythm.next()}
-        headingId="glass-faq-title"
-        jsonLd={faqJsonLdIndex(layout, blockPage) < 0}
-      />
-    );
-  }
+  const relatedLinks = otherRelatedLinks(doc);
 
-  // 10. Closing buttons, unless the layout has its own call to action.
-  if (!layout.some((block) => block.blockType === "cta")) {
-    sections.push(
-      <FinalCtaSection
-        key="final-cta"
-        prefill={doc.quizPrefill}
-        path={path}
-        slug={slug}
-        ctx={ctx}
-        variant={rhythm.next()}
-      />
-    );
-  }
+  // «Образцы и цветопроба».
+  const samplesKey = doc.samplesSnippetKey?.trim() || DEFAULT_SAMPLES_KEY;
+  const snippet = snippets?.items?.find((item) => item.key === samplesKey);
+  const vid = doc.quizPrefill?.kind;
 
   return (
+    // The how-to-order panels close the page and meet the footer (mockup): no conditions
+    // section (the hero lists the terms), no quiz CTA (the hero has the button).
     <PageShell path={path} lastLabel={crumbLabel} showConditions={false} quiz={false}>
-      <GlassTypeHero
-        doc={doc}
+      <ProcessingHero
         title={title}
-        path={path}
-        ctx={ctx}
-        terms={heroTerms(conditions, ctx)}
+        media={media}
+        placeholder={HERO_PLACEHOLDER}
+        terms={terms}
+        lead={
+          hasContent(doc.intro) ? (
+            <div data-testid="glass-intro">
+              <RichText data={doc.intro} ctx={ctx} disableContainer />
+            </div>
+          ) : undefined
+        }
+        actions={<GlassButtons doc={doc} slug={slug} path={path} ctx={ctx} />}
       />
-      {sections}
+      <HeroPhotos photos={heroPhotoViews(doc.heroPhotos)} />
+      <SpecTiles tiles={specTilesFrom(tables.filter(isSpecTable), ctx)} />
+      {aboutFirst ? null : variants}
+      {otherTables.map((table, index) => (
+        <TableSection
+          key={`table-${table.id ?? index}`}
+          table={table}
+          ctx={ctx}
+          variant="bg"
+          headingId={`glass-table-${index + 1}-title`}
+        />
+      ))}
+      <ServiceLayout
+        blocks={layout}
+        ctx={ctx}
+        page={blockPage}
+        afterAbout={aboutFirst ? variants : null}
+      />
+      <Applications doc={doc} ctx={ctx} />
+      <ServiceCallouts callouts={important ? [important] : []} ctx={ctx} />
+      {doc.showSamples ? (
+        <section aria-labelledby="glass-samples-title" className="py-8 max-sm:py-4">
+          <Container>
+            <SamplesSnippet
+              content={snippet?.content ?? null}
+              title={snippet?.title ? fill(snippet.title, ctx) : undefined}
+              ctaLabel={snippet?.ctaLabel ? fill(snippet.ctaLabel, ctx) : undefined}
+              formParams={{ source: slug, ...(vid ? { vid } : {}) }}
+              ctx={ctx}
+              headingId="glass-samples-title"
+            />
+          </Container>
+        </section>
+      ) : null}
+      {objectsProduct ? (
+        <ObjectsFeedBlock
+          block={{
+            blockType: "objectsFeed",
+            mode: "byProduct",
+            product: objectsProduct,
+            limit: OBJECTS_LIMIT,
+            heading: OBJECTS_HEADING,
+          }}
+          ctx={ctx}
+          section={{ index: 0, variant: "bg", headingId: "glass-objects-title" }}
+        />
+      ) : null}
+      <ServiceFaq
+        heading={FAQ_HEADING}
+        headingId="glass-faq-title"
+        items={faq.map((item, index) => ({
+          key: item.id ?? String(index),
+          question: item.question,
+          answer: item.answer,
+        }))}
+        ctx={ctx}
+        // One FAQPage per page: a layout FAQ block that emits its own JSON-LD wins.
+        jsonLd={faqJsonLdIndex(layout, blockPage) < 0}
+      />
+      <RelatedGlassTypes cards={related} hubPath={HUB_BASE} />
+      {relatedLinks ? <RenderBlocks blocks={[relatedLinks]} ctx={ctx} page={blockPage} /> : null}
+      <InfoPanels panels={columnPanels(layout, ctx)} ctx={ctx} attachedToFooter />
     </PageShell>
   );
 }

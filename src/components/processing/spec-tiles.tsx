@@ -52,6 +52,24 @@ const longestValue = (tiles: readonly SpecTile[]) =>
 const cellText = (value: string | null | undefined, ctx: PlaceholderContext) =>
   value?.trim() ? replacePlaceholders(value.trim(), ctx) : "";
 
+/**
+ * Column labels that mark a table of `tables[]` as the spec tiles on pages whose `tables[]`
+ * also holds real tables (glass types; the processing seed writes the same labels,
+ * `SPEC_COLUMNS` of `src/seed/slices/processing.ts`).
+ */
+export const SPEC_TABLE_COLUMNS = ["Параметр", "Значение", "Пояснение"] as const;
+
+type SpecTableCandidate = { columns?: Array<{ label?: string | null }> | null };
+
+/** `true` for a table whose columns are exactly «Параметр | Значение | Пояснение». */
+export function isSpecTable(table: SpecTableCandidate): boolean {
+  const labels = (table.columns ?? []).map((column) => column.label?.trim() ?? "");
+  return (
+    labels.length === SPEC_TABLE_COLUMNS.length &&
+    labels.every((label, index) => label === SPEC_TABLE_COLUMNS[index])
+  );
+}
+
 /** Rows of every table of `tables[]` → tiles; rows without a value are skipped. */
 export function specTilesFrom(tables: ServiceTables, ctx: PlaceholderContext): SpecTile[] {
   return (tables ?? []).flatMap((table, tableIndex) =>

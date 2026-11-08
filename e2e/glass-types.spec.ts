@@ -61,7 +61,7 @@ const PAGES: GlassCase[] = [
       "Стекло, окрашенное керамической краской и закалённое: цвет по RAL, размеры до 3000 × 1600 мм. Чем отличается от лакобеля — на странице.",
     crumb: "Крашеное по RAL",
     quiz: { type: "tempered", vid: "painted" },
-    faq: false,
+    faq: true,
     samples: true,
   },
   {
@@ -85,7 +85,7 @@ const PAGES: GlassCase[] = [
       "Закалённое стекло для мебельных фасадов и столешниц: кромка, отверстия под петли, без клейма по запросу. Серии от 50 м².",
     crumb: "Для мебели",
     quiz: { type: "tempered", vid: null },
-    faq: false,
+    faq: true,
     samples: true,
   },
   {
@@ -109,7 +109,7 @@ const PAGES: GlassCase[] = [
       "Гнутое закалённое стекло до 1200 × 2000 мм с радиусом от 1000 мм. Что указать в чертеже радиусного стекла — на странице.",
     crumb: "Гнутое",
     quiz: { type: "tempered", vid: "bent" },
-    faq: false,
+    faq: true,
     samples: false,
   },
   {
@@ -121,7 +121,7 @@ const PAGES: GlassCase[] = [
       "Многослойное стекло по ГОСТ 30826-2014: закалённое до 3000 × 2000 мм, плёнка EVA, со вставками. Схему подберём под нагрузку.",
     crumb: "Триплекс",
     quiz: { type: "triplex", vid: null },
-    faq: false,
+    faq: true,
     samples: false,
   },
 ];
@@ -210,7 +210,17 @@ test.describe("glass types", () => {
       expect(href.searchParams.get("vid")).toBe(item.quiz.vid);
       expect(href.searchParams.get("src")).toBe(item.path);
 
-      await expect(hero.locator(".ig-terms__item")).toHaveCount(3);
+      // Terms checklist of the hero (the `conditions` terms bar); no «Условия» section below.
+      await expect(hero.getByRole("list", { name: "Условия" }).getByRole("listitem")).toHaveCount(
+        4
+      );
+      await expect(page.locator("main").getByRole("heading", { name: "Условия" })).toHaveCount(0);
+      // «Другие виды стекла»: three other types, never the page itself.
+      const related = page.getByTestId("glass-related-card");
+      await expect(related).toHaveCount(3);
+      for (const card of await related.all()) {
+        expect(await card.getAttribute("href")).not.toBe(item.path);
+      }
 
       const text = (await page.locator("main").innerText()).replace(/\s+/g, " ");
       expect(text).not.toMatch(/[{}]/);
@@ -236,13 +246,88 @@ test.describe("glass types", () => {
         await expect(dialog).toBeHidden();
       }
 
-      // Closing buttons: the drawing form.
-      const finalCta = page.locator("[data-final-cta]");
-      await finalCta.getByRole("button", { name: "Отправить чертёж" }).click();
+      // The hero carries the only buttons: «Отправить чертёж» opens the drawing form.
+      await expect(page.locator("[data-final-cta]")).toHaveCount(0);
+      await hero.getByRole("button", { name: "Отправить чертёж" }).click();
       await expect(page.getByRole("dialog")).toBeVisible();
       await page.keyboard.press("Escape");
     });
   }
+
+  test("матовое: sections of the Paper mockup 2560_glass_matovoe", async ({ page }, testInfo) => {
+    await open(page, bySlug("matovoe").path);
+    const mobile = isMobile(testInfo.project.name);
+
+    // Hero photo (temporary seed photo, replaceable in the admin), no placeholder.
+    const hero = page.getByTestId("processing-hero");
+    await expect(hero.locator("img")).toHaveCount(1);
+    await expect(hero.locator(".ig-ph")).toHaveCount(0);
+
+    // Specs: four tiles, the last one accented.
+    const specs = page.getByTestId("processing-spec");
+    await expect(specs).toHaveCount(4);
+    await expect(specs.nth(3)).toHaveAttribute("data-accent", "");
+    await expect(specs.nth(1)).toContainText("4–12 мм");
+
+    // About: H2 + comparison table (rows on phones).
+    const about = page.getByTestId("processing-about");
+    await expect(
+      about.getByRole("heading", { level: 2, name: "Как делают матовое стекло" })
+    ).toBeVisible();
+    const table = about.getByTestId("about-table");
+    if (mobile) {
+      await expect(table.getByRole("listitem")).toHaveCount(4);
+      await expect(table.locator("table")).toBeHidden();
+    } else {
+      await expect(table.locator("table tbody tr")).toHaveCount(4);
+      await expect(table.locator("thead th")).toHaveText(["Сатинированное", "Пескоструйное"]);
+    }
+    await expect(table.getByRole("link", { name: "Матирование" }).first()).toHaveAttribute(
+      "href",
+      "/obrabotka-stekla/matirovanie/"
+    );
+
+    // Use-cases: six numbered cards, the first three link to the related pages.
+    const useCases = page.getByTestId("processing-use-case");
+    await expect(useCases).toHaveCount(6);
+    await expect(useCases.first().getByRole("link")).toHaveAttribute(
+      "href",
+      "/steklyannye-peregorodki/"
+    );
+
+    // «Что важно знать до заказа»: three bold-lead lines and the «Матирование» pill.
+    const callout = page.getByTestId("processing-callout");
+    await expect(callout.getByRole("heading", { name: "Что важно знать до заказа" })).toBeVisible();
+    await expect(callout.getByTestId("processing-callout-items").getByRole("listitem")).toHaveCount(
+      3
+    );
+    await expect(callout.getByRole("link", { name: "Матирование" })).toHaveAttribute(
+      "href",
+      "/obrabotka-stekla/matirovanie/"
+    );
+
+    // FAQ: two columns, the first answer open, the new tempering answer.
+    const faq = page.getByTestId("service-faq");
+    await expect(faq.getByRole("heading", { level: 2, name: "Частые вопросы" })).toBeVisible();
+    await expect(
+      faq.getByRole("button", { name: "Матовое стекло можно закалить?" })
+    ).toHaveAttribute("aria-expanded", "true");
+    await expect(faq).toContainText("Пескоструй можно сделать и на уже закалённом стекле.");
+
+    // «Другие виды стекла» as in the mockup, тонированное with its three colour swatches.
+    const related = page.getByTestId("glass-related-card");
+    await expect(related.locator("h3")).toHaveText(["Тонированное", "Триплекс", "Для мебели"]);
+    await expect(
+      related.first().getByTestId("glass-related-swatches").locator("> span")
+    ).toHaveCount(3);
+
+    // How-to-order: two cream panels meeting the footer.
+    const info = page.getByTestId("processing-info");
+    await expect(info.getByRole("heading", { level: 2 })).toHaveText([
+      "Как заказать",
+      "Как считается цена",
+    ]);
+  });
 
   test("рифлёное: pattern picker with keyboard and live panel", async ({ page }) => {
     await open(page, bySlug("riflenoe").path);
@@ -280,8 +365,8 @@ test.describe("glass types", () => {
 
   test("осветлённое: edge photos and four highlighted cells", async ({ page }, testInfo) => {
     await open(page, bySlug("osvetlennoe").path);
-    const hero = page.locator('section[aria-labelledby="page-title"]');
-    const captions = hero.locator("figure figcaption");
+    // The captioned photo pair (`heroPhotos`) sits right under the hero.
+    const captions = page.locator("[data-hero-photos] figure figcaption");
     await expect(captions).toHaveText([
       "Торец обычного стекла, 12 мм",
       "Торец осветлённого стекла, 12 мм",
@@ -301,18 +386,21 @@ test.describe("glass types", () => {
     await expect(page.getByRole("heading", { level: 2, name: "Цвета" })).toBeVisible();
   });
 
-  test("крашеное: two tables, four rows in «Лакобель и эмалит»", async ({ page }, testInfo) => {
+  test("крашеное: spec tiles and «Лакобель и эмалит» in the about panel", async ({
+    page,
+  }, testInfo) => {
     await open(page, bySlug("okrashennoe").path);
-    const tables = page.locator("[data-glass-table]");
-    await expect(tables).toHaveCount(2);
-    const lacobel = tables.nth(1);
-    await expect(
-      lacobel.getByRole("heading", { name: "Лакобель и эмалит: не путайте" })
-    ).toBeVisible();
+    // The old parameters table became spec tiles; the comparison moved to the about panel.
+    await expect(page.locator("[data-glass-table]")).toHaveCount(0);
+    await expect(page.getByTestId("processing-spec")).toHaveCount(4);
+    const table = page.getByTestId("about-table");
+    await expect(table).toHaveCount(1);
+    await expect(table).toContainText("Лакобель и эмалит: не путайте");
     if (isMobile(testInfo.project.name)) {
-      await expect(lacobel.locator('[data-table-view="cards"] .ig-mcard')).toHaveCount(4);
+      await expect(table.getByRole("listitem")).toHaveCount(4);
+      await expect(table.locator("table")).toBeHidden();
     } else {
-      await expect(lacobel.locator("table tbody tr")).toHaveCount(4);
+      await expect(table.locator("table tbody tr")).toHaveCount(4);
     }
   });
 

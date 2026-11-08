@@ -2,6 +2,7 @@ import { Container } from "@/components/ig/container";
 import { RichText, type RichTextData } from "@/components/rich-text/rich-text";
 import type { PlaceholderContext } from "@/lib/domain";
 import { cn } from "@/lib/utils";
+import { AboutTable, type AboutTableData } from "./about-table";
 import { DiagramZoom } from "./diagram-zoom";
 
 /**
@@ -9,10 +10,11 @@ import { DiagramZoom } from "./diagram-zoom";
  * paragraphs and a list with teal dots on the left; a white panel with the diagram on the right
  * (micro caps caption above the image). Without a figure the text keeps its measure.
  *
- * Source: a `richText` block (heading + text) and — for the figure — the one-image `gallery`
- * block right after it (`alt` and `caption` of the gallery item). ≤1100 px the panel goes
- * under the text; ≤599 px the diagram fits the panel width and opens full size on tap
- * (`DiagramZoom`).
+ * Source: a `richText` block (heading + text) and — for the panel — the block right after it:
+ * a one-image `gallery` (the diagram; `alt` and `caption` of the gallery item) or a `table`
+ * (the comparison table of `2560_glass_matovoe`, `AboutTable`). ≤1100 px the panel goes under
+ * the text; ≤599 px the diagram fits the panel width and opens full size on tap
+ * (`DiagramZoom`), the table turns into one group per row.
  */
 
 export interface AboutFigure {
@@ -29,6 +31,8 @@ export interface ServiceAboutProps {
   body: RichTextData;
   ctx: PlaceholderContext;
   figure?: AboutFigure | null | undefined;
+  /** The comparison table panel (used when there is no `figure`). */
+  table?: AboutTableData | null | undefined;
   anchorId?: string | undefined;
 }
 
@@ -72,8 +76,10 @@ export function ServiceAbout({
   body,
   ctx,
   figure,
+  table,
   anchorId,
 }: ServiceAboutProps) {
+  const hasPanel = Boolean(figure || table);
   return (
     <section
       id={anchorId}
@@ -84,10 +90,10 @@ export function ServiceAbout({
       <Container
         className={cn(
           "grid items-center gap-16 max-md:grid-cols-1 max-md:gap-8",
-          figure ? "grid-cols-[minmax(0,760fr)_minmax(0,956fr)]" : "grid-cols-1"
+          hasPanel ? "grid-cols-[minmax(0,760fr)_minmax(0,956fr)]" : "grid-cols-1"
         )}
       >
-        <div className={cn("flex min-w-0 flex-col gap-6", !figure && "max-w-[900px]")}>
+        <div className={cn("flex min-w-0 flex-col gap-6", !hasPanel && "max-w-[900px]")}>
           <h2 id={headingId} className="ig-h2 text-primary-dark m-0 text-balance">
             {heading}
           </h2>
@@ -95,7 +101,11 @@ export function ServiceAbout({
             <RichText data={body} ctx={ctx} disableContainer />
           </div>
         </div>
-        {figure ? <Figure figure={figure} /> : null}
+        {figure ? (
+          <Figure figure={figure} />
+        ) : table ? (
+          <AboutTable table={table} ctx={ctx} captionId={`${headingId}-table`} />
+        ) : null}
       </Container>
     </section>
   );

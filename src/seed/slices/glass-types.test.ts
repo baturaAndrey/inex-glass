@@ -4,28 +4,35 @@ import { describe, expect, it } from "vitest";
 import { checkStopWords } from "@/lib/domain";
 import { EDGE_TERMINOLOGY_APPROVED_STRINGS } from "../content/edge-terminology";
 import {
+  EMPTY_HEADER,
   GLASS_TYPES_CONTENT,
   GLASS_TYPE_SLUGS,
-  layoutBackgrounds,
   type GlassTypeContent,
+  type LayoutContent,
 } from "../content/glass-types";
 
 /**
- * Content of the glass-type pages (task 24) against its sources: verbatim teksty, 17-meta,
- * forbidden wording (ТЗ §11) and link format. Pure data — Payload is not booted.
+ * Content of the glass-type pages (task 24, Paper mockups `2560_glass_*`) against its sources:
+ * verbatim teksty (`copy.source: "teksty"`) or the mockup with its «[уточнить]» list
+ * (`copy.source: "paper"`), 17-meta, forbidden wording (ТЗ §11), link format, seed images and
+ * the section shapes of the new design. Pure data — Payload is not booted.
  */
 
 const ROOT = path.resolve(import.meta.dirname, "../../..");
 const TEKSTY_DIR = path.join(ROOT, "res/inex-glass-handoff/teksty");
 const META_FILE = path.join(ROOT, "docs/inex/17-meta.md");
+const DRAFTS_FILE = path.join(ROOT, "docs/inex/drafts/service-pages-paper-drafts.md");
+const MEDIA_DIR = path.join(ROOT, "src/seed/media/glass-types");
 const HAS_TEKSTY = existsSync(TEKSTY_DIR);
 
-/** Comparable text: markdown links/bold, arrows and spacing removed. */
+/** Comparable text: markdown links/bold/headings/quotes, arrows and spacing removed. */
 function normalize(text: string): string {
   return text
     .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
     .replace(/\[([^\]]+)\]/g, "$1")
     .replace(/\*\*/g, "")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^>\s+/gm, "")
     .replace(/→/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -42,12 +49,55 @@ function tekstySection(doc: GlassTypeContent): string {
   return end < 0 ? rest : rest.slice(0, end);
 }
 
+function layoutTexts(block: LayoutContent): string[] {
+  switch (block.kind) {
+    case "richText":
+      return [
+        block.heading ?? "",
+        block.md,
+        block.figure?.caption ?? "",
+        block.table?.caption ?? "",
+        block.table?.footnote ?? "",
+        ...(block.table?.columns ?? []),
+        ...(block.table?.rows.flat() ?? []),
+      ];
+    case "callout":
+      return [block.title ?? "", ...block.items.flatMap((item) => [item.lead ?? "", item.text])];
+    case "cards":
+      return [
+        block.heading,
+        block.sub ?? "",
+        ...block.items.flatMap((item) => [item.title, item.text ?? ""]),
+      ];
+    case "table": {
+      const { table } = block;
+      return [
+        table.heading,
+        table.lead ?? "",
+        table.footnote ?? "",
+        ...table.columns.map((column) => column.label),
+        ...table.rows.flat().map((cell) => (typeof cell === "string" ? cell : cell.value)),
+      ];
+    }
+    case "twoColumns":
+      return [block.left, ...(block.right ? [block.right] : [])].flatMap((column) => [
+        column.heading,
+        column.md,
+      ]);
+  }
+}
+
 /** Lines of copy of a document (markdown fragments split by line and list markers). */
 function copyFragments(doc: GlassTypeContent): string[] {
   const out: string[] = [doc.intro];
   const add = (value: string | undefined) => {
     if (value) out.push(value);
   };
+  for (const spec of doc.specs ?? []) {
+    add(spec.label);
+    add(spec.value);
+    add(spec.text);
+  }
   add(doc.variantsHeading);
   for (const variant of doc.variants ?? []) {
     add(variant.name);
@@ -58,29 +108,14 @@ function copyFragments(doc: GlassTypeContent): string[] {
   add(doc.variantsCallout?.title);
   add(doc.variantsCallout?.body);
   for (const table of doc.tables ?? []) {
-    add(table.heading);
-    add(table.lead);
-    add(table.footnote);
-    for (const column of table.columns) add(column.label);
-    for (const row of table.rows)
-      for (const cell of row) add(typeof cell === "string" ? cell : cell.value);
+    layoutTexts({ kind: "table", table }).forEach(add);
   }
   for (const item of doc.importantItems ?? []) {
     add(item.lead);
     add(item.text);
   }
-  for (const block of doc.layout ?? []) {
-    if (block.kind === "richText") {
-      add(block.heading);
-      add(block.md);
-    } else {
-      add(block.title);
-      for (const item of block.items) {
-        add(item.lead);
-        add(item.text);
-      }
-    }
-  }
+  add(doc.importantButton?.label);
+  for (const block of doc.layout ?? []) layoutTexts(block).forEach(add);
   for (const item of doc.applications ?? []) {
     add(item.text);
     add(item.link?.label);
@@ -90,14 +125,14 @@ function copyFragments(doc: GlassTypeContent): string[] {
     add(item.question);
     add(item.answer);
   }
-  return toCopyLines(out);
+  return toCopyLines(out.filter((text) => text !== EMPTY_HEADER));
 }
 
 /** Texts → comparable lines: split by line, list marker dropped, normalized, empty dropped. */
 function toCopyLines(texts: readonly string[]): string[] {
   return texts
     .flatMap((text) => text.split("\n"))
-    .map((line) => normalize(line.replace(/^\s*-\s+/, "")))
+    .map((line) => normalize(line.replace(/^\s*(?:-|\d+\.)\s+/, "")))
     .filter((line) => line !== "");
 }
 
@@ -118,6 +153,7 @@ function allText(doc: GlassTypeContent): string {
     doc.seo.h1,
     doc.seo.title,
     doc.seo.description,
+    doc.heroImage?.alt ?? "",
     ...(doc.heroPhotoCaptions ?? []),
     ...copyFragments(doc),
   ].join("\n");
@@ -128,6 +164,10 @@ function allLinks(doc: GlassTypeContent): string[] {
   const urls = [
     ...(doc.applications ?? []).flatMap((item) => (item.link ? [item.link.url] : [])),
     ...(doc.relatedLinks ?? []).map((item) => item.url),
+    ...(doc.importantButton ? [doc.importantButton.url] : []),
+    ...(doc.layout ?? []).flatMap((block) =>
+      block.kind === "cards" ? block.items.flatMap((item) => (item.href ? [item.href] : [])) : []
+    ),
   ];
   const markdown = JSON.stringify(doc);
   for (const match of markdown.matchAll(/\]\(([^)]+)\)/g)) urls.push(match[1] ?? "");
@@ -155,6 +195,9 @@ function metaRows(): Map<string, MetaRow> {
   return rows;
 }
 
+const tekstyDocs = GLASS_TYPES_CONTENT.filter((doc) => doc.copy.source === "teksty");
+const bySlug = (slug: string) => GLASS_TYPES_CONTENT.find((doc) => doc.slug === slug)!;
+
 describe("glass-types content", () => {
   it("has the eight documents with the expected URLs", () => {
     expect(GLASS_TYPES_CONTENT.map((doc) => doc.slug).sort()).toEqual([...GLASS_TYPE_SLUGS].sort());
@@ -179,11 +222,27 @@ describe("glass-types content", () => {
     }
   });
 
-  it.skipIf(!HAS_TEKSTY)("copies every line of copy from its teksty section", () => {
-    for (const doc of GLASS_TYPES_CONTENT) {
+  it.skipIf(!HAS_TEKSTY)("teksty documents copy every line from their teksty section", () => {
+    for (const doc of tekstyDocs) {
       const section = normalize(tekstySection(doc));
       for (const fragment of copyFragments(doc).filter((line) => !edgeApproved.has(line))) {
         expect(section, `${doc.slug}: «${fragment}»`).toContain(fragment);
+      }
+    }
+  });
+
+  it("mockup documents: every «[уточнить]» statement is in the copy and in the drafts doc", () => {
+    const drafts = existsSync(DRAFTS_FILE) ? normalize(readFileSync(DRAFTS_FILE, "utf8")) : null;
+    for (const doc of GLASS_TYPES_CONTENT) {
+      expect(JSON.stringify(doc), doc.slug).not.toMatch(/уточнить/i);
+      if (doc.copy.source !== "paper") continue;
+      expect(doc.copy.mockup).toBe(`2560_glass_${doc.slug}`);
+      const copy = copyFragments(doc).join(" ");
+      for (const statement of doc.copy.pendingApproval) {
+        expect(copy, `${doc.slug}: ${statement}`).toContain(normalize(statement));
+        if (drafts !== null) {
+          expect(drafts, `drafts doc: ${statement}`).toContain(normalize(statement));
+        }
       }
     }
   });
@@ -193,9 +252,9 @@ describe("glass-types content", () => {
     expect(EDGE_APPROVED_LINES.filter((line) => !content.has(line))).toEqual([]);
   });
 
-  it.skipIf(!HAS_TEKSTY)("takes hub card texts from teksty/02", () => {
+  it.skipIf(!HAS_TEKSTY)("teksty documents take hub card texts from teksty/02", () => {
     const hub = normalize(readFileSync(path.join(TEKSTY_DIR, "02-zakalennoe-steklo.md"), "utf8"));
-    for (const doc of GLASS_TYPES_CONTENT) {
+    for (const doc of tekstyDocs) {
       if (doc.card.text) expect(hub, doc.slug).toContain(doc.card.text);
     }
   });
@@ -217,15 +276,56 @@ describe("glass-types content", () => {
     }
   });
 
+  it("ships every seed image with a Russian alt", () => {
+    for (const doc of GLASS_TYPES_CONTENT) {
+      const figures = (doc.layout ?? []).flatMap((block) =>
+        block.kind === "richText" && block.figure ? [block.figure.image] : []
+      );
+      for (const image of [...(doc.heroImage ? [doc.heroImage] : []), ...figures]) {
+        expect(image.alt, `${doc.slug}: ${image.file}`).toMatch(/[А-Яа-яЁё]/);
+        expect(existsSync(path.join(MEDIA_DIR, image.file)), image.file).toBe(true);
+      }
+    }
+  });
+
+  it("keeps the shapes of the new sections consistent", () => {
+    for (const doc of GLASS_TYPES_CONTENT) {
+      if (doc.specs) expect(doc.specs.length, `${doc.slug}: specs`).toBeGreaterThanOrEqual(2);
+      if (doc.related) {
+        expect(new Set(doc.related).size, `${doc.slug}: related`).toBe(3);
+        expect(doc.related, `${doc.slug}: related`).not.toContain(doc.slug);
+      }
+      for (const block of doc.layout ?? []) {
+        if (block.kind !== "richText") continue;
+        expect(block.figure && block.table, `${doc.slug}: figure or table`).toBeFalsy();
+        if (block.table) {
+          const { columns, rows, highlightColumn } = block.table;
+          for (const row of rows) expect(row, `${doc.slug}: row`).toHaveLength(columns.length);
+          if (highlightColumn) expect(highlightColumn).toBeLessThanOrEqual(columns.length);
+        }
+        if (block.figure || block.table) expect(block.heading, doc.slug).toBeTruthy();
+      }
+    }
+  });
+
+  it("матовое: sandblasting also on tempered glass (client decision)", () => {
+    const matovoe = bySlug("matovoe");
+    expect(matovoe.faq?.[0]?.answer).toContain(
+      "Пескоструй можно сделать и на уже закалённом стекле."
+    );
+    expect(matovoe.related).toEqual(["tonirovannoe", "tripleks", "dlya-mebeli"]);
+    expect(matovoe.specs?.filter((spec) => spec.accent)).toHaveLength(1);
+  });
+
   it("highlights four rows for осветлённое and gives рифлёное five patterns", () => {
-    const osvetlennoe = GLASS_TYPES_CONTENT.find((doc) => doc.slug === "osvetlennoe");
-    const positive = (osvetlennoe?.tables ?? []).flatMap((table) =>
+    const osvetlennoe = bySlug("osvetlennoe");
+    const positive = (osvetlennoe.tables ?? []).flatMap((table) =>
       table.rows.filter((row) => row.some((cell) => typeof cell !== "string" && cell.positive))
     );
     expect(positive).toHaveLength(4);
 
-    const riflenoe = GLASS_TYPES_CONTENT.find((doc) => doc.slug === "riflenoe");
-    const patterns = (riflenoe?.variants ?? []).filter(
+    const riflenoe = bySlug("riflenoe");
+    const patterns = (riflenoe.variants ?? []).filter(
       (variant) => variant.swatchKind === "pattern" && variant.patternKey
     );
     expect(patterns.map((variant) => variant.patternKey)).toEqual([
@@ -238,19 +338,19 @@ describe("glass-types content", () => {
     expect(patterns.every((variant) => variant.application)).toBe(true);
   });
 
-  it("has FAQ exactly on матовое, тонированное, осветлённое, рифлёное", () => {
+  it("gives every glass type its own FAQ (3–4 questions)", () => {
     const withFaq = GLASS_TYPES_CONTENT.filter((doc) => (doc.faq?.length ?? 0) > 0)
       .map((doc) => `${doc.slug}:${doc.faq?.length}`)
       .sort();
-    expect(withFaq).toEqual(["matovoe:3", "osvetlennoe:2", "riflenoe:3", "tonirovannoe:2"]);
-  });
-
-  it("continues the bg ↔ sf rhythm of the template in the layout blocks", () => {
-    const osvetlennoe = GLASS_TYPES_CONTENT.find((doc) => doc.slug === "osvetlennoe");
-    // hero bg → table sf → important bg → layout sf.
-    expect(osvetlennoe && layoutBackgrounds(osvetlennoe)).toEqual(["sf"]);
-    const matovoe = GLASS_TYPES_CONTENT.find((doc) => doc.slug === "matovoe");
-    // hero bg → table sf → layout bg, sf, bg.
-    expect(matovoe && layoutBackgrounds(matovoe)).toEqual(["bg", "sf", "bg"]);
+    expect(withFaq).toEqual([
+      "dlya-mebeli:4",
+      "matovoe:3",
+      "mollirovannoe:4",
+      "okrashennoe:3",
+      "osvetlennoe:3",
+      "riflenoe:3",
+      "tonirovannoe:3",
+      "tripleks:4",
+    ]);
   });
 });

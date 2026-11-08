@@ -6,15 +6,17 @@ import type { PlaceholderContext } from "@/lib/domain";
 import { cn } from "@/lib/utils";
 
 /**
- * «Образцы и цветопроба» (`.ct-sample` of `Osvetl.dc.html`): a deep-teal plate with the shared
- * text of the `snippets` global and a white «Заказать образец» button opening the sample form.
+ * «Образцы и цветопроба» (Paper mockup `2560_glass_matovoe`, section «samples»): a deep-teal
+ * plate (`primary-dark`, 24 px radius) with the shared text of the `snippets` global and a white
+ * pill «Заказать образец» opening the sample form. ≤1100 px the button goes under the text,
+ * ≤599 px it spans the width.
  */
 
 export const SAMPLES_TITLE = "Образцы и цветопроба";
 export const SAMPLES_CTA_LABEL = "Заказать образец";
 
-/** Light text on `primary-dark` (prototype `#DCE9E6`, ≈10:1 on #16403D). */
-const PLATE_TEXT = "text-[#DCE9E6]";
+/** Light text on `primary-dark` (`on-navy-2` #C9D3DD, ≈8.8:1 on #16403D); bold parts white. */
+const PLATE_TEXT = "text-on-navy-2";
 
 export interface SamplesSnippetProps {
   /** Rich text of `snippets.items[key]`; `null` → the verbatim fallback of teksty/08. */
@@ -57,21 +59,19 @@ export function SamplesSnippet({
     <div
       data-samples-snippet=""
       className={cn(
-        "bg-primary-dark grid grid-cols-[minmax(0,1fr)_auto] items-center gap-6 rounded-xl p-8 text-white max-sm:grid-cols-1 max-sm:p-6",
+        "bg-primary-dark grid grid-cols-[minmax(0,1fr)_auto] items-center gap-12 rounded-xl px-14 py-12 text-white",
+        "max-md:grid-cols-1 max-md:items-start max-md:gap-6 max-md:px-8 max-md:py-10 max-sm:px-5 max-sm:py-8",
         className
       )}
     >
-      <div className="flex max-w-[760px] flex-col gap-2">
-        <h2
-          id={headingId}
-          className="m-0 text-[28px] leading-[1.2] font-bold text-white max-sm:text-[24px]"
-        >
+      <div className="flex min-w-0 flex-col gap-3">
+        <h2 id={headingId} className="text-h3 m-0 font-bold text-white">
           {title?.trim() || SAMPLES_TITLE}
         </h2>
         <div
           className={cn(
             PLATE_TEXT,
-            "text-[17px] leading-[1.55] [&_a]:text-white [&_p]:m-0 [&_p]:max-w-none [&_p]:text-inherit [&_p]:[font:inherit] [&_strong]:text-white"
+            "text-lead max-w-[760px] [&_a]:text-white [&_p]:m-0 [&_p]:max-w-none [&_p]:text-inherit [&_p]:[font:inherit] [&_strong]:font-semibold [&_strong]:text-white"
           )}
         >
           {content ? <RichText data={content} ctx={ctx} /> : <FallbackText />}
@@ -81,7 +81,7 @@ export function SamplesSnippet({
         <Button
           variant="secondary"
           size="l"
-          className="focus-visible:outline-(--ig-focus-outline-on-dark) max-sm:w-full"
+          className="text-primary-dark hover:text-primary-dark border-transparent focus-visible:outline-(--ig-focus-outline-on-dark) max-md:justify-self-start max-sm:w-full"
         >
           {label}
         </Button>

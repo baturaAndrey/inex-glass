@@ -9,7 +9,9 @@ import { SEED_REQUEST_CONTEXT, type SeedContext } from "./context";
  * Payload renames an upload whose file already exists in MEDIA_DIR). An existing document is
  * reused as is, so editors may change its alt or replace the file in the admin; a new file in
  * the repo needs a new file name. Real images (not generated placeholders): `isPlaceholder`
- * stays `false`, so `scripts/attach-generated-media.ts` never replaces them.
+ * stays `false`, so `scripts/attach-generated-media.ts` never replaces them — unless the image is
+ * a stand-in until the client's photo arrives (`temporary`): then it is flagged «Временное
+ * изображение» and listed by the admin's quick filter.
  */
 
 const MEDIA_ROOT = path.join(import.meta.dirname, "media");
@@ -28,6 +30,8 @@ export interface SeedImage {
   /** Russian alt text (required for images). */
   alt: string;
   kind?: "photo" | "illustration" | "background" | "scheme";
+  /** A stand-in picture to be replaced by the client's photo (`isPlaceholder: true`). */
+  temporary?: boolean;
 }
 
 const sourceKey = (image: SeedImage) => `seed:${image.group}/${image.file}`;
@@ -52,7 +56,12 @@ export async function ensureSeedImage(ctx: SeedContext, image: SeedImage): Promi
   const data = await readFile(path.join(MEDIA_ROOT, image.group, image.file));
   const media = await payload.create({
     collection: "media",
-    data: { alt: image.alt, kind: image.kind ?? "photo", isPlaceholder: false, sourceUrl },
+    data: {
+      alt: image.alt,
+      kind: image.kind ?? "photo",
+      isPlaceholder: image.temporary ?? false,
+      sourceUrl,
+    },
     file: { data, mimetype, name: image.file, size: data.length },
     overrideAccess: true,
     context: SEED_REQUEST_CONTEXT,

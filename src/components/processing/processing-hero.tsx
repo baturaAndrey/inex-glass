@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { Check } from "lucide-react";
+import { Placeholder } from "@/components/ig/placeholder";
 import { cn } from "@/lib/utils";
 
 /**
@@ -26,6 +27,12 @@ export interface ProcessingHeroProps {
   actions?: ReactNode;
   /** Background photo; the hero is the LCP element, so the image is preloaded. */
   media?: { src: string; alt: string } | null | undefined;
+  /**
+   * Caption of the photo placeholder (`.ig-ph`) drawn on the right half when there is no
+   * `media` yet (glass types before their photos are uploaded). Decorative, desktop only:
+   * ≤1100 px the text runs over the whole hero and a placeholder would only push it down.
+   */
+  placeholder?: string | undefined;
 }
 
 const DEFAULT_TITLE_ID = "page-title";
@@ -54,6 +61,7 @@ export function ProcessingHero({
   terms,
   actions,
   media,
+  placeholder,
 }: ProcessingHeroProps) {
   return (
     <section
@@ -79,6 +87,13 @@ export function ProcessingHero({
           </div>
           <div aria-hidden="true" className={cn("absolute inset-0 max-sm:hidden", FADE)} />
         </>
+      ) : placeholder ? (
+        // The photo slot: the placeholder fades in from the middle (mask), so its edge never
+        // cuts across the text; the label sits in the visible part.
+        <Placeholder
+          label={placeholder}
+          className="absolute inset-y-0 right-0 aspect-auto w-[60%] [mask-image:linear-gradient(90deg,transparent_0%,black_35%)] max-md:hidden"
+        />
       ) : null}
       {/* Mockup: 136 px above the buttons at 1920; below 1536 px less, so «Рассчитать стоимость»
           stays on the first screen of a 1366 × 768 laptop even with a long intro. */}
