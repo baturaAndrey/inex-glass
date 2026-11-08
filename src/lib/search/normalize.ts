@@ -16,11 +16,17 @@ export const PLACEHOLDER_PATTERN = /\{[^{}]+\}/g;
  * Removed outright (a soft hyphen inside a word must not split it).
  */
 const INVISIBLE = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F­​-‍⁠﻿]/g;
+/**
+ * Hyphen (U+2010) and non-breaking hyphen (U+2011): typography keeps «УФ‑печать» on one line,
+ * but Postgres' parser splits words only at the ASCII hyphen-minus — folded so that the indexed
+ * text and the query («уф-печать») produce the same lexemes.
+ */
+export const TYPOGRAPHIC_HYPHEN = /[\u2010\u2011]/g;
 /** Any whitespace, incl. no-break (U+00A0), narrow no-break (U+202F) and line separators. */
 const WHITESPACE_RUN = /[\s   ]+/g;
 
 /**
- * Lower case, «ё» → «е», HTML tags / entities / placeholders and invisible characters stripped,
+ * Lower case, «ё» → «е», typographic hyphens → «-», HTML tags / entities / placeholders and invisible characters stripped,
  * whitespace (incl. no-break spaces and line breaks) collapsed to single spaces, trimmed.
  * Non-string input gives `""`.
  */
@@ -31,6 +37,7 @@ export function normalizeRu(text: unknown): string {
     .replace(HTML_ENTITY, " ")
     .replace(PLACEHOLDER_PATTERN, " ")
     .replace(INVISIBLE, "")
+    .replace(TYPOGRAPHIC_HYPHEN, "-")
     .toLowerCase()
     .replace(/ё/g, "е")
     .replace(WHITESPACE_RUN, " ")

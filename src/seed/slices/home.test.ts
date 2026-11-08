@@ -3,6 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { EXPERIENCE_PHRASE, checkStopWords } from "@/lib/domain";
 import {
+  HOME_CLIENT_APPROVED_STRINGS,
   HOME_CONSTRUCTIONS,
   HOME_FORM,
   HOME_GLASS,
@@ -19,8 +20,12 @@ import {
 
 /**
  * Content checks of the home slice (task 22): verbatim copy of teksty/01, no stop words,
- * well-formed internal links and the section sizes of the template.
+ * well-formed internal links and the section sizes of the template. Client-approved copy of
+ * 2026-11-08 (`HOME_CLIENT_APPROVED_STRINGS`) is exempt from the verbatim checks only.
  */
+
+const clientApproved = new Set(HOME_CLIENT_APPROVED_STRINGS);
+const notClientApproved = (text: string) => !clientApproved.has(text);
 
 const ROOT = process.cwd();
 const TEKSTY = path.join(ROOT, "res/inex-glass-handoff/teksty/01-glavnaya.md");
@@ -96,13 +101,17 @@ const hasSources = existsSync(TEKSTY) && existsSync(PROTOTYPE) && existsSync(MET
 describe("home content", () => {
   it.skipIf(!hasSources)("copies every string verbatim from teksty/01", () => {
     const teksty = stripMarkdown(readFileSync(TEKSTY, "utf8"));
-    const missing = contentStrings().filter((text) => !teksty.includes(text));
+    const missing = contentStrings()
+      .filter(notClientApproved)
+      .filter((text) => !teksty.includes(text));
     expect(missing).toEqual([]);
   });
 
   it.skipIf(!hasSources)("takes the prototype-only labels from Home.dc.html", () => {
     const prototype = readFileSync(PROTOTYPE, "utf8");
-    const missing = HOME_PROTOTYPE_STRINGS.filter((text) => !prototype.includes(text));
+    const missing = HOME_PROTOTYPE_STRINGS.filter(notClientApproved).filter(
+      (text) => !prototype.includes(text)
+    );
     expect(missing).toEqual([]);
   });
 
@@ -112,6 +121,11 @@ describe("home content", () => {
     expect(row).toBeDefined();
     const cells = (row ?? "").split("|").map((cell) => cell.trim());
     expect(cells.slice(2, 5)).toEqual([HOME_SEO.h1, HOME_SEO.title, HOME_SEO.description]);
+  });
+
+  it("keeps the client-approved strings in the page content", () => {
+    const content = new Set([...contentStrings(), ...HOME_PROTOTYPE_STRINGS]);
+    expect(HOME_CLIENT_APPROVED_STRINGS.filter((text) => !content.has(text))).toEqual([]);
   });
 
   it("has no stop words", () => {
@@ -136,7 +150,7 @@ describe("home content", () => {
   });
 
   it("has the section sizes of the template", () => {
-    expect(HOME_WHY.rows).toHaveLength(8);
+    expect(HOME_WHY.rows).toHaveLength(10);
     expect(HOME_STEPS.items).toHaveLength(6);
     expect(HOME_CONSTRUCTIONS.items).toHaveLength(9);
     expect(HOME_PROCESSING.tiles).toHaveLength(7);

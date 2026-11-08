@@ -5,6 +5,7 @@ import { checkStopWords, THICKNESSES } from "@/lib/domain";
 import { ANCHOR_PATTERN } from "@/payload/blocks/_section";
 import { seed as seedThicknesses } from "./thicknesses";
 import { seed as seedHub } from "./zak-hub";
+import { EDGE_TERMINOLOGY_APPROVED_STRINGS } from "../content/edge-terminology";
 import {
   INDEXABLE_THICKNESSES,
   THICKNESS_CTA_LABEL,
@@ -144,6 +145,10 @@ function hubStrings(): string[] {
   ];
 }
 
+/** Client-approved edge terminology of 2026-11-08: exempt from the verbatim teksty check only. */
+const EDGE_APPROVED: readonly string[] = EDGE_TERMINOLOGY_APPROVED_STRINGS["zak-hub"];
+const edgeApproved = new Set(EDGE_APPROVED);
+
 function thicknessStrings(): string[] {
   return [
     ...THICKNESS_GROUPS.flatMap((group) => [group.podbor, group.obrabotka, ...group.faq.flat()]),
@@ -165,10 +170,12 @@ describe.skipIf(!HAS_SOURCES)("zak-hub / thicknesses content matches teksty and 
   });
 
   it("hub strings are verbatim teksty/02 (meta from 17-meta)", () => {
-    const missing = hubStrings().filter((text) => {
-      const value = plain(text);
-      return !teksty02.includes(value) && !meta.includes(value);
-    });
+    const missing = hubStrings()
+      .filter((text) => !edgeApproved.has(text))
+      .filter((text) => {
+        const value = plain(text);
+        return !teksty02.includes(value) && !meta.includes(value);
+      });
     expect(missing).toEqual([]);
   });
 
@@ -198,6 +205,11 @@ describe("zak-hub / thicknesses content rules", () => {
       checkStopWords(text).map((finding) => `${finding.match}: ${text}`)
     );
     expect(findings).toEqual([]);
+  });
+
+  it("keeps the client-approved edge strings in the hub content", () => {
+    const content = new Set(hubStrings());
+    expect(EDGE_APPROVED.filter((text) => !content.has(text))).toEqual([]);
   });
 
   it("never mentions Heat Soak or glazing units (ТЗ §11)", () => {

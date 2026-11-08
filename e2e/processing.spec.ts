@@ -2,8 +2,10 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 /**
- * Section «Обработка стекла» (task 25): hub + 6 service pages, meta from 17-meta, the holes
- * calculator (ГОСТ 30698-2014) with its goal, FAQ and tolerance table.
+ * Section «Обработка стекла» (task 25): hub + 6 service pages, meta from 17-meta, the sections
+ * of the service page (Paper mockups `2560_service_facet`, `2560_service_otverstiya`), the holes
+ * calculator (ГОСТ 30698-2014) with its goal: the panel of the holes page and the site-wide block
+ * of the tolerances page.
  *
  * Precondition: `pnpm seed --minimal`, then `pnpm seed --only=processing --force` (CI runs
  * `pnpm seed --full`).
@@ -38,7 +40,7 @@ const PAGES: PageCase[] = [
     h1: "Обработка кромки стекла",
     title: "Обработка кромки стекла — шлифовка, еврокромка | Inex Glass",
     description:
-      "Шлифованная, полированная, «трапеция» и «еврокромка». Какую кромку выбрать для профиля, видимого торца и мебели.",
+      "Шлифованная, полированная, «еврокромка» (трапеция) и «карандаш». Какую кромку выбрать для профиля, видимого торца и мебели.",
     crumb: "Кромка",
     secondary: "Отправить чертёж",
     quizType: "tempered",
@@ -56,9 +58,9 @@ const PAGES: PageCase[] = [
   {
     path: "/obrabotka-stekla/facet/",
     h1: "Фацет на зеркале",
-    title: "Фацет на зеркале — что это, ширина 30 и 50 мм | Inex Glass",
+    title: "Фацет на зеркале — что это, ширина 5–40 мм | Inex Glass",
     description:
-      "Фацет — широкая полированная фаска по краю зеркала. Делаем на зеркалах шириной 30 или 50 мм — для залов, салонов и гостиниц.",
+      "Фацет — широкая полированная фаска по краю зеркала или стекла. Делаем шириной 5–40 мм на зеркалах и стекле от 4 мм — для залов, салонов и гостиниц.",
     crumb: "Фацет",
     secondary: "Отправить размеры",
     quizType: "mirrors",
@@ -68,7 +70,7 @@ const PAGES: PageCase[] = [
     h1: "Пескоструйное матирование стекла",
     title: "Матирование стекла — пескоструй, логотипы, рисунки | Inex Glass",
     description:
-      "Пескоструйное матирование до закалки: сплошное, полосы приватности, логотип на перегородке. Долговечнее плёнки.",
+      "Пескоструйное матирование до и после закалки: сплошное, полосы приватности, логотип, рисунок, глубокое, по зеркалу. Долговечнее плёнки.",
     crumb: "Матирование",
     secondary: "Отправить макет",
     quizType: "tempered",
@@ -80,15 +82,15 @@ const PAGES: PageCase[] = [
     description:
       "Матовые, тонирующие и защитные плёнки на стекло вашего заказа. Когда лучше плёнка, а когда — пескоструй или сатин.",
     crumb: "Плёнки",
-    secondary: null,
+    secondary: "Отправить чертёж",
     quizType: "tempered",
   },
   {
     path: "/obrabotka-stekla/pechat/",
     h1: "Печать на стекле",
-    title: "Печать на стекле — шелкография с закалкой, УФ-печать | Inex Glass",
+    title: "Печать на стекле — шелкография, УФ-печать, фотопечать | Inex Glass",
     description:
-      "Шелкография керамической краской вжигается при закалке и не стирается. Цвета по RAL, формат до 1100 × 700 мм.",
+      "Шелкография керамической краской вжигается при закалке и не стирается. Цвета по RAL, формат до 1100 × 700 мм. УФ-печать и фотопечать — до 2000 × 3180 мм.",
     crumb: "Печать",
     secondary: "Отправить макет",
     quizType: "tempered",
@@ -96,6 +98,9 @@ const PAGES: PageCase[] = [
 ];
 
 const HOLES_PATH = "/obrabotka-stekla/otverstiya-i-vyrezy/";
+const FACET_PATH = "/obrabotka-stekla/facet/";
+/** The site-wide `holesCalculator` block (chips, scheme, diameter field) lives here. */
+const TOLERANCES_PATH = "/kak-zakazat/dopuski-i-gost/";
 const DIAMETER_HINT = "До 220 мм — при сверлении с одной стороны. Уточним по чертежу";
 
 test.beforeAll(async ({ request }) => {
@@ -207,30 +212,137 @@ test.describe("processing pages", () => {
     });
   }
 
-  test("hub: operations table of 6 clickable rows", async ({ page }) => {
+  test("hub: 6 photo cards, info panels, no final buttons or conditions", async ({ page }) => {
     await open(page, "/obrabotka-stekla/");
     const section = page.getByTestId("processing-operations");
+    // The mockup shows no heading; the outline keeps an sr-only h2.
     await expect(section.getByRole("heading", { level: 2 })).toHaveText("Что делаем");
-    const mobile = (page.viewportSize()?.width ?? 0) < 600;
-    if (mobile) {
-      await expect(section.locator(".ig-mcard")).toHaveCount(6);
-      await expect(section.locator("table")).toBeHidden();
-    } else {
-      await expect(section.locator("tbody tr")).toHaveCount(6);
-    }
-    const scope = mobile ? section.locator(".ig-mcard") : section.locator("tbody tr");
-    await expect(scope.nth(1)).toContainText("Ø 4–130 мм; от кромки — не ближе двух толщин стекла");
-    await scope.nth(1).getByRole("link").click();
+    const cards = section.getByTestId("processing-card");
+    await expect(cards).toHaveCount(6);
+    await expect(cards.nth(1)).toContainText("Отверстия и вырезы");
+    await expect(cards.nth(1)).toContainText("Ø 4–130 мм; от кромки — не ближе двух толщин стекла");
+
+    const info = page.getByTestId("processing-info");
+    await expect(info.getByRole("heading", { level: 2 })).toHaveText([
+      "Как считается цена",
+      "Перед отправкой чертежа",
+    ]);
+    await expect(info).toContainText("В ориентировочную цену за м² обработка не входит!");
+    await expect(info.getByRole("link", { name: "Требования к чертежам" })).toHaveAttribute(
+      "href",
+      "/kak-zakazat/trebovaniya-k-chertezham/"
+    );
+    await expect(info.getByRole("link", { name: "Допуски по ГОСТ 30698-2014" })).toHaveAttribute(
+      "href",
+      "/kak-zakazat/dopuski-i-gost/"
+    );
+    // The hero carries the only buttons and the terms: no «Условия» section, one quiz button.
+    await expect(page.locator("main").getByRole("heading", { name: "Условия" })).toHaveCount(0);
+    await expect(page.locator("main a[data-quiz-cta]")).toHaveCount(1);
+
+    await cards.nth(1).click();
     await expect(page).toHaveURL(/\/obrabotka-stekla\/otverstiya-i-vyrezy\/$/);
   });
 
-  test("facet: mirrors only", async ({ page }) => {
-    await open(page, "/obrabotka-stekla/facet/");
+  test("service page: photo hero, plaque and the «Как указать» panel", async ({ page }) => {
+    await open(page, HOLES_PATH);
+    const hero = page.getByTestId("processing-hero");
+    await expect(hero.locator("img")).toHaveAttribute("alt", /\S/);
+    await expect(hero.getByTestId("processing-intro")).toBeVisible();
+    await expect(
+      page.getByTestId("processing-callout").getByRole("heading", { level: 2 })
+    ).toHaveText("Если фурнитура не подходит к отверстию");
+    const info = page.getByTestId("processing-info");
+    await expect(info.getByRole("heading", { level: 2 })).toHaveText([
+      "Как указать в чертеже",
+      "Допуски диаметра",
+      "Как считается цена",
+    ]);
+  });
+
+  test("facet: sections of the service page mockup", async ({ page }) => {
+    await open(page, FACET_PATH);
     const main = page.locator("main");
-    await expect(main.getByRole("heading", { name: "А на закалённом стекле?" })).toBeVisible();
-    await expect(main).toContainText("На закалённом стекле фацет не делаем.");
+
+    // specs: 4 tiles, the last one is the accent tile.
+    const specs = page.getByTestId("processing-spec");
+    await expect(specs).toHaveCount(4);
+    await expect(specs.locator("dd").first()).toHaveText("5–40 мм");
+    await expect(specs.last()).toHaveAttribute("data-accent", "");
+    await expect(specs.last()).toContainText("Любая");
+
+    // about: H2, list and the diagram with a descriptive alt.
+    const about = page.getByTestId("processing-about");
+    await expect(about.getByRole("heading", { level: 2 })).toHaveText("Что такое фацет");
+    await expect(about.locator("li")).toHaveCount(4);
+    await expect(about.locator("figcaption")).toHaveText("Сечение края с фацетом");
+    await expect(about.locator("figure img")).toHaveAttribute("alt", /Схема сечения края/);
+
+    // use-cases: 6 numbered cards.
+    const useCases = page.getByTestId("processing-use-cases");
+    await expect(useCases.getByRole("heading", { level: 2 })).toHaveText("Где применяют");
+    await expect(useCases.getByTestId("processing-use-case")).toHaveCount(6);
+    await expect(useCases.getByRole("heading", { level: 3 }).last()).toHaveText("Кухни");
+
+    // callout: the trailing link of the text is the button.
+    const callout = page.getByTestId("processing-callout");
+    await expect(callout.getByRole("heading", { level: 2 })).toHaveText("А на закалённом стекле?");
+    await expect(callout).toContainText("На закалённом стекле фацет не делаем.");
+    await expect(callout.getByRole("link", { name: "Обработка кромки" })).toHaveAttribute(
+      "href",
+      "/obrabotka-stekla/kromka/"
+    );
+
+    // related: three other services, the link to the hub.
+    const related = page.getByTestId("processing-related");
+    await expect(related.getByRole("heading", { level: 2 })).toHaveText("Другая обработка");
+    const cards = related.getByTestId("processing-card");
+    await expect(cards).toHaveCount(3);
+    await expect(cards).toHaveText([/Обработка кромки/, /Отверстия и вырезы/, /матирование/]);
+    await expect(related.getByRole("link", { name: "Все виды обработки" })).toHaveAttribute(
+      "href",
+      "/obrabotka-stekla/"
+    );
+
+    // how-to-order: two panels close the page, no conditions section.
+    const info = page.getByTestId("processing-info");
+    await expect(info.getByRole("heading", { level: 2 })).toHaveText([
+      "Как заказать",
+      "Как считается цена",
+    ]);
+    await expect(main.getByRole("heading", { name: "Условия" })).toHaveCount(0);
+
     const text = await main.innerText();
-    expect(text).not.toMatch(/фацет[^.]*\bдо 30 мм/i);
+    expect(text).not.toMatch(/30 (?:и|или) 50 мм|уточнить/i);
+    if ((page.viewportSize()?.width ?? 0) <= 375) await noHorizontalScroll(page);
+  });
+
+  test("about diagram: fits the panel, opens full size on phones", async ({ page }) => {
+    await open(page, "/obrabotka-stekla/kromka/");
+    const figure = page.getByTestId("processing-about").locator("figure");
+    const image = figure.locator("img").first();
+    await image.scrollIntoViewIfNeeded();
+    const [imageBox, figureBox] = [await image.boundingBox(), await figure.boundingBox()];
+    // Never wider than its panel: the whole diagram is visible, no sideways scroll.
+    expect(imageBox!.x + imageBox!.width).toBeLessThanOrEqual(figureBox!.x + figureBox!.width);
+
+    const zoom = figure.getByRole("button", { name: /^Открыть схему/ });
+    if ((page.viewportSize()?.width ?? 0) >= 600) {
+      await expect(zoom).toBeHidden();
+      return;
+    }
+    await expect(figure).toContainText("Открыть схему");
+    // Retried: a tap before hydration does nothing.
+    await expect(async () => {
+      await zoom.click();
+      await expect(page.getByRole("dialog")).toBeVisible({ timeout: 3_000 });
+    }).toPass({ timeout: 45_000 });
+    await expect(page.getByRole("dialog").locator("img").last()).toHaveAttribute(
+      "alt",
+      /Схема профилей/
+    );
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
   });
 
   test("unknown slug answers 404", async ({ request }) => {
@@ -244,9 +356,75 @@ test.describe("processing pages", () => {
 });
 
 test.describe("holes calculator", () => {
-  test("defaults, thickness switching, scheme and keyboard", async ({ page }) => {
+  test("holes page: panel with the thickness select and four tiles", async ({ page }) => {
     await openCalculator(page, `${HOLES_PATH}#kalkulyator`);
-    await expect(page.locator("#kalkulyator")).toHaveCount(1);
+    const panel = page.locator("#kalkulyator");
+    await expect(panel).toHaveCount(1);
+    await expect(panel).toContainText("Калькулятор отверстий");
+    await expect(panel.getByRole("heading", { level: 2 })).toHaveText("Калькулятор расстояний");
+    // No scheme and no diameter field: the «about» diagram and the tolerance panel carry them.
+    await expect(panel.getByTestId("holes-scheme")).toHaveCount(0);
+    await expect(panel.getByLabel("Диаметр отверстия, мм")).toHaveCount(0);
+
+    const select = panel.getByLabel("Толщина стекла, мм");
+    const results = panel.getByTestId("holes-results");
+    await expect(results).toHaveAttribute("aria-live", "polite");
+    await expect(select).toHaveValue("10");
+    await expect(results.locator("dt")).toHaveText([
+      "От кромки стекла",
+      "Между отверстиями",
+      "От угла стекла",
+      "Мин. диаметр",
+    ]);
+    // 2t, 2t, 6t and Ø ≥ t (ГОСТ 30698-2014).
+    await expect(results.locator("dd")).toHaveText(["20 мм", "20 мм", "60 мм", "Ø 10 мм"]);
+    await expect(panel).toContainText("t = 10 мм · 2t = 20 мм · 6t = 60 мм");
+
+    await select.selectOption("4");
+    await expect(results.locator("dd")).toHaveText(["8 мм", "8 мм", "24 мм", "Ø 4 мм"]);
+    await select.selectOption("19");
+    await expect(results.locator("dd")).toHaveText(["38 мм", "38 мм", "114 мм", "Ø 19 мм"]);
+    await expect(panel).toContainText("t = 19 мм · 2t = 38 мм · 6t = 114 мм");
+
+    if ((page.viewportSize()?.width ?? 0) <= 375) await noHorizontalScroll(page);
+  });
+
+  test("holes page: calc_holes goal is sent once for a burst of changes", async ({ page }) => {
+    await openCalculator(page, HOLES_PATH);
+    const select = page.locator("#kalkulyator").getByLabel("Толщина стекла, мм");
+    await select.selectOption("4");
+    await select.selectOption("19");
+    await expect
+      .poll(async () => (await goals(page)).filter((goal) => goal.name === "calc_holes"))
+      .toEqual([{ name: "calc_holes", params: { thickness: 4, source: "otverstiya-i-vyrezy" } }]);
+  });
+
+  test("holes page: diameter tolerances as a two-column panel table, no FAQ", async ({ page }) => {
+    await open(page, HOLES_PATH);
+    const panel = page
+      .getByTestId("processing-info")
+      .getByRole("group", { name: "Допуски диаметра" });
+    await expect(panel).toContainText(
+      "Втулка или прокладка крепежа должна садиться в отверстие и с минимальным, и с максимальным диаметром."
+    );
+    // The panel's own table (mockup): the same two columns on every width, no site table cards.
+    const rows = panel.locator("tbody tr");
+    await expect(rows).toHaveCount(3);
+    await expect(rows.first()).toBeVisible();
+    await expect(panel.locator(".ig-table, .ig-mcard")).toHaveCount(0);
+    await expect(panel.locator("thead th")).toHaveText(["Диаметр", "Допуск"]);
+    await expect(rows.first().locator("td")).toHaveCSS("text-align", "right");
+    for (const text of ["±1,0 мм", "±2,0 мм", "по согласованию"]) {
+      await expect(panel).toContainText(text);
+    }
+    // The mockup has no FAQ on this page.
+    await expect(
+      page.locator('script[type="application/ld+json"]', { hasText: "FAQPage" })
+    ).toHaveCount(0);
+  });
+
+  test("tolerances page: site-wide block — chips, scheme and keyboard", async ({ page }) => {
+    await openCalculator(page, TOLERANCES_PATH);
 
     const calc = page.getByTestId("holes-calculator");
     const results = page.getByTestId("holes-results");
@@ -290,8 +468,8 @@ test.describe("holes calculator", () => {
     }
   });
 
-  test("diameter tolerances and hints", async ({ page }) => {
-    await openCalculator(page, HOLES_PATH);
+  test("tolerances page: diameter tolerances and hints", async ({ page }) => {
+    await openCalculator(page, TOLERANCES_PATH);
     const input = page.getByLabel("Диаметр отверстия, мм");
     const message = page.getByTestId("holes-diameter-message");
 
@@ -312,42 +490,8 @@ test.describe("holes calculator", () => {
     await expect(message).toHaveText("");
   });
 
-  test("calc_holes goal is sent once for a burst of interactions", async ({ page }) => {
-    await openCalculator(page, HOLES_PATH);
-    const group = page.getByRole("radiogroup", { name: "Толщина стекла" });
-    await group.getByRole("radio", { name: "4 мм", exact: true }).click();
-    await group.getByRole("radio", { name: "19 мм" }).click();
-    await page.getByLabel("Диаметр отверстия, мм").fill("12");
-    await expect
-      .poll(async () => (await goals(page)).filter((goal) => goal.name === "calc_holes"))
-      .toEqual([{ name: "calc_holes", params: { thickness: 4, source: "otverstiya-i-vyrezy" } }]);
-  });
-
-  test("tolerance table, FAQ and FAQPage JSON-LD", async ({ page }) => {
-    await openCalculator(page, HOLES_PATH);
-    const tolerance = page
-      .locator("section")
-      .filter({ has: page.getByRole("heading", { name: "Допуски диаметра" }) });
-    const mobile = (page.viewportSize()?.width ?? 0) < 600;
-    await expect(
-      mobile ? tolerance.locator(".ig-mcard") : tolerance.locator("tbody tr")
-    ).toHaveCount(3);
-
-    const question = page.getByRole("button", {
-      name: "Можно ли просверлить закалённое стекло на объекте?",
-    });
-    await question.click();
-    await expect(page.getByText("Закалённое стекло при сверлении разрушается.")).toBeVisible();
-
-    const faqLd = (await page.locator('script[type="application/ld+json"]').allTextContents())
-      .map((text) => JSON.parse(text) as { "@type"?: string; mainEntity?: unknown[] })
-      .filter((data) => data["@type"] === "FAQPage");
-    expect(faqLd).toHaveLength(1);
-    expect(faqLd[0]!.mainEntity).toHaveLength(4);
-  });
-
   test("no critical accessibility violations", async ({ page }) => {
-    for (const path of ["/obrabotka-stekla/", HOLES_PATH]) {
+    for (const path of ["/obrabotka-stekla/", HOLES_PATH, FACET_PATH]) {
       await open(page, path);
       const results = await new AxeBuilder({ page }).analyze();
       const critical = results.violations.filter((violation) => violation.impact === "critical");

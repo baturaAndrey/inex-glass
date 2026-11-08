@@ -5,6 +5,7 @@ import { checkStopWords } from "@/lib/domain/stop-words";
 import {
   EMPTY_HEADER,
   HUB,
+  HUB_MOCKUP_COPY,
   HUB_PATH,
   LINKS,
   SERVICES,
@@ -14,9 +15,12 @@ import {
 } from "../content/processing";
 
 /**
- * Content checks of the «processing» slice (task 25): texts are verbatim from teksty, no stop
- * words, meta equal to `docs/inex/17-meta.md`, internal links lowercase with a trailing slash,
- * and the holes page carries the calculator, 4 FAQ and the 3-row tolerance table.
+ * Content checks of the «processing» slice (task 25 + service pages of the Paper mockups):
+ * services with `copy.source: "teksty"` are verbatim from teksty, mockup services list their
+ * «[уточнить]» statements (and the drafts doc carries them), no stop words, meta equal to
+ * `docs/inex/17-meta.md`, internal links lowercase with a trailing slash, every image and
+ * diagram ships with the seed, and the holes page carries the calculator, no FAQ and the 3-row
+ * tolerance panel.
  */
 
 const ROOT = process.cwd();
@@ -27,6 +31,8 @@ const TEKSTY_FILES = [
   "17-matirovanie-markirovka-listingi.md",
 ];
 const META_FILE = join(ROOT, "docs/inex/17-meta.md");
+const MEDIA_DIR = join(ROOT, "src/seed/media/processing");
+const DRAFTS_FILE = join(ROOT, "docs/inex/drafts/service-pages-paper-drafts.md");
 const hasSources = TEKSTY_FILES.every((file) => existsSync(join(TEKSTY_DIR, file)));
 const hasMeta = existsSync(META_FILE);
 
@@ -36,13 +42,14 @@ const hasMeta = existsSync(META_FILE);
 
 /**
  * Markdown → comparable plain text: `[label](url)` → `[label]` (teksty write links as
- * `[Название]`), no `**`/`##`/list markers, collapsed whitespace.
+ * `[Название]`), no `**`/`##`/`>`/list markers, collapsed whitespace.
  */
 function normalize(text: string): string {
   return text
     .replace(/\[([^\]]+)\]\([^)]*\)/g, "[$1]")
     .replace(/\*\*/g, "")
     .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^>\s+/gm, "")
     .replace(/^\s*(?:[-*]|\d+\.)\s+/gm, "")
     .replace(/\s+/g, " ")
     .trim();
@@ -71,7 +78,11 @@ function tableUnits(table: TableSeed): string[] {
 function layoutUnits(block: LayoutSeed): string[] {
   switch (block.blockType) {
     case "richText":
-      return [...(block.heading ? [block.heading] : []), ...mdUnits(block.md)];
+      return [
+        ...(block.heading ? [block.heading] : []),
+        ...mdUnits(block.md),
+        ...(block.figure?.caption ? [block.figure.caption] : []),
+      ];
     case "table":
       return [...(block.heading ? [block.heading] : []), ...tableUnits(block.table)];
     case "callout":
@@ -83,6 +94,17 @@ function layoutUnits(block: LayoutSeed): string[] {
       ];
     case "holesCalculator":
       return [block.heading, block.sub, block.note].filter((v): v is string => Boolean(v));
+    case "cards":
+      return [
+        block.heading,
+        ...(block.sub ? [block.sub] : []),
+        ...block.items.flatMap((item) => [item.title, ...(item.text ? [item.text] : [])]),
+      ];
+    case "twoColumns":
+      return [block.left, ...(block.right ? [block.right] : [])].flatMap((column) => [
+        column.heading,
+        ...mdUnits(column.md),
+      ]);
   }
 }
 
@@ -91,7 +113,11 @@ function serviceUnits(service: ServiceSeed): string[] {
   return [
     service.keyLimit,
     ...mdUnits(service.introMd).map((line) => line.replace(/\s*\{условия\}$/, "")),
-    ...service.tables.flatMap(tableUnits),
+    ...(service.specs ?? []).flatMap((spec) => [
+      spec.label,
+      spec.value,
+      ...(spec.text ? [spec.text] : []),
+    ]),
     ...service.layout.flatMap(layoutUnits),
     ...(service.howToSpecifyMd ? mdUnits(service.howToSpecifyMd) : []),
     ...(service.callouts ?? []).flatMap((callout) => [callout.title, ...mdUnits(callout.md)]),
@@ -104,9 +130,22 @@ const hubUnits = (): string[] => [
   HUB.lead,
   HUB.primaryLabel,
   HUB.secondaryLabel,
-  ...HUB.layout.flatMap(layoutUnits),
-  ...SERVICES.flatMap((service) => [service.cardTitle, service.keyLimit]),
+  // Card texts of mockup services are checked with the service (`copy.source: "paper"`).
+  ...SERVICES.filter((service) => service.copy.source === "teksty").flatMap((service) => [
+    service.cardTitle,
+    service.keyLimit,
+  ]),
 ];
+
+/**
+ * The hub panels restructure teksty/07 §1 by the Paper mockup: list items and sub-headings are
+ * teksty phrases with a capital letter / a colon, the lead is the mockup wording.
+ */
+const hubPanelUnits = (): string[] =>
+  HUB.layout.flatMap(layoutUnits).filter((unit) => !HUB_MOCKUP_COPY.includes(unit));
+
+/** Case-insensitive comparable form without trailing «:» / «!». */
+const loose = (text: string) => normalize(text).replace(/[:!]$/, "").toLowerCase();
 
 /** Every string of the slice, raw (stop words, links). */
 function allStrings(): string[] {
@@ -130,13 +169,20 @@ describe.skipIf(!hasSources)("processing content is verbatim from teksty", () =>
     ? normalize(TEKSTY_FILES.map((file) => readFileSync(join(TEKSTY_DIR, file), "utf8")).join("\n"))
     : "";
 
-  it.each(SERVICES.map((service) => [service.slug, service] as const))("%s", (_, service) => {
+  const verbatim = SERVICES.filter((service) => service.copy.source === "teksty");
+  it.each(verbatim.map((service) => [service.slug, service] as const))("%s", (_, service) => {
     const missing = serviceUnits(service).filter((unit) => !teksty.includes(normalize(unit)));
     expect(missing).toEqual([]);
   });
 
   it("hub", () => {
     const missing = hubUnits().filter((unit) => !teksty.includes(normalize(unit)));
+    expect(missing).toEqual([]);
+  });
+
+  it("hub panels: teksty phrases (mockup wording listed in HUB_MOCKUP_COPY)", () => {
+    const lower = teksty.toLowerCase();
+    const missing = hubPanelUnits().filter((unit) => !lower.includes(loose(unit)));
     expect(missing).toEqual([]);
   });
 });
@@ -161,12 +207,50 @@ describe("processing content rules", () => {
     }
   });
 
-  it("facet is described for mirrors only", () => {
+  it("facet: glass and mirrors 5–40 mm, never on tempered glass", () => {
     const facet = SERVICES.find((service) => service.slug === "facet")!;
     expect(facet.quizType).toBe("mirrors");
+    expect(facet.keyLimit).toBe("На зеркалах и стекле, ширина 5–40 мм");
     const text = JSON.stringify(facet);
     expect(text).toContain("На закалённом стекле фацет не делаем.");
-    expect(text).not.toMatch(/до 30 мм/);
+    expect(text).not.toMatch(/30 (?:и|или) 50 мм|до 30 мм/);
+  });
+
+  it("every service, figure and the hub hero have an image with a Russian alt", () => {
+    const figures = SERVICES.flatMap((service) =>
+      service.layout.flatMap((block) =>
+        block.blockType === "richText" && block.figure ? [block.figure.image] : []
+      )
+    );
+    const images = [HUB.heroImage, ...SERVICES.map((service) => service.image), ...figures];
+    for (const image of images) {
+      expect(image.alt).toMatch(/[А-Яа-яЁё]/);
+      expect(existsSync(join(MEDIA_DIR, image.file)), image.file).toBe(true);
+    }
+  });
+
+  it("mockup services: every «[уточнить]» statement is in the copy and in the drafts doc", () => {
+    const drafts = existsSync(DRAFTS_FILE) ? normalize(readFileSync(DRAFTS_FILE, "utf8")) : null;
+    for (const service of SERVICES) {
+      if (service.copy.source !== "paper") continue;
+      const units = normalize(serviceUnits(service).join(" "));
+      for (const statement of service.copy.pendingApproval) {
+        expect(units, `${service.slug}: ${statement}`).toContain(normalize(statement));
+        expect(statement).not.toMatch(/уточнить/i);
+        if (drafts !== null) {
+          expect(drafts, `drafts doc: ${statement}`).toContain(normalize(statement));
+        }
+      }
+      expect(JSON.stringify(service)).not.toMatch(/\[уточнить\]/i);
+    }
+  });
+
+  it("«Другая обработка»: three other services, no duplicates", () => {
+    for (const service of SERVICES) {
+      if (!service.related) continue;
+      expect(new Set(service.related).size, service.slug).toBe(3);
+      expect(service.related, service.slug).not.toContain(service.slug);
+    }
   });
 
   it("services come in the hub order 1…6", () => {
@@ -180,16 +264,26 @@ describe("processing content rules", () => {
     ]);
   });
 
-  it("otverstiya-i-vyrezy: calculator #kalkulyator, 4 FAQ, tolerance table of 3 rows", () => {
+  it("otverstiya-i-vyrezy: calculator #kalkulyator, no FAQ, tolerance panel of 3 rows", () => {
     const holes = SERVICES.find((service) => service.slug === "otverstiya-i-vyrezy")!;
     const calculator = holes.layout.find((block) => block.blockType === "holesCalculator");
     expect(calculator).toMatchObject({ anchorId: "kalkulyator", defaultThickness: "10" });
     expect(holes.hasHoleCalculator).toBe(true);
-    expect(holes.faq).toHaveLength(4);
-    const tolerances = holes.layout.find(
-      (block) => block.blockType === "table" && block.heading === "Допуски диаметра"
-    );
-    expect(tolerances?.blockType === "table" ? tolerances.table.rows : []).toHaveLength(3);
+    // The approved mockup has no FAQ on this page.
+    expect(holes.faq ?? []).toEqual([]);
+    // The tolerances are a markdown table inside the «Допуски диаметра» how-to-order panel.
+    const panel = holes.layout
+      .flatMap((block) =>
+        block.blockType === "twoColumns" ? [block.left, ...(block.right ? [block.right] : [])] : []
+      )
+      .find((column) => column.heading === "Допуски диаметра");
+    expect(panel, "twoColumns panel «Допуски диаметра»").toBeDefined();
+    const rows = panel!.md
+      .split("\n")
+      .filter((line) => line.startsWith("|"))
+      .slice(2)
+      .map((line) => line.split("|")[1]!.trim());
+    expect(rows).toEqual(["4–20 мм", "20–100 мм", "свыше 100 мм"]);
   });
 });
 

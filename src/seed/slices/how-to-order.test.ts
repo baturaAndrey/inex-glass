@@ -3,6 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { checkStopWords } from "@/lib/domain";
 import { splitStepText } from "@/lib/service/page-compose";
+import { EDGE_TERMINOLOGY_APPROVED_STRINGS } from "../content/edge-terminology";
 import {
   HOW_TO_ORDER_PAGES,
   PAYMENT_TERMS_COLUMNS,
@@ -98,6 +99,10 @@ const bodyStrings = (page: ServicePageSeed) => [
   ...page.layout.flatMap(blockStrings),
 ];
 
+/** Client-approved edge terminology of 2026-11-08: exempt from the verbatim teksty check only. */
+const EDGE_APPROVED: readonly string[] = EDGE_TERMINOLOGY_APPROVED_STRINGS["how-to-order"];
+const edgeApproved = new Set(EDGE_APPROVED);
+
 const allText = HOW_TO_ORDER_PAGES.flatMap((page) => [
   ...Object.values(page.seo),
   ...bodyStrings(page),
@@ -116,6 +121,7 @@ describe("how-to-order content", () => {
       for (const page of HOW_TO_ORDER_PAGES) {
         const source = sources[page.source] ?? "";
         const missing = bodyStrings(page)
+          .filter((text) => !edgeApproved.has(text))
           .map(normalize)
           .filter((text) => text !== "" && !source.includes(text));
         expect(missing, `${page.path} (${page.source})`).toEqual([]);
@@ -129,6 +135,11 @@ describe("how-to-order content", () => {
         expect(meta, `${page.path} seo.${field}`).toContain(normalize(value));
       }
     }
+  });
+
+  it("keeps the client-approved edge strings in the content", () => {
+    const content = new Set(HOW_TO_ORDER_PAGES.flatMap(bodyStrings));
+    expect(EDGE_APPROVED.filter((text) => !content.has(text))).toEqual([]);
   });
 
   it("contains no stop-words", () => {

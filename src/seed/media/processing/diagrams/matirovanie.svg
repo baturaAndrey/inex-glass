@@ -1,0 +1,36 @@
+<svg width="880" height="300" viewBox="0 0 880 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="matirovanie-title matirovanie-desc" font-family="Rubik, system-ui, sans-serif">
+  <!--
+    Source of the matting diagram (Paper mockup 2560_service_matirovanie, frame «diagram» → SVG
+    «swatches»). The site shows the raster `matirovanie.webp` next to this file (export 2x from
+    Paper, Rubik baked in): the media collection does not accept SVG uploads (stored XSS). After
+    editing this file, re-export the WebP under a NEW file name (seed media are keyed by file
+    name) and update the service seed.
+    Colours = tokens: #2B8C7E primary, #CFE3DF line-teal (matte zone), #DCEBE8 teal-wash
+    (glare on clear glass), #16403D primary-dark, #FFFFFF surface (clear glass).
+  -->
+  <title id="matirovanie-title">Варианты матирования</title>
+  <desc id="matirovanie-desc">Четыре образца стекла: сплошное матирование по всей площади; полоса приватности — матовая полоса поперёк прозрачного стекла; логотип и надпись — матовый круг и строки текста на прозрачном стекле; рисунок, орнамент — матовые ромбы и волна внизу прозрачного стекла.</desc>
+  <!-- сплошное -->
+  <rect x="1" y="1" width="188" height="238" rx="8" fill="#CFE3DF" stroke="#2B8C7E" stroke-width="2" />
+  <!-- полоса приватности -->
+  <rect x="231" y="1" width="188" height="238" rx="8" fill="#FFFFFF" stroke="#2B8C7E" stroke-width="2" />
+  <rect x="232" y="90" width="186" height="60" fill="#CFE3DF" />
+  <line x1="250" y1="60" x2="290" y2="20" stroke="#DCEBE8" stroke-width="6" />
+  <line x1="350" y1="220" x2="400" y2="170" stroke="#DCEBE8" stroke-width="6" />
+  <!-- логотип, надпись -->
+  <rect x="461" y="1" width="188" height="238" rx="8" fill="#FFFFFF" stroke="#2B8C7E" stroke-width="2" />
+  <circle cx="555" cy="100" r="38" fill="#CFE3DF" />
+  <rect x="515" y="156" width="80" height="12" rx="3" fill="#CFE3DF" />
+  <rect x="527" y="176" width="56" height="8" rx="3" fill="#CFE3DF" />
+  <line x1="480" y1="60" x2="520" y2="20" stroke="#DCEBE8" stroke-width="6" />
+  <!-- рисунок, орнамент -->
+  <rect x="691" y="1" width="188" height="238" rx="8" fill="#FFFFFF" stroke="#2B8C7E" stroke-width="2" />
+  <path d="M 692 200 C 730 160, 760 230, 800 190 S 850 170, 878 200 L 878 238 L 692 238 Z" fill="#CFE3DF" />
+  <path d="M 785 40 L 815 70 L 785 100 L 755 70 Z" fill="#CFE3DF" />
+  <path d="M 730 110 L 750 130 L 730 150 L 710 130 Z" fill="#CFE3DF" />
+  <path d="M 840 110 L 860 130 L 840 150 L 820 130 Z" fill="#CFE3DF" />
+  <text x="95" y="276" text-anchor="middle" font-size="16" font-weight="500" fill="#16403D">сплошное</text>
+  <text x="325" y="276" text-anchor="middle" font-size="16" font-weight="500" fill="#16403D">полоса приватности</text>
+  <text x="555" y="276" text-anchor="middle" font-size="16" font-weight="500" fill="#16403D">логотип, надпись</text>
+  <text x="785" y="276" text-anchor="middle" font-size="16" font-weight="500" fill="#16403D">рисунок, орнамент</text>
+</svg>

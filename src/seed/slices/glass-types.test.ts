@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { checkStopWords } from "@/lib/domain";
+import { EDGE_TERMINOLOGY_APPROVED_STRINGS } from "../content/edge-terminology";
 import {
   GLASS_TYPES_CONTENT,
   GLASS_TYPE_SLUGS,
@@ -89,11 +90,23 @@ function copyFragments(doc: GlassTypeContent): string[] {
     add(item.question);
     add(item.answer);
   }
-  return out
+  return toCopyLines(out);
+}
+
+/** Texts → comparable lines: split by line, list marker dropped, normalized, empty dropped. */
+function toCopyLines(texts: readonly string[]): string[] {
+  return texts
     .flatMap((text) => text.split("\n"))
     .map((line) => normalize(line.replace(/^\s*-\s+/, "")))
     .filter((line) => line !== "");
 }
+
+/**
+ * Client-approved edge terminology of 2026-11-08 (`EDGE_TERMINOLOGY_APPROVED_STRINGS`), as
+ * copy lines: exempt from the verbatim teksty check only.
+ */
+const EDGE_APPROVED_LINES = toCopyLines(EDGE_TERMINOLOGY_APPROVED_STRINGS["glass-types"]);
+const edgeApproved = new Set(EDGE_APPROVED_LINES);
 
 /** Every string of a document (stop-word check). */
 function allText(doc: GlassTypeContent): string {
@@ -169,10 +182,15 @@ describe("glass-types content", () => {
   it.skipIf(!HAS_TEKSTY)("copies every line of copy from its teksty section", () => {
     for (const doc of GLASS_TYPES_CONTENT) {
       const section = normalize(tekstySection(doc));
-      for (const fragment of copyFragments(doc)) {
+      for (const fragment of copyFragments(doc).filter((line) => !edgeApproved.has(line))) {
         expect(section, `${doc.slug}: «${fragment}»`).toContain(fragment);
       }
     }
+  });
+
+  it("keeps the client-approved edge strings in the content", () => {
+    const content = new Set(GLASS_TYPES_CONTENT.flatMap(copyFragments));
+    expect(EDGE_APPROVED_LINES.filter((line) => !content.has(line))).toEqual([]);
   });
 
   it.skipIf(!HAS_TEKSTY)("takes hub card texts from teksty/02", () => {

@@ -1,0 +1,26 @@
+<svg width="880" height="300" viewBox="0 0 880 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="facet-title facet-desc" font-family="Rubik, system-ui, sans-serif">
+  <!--
+    Source of the facet diagram (Paper mockup 2560_service_facet, frame «diagram»). The site shows
+    the raster `facet.webp` next to this file (export 2x from Paper, Rubik baked in): the media
+    collection does not accept SVG uploads (stored XSS). After editing this file, re-export the
+    WebP under a NEW file name (seed media are keyed by file name) and update the service seed.
+    Colours = tokens: #16403D primary-dark, #1F6B60 primary-pressed, #2B8C7E primary,
+    #DCEBE8 teal-wash, #9AA1A8 text-muted, #5B636B text-2.
+  -->
+  <title id="facet-title">Сечение края с фацетом</title>
+  <desc id="facet-desc">Край стекла или зеркала стачивают под углом 3–45° на ширину 5–40 мм; у кромки остаётся узкая полированная грань. Стекло или зеркало толщиной от 4 мм, у зеркала снизу амальгама.</desc>
+  <line x1="60" y1="70" x2="300" y2="70" stroke="#1F6B60" stroke-width="2" />
+  <line x1="60" y1="58" x2="60" y2="82" stroke="#1F6B60" stroke-width="2" />
+  <line x1="300" y1="58" x2="300" y2="82" stroke="#1F6B60" stroke-width="2" />
+  <text x="180" y="52" text-anchor="middle" font-size="18" font-weight="600" fill="#16403D">ширина фацета 5–40 мм</text>
+  <polygon points="300,130 840,130 840,210 60,210 60,180" fill="#DCEBE8" stroke="#2B8C7E" stroke-width="2" />
+  <line x1="60" y1="216" x2="840" y2="216" stroke="#9AA1A8" stroke-width="8" />
+  <line x1="300" y1="130" x2="60" y2="180" stroke="#16403D" stroke-width="4" />
+  <line x1="60" y1="180" x2="60" y2="210" stroke="#16403D" stroke-width="6" />
+  <path d="M 200 151 A 100 100 0 0 1 204 130" fill="none" stroke="#1F6B60" stroke-width="2" />
+  <text x="214" y="122" font-size="16" fill="#5B636B">угол скоса 3–45°</text>
+  <line x1="60" y1="195" x2="30" y2="260" stroke="#5B636B" stroke-width="1.5" />
+  <text x="30" y="282" font-size="16" fill="#5B636B">полированная грань</text>
+  <text x="560" y="178" text-anchor="middle" font-size="16" fill="#1F6B60">стекло или зеркало, от 4 мм</text>
+  <text x="840" y="248" text-anchor="end" font-size="16" fill="#5B636B">амальгама (у зеркала)</text>
+</svg>

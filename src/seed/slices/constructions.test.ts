@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { checkStopWords } from "@/lib/domain";
 import { sanitizeSvg } from "@/lib/svg-sanitize";
 import { CONSTRUCTIONS, type ConstructionSeed } from "../content/constructions";
+import { EDGE_TERMINOLOGY_APPROVED_STRINGS } from "../content/edge-terminology";
 
 /**
  * Content checks of the constructions slice (task 26): verbatim copy, stop words, links, SVG.
@@ -66,11 +67,23 @@ function fragments(doc: ConstructionSeed): string[] {
       texts.push(block.heading, ...block.items.flatMap((item) => [item.title, item.text]));
     }
   }
+  return toFragments(texts);
+}
+
+/** Texts → comparable fragments: one per line, plain text, empty lines dropped. */
+function toFragments(texts: readonly string[]): string[] {
   return texts
     .flatMap((text) => text.split("\n"))
     .map(plain)
     .filter((text) => text !== "");
 }
+
+/**
+ * Client-approved edge terminology of 2026-11-08 (`EDGE_TERMINOLOGY_APPROVED_STRINGS`), as
+ * fragments: exempt from the verbatim teksty check only.
+ */
+const EDGE_APPROVED_FRAGMENTS = toFragments(EDGE_TERMINOLOGY_APPROVED_STRINGS.constructions);
+const edgeApproved = new Set(EDGE_APPROVED_FRAGMENTS);
 
 /** Every internal / external href of a document. */
 function links(doc: ConstructionSeed): string[] {
@@ -104,10 +117,15 @@ describe("constructions seed content", () => {
       const file = SOURCES[doc.slug];
       expect(file, doc.slug).toBeDefined();
       const source = plain(readFileSync(path.join(TEKSTY_DIR, file as string), "utf8"));
-      for (const fragment of fragments(doc)) {
+      for (const fragment of fragments(doc).filter((text) => !edgeApproved.has(text))) {
         expect(source.includes(fragment), `${doc.slug}: «${fragment}»`).toBe(true);
       }
     }
+  });
+
+  it("keeps the client-approved edge strings in the content", () => {
+    const content = new Set(CONSTRUCTIONS.flatMap(fragments));
+    expect(EDGE_APPROVED_FRAGMENTS.filter((text) => !content.has(text))).toEqual([]);
   });
 
   it("has no stop words («под ключ» only in the inex.su bridge)", () => {

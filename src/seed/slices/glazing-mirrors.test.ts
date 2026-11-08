@@ -7,6 +7,7 @@ import { GLAZING_MIRRORS_ROUTES, findGlazingMirrorsRoute } from "@/lib/cms/glazi
 import { checkStopWords } from "@/lib/domain";
 import { ANCHOR_PATTERN } from "@/payload/blocks/_section";
 import { LINKABLE_COLLECTIONS } from "@/payload/fields/link";
+import { EDGE_TERMINOLOGY_APPROVED_STRINGS } from "../content/edge-terminology";
 import { GLAZING_MIRRORS_CONTENT } from "../content/glazing-mirrors";
 import { getEditorConfig, markdownToLexical } from "../lexical";
 import { buildConstructionData, seed } from "./glazing-mirrors";
@@ -103,12 +104,23 @@ function tekstyStrings(page: GlazingMirrorsPageContent): string[] {
     page.inexSuBridge?.buttonLabel,
     ...page.layout.flatMap(blockStrings),
   ];
+  return toPlainLines(strings.filter((value): value is string => typeof value === "string"));
+}
+
+/** Content strings → comparable lines: split by line, plain text, empty lines dropped. */
+function toPlainLines(strings: readonly string[]): string[] {
   return strings
-    .filter((value): value is string => typeof value === "string")
     .flatMap((value) => value.split("\n"))
     .map(plainContent)
     .filter(Boolean);
 }
+
+/**
+ * Client-approved edge terminology of 2026-11-08 (`EDGE_TERMINOLOGY_APPROVED_STRINGS`), as
+ * plain lines: exempt from the verbatim teksty check only.
+ */
+const EDGE_APPROVED_LINES = toPlainLines(EDGE_TERMINOLOGY_APPROVED_STRINGS["glazing-mirrors"]);
+const edgeApproved = new Set(EDGE_APPROVED_LINES);
 
 function blockStrings(block: LayoutContent): Array<string | undefined> {
   switch (block.type) {
@@ -177,7 +189,9 @@ describe.skipIf(!HAS_SOURCES)("glazing-mirrors content matches teksty and 17-met
       const section = tekstySection(page.source.file, page.source.section);
       expect(section).toContain(`**URL:** ${page.path}`);
       const haystack = plainTeksty(section);
-      const missing = tekstyStrings(page).filter((text) => !haystack.includes(text));
+      const missing = tekstyStrings(page)
+        .filter((text) => !edgeApproved.has(text))
+        .filter((text) => !haystack.includes(text));
       expect(missing).toEqual([]);
     });
 
@@ -210,6 +224,11 @@ describe("glazing-mirrors content rules", () => {
       checkStopWords(allText(page)).map((finding) => `${page.path}: ${finding.match}`)
     );
     expect(findings).toEqual([]);
+  });
+
+  it("keeps the client-approved edge strings in the content", () => {
+    const content = new Set(GLAZING_MIRRORS_CONTENT.flatMap(tekstyStrings));
+    expect(EDGE_APPROVED_LINES.filter((text) => !content.has(text))).toEqual([]);
   });
 
   it("keeps the mirror facet widths exactly «30 или 50 мм»", () => {

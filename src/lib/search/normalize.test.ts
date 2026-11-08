@@ -19,6 +19,10 @@ describe("normalizeRu", () => {
     expect(normalizeRu("пере­городка​")).toBe("перегородка");
   });
 
+  it("folds the hyphen and the non-breaking hyphen into «-»", () => {
+    expect(normalizeRu("УФ\u2011печать и УФ\u2010печать")).toBe("уф-печать и уф-печать");
+  });
+
   it("strips HTML tags and entities", () => {
     expect(normalizeRu("<p>Стекло&nbsp;<b>10</b>&#171;мм&raquo;</p>")).toBe("стекло 10 мм");
   });

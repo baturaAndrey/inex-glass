@@ -1,41 +1,60 @@
 import { FileText } from "lucide-react";
+import { CtaButtons } from "@/components/blocks/cta-buttons";
 import { RenderBlocks } from "@/components/blocks/render-blocks";
-import { BlockImage, asMedia } from "@/components/blocks/shared";
-import type { BlockPageContext, LayoutBlock } from "@/components/blocks/types";
+import { asMedia, fill, hasText, mediaSrc } from "@/components/blocks/shared";
+import type { BlockOf, BlockPageContext, LayoutBlock } from "@/components/blocks/types";
 import type { FormKey } from "@/components/forms/form-dialog-provider";
 import { FormTrigger } from "@/components/forms/form-trigger";
-import { Breadcrumbs } from "@/components/ig/breadcrumbs";
 import { Button } from "@/components/ig/button";
 import { Container } from "@/components/ig/container";
-import { PageHero } from "@/components/ig/page-hero";
 import { Placeholder } from "@/components/ig/placeholder";
-import { Section } from "@/components/ig/section";
 import { NOT_FOUND_METADATA, NotFoundResponse } from "@/components/page/not-found-response";
 import { pageBlockContext } from "@/components/page/page-context";
 import { PageShell } from "@/components/page/page-shell";
-import { DRAWING_CTA_LABEL, QUIZ_CTA_LABEL, QuizLink, fillLabel } from "@/components/page/quiz-cta";
-import { OperationsTable } from "@/components/processing/operations-table";
-import { RichText } from "@/components/rich-text/rich-text";
-import { getPlaceholderContext } from "@/lib/cms/globals";
+import {
+  DRAWING_CTA_LABEL,
+  QUIZ_CTA_LABEL,
+  QuizCta,
+  QuizLink,
+  fillLabel,
+} from "@/components/page/quiz-cta";
+import { InfoPanels, type InfoPanel } from "@/components/processing/info-panels";
+import { ProcessingHero } from "@/components/processing/processing-hero";
+import { ServiceCallouts, type ServiceCallout } from "@/components/processing/service-callouts";
+import {
+  RelatedServices,
+  ServiceCards,
+  type ServiceCardDoc,
+} from "@/components/processing/service-cards";
+import { ServiceLayout } from "@/components/processing/service-layout";
+import { SpecTiles, specTilesFrom } from "@/components/processing/spec-tiles";
+import { RichText, type RichTextData } from "@/components/rich-text/rich-text";
+import { getConditions, getPlaceholderContext } from "@/lib/cms/globals";
 import { getDocBySlug, getPageByPath, listPublished, redirectIfExists } from "@/lib/cms/queries";
 import type { PlaceholderContext } from "@/lib/domain";
 import { buildBreadcrumbs } from "@/lib/seo/breadcrumbs";
 import { buildMetadata, resolveH1, resolveSeoText } from "@/lib/seo/metadata";
 import { pickOgImage } from "@/lib/seo/og-image";
-import { cn } from "@/lib/utils";
+import { lexicalToPlainText } from "@/payload/utils/lexical-text";
 import type { Media, ProcessingService } from "@/payload-types";
 import type { Metadata } from "next";
 
 /**
- * Section «Обработка стекла» (task 25): the hub `/obrabotka-stekla/` (a `pages` document with
- * the operations table from the `processing-services` collection) and the service template
- * `/obrabotka-stekla/<slug>/` (`Holes.dc.html`, `Constr.dc.html`).
+ * Section «Обработка стекла» (task 25, restyled to the Paper mockup `2560_obrabotka-stekla`):
+ * the hub `/obrabotka-stekla/` (a `pages` document plus photo cards from the
+ * `processing-services` collection) and the service template `/obrabotka-stekla/<slug>/`.
  *
- * Service page order: hero (crumbs inside, H1, intro, buttons) → photo → `tables[]` →
- * `layout` → «Как указать в чертеже» → «Что важно знать до заказа» → callouts → related links →
- * FAQ (+ FAQPage JSON-LD) → final buttons → conditions (`PageShell`). Everything between the
- * hero and the final buttons is rendered by ONE `RenderBlocks` pass over blocks composed from the
- * document fields: one FAQPage per page, unique heading ids and the `bg` ↔ `sf` rhythm.
+ * Hub: crumbs → hero (first `hero` block: photo background, H1, lead, terms checklist, buttons)
+ * → service cards → other blocks → the `twoColumns` blocks as the cream info block that closes
+ * the page (the document hides the conditions section and the quiz CTA, so it meets the footer).
+ *
+ * Service page (Paper mockups `2560_service_*`; field → section mapping in
+ * `src/seed/content/processing/README.md`): crumbs → hero (`heroImage`, intro, terms, buttons)
+ * → specs (`tables[]` as tiles) → `layout` (about, calculator, use-cases, other blocks; see
+ * `ServiceLayout`) → plaques (`callouts[]`) → «Что важно знать до заказа» → FAQ (+ FAQPage
+ * JSON-LD) → «Другая обработка» (3 services) → how-to-order (`howToSpecify` + `twoColumns` as
+ * the cream panels, meeting the footer). No conditions section and no final buttons: the hero
+ * carries both.
  *
  * Static + ISR: no request APIs. 404 through `redirectIfExists` + `<NotFoundResponse />`.
  */
@@ -56,22 +75,21 @@ const BREADCRUMB_LABELS: Readonly<Record<string, string>> = {
 };
 
 /**
- * Photo placeholders (`.ig-ph`) for the «[Фото: …]» notes of teksty until real photos arrive
- * (task 38 uploads them into `heroImage`).
+ * Photo placeholders (`.ig-ph`) for the «[Фото: …]» notes of teksty, shown under the hero while
+ * a service has no `heroImage`.
  */
 const PHOTO_PLACEHOLDERS: Readonly<Record<string, string>> = {
-  facet: "зеркало с фацетом крупным планом; схема сечения — фацет и обычная кромка",
   matirovanie: "перегородка с полосой приватности; логотип на стеклянной двери",
 };
-
-/** Pages whose teksty list the form button before «Рассчитать стоимость» at the end. */
-const SECONDARY_FIRST_SLUGS: ReadonlySet<string> = new Set(["otverstiya-i-vyrezy", "matirovanie"]);
 
 const HOW_TO_SPECIFY_HEADING = "Как указать в чертеже";
 const IMPORTANT_HEADING = "Что важно знать до заказа";
 const FAQ_HEADING = "Частые вопросы";
 const CALCULATOR_HEADING = "Калькулятор расстояний";
 const CALCULATOR_ANCHOR = "kalkulyator";
+
+/** Copy that must not be invented: an empty H1 is visibly marked for the editor. */
+const MISSING_TEXT = "[…]";
 
 type ServiceDoc = ProcessingService;
 
@@ -92,6 +110,27 @@ function ogImageOf(seo: { ogImage?: string | Media | null } | null | undefined) 
   return pickOgImage([seo?.ogImage]);
 }
 
+/** Hero photo: the original upload (the hero spans up to 1920 px; `next/image` resizes it). */
+function heroMedia(value: unknown, alt?: string | null): { src: string; alt: string } | null {
+  const media = asMedia(value);
+  const src = media ? mediaSrc(media) : null;
+  if (!media || !src) return null;
+  return { src, alt: alt?.trim() || media.alt || "" };
+}
+
+/** Terms checklist of the hero: the `conditions` terms bar (full or short), placeholders filled. */
+async function heroTerms(
+  mode: "full" | "short" | null | undefined,
+  ctx: PlaceholderContext
+): Promise<string[]> {
+  const conditions = await getConditions();
+  const items =
+    mode === "short" && conditions?.termsBarShort?.length
+      ? conditions.termsBarShort
+      : (conditions?.termsBar ?? []);
+  return items.map((item) => fill(item.text, ctx)).filter(Boolean);
+}
+
 // ---------------------------------------------------------------------------------------------
 // Section rhythm
 // ---------------------------------------------------------------------------------------------
@@ -100,7 +139,7 @@ const other = (variant: "bg" | "sf"): "bg" | "sf" => (variant === "bg" ? "sf" : 
 
 /**
  * Explicit `bg` ↔ `sf` backgrounds starting with `first` for blocks left on «auto»: the blocks
- * follow content rendered outside `RenderBlocks` (hero, tables, photo), so its index-based
+ * follow content rendered outside `RenderBlocks` (hero, cards, panels), so its index-based
  * rhythm would be off by that content. The hero (no section) and editor choices stay as they are.
  */
 function withRhythm(blocks: readonly LayoutBlock[], first: "bg" | "sf"): LayoutBlock[] {
@@ -115,39 +154,12 @@ function withRhythm(blocks: readonly LayoutBlock[], first: "bg" | "sf"): LayoutB
   });
 }
 
-/** Background after `count` alternating sections that started with `first`. */
-const variantAfter = (first: "bg" | "sf", count: number): "bg" | "sf" =>
-  count % 2 === 0 ? first : other(first);
-
 // ---------------------------------------------------------------------------------------------
-// Service page: composed blocks
+// Service page: composed blocks and panels
 // ---------------------------------------------------------------------------------------------
-
-/** Lexical state that starts with a heading (the teksty heading replaces the template one). */
-function startsWithHeading(state: ServiceDoc["howToSpecify"]): boolean {
-  const first = state?.root?.children?.[0] as { type?: unknown } | undefined;
-  return first?.type === "heading";
-}
 
 function hasContent(state: { root?: { children?: unknown[] } } | null | undefined): boolean {
   return (state?.root?.children?.length ?? 0) > 0;
-}
-
-/** `tables[]` of the document as `table` blocks (lead → section sub). */
-function tableBlocks(doc: ServiceDoc): LayoutBlock[] {
-  return (doc.tables ?? []).map((table, index) => ({
-    blockType: "table" as const,
-    id: `processing-table-${table.id ?? index}`,
-    heading: table.heading ?? null,
-    sub: table.lead ?? null,
-    table: {
-      role: table.role ?? null,
-      mobileMode: table.mobileMode ?? null,
-      columns: table.columns ?? [],
-      rows: table.rows ?? [],
-      footnote: table.footnote ?? null,
-    },
-  }));
 }
 
 /**
@@ -169,17 +181,88 @@ function layoutBlocks(doc: ServiceDoc): LayoutBlock[] {
   ];
 }
 
+/**
+ * «Как указать в чертеже» as a panel. A teksty heading leading the rich text («Как указать
+ * отверстие в чертеже») becomes the panel heading instead of the template one.
+ */
+function howToSpecifyPanel(doc: ServiceDoc, ctx: PlaceholderContext): InfoPanel | null {
+  const state = doc.howToSpecify;
+  if (!state || !hasContent(state)) return null;
+  const [first, ...rest] = state.root.children as Array<{ type?: unknown }>;
+  const leadsWithHeading = first?.type === "heading";
+  const heading = leadsWithHeading
+    ? fill(lexicalToPlainText({ root: { ...state.root, children: [first] } }), ctx)
+    : HOW_TO_SPECIFY_HEADING;
+  const body: RichTextData = leadsWithHeading
+    ? { ...state, root: { ...state.root, children: rest } }
+    : state;
+  return {
+    key: "how-to-specify",
+    heading,
+    headingId: "processing-how-to-specify-title",
+    body,
+    lead: true,
+  };
+}
+
+/**
+ * «how-to-order» panels of a service page: «Как указать в чертеже» (`howToSpecify`), then the
+ * columns of the `twoColumns` blocks of the layout (2 or 3 panels in the mockups).
+ */
+function servicePanels(doc: ServiceDoc, ctx: PlaceholderContext): InfoPanel[] {
+  const howTo = howToSpecifyPanel(doc, ctx);
+  const layout = (doc.layout ?? []) as LayoutBlock[];
+  return [...(howTo ? [howTo] : []), ...columnPanels(layout.filter(isTwoColumns), ctx)];
+}
+
+/** Plaques of a service page (`callouts[]`). */
+function serviceCallouts(doc: ServiceDoc, ctx: PlaceholderContext): ServiceCallout[] {
+  return (doc.callouts ?? []).flatMap((callout, index): ServiceCallout[] => {
+    const title = fill(callout.title, ctx);
+    if (!title && !hasContent(callout.body)) return [];
+    return [
+      {
+        key: callout.id ?? String(index),
+        tone: callout.tone === "info" ? "info" : "warning",
+        title,
+        body: callout.body ?? null,
+      },
+    ];
+  });
+}
+
+const RELATED_COUNT = 3;
+
+type RelatedLink = NonNullable<ServiceDoc["relatedLinks"]>[number];
+
+/** Id of a `relatedLinks` item that points at a processing service, else `null`. */
+function relatedServiceId(item: RelatedLink): string | null {
+  const target = item.link?.type === "custom" ? null : item.link?.doc;
+  if (!target || target.relationTo !== "processing-services") return null;
+  return typeof target.value === "string" ? target.value : target.value.id;
+}
+
+/**
+ * «Другая обработка»: the services pinned in `relatedLinks` (in their order), topped up with the
+ * first other published services by `order` — three cards, never the current page.
+ */
+async function relatedServices(doc: ServiceDoc): Promise<ServiceCardDoc[]> {
+  // Depth 1: the cards need the populated `heroImage` / `card.image`.
+  const { docs } = await listPublished("processing-services", {
+    sort: "order",
+    limit: 50,
+    depth: 1,
+  });
+  const others = docs.filter((service) => service.id !== doc.id && Boolean(service.path));
+  const byId = new Map(others.map((service) => [service.id, service]));
+  const pinned = (doc.relatedLinks ?? [])
+    .map(relatedServiceId)
+    .flatMap((id) => (id && byId.has(id) ? [byId.get(id)!] : []));
+  return [...new Set([...pinned, ...others])].slice(0, RELATED_COUNT);
+}
+
 function trailingBlocks(doc: ServiceDoc): LayoutBlock[] {
   const blocks: LayoutBlock[] = [];
-
-  if (hasContent(doc.howToSpecify) && doc.howToSpecify) {
-    blocks.push({
-      blockType: "richText",
-      id: "processing-how-to-specify",
-      heading: startsWithHeading(doc.howToSpecify) ? null : HOW_TO_SPECIFY_HEADING,
-      content: doc.howToSpecify,
-    });
-  }
 
   const important = (doc.importantItems ?? []).filter(
     (item) => Boolean(item.lead?.trim()) || hasContent(item.text)
@@ -194,18 +277,8 @@ function trailingBlocks(doc: ServiceDoc): LayoutBlock[] {
     });
   }
 
-  (doc.callouts ?? []).forEach((callout, index) => {
-    if (!callout.title?.trim() && !hasContent(callout.body)) return;
-    blocks.push({
-      blockType: "callout",
-      id: `processing-callout-${callout.id ?? index}`,
-      tone: callout.tone ?? "warning",
-      title: callout.title ?? null,
-      body: callout.body ?? null,
-    });
-  });
-
-  const related = doc.relatedLinks ?? [];
+  // Links to processing services are the «Другая обработка» cards; the rest stay a link list.
+  const related = (doc.relatedLinks ?? []).filter((item) => !relatedServiceId(item));
   if (related.length > 0) {
     const withDescriptions = related.some((item) => Boolean(item.description?.trim()));
     blocks.push({
@@ -224,7 +297,7 @@ function trailingBlocks(doc: ServiceDoc): LayoutBlock[] {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Service page: hero, photo, final buttons
+// Service page: buttons, photo placeholder
 // ---------------------------------------------------------------------------------------------
 
 interface ServiceCtas {
@@ -250,58 +323,43 @@ interface CtaButtonsProps {
   path: string;
   ctas: ServiceCtas;
   ctx: PlaceholderContext;
-  /** Final row: some pages list the form button first (teksty order). */
-  secondaryFirst?: boolean | undefined;
 }
 
-function ServiceButtons({ doc, slug, path, ctas, ctx, secondaryFirst = false }: CtaButtonsProps) {
-  const primary = (
-    <QuizLink key="quiz" prefill={doc.quizPrefill} src={path} ctx={ctx}>
-      {ctas.primaryLabel}
-    </QuizLink>
-  );
-  const secondary = ctas.secondary ? (
-    <FormTrigger
-      key="form"
-      formKey={ctas.secondary.formKey}
-      params={{ label: ctas.secondary.label, source: slug }}
-      asChild
-    >
-      <Button
-        variant="secondary"
-        size="l"
-        leftIcon={<FileText aria-hidden="true" strokeWidth={2} />}
-      >
-        {ctas.secondary.label}
-      </Button>
-    </FormTrigger>
-  ) : null;
-  return <>{secondaryFirst ? [secondary, primary] : [primary, secondary]}</>;
-}
-
-/** `heroImage`, otherwise the «[Фото: …]» placeholder of the page (if teksty have one). */
-function ServicePhoto({ doc, slug }: { doc: ServiceDoc; slug: string }) {
-  const media = asMedia(doc.heroImage);
-  const placeholder = PHOTO_PLACEHOLDERS[slug];
-  if (!media && !placeholder) return null;
-  // Continues the hero background (no section padding of its own).
+function ServiceButtons({ doc, slug, path, ctas, ctx }: CtaButtonsProps) {
   return (
-    <div className="bg-bg">
-      <Container className="pb-16 max-sm:pb-10">
-        <div className="max-w-[900px]">
-          {media ? (
-            <BlockImage
-              media={media}
-              size="hero"
-              sizes="(max-width: 1100px) 100vw, 900px"
-              frameClassName="aspect-[16/9] rounded-xl"
-            />
-          ) : (
-            <Placeholder ratio="16/9" label={placeholder ?? ""} className="rounded-xl" />
-          )}
-        </div>
-      </Container>
-    </div>
+    <>
+      <QuizLink prefill={doc.quizPrefill} src={path} ctx={ctx}>
+        {ctas.primaryLabel}
+      </QuizLink>
+      {ctas.secondary ? (
+        <FormTrigger
+          formKey={ctas.secondary.formKey}
+          params={{ label: ctas.secondary.label, source: slug }}
+          asChild
+        >
+          <Button
+            variant="secondary"
+            size="l"
+            leftIcon={<FileText aria-hidden="true" strokeWidth={2} />}
+          >
+            {ctas.secondary.label}
+          </Button>
+        </FormTrigger>
+      ) : null}
+    </>
+  );
+}
+
+/** The «[Фото: …]» placeholder of the page while it has no `heroImage` (if teksty have one). */
+function PhotoPlaceholder({ slug }: { slug: string }) {
+  const label = PHOTO_PLACEHOLDERS[slug];
+  if (!label) return null;
+  return (
+    <Container className="pb-16 max-sm:pb-10">
+      <div className="max-w-[900px]">
+        <Placeholder ratio="16/9" label={label} className="rounded-xl" />
+      </div>
+    </Container>
   );
 }
 
@@ -341,56 +399,40 @@ export async function ProcessingServicePage({ slug }: { slug: string }) {
     quizPrefill: doc.quizPrefill,
   };
   const ctas = serviceCtas(doc, ctx);
+  const media = heroMedia(doc.heroImage);
+  const panels = servicePanels(doc, ctx);
+  const related = await relatedServices(doc);
 
-  // The hero (and the photo under it) is `bg`; the composed blocks start on `sf`.
-  const blocksStart = "sf";
-  const blocks = withRhythm(
-    [...tableBlocks(doc), ...layoutBlocks(doc), ...trailingBlocks(doc)],
-    blocksStart
-  );
-  const autoCount = blocks.filter((block) => block.blockType !== "hero").length;
-  const finalVariant = variantAfter(blocksStart, autoCount);
+  // Only bg is drawn now (`sf` renders as `bg`), the rhythm just keeps editor choices explicit.
+  const contentBlocks = withRhythm(layoutBlocks(doc), "bg");
+  const closingBlocks = withRhythm(trailingBlocks(doc), "bg");
 
   return (
-    <PageShell path={path} breadcrumbs={crumbs} hideBreadcrumbs showConditions quiz={false}>
-      <PageHero
-        variant="p5-top"
+    // The how-to-order panels close the page and meet the footer (mockup): no conditions
+    // section (the hero lists the terms), no quiz CTA (the hero has the button).
+    <PageShell path={path} breadcrumbs={crumbs} showConditions={false} quiz={false}>
+      <ProcessingHero
         title={title}
-        breadcrumbs={<Breadcrumbs items={crumbs} />}
+        media={media}
+        terms={await heroTerms("full", ctx)}
+        lead={
+          hasContent(doc.intro) ? (
+            <div data-testid="processing-intro">
+              <RichText data={doc.intro} ctx={ctx} disableContainer />
+            </div>
+          ) : undefined
+        }
         actions={<ServiceButtons doc={doc} slug={slug} path={path} ctas={ctas} ctx={ctx} />}
-      >
-        {hasContent(doc.intro) ? (
-          <div
-            className="text-ink-3 max-w-[900px] text-pretty [&_p]:m-0 [&_p]:text-(length:--ig-lead-m-size) [&_p]:leading-(--ig-lead-m-lh) [&_p+p]:mt-3"
-            data-testid="processing-intro"
-          >
-            <RichText data={doc.intro} ctx={ctx} disableContainer />
-          </div>
-        ) : null}
-      </PageHero>
+      />
 
-      <ServicePhoto doc={doc} slug={slug} />
+      {media ? null : <PhotoPlaceholder slug={slug} />}
 
-      <RenderBlocks blocks={blocks} ctx={ctx} page={blockPage} />
-
-      <Section variant={finalVariant} aria-label="Действия">
-        <div
-          className={cn(
-            "flex flex-wrap justify-center gap-3",
-            "max-sm:flex-col max-sm:items-stretch max-sm:[&_.ig-btn]:w-full"
-          )}
-          data-testid="processing-final-cta"
-        >
-          <ServiceButtons
-            doc={doc}
-            slug={slug}
-            path={path}
-            ctas={ctas}
-            ctx={ctx}
-            secondaryFirst={SECONDARY_FIRST_SLUGS.has(slug)}
-          />
-        </div>
-      </Section>
+      <SpecTiles tiles={specTilesFrom(doc.tables, ctx)} />
+      <ServiceLayout blocks={contentBlocks} ctx={ctx} page={blockPage} />
+      <ServiceCallouts callouts={serviceCallouts(doc, ctx)} ctx={ctx} />
+      <RenderBlocks blocks={closingBlocks} ctx={ctx} page={blockPage} />
+      <RelatedServices services={related} ctx={ctx} hubPath={PROCESSING_HUB_PATH} />
+      <InfoPanels panels={panels} ctx={ctx} attachedToFooter />
     </PageShell>
   );
 }
@@ -411,9 +453,69 @@ export async function generateProcessingHubMetadata(): Promise<Metadata> {
   });
 }
 
+/** The hub hero from the first `hero` block of the document. */
+async function HubHero({
+  block,
+  ctx,
+  page,
+}: {
+  block: BlockOf<"hero"> | null;
+  ctx: PlaceholderContext;
+  page: BlockPageContext;
+}) {
+  const title = fill(block?.titleOverride, ctx) || fill(page.title, ctx) || MISSING_TEXT;
+  const lead = block ? fill(lexicalToPlainText(block.lead), ctx) : "";
+  const terms = block && block.showTerms !== false ? await heroTerms(block.termsMode, ctx) : [];
+  const hasButtons = (block?.buttons ?? []).some((button) => hasText(button.label));
+  return (
+    <ProcessingHero
+      title={title}
+      lead={lead || undefined}
+      terms={terms}
+      media={block ? heroMedia(block.image, fill(block.imageAlt, ctx)) : null}
+      actions={
+        hasButtons ? (
+          <CtaButtons buttons={block?.buttons} ctx={ctx} page={page} className="contents" />
+        ) : (
+          <QuizCta
+            prefill={page.quizPrefill}
+            src={page.path ?? PROCESSING_HUB_PATH}
+            ctx={ctx}
+            className="contents"
+          />
+        )
+      }
+    />
+  );
+}
+
+/** `twoColumns` blocks → panels of the info block (left, then right; empty columns skipped). */
+function columnPanels(blocks: readonly BlockOf<"twoColumns">[], ctx: PlaceholderContext) {
+  return blocks.flatMap((block, index): InfoPanel[] => {
+    const key = block.id ?? String(index);
+    return (["left", "right"] as const).flatMap((side) => {
+      const column = block[side];
+      if (!column || (!hasText(column.heading) && !hasContent(column.body))) return [];
+      return [
+        {
+          key: `${key}-${side}`,
+          heading: fill(column.heading, ctx) || null,
+          headingId: `processing-info-${key}-${side}-title`,
+          body: column.body ?? null,
+          lead: true,
+        },
+      ];
+    });
+  });
+}
+
+const isTwoColumns = (block: LayoutBlock): block is BlockOf<"twoColumns"> =>
+  block.blockType === "twoColumns";
+
 /**
- * Hub: the `pages` document `/obrabotka-stekla/` — its first block (the hero), then the
- * operations table built from the collection, then the rest of the layout.
+ * Hub: the `pages` document `/obrabotka-stekla/` — its first block (the hero), the service
+ * cards from the collection, the remaining blocks, and its `twoColumns` blocks as the closing
+ * info block.
  */
 export async function ProcessingHubPage() {
   const page = await getPageByPath(PROCESSING_HUB_PATH);
@@ -424,15 +526,20 @@ export async function ProcessingHubPage() {
 
   const ctx = await getPlaceholderContext();
   const blockPage = pageBlockContext(page, PROCESSING_HUB_PATH, ctx);
+  // Depth 1: the cards need the populated `heroImage` / `card.image`.
   const services = await listPublished("processing-services", {
     sort: "order",
     limit: 50,
-    depth: 0,
+    depth: 1,
   });
   const layout = (page.layout ?? []) as LayoutBlock[];
   const [first, ...rest] = layout;
-  const hasHero = first?.blockType === "hero";
-  const afterTable = hasHero ? rest : layout;
+  const hero = first?.blockType === "hero" ? first : null;
+  const afterHero = hero ? rest : layout;
+  const panels = columnPanels(afterHero.filter(isTwoColumns), ctx);
+  const others = afterHero.filter((block) => !isTwoColumns(block));
+  // With the conditions section and the quiz CTA hidden the info block meets the footer.
+  const closesPage = Boolean(page.hideConditions && page.hideQuizCta);
 
   return (
     <PageShell
@@ -441,15 +548,10 @@ export async function ProcessingHubPage() {
       showConditions={!page.hideConditions}
       quiz={page.hideQuizCta ? false : (page.quizPrefill ?? {})}
     >
-      {hasHero ? (
-        <RenderBlocks blocks={[first]} ctx={ctx} page={blockPage} />
-      ) : (
-        <Container className="pt-6 max-sm:pt-4">
-          <h1 className="ig-h1 m-0">{blockPage.title}</h1>
-        </Container>
-      )}
-      <OperationsTable services={services.docs} ctx={ctx} variant="sf" />
-      <RenderBlocks blocks={withRhythm(afterTable, "bg")} ctx={ctx} page={blockPage} />
+      <HubHero block={hero} ctx={ctx} page={blockPage} />
+      <ServiceCards services={services.docs} ctx={ctx} />
+      <RenderBlocks blocks={withRhythm(others, "bg")} ctx={ctx} page={blockPage} />
+      <InfoPanels panels={panels} ctx={ctx} attachedToFooter={closesPage} />
     </PageShell>
   );
 }

@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { checkStopWords, EXPERIENCE_PHRASE } from "@/lib/domain";
+import { EDGE_TERMINOLOGY_APPROVED_STRINGS } from "../content/edge-terminology";
 import {
   COMPANY,
   CONTACTS,
@@ -142,6 +143,10 @@ const VERBATIM: Array<[string, string | null, string[]]> = [
   ["/kontakty/", TEKSTY_06, [CONTACTS.form.heading, CONTACTS.form.sub, CONTACTS.form.submitLabel]],
 ];
 
+/** Client-approved edge terminology of 2026-11-08: exempt from the verbatim teksty check only. */
+const EDGE_APPROVED: readonly string[] = EDGE_TERMINOLOGY_APPROVED_STRINGS["klientam-company"];
+const edgeApproved = new Set(EDGE_APPROVED);
+
 /** All visible copy of a page for the stop-word and bracket checks. */
 const PAGE_TEXT: Record<string, string> = Object.fromEntries(
   VERBATIM.map(([pagePath, , strings]) => [pagePath, stripLinks(strings.join("\n"))])
@@ -154,10 +159,17 @@ const seoText = (page: PageEntry) =>
 describe("klientam-company content: verbatim teksty", () => {
   for (const [pagePath, source, strings] of VERBATIM) {
     it.skipIf(source === null)(`${pagePath}: every string is from teksty`, () => {
-      const missing = strings.filter((text) => !source?.includes(normalize(text)));
+      const missing = strings
+        .filter((text) => !edgeApproved.has(text))
+        .filter((text) => !source?.includes(normalize(text)));
       expect(missing).toEqual([]);
     });
   }
+
+  it("keeps the client-approved edge strings in the content", () => {
+    const content = new Set(VERBATIM.flatMap(([, , strings]) => strings));
+    expect(EDGE_APPROVED.filter((text) => !content.has(text))).toEqual([]);
+  });
 
   it.skipIf(TEKSTY_09 === null)("segment placeholders come from teksty", () => {
     expect(TEKSTY_09).toContain("{условия} · {акция_текст}");

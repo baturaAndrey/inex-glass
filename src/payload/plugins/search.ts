@@ -2,7 +2,7 @@ import { sql } from "@payloadcms/db-postgres";
 import { customType, index } from "@payloadcms/db-postgres/drizzle/pg-core";
 import { searchPlugin } from "@payloadcms/plugin-search";
 import { documentToText } from "@/lib/search/lexical-to-text";
-import { normalizeRu } from "@/lib/search/normalize";
+import { normalizeRu, TYPOGRAPHIC_HYPHEN } from "@/lib/search/normalize";
 import { SEARCH_COLLECTIONS, type SearchKind } from "@/lib/search/types";
 import { docUrl } from "@/lib/seo/doc-url";
 import { isExcludedFromSearch } from "@/lib/seo/indexable";
@@ -93,8 +93,8 @@ export function searchTitle(collection: string, doc: AnyDoc, fallback?: string |
 
 /**
  * Fields written to the `search` entry of a document. `bodyText` keeps the letter case (it is
- * also the source of the result snippets) but folds «ё» into «е» like `normalizeRu`, which the
- * `russian` dictionary does not do; `titleNorm` is fully normalized. A thickness document holds
+ * also the source of the result snippets) but folds «ё» into «е» and typographic hyphens into «-»
+ * like `normalizeRu` (the `russian` dictionary does neither); `titleNorm` is fully normalized. A thickness document holds
  * little copy of its own (the page is built from its group), so «Толщина N мм» is added: people
  * search «толщина 10».
  */
@@ -104,7 +104,8 @@ export function buildSearchFields(collection: string, doc: AnyDoc, fallbackTitle
   const lead = n ? `${title}. Толщина ${n} мм.` : title;
   const body = fillPlaceholders(documentToText(doc, { lead }), n)
     .replace(/ё/g, "е")
-    .replace(/Ё/g, "Е");
+    .replace(/Ё/g, "Е")
+    .replace(TYPOGRAPHIC_HYPHEN, "-");
   return {
     title,
     url: docUrl(collection, doc),

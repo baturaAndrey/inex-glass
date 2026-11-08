@@ -5,7 +5,7 @@ import { Container } from "@/components/ig/container";
 import { TextLink } from "@/components/ig/text-link";
 
 /**
- * Block 2 — «Почему через нас, а не напрямую с завода»: 8-row comparison (topic / by yourself /
+ * Block 2 — «Почему через нас, а не напрямую с завода»: row comparison (topic / by yourself /
  * through Inex Glass); ≤760 px every row becomes a «Сами → Через Inex Glass» card. Sits on the
  * page background like every section (the former teal «glass» gradient was dropped in the
  * revised mockup); the table keeps its own white panel.

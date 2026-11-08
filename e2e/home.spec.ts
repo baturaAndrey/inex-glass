@@ -116,10 +116,10 @@ test.describe("home page", () => {
     expect([...order].sort((a, b) => a - b)).toEqual(order);
   });
 
-  test("compares 8 stages: pairs on phones, a table on desktop", async ({ page }, testInfo) => {
+  test("compares 10 stages: pairs on phones, a table on desktop", async ({ page }, testInfo) => {
     await openHome(page);
     const table = page.locator("#why [role=table]");
-    await expect(table.locator("[role=row]:has([role=rowheader])")).toHaveCount(8);
+    await expect(table.locator("[role=row]:has([role=rowheader])")).toHaveCount(10);
     const firstLabel = table.locator("[role=cell]").first().getByText("Сами", { exact: true });
     if (testInfo.project.name === "mobile-375") {
       await expect(firstLabel).toBeVisible();

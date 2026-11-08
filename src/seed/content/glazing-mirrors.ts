@@ -520,7 +520,7 @@ const zerkala: GlazingMirrorsPageContent = {
         ],
         [
           { value: "Обработка кромки", href: LINKS.kromka },
-          { value: "Шлифованная, полированная, еврокромка" },
+          { value: "Шлифованная, полированная, «карандаш»" },
         ],
         // Facet of mirrors: only 30 or 50 mm (teksty, SSoT) — do not rephrase.
         [{ value: "Фацет", href: LINKS.facet }, { value: "Ширина 30 или 50 мм" }],
