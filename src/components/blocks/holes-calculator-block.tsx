@@ -37,19 +37,37 @@ function quizHrefsByThickness(page: BlockPageContext | undefined): Record<string
  */
 export function HolesCalculatorBlock({ block, ctx, section, page }: BlockProps<"holesCalculator">) {
   const anchorId = hasText(block.anchorId) ? block.anchorId : HOLES_CALCULATOR_ANCHOR;
-  const note = fill(block.note, ctx);
-  const ctaLabel = fill(block.ctaLabel, ctx);
 
   return (
     <BlockSection block={{ ...block, anchorId }} section={section} ctx={ctx}>
-      <HolesCalculator
-        defaultThickness={toThickness(block.defaultThickness)}
-        showScheme={block.showScheme !== false}
-        note={note || undefined}
-        ctaLabel={ctaLabel || undefined}
-        quizHrefs={ctaLabel ? quizHrefsByThickness(page) : undefined}
-        source={pageSlug(page?.path)}
-      />
+      <HolesCalculatorWidget block={block} ctx={ctx} page={page} />
     </BlockSection>
+  );
+}
+
+/**
+ * The calculator of a `holesCalculator` block without its section chrome: for templates that
+ * place it inside their own layout (the «Как заказать» subpage article).
+ */
+export function HolesCalculatorWidget({
+  block,
+  ctx,
+  page,
+  className,
+}: Pick<BlockProps<"holesCalculator">, "block" | "ctx" | "page"> & {
+  className?: string | undefined;
+}) {
+  const note = fill(block.note, ctx);
+  const ctaLabel = fill(block.ctaLabel, ctx);
+  return (
+    <HolesCalculator
+      defaultThickness={toThickness(block.defaultThickness)}
+      showScheme={block.showScheme !== false}
+      note={note || undefined}
+      ctaLabel={ctaLabel || undefined}
+      quizHrefs={ctaLabel ? quizHrefsByThickness(page) : undefined}
+      source={pageSlug(page?.path)}
+      className={className}
+    />
   );
 }

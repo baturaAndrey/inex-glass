@@ -20,9 +20,10 @@ const OBSERVER_MARGIN = "-96px 0px -60% 0px";
 
 /**
  * Scroll-spy: the last heading above the reading line is active. Without JS (or before
- * hydration) the list is plain anchor links.
+ * hydration) the list is plain anchor links. Shared with the «На странице» card of the
+ * «Как заказать» subpages (`@/components/how-to-order/subpage-toc`).
  */
-function useActiveHeading(ids: readonly string[]): string | null {
+export function useActiveHeading(ids: readonly string[]): string | null {
   const [active, setActive] = useState<string | null>(null);
 
   useEffect(() => {

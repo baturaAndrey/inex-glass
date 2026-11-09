@@ -172,7 +172,7 @@ export const HOME_PROCESSING = {
 /** «Конструкции из стекла для объектов». */
 export const HOME_CONSTRUCTIONS = {
   heading: "Конструкции из стекла для объектов",
-  sub: "Проектируем, комплектуем и отправляем на объект. Монтаж выполняет ваша бригада — поможем с узлами и чертежами.",
+  sub: "Проектируем, комплектуем и отправляем на объект. Подберём проверенную монтажную бригаду или проведём шеф-монтаж с вашими специалистами.",
   items: [
     { title: "Стеклянные перегородки", url: "/steklyannye-peregorodki/" },
     { title: "Ограждения и перила", url: "/steklyannye-ograzhdeniya/" },
@@ -246,7 +246,7 @@ export const HOME_STEPS = {
       text: "Обрешётка, фото при отгрузке, доставка транспортной компанией или самовывоз в Челябинске.",
     },
   ],
-  footnote: "Работаем с заказами от 50 м². Срочного изготовления нет. Монтаж не выполняем.",
+  footnote: "Работаем с заказами от 50 м². Срочного изготовления нет. Монтаж — бригада-партнёр или шеф-монтаж.",
   buttonLabel: "Отправить чертёж",
 } as const;
 
@@ -313,7 +313,8 @@ const CLIENT_WHY_TOPICS: ReadonlySet<string> = new Set([
 
 /**
  * Copy approved by the client on 2026-11-08 that is in neither teksty/01 nor the prototype: the
- * hero lead and the revised «why» rows (topics and texts). The verbatim checks of the seed tests
+ * hero lead, the revised «why» rows (topics and texts), the steps footnote and the constructions
+ * sub with the installation wording of 2026-11-09 (partner crew or chef-montage). The verbatim checks of the seed tests
  * skip these strings; the stop-word check still covers them. The client consciously accepted the
  * production / «под ключ» / installation wording (ТЗ §11, note of 2026-11-08).
  */
@@ -322,6 +323,9 @@ export const HOME_CLIENT_APPROVED_STRINGS: readonly string[] = [
   ...HOME_WHY.rows
     .filter((row) => CLIENT_WHY_TOPICS.has(row.topic))
     .flatMap((row) => [row.topic, row.left, row.right]),
+  // Installation wording decided by the client on 2026-11-09, site-wide.
+  HOME_STEPS.footnote,
+  HOME_CONSTRUCTIONS.sub,
 ];
 
 /** Strings taken from the prototype `Home.dc.html` (not present in teksty/01). */

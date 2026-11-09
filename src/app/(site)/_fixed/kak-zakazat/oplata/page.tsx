@@ -1,19 +1,18 @@
-import { RenderBlocks } from "@/components/blocks/render-blocks";
-import { sectionVariant } from "@/components/blocks/shared";
-import { Container } from "@/components/ig/container";
-import { NotFoundResponse } from "@/components/page/not-found-response";
-import { PageShell } from "@/components/page/page-shell";
-import { PaymentTerms } from "@/components/service/payment-terms";
-import { redirectIfExists } from "@/lib/cms/queries";
-import { pickFirst, withExplicitBackgrounds } from "@/lib/service/page-compose";
-import { loadServicePage, servicePageMetadata } from "@/lib/service/service-page";
+import { fill } from "@/components/blocks/shared";
+import type { LayoutBlock } from "@/components/blocks/types";
+import { OrderTable } from "@/components/how-to-order/order-table";
+import type { ArticlePiece } from "@/components/how-to-order/subpage-article";
+import { HowToOrderSubpage } from "@/components/how-to-order/subpage-template";
+import { paymentTermRows } from "@/components/service/payment-terms";
+import { pickFirst } from "@/lib/service/page-compose";
+import { servicePageMetadata, type ServicePageData } from "@/lib/service/service-page";
 import type { Metadata } from "next";
 
 /**
- * «Оплата и договор» (teksty 11 §3). Rendered like the catch-all `[...slug]` (same frame, same
- * blocks), with one exception: the first `table` block is the key/value «Условия» table, drawn
- * by `PaymentTerms` — no header row, and the «Скидка | {акция_текст}» row disappears while no
- * promo is active (the generic `table` block would show an empty cell).
+ * «Оплата и договор» (teksty 11 §3) on the subpage template (Paper mockup
+ * `2560_kak-zakazat_trebovaniya`), with one exception: the first `table` block is the key/value
+ * «Условия» table — no header row (the column labels the schema requires are editor-only), and
+ * the «Скидка | {акция_текст}» row disappears while no promo is active (`paymentTermRows`).
  */
 
 const PATH = "/kak-zakazat/oplata/";
@@ -22,47 +21,31 @@ export function generateMetadata(): Promise<Metadata> {
   return servicePageMetadata(PATH);
 }
 
-export default async function PaymentPage() {
-  const data = await loadServicePage(PATH);
-  if (!data) {
-    await redirectIfExists(PATH);
-    return <NotFoundResponse />;
-  }
-  const { page, path, placeholders: ctx, blockPage, breadcrumbLabel } = data;
-  // Blocks are rendered one by one around `PaymentTerms`: fix the bg ↔ sf rhythm first.
-  const layout = withExplicitBackgrounds(page.layout);
-  const terms = pickFirst(layout, "table");
-  const hasHero = layout[0]?.blockType === "hero";
+function compose({ page, placeholders: ctx }: ServicePageData) {
+  const terms = pickFirst(page.layout, "table");
+  const override = (block: LayoutBlock): ArticlePiece[] | null => {
+    if (block !== terms) return null;
+    const heading = fill(terms.heading, ctx);
+    const rows = paymentTermRows(terms.table?.rows, ctx);
+    return [
+      {
+        title: heading || undefined,
+        content:
+          rows.length > 0 ? (
+            <OrderTable
+              headerless
+              caption={heading || undefined}
+              columns={[{ label: "", width: "40%" }, { label: "" }]}
+              rows={rows.map((row) => ({ key: row.label, cells: [row.label, row.value] }))}
+              data-testid="payment-terms"
+            />
+          ) : null,
+      },
+    ];
+  };
+  return { override };
+}
 
-  return (
-    <PageShell
-      path={path}
-      breadcrumbLabel={breadcrumbLabel}
-      showConditions={!page.hideConditions}
-      quiz={page.hideQuizCta ? false : (page.quizPrefill ?? {})}
-    >
-      {hasHero ? null : (
-        <Container className="pt-6 max-sm:pt-4">
-          <h1 className="ig-h1 m-0">{blockPage.title}</h1>
-        </Container>
-      )}
-      {layout.map((block, index) =>
-        block === terms ? (
-          <PaymentTerms
-            key={block.id ?? index}
-            block={terms}
-            ctx={ctx}
-            page={blockPage}
-            section={{
-              index,
-              variant: sectionVariant(terms.background, index),
-              headingId: `blk-${block.id ?? index}-title`,
-            }}
-          />
-        ) : (
-          <RenderBlocks key={block.id ?? index} blocks={[block]} ctx={ctx} page={blockPage} />
-        )
-      )}
-    </PageShell>
-  );
+export default function PaymentPage() {
+  return <HowToOrderSubpage path={PATH} compose={compose} />;
 }

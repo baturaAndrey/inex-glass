@@ -315,6 +315,15 @@ export const HUB_MOCKUP_COPY: readonly string[] = [
   ...HUB_CARDS.map((item) => item.text),
 ];
 
+/**
+ * Site-wide installation wording decided by the client on 2026-11-09, in place of teksty's
+ * «Монтаж не выполняем — комплект для вашей бригады» (showers callout), «Нет — комплект для
+ * вашей бригады» (canopies FAQ) and «Монтаж выполняет ваша бригада» (partitions and railings
+ * intros, which use `MONTAGE_LEAD`).
+ */
+const MONTAGE_CALLOUT_ITEM = "- Монтаж — бригада-партнёр или шеф-монтаж с вашими специалистами.";
+const MONTAGE_FAQ_ANSWER = `Да — ${MONTAGE_LEAD.charAt(0).toLowerCase()}${MONTAGE_LEAD.slice(1)}`;
+
 /** teksty/11 §1 — «Стеклянные перегородки». */
 const PARTITIONS: ConstructionSeed = {
   slug: "steklyannye-peregorodki",
@@ -332,7 +341,7 @@ const PARTITIONS: ConstructionSeed = {
       "Цельностеклянные и в алюминиевом профиле: стекло, профиль и фурнитура одним заказом, проверка узлов до запуска. Объекты от 50 м².",
   },
   intro:
-    "Офисы, торговые центры, банки, медицинские центры: стекло, профиль и фурнитура одним комплектом. Проверяем узлы до запуска производства, чтобы перегородка собралась на объекте без доработок. Монтаж выполняет ваша бригада. {условия}",
+    `Офисы, торговые центры, банки, медицинские центры: стекло, профиль и фурнитура одним комплектом. Проверяем узлы до запуска производства, чтобы перегородка собралась на объекте без доработок. ${MONTAGE_LEAD} {условия}`,
   ctaPrimaryLabel: "Рассчитать комплект",
   ctaSecondaryLabel: "Отправить планировку",
   secondaryFormKey: "drawing",
@@ -460,7 +469,7 @@ const RAILINGS: ConstructionSeed = {
       "Ограждения для лестниц, атриумов и балконов: закалённое стекло или триплекс под нагрузку, профиль и фурнитура одним заказом.",
   },
   intro:
-    "Стекло и профиль одним комплектом, рассчитанные под нагрузку вашего объекта. Монтаж выполняет ваша бригада. {условия}",
+    `Стекло и профиль одним комплектом, рассчитанные под нагрузку вашего объекта. ${MONTAGE_LEAD} {условия}`,
   ctaPrimaryLabel: "Рассчитать комплект",
   ctaSecondaryLabel: "Отправить проект",
   secondaryFormKey: "drawing",
@@ -601,7 +610,7 @@ const CANOPIES: ConstructionSeed = {
       question: "Можно ли без тяг?",
       answer: "Да, консольный козырёк на зажимном профиле. Триплекс для него, как правило, толще.",
     },
-    { question: "Делаете ли монтаж?", answer: "Нет — комплект для вашей бригады." },
+    { question: "Делаете ли монтаж?", answer: MONTAGE_FAQ_ANSWER },
   ],
   layout: [
     {
@@ -667,7 +676,7 @@ const SHOWERS: ConstructionSeed = {
       heading: "Что важно знать",
       tone: "warning",
       md: [
-        "- Монтаж не выполняем — комплект для вашей бригады.",
+        MONTAGE_CALLOUT_ITEM,
         "- Отверстия под петли и вырезы под ручки делаются до закалки: модель фурнитуры нужна до заказа.",
         "- Розничные заказы (одна кабина, шторка, поддон) не принимаем.",
       ].join("\n"),
@@ -795,7 +804,18 @@ const HARDWARE: ConstructionSeed = {
   ],
 };
 
-/** All documents of the slice, in `order`. */
+/**
+ * Non-teksty montage copy of the inner construction pages (decision of 2026-11-09), whole as the
+ * verbatim test compares it: the partitions and railings intros, the showers callout item and the
+ * canopies FAQ answer.
+ */
+export const MONTAGE_DECISION_COPY: readonly string[] = [
+  PARTITIONS.intro,
+  RAILINGS.intro,
+  MONTAGE_CALLOUT_ITEM,
+  MONTAGE_FAQ_ANSWER,
+];
+
 /** Every seed photo of a document (hero, card images), in document order. */
 export function seedImagesOf(item: ConstructionSeed): ImageSeed[] {
   const cards = item.layout.flatMap((block) =>
@@ -804,6 +824,7 @@ export function seedImagesOf(item: ConstructionSeed): ImageSeed[] {
   return [...(item.heroImage ? [item.heroImage] : []), ...cards];
 }
 
+/** All documents of the slice, in `order`. */
 export const CONSTRUCTIONS: readonly ConstructionSeed[] = [
   HUB,
   PARTITIONS,

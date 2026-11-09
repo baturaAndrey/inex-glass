@@ -27,13 +27,44 @@ export type ServiceButton =
       variant?: "primary" | "secondary";
       icon?: string;
     }
-  | { kind: "link"; label: string; url: string; icon?: string };
+  | {
+      kind: "link";
+      label: string;
+      url: string;
+      icon?: string;
+      variant?: "primary" | "secondary";
+    };
+
+/** Photo of a hero: a file of `src/seed/media/how-to-order/` with its Russian alt text. */
+export interface HeroImage {
+  file: string;
+  alt: string;
+}
+
+/** Folder of the section's seed photos (`src/seed/media/how-to-order/`). */
+export const HOW_TO_ORDER_MEDIA_GROUP = "how-to-order";
+
+/**
+ * Hero photos of the Paper mockups `2560_kak-zakazat` (hub) and `2560_kak-zakazat_trebovaniya`
+ * (every subpage: one photo for the template until per-page photos arrive). Generated
+ * illustrations: flagged temporary in the media library.
+ */
+export const HOW_TO_ORDER_IMAGES = {
+  hub: {
+    file: "order-hero.webp",
+    alt: "Закалённое стекло с отверстием на столе рядом с чертежом, за ним инженер у монитора",
+  },
+  subpage: {
+    file: "drawings-hero.webp",
+    alt: "Закалённое стекло с обработанной кромкой на чертеже, рядом карандаш и линейка",
+  },
+} as const satisfies Record<string, HeroImage>;
 
 /** A table cell: plain text, or text with a link (`href` of the cell). */
 export type ServiceCell = string | { value: string; href: string };
 
 export type ServiceBlock =
-  | { type: "hero"; lead?: string; buttons: ServiceButton[] }
+  | { type: "hero"; lead?: string; buttons: ServiceButton[]; image?: HeroImage }
   | { type: "richText"; heading?: string; markdown: string; width?: "narrow" | "normal" }
   | {
       type: "table";
@@ -65,7 +96,9 @@ export type ServiceBlock =
   | { type: "holesCalculator" }
   | { type: "download"; items: Array<{ title: string }> }
   | { type: "cta"; buttons: ServiceButton[] }
-  | { type: "form"; label: string; source: string; accept: string[] };
+  | { type: "form"; label: string; source: string; accept: string[] }
+  /** Link cards (the hub's subpages, `anchorId` `subpages`). */
+  | { type: "linkList"; anchorId: string; items: Array<{ label: string; url: string }> };
 
 export interface ServicePageSeed {
   path: string;
@@ -92,6 +125,8 @@ export const SERVICE_LINKS = {
   delivery: "/kak-zakazat/upakovka-i-dostavka/",
   documents: "/kak-zakazat/dokumenty/",
   acceptance: "/kak-zakazat/priemka/",
+  payment: "/kak-zakazat/oplata/",
+  quality: "/kak-zakazat/kontrol-kachestva/",
   measuring: "/blog/kak-snyat-razmery-dlya-stekla/",
   weightCalculator: "/instrumenty/kalkulyator-vesa-stekla/",
   /** The quiz page; quiz links get `?src=` of the page at render time. */
@@ -101,6 +136,21 @@ export const SERVICE_LINKS = {
 const QUIZ = (label = "Рассчитать стоимость"): ServiceButton => ({ kind: "quiz", label });
 
 const DRAWING_ACCEPT = ["dwg", "dxf", "pdf"];
+
+/**
+ * Hero buttons of every subpage (template of the Paper mockup `2560_kak-zakazat_trebovaniya`):
+ * the quiz and «Загрузить чертёж», which jumps to the drawing-form panel (`#dr-up`).
+ */
+const SUBPAGE_BUTTONS: ServiceButton[] = [
+  QUIZ(),
+  {
+    kind: "link",
+    label: "Загрузить чертёж",
+    url: "#dr-up",
+    icon: "file-text",
+    variant: "secondary",
+  },
+];
 
 /* ------------------------------------------------------------------------------------------ */
 /* 1. /kak-zakazat/ — 04 §1                                                                    */
@@ -124,6 +174,7 @@ const hub: ServicePageSeed = {
     {
       type: "hero",
       lead: "Шесть шагов от файла до отгрузки. На каждом понятно, что делаем мы и что нужно от вас.",
+      image: HOW_TO_ORDER_IMAGES.hub,
       buttons: [
         QUIZ(),
         {
@@ -176,7 +227,7 @@ const hub: ServicePageSeed = {
       markdown: [
         "- Заказы от 50 м²",
         "- Срочного изготовления нет",
-        "- Монтаж не выполняем",
+        "- Монтаж — бригада-партнёр или шеф-монтаж",
         "- Принимаем файлы, физические шаблоны — нет",
       ].join("\n"),
     },
@@ -188,6 +239,20 @@ const hub: ServicePageSeed = {
         ["Ошибся завод", "Завод — стекло переделывают за его счёт"],
         ["Ошибка в согласованном чертеже", "Заказчик"],
         ["Доставка повторной партии", "Заказчик"],
+      ],
+    },
+    {
+      type: "linkList",
+      anchorId: "subpages",
+      items: [
+        { label: "Требования к чертежам", url: SERVICE_LINKS.drawings },
+        { label: "Допуски по ГОСТ 30698-2014", url: SERVICE_LINKS.gost },
+        { label: "Сроки изготовления", url: SERVICE_LINKS.terms },
+        { label: "Упаковка и доставка", url: SERVICE_LINKS.delivery },
+        { label: "Документы на стекло", url: SERVICE_LINKS.documents },
+        { label: "Оплата и договор", url: SERVICE_LINKS.payment },
+        { label: "Приёмка стекла", url: SERVICE_LINKS.acceptance },
+        { label: "Контроль качества", url: SERVICE_LINKS.quality },
       ],
     },
   ],
@@ -215,7 +280,8 @@ const drawings: ServicePageSeed = {
     {
       type: "hero",
       lead: "Закалённое стекло нельзя подогнать на объекте. Поэтому чертёж — главный документ заказа: что в нём написано, то и будет изготовлено.",
-      buttons: [{ kind: "link", label: "Загрузить чертёж", url: "#dr-up", icon: "upload" }],
+      image: HOW_TO_ORDER_IMAGES.subpage,
+      buttons: SUBPAGE_BUTTONS,
     },
     {
       type: "table",
@@ -246,9 +312,9 @@ const drawings: ServicePageSeed = {
         ["Гнутое стекло", "до 1200 × 2000 мм; радиус от 1000 мм (4–6 мм), от 1500 мм (8–12 мм)"],
         [
           "Отверстия",
-          "Ø 4–130 мм (до 220 мм при сверлении с одной стороны); стекло с отверстиями — от 250 × 100 до 3000 × 1600 мм",
+          "Ø 4–130 мм; до 220 мм при сверлении с одной стороны; стекло с отверстиями — от 250 × 100 до 3000 × 1600 мм",
         ],
-        ["Печать", "до 1100 × 700 мм"],
+        ["Печать", "Шелкография до 1100 × 700 мм; УФ-печать и фотопечать — до 2000 × 3180 мм"],
       ],
     },
     {
@@ -313,7 +379,8 @@ const gost: ServicePageSeed = {
     {
       type: "hero",
       lead: "Мы работаем по ГОСТ 30698-2014 «Стекло закалённое. Технические условия». Ниже — нормы, которые влияют на чертёж, монтаж и приёмку.",
-      buttons: [QUIZ()],
+      image: HOW_TO_ORDER_IMAGES.subpage,
+      buttons: SUBPAGE_BUTTONS,
     },
     {
       type: "table",
@@ -416,7 +483,7 @@ const terms: ServicePageSeed = {
   source: TEKSTY_HOW_TO_ORDER,
   hideQuizCta: true,
   layout: [
-    { type: "hero", buttons: [QUIZ()] },
+    { type: "hero", image: HOW_TO_ORDER_IMAGES.subpage, buttons: SUBPAGE_BUTTONS },
     {
       type: "table",
       columns: ["Изделие", "Срок, рабочих дней"],
@@ -482,7 +549,7 @@ const delivery: ServicePageSeed = {
   source: TEKSTY_HOW_TO_ORDER,
   hideQuizCta: true,
   layout: [
-    { type: "hero", buttons: [QUIZ()] },
+    { type: "hero", image: HOW_TO_ORDER_IMAGES.subpage, buttons: SUBPAGE_BUTTONS },
     {
       type: "richText",
       markdown: [
@@ -540,7 +607,8 @@ const documents: ServicePageSeed = {
     {
       type: "hero",
       lead: "Для сдачи объекта нужен комплект документов на стекло. Мы передаём его с каждой партией.",
-      buttons: [QUIZ()],
+      image: HOW_TO_ORDER_IMAGES.subpage,
+      buttons: SUBPAGE_BUTTONS,
     },
     {
       type: "richText",
@@ -601,7 +669,8 @@ const acceptance: ServicePageSeed = {
     {
       type: "hero",
       lead: "Как принять партию на объекте так, чтобы при повреждении или ошибке не остаться без компенсации.",
-      buttons: [QUIZ()],
+      image: HOW_TO_ORDER_IMAGES.subpage,
+      buttons: SUBPAGE_BUTTONS,
     },
     {
       type: "richText",
@@ -676,12 +745,12 @@ const acceptance: ServicePageSeed = {
 
 /**
  * Column labels of the key/value «Условия» table. The teksty table has an empty header row; the
- * schema requires labels, so they are stored for the editor and never rendered (`PaymentTerms`).
+ * schema requires labels, so they are stored for the editor and never rendered (`paymentTermRows`).
  */
 export const PAYMENT_TERMS_COLUMNS = ["Параметр", "Значение"];
 
 const payment: ServicePageSeed = {
-  path: "/kak-zakazat/oplata/",
+  path: SERVICE_LINKS.payment,
   slug: "oplata",
   child: true,
   template: "service",
@@ -695,7 +764,7 @@ const payment: ServicePageSeed = {
   source: TEKSTY_SERVICE,
   hideQuizCta: true,
   layout: [
-    { type: "hero", buttons: [QUIZ()] },
+    { type: "hero", image: HOW_TO_ORDER_IMAGES.subpage, buttons: SUBPAGE_BUTTONS },
     {
       type: "table",
       heading: "Условия",
@@ -707,7 +776,7 @@ const payment: ServicePageSeed = {
         ["Предоплата", "70%"],
         ["Цена", "Фиксируется в договоре и не меняется после оплаты"],
         ["Срок изготовления", "Считается от даты договора"],
-        // Empty while no promo is active: the row is hidden then (`PaymentTerms`).
+        // Empty while no promo is active: the row is hidden then (`paymentTermRows`).
         ["Скидка", "{акция_текст}"],
       ],
     },
@@ -748,7 +817,7 @@ const payment: ServicePageSeed = {
 /* ------------------------------------------------------------------------------------------ */
 
 const quality: ServicePageSeed = {
-  path: "/kak-zakazat/kontrol-kachestva/",
+  path: SERVICE_LINKS.quality,
   slug: "kontrol-kachestva",
   child: true,
   template: "service",
@@ -765,7 +834,8 @@ const quality: ServicePageSeed = {
     {
       type: "hero",
       lead: "Стекло изготавливают заводы-партнёры в России и Китае. Мы отвечаем за то, чтобы оно пришло по чертежу, по ГОСТ и целым. Вот что для этого делаем.",
-      buttons: [QUIZ()],
+      image: HOW_TO_ORDER_IMAGES.subpage,
+      buttons: SUBPAGE_BUTTONS,
     },
     {
       type: "richText",
@@ -822,7 +892,8 @@ const design: ServicePageSeed = {
     {
       type: "hero",
       lead: "Для подрядчиков, дизайнеров и архитекторов, у которых нет своего конструктора по стеклу. Инженер Inex Glass рассчитывает стекло под нагрузку, прорабатывает узлы крепления и готовит документацию, по которой конструкцию изготавливают и монтируют.",
-      buttons: [QUIZ()],
+      image: HOW_TO_ORDER_IMAGES.subpage,
+      buttons: SUBPAGE_BUTTONS,
     },
     {
       type: "table",
@@ -885,4 +956,31 @@ export const HOW_TO_ORDER_PAGES: readonly ServicePageSeed[] = [
   payment,
   quality,
   design,
+];
+
+/**
+ * Wording of the approved Paper mockups `2560_kak-zakazat` / `2560_kak-zakazat_trebovaniya`
+ * (2026-11-09) that is not verbatim in teksty 04 / 11. The verbatim test of the slice skips
+ * exactly these strings (and checks they are still in the content); they are pending client
+ * approval in `docs/inex/drafts/service-pages-paper-drafts.md` («Как заказать — тексты на
+ * согласовании (2026-11-09)»). The edge terminology of «Что указать в чертеже» is in
+ * `EDGE_TERMINOLOGY_APPROVED_STRINGS["how-to-order"]` (`./edge-terminology.ts`).
+ */
+export const HOW_TO_ORDER_MOCKUP_COPY: readonly string[] = [
+  // «Условия» of the hub: the installation line decided by the client on 2026-11-09 (as on the
+  // constructions hub) instead of «Монтаж не выполняем»; the `conditions` global
+  // (`noInstallText`) carries the same text site-wide.
+  "- Монтаж — бригада-партнёр или шеф-монтаж",
+  // «Технологические ограничения» → tiles: the value is split at «; » into the bold line and
+  // the note; «Печать» as on /obrabotka-stekla/pechat/.
+  "Ø 4–130 мм; до 220 мм при сверлении с одной стороны; стекло с отверстиями — от 250 × 100 до 3000 × 1600 мм",
+  "Шелкография до 1100 × 700 мм; УФ-печать и фотопечать — до 2000 × 3180 мм",
+  // Subpage cards of the hub: the H1 of each page («Допуски по ГОСТ 30698-2014» shortened);
+  // the H1 of teksty 11 pages are not in teksty 04, the source of the hub.
+  "Допуски по ГОСТ 30698-2014",
+  "Оплата и договор",
+  "Приёмка стекла",
+  "Контроль качества",
+  // Hero button of every subpage (template); teksty 11 pages had only the quiz button.
+  "Загрузить чертёж",
 ];

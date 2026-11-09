@@ -99,7 +99,7 @@ async function seedConditions(ctx: SeedContext): Promise<void> {
     kpText: "КП в среднем за 2–3 рабочих дня",
     priceFixedText: "Цена в договоре фиксируется",
     noUrgentText: "Срочного изготовления нет",
-    noInstallText: "Монтаж не выполняем",
+    noInstallText: "Монтаж — бригада-партнёр или шеф-монтаж",
     inlineText:
       "Заказы от 50 м², срок от 10 рабочих дней с даты договора, КП в среднем за 2–3 рабочих дня.",
     termsBar: termsBar.map((text) => ({ text, icon: "check" })),
@@ -473,6 +473,7 @@ const SERVICES_MENU: MegaMenu = {
         megaLink("Документы", `${K}dokumenty/`),
         megaLink("Оплата", `${K}oplata/`),
         megaLink("Приёмка", `${K}priemka/`),
+        megaLink("Контроль качества", `${K}kontrol-kachestva/`),
       ],
     },
     {

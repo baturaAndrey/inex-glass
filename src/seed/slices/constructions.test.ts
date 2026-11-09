@@ -6,6 +6,7 @@ import { sanitizeSvg } from "@/lib/svg-sanitize";
 import {
   CONSTRUCTIONS,
   HUB_MOCKUP_COPY,
+  MONTAGE_DECISION_COPY,
   seedImagesOf,
   type ConstructionSeed,
 } from "../content/constructions";
@@ -96,6 +97,9 @@ const edgeApproved = new Set(EDGE_APPROVED_FRAGMENTS);
 const MOCKUP_FRAGMENTS = toFragments(HUB_MOCKUP_COPY);
 const mockupApproved = new Set(MOCKUP_FRAGMENTS);
 
+/** Installation wording of 2026-11-09 on the inner pages (not in teksty). */
+const montageApproved = new Set(toFragments(MONTAGE_DECISION_COPY));
+
 /** Every internal / external href of a document. */
 function links(doc: ConstructionSeed): string[] {
   const markdown = [
@@ -130,6 +134,7 @@ describe("constructions seed content", () => {
       const source = plain(readFileSync(path.join(TEKSTY_DIR, file as string), "utf8"));
       const exempt = (text: string) =>
         edgeApproved.has(text) ||
+        montageApproved.has(text) ||
         (doc.slug === "steklyannye-konstrukcii" && mockupApproved.has(text));
       for (const fragment of fragments(doc).filter((text) => !exempt(text))) {
         expect(source.includes(fragment), `${doc.slug}: «${fragment}»`).toBe(true);

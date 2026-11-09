@@ -1,4 +1,5 @@
 import { RenderBlocks } from "@/components/blocks/render-blocks";
+import { HowToOrderSubpage } from "@/components/how-to-order/subpage-template";
 import { Container } from "@/components/ig/container";
 import { NOT_FOUND_METADATA, NotFoundResponse } from "@/components/page/not-found-response";
 import { pageBlockContext } from "@/components/page/page-context";
@@ -22,8 +23,10 @@ import type { Metadata } from "next";
  *    route would be marked dynamic for good — see `@/lib/cms/cache`).
  * 1. Path from the segments (`proxy.ts` guarantees lower case, Next the trailing slash). A segment
  *    with an encoded `/` (`%2F`) is a 404, not a duplicate of the nested URL (`@/lib/cms/path`).
- * 2. Published page with that path → `PageShell` + blocks. The blocks receive the document
- *    (`pageBlockContext`): the hero renders its H1, FAQ / quiz blocks read `faq` / `quizPrefill`.
+ * 2. Published page with that path → `PageShell` + blocks; a page with the template «Услуга /
+ *    сервис» → `HowToOrderSubpage` (the «Как заказать» subpage template). The blocks receive
+ *    the document (`pageBlockContext`): the hero renders its H1, FAQ / quiz blocks read `faq` /
+ *    `quizPrefill`.
  * 3. Otherwise an active record of `redirects` → `permanentRedirect` (HTTP 308: search engines
  *    treat it as permanent, like 301 — see requirements «Техническое SEO»), otherwise 404 via
  *    `<NotFoundResponse />` (HTTP 404 with the 404 body in the server HTML; a bare `notFound()`
@@ -95,6 +98,9 @@ export default async function CatchAllPage({ params }: { params: Params }) {
     await redirectIfExists(path);
     return <NotFoundResponse />;
   }
+  // «Услуга / сервис» pages (the «Как заказать» subpages): the subpage template of the Paper
+  // mockup `2560_kak-zakazat_trebovaniya` (article with «На странице», drawing-form panel).
+  if (page.template === "service") return <HowToOrderSubpage path={path} />;
 
   const placeholders = await getPlaceholderContext();
   const blockPage = pageBlockContext(page, path, placeholders);

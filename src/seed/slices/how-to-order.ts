@@ -1,8 +1,9 @@
 import type { LayoutBlock } from "@/components/blocks/types";
 import type { CtaBlock, Page } from "@/payload-types";
-import { HOW_TO_ORDER_PAGES, HUB_PATH } from "../content/how-to-order";
+import { HOW_TO_ORDER_MEDIA_GROUP, HOW_TO_ORDER_PAGES, HUB_PATH } from "../content/how-to-order";
 import { upsertByPath } from "../context";
 import { markdown } from "../lexical";
+import { ensureSeedImage } from "../seed-media";
 import type {
   ServiceBlock,
   ServiceButton,
@@ -44,7 +45,7 @@ function button(spec: ServiceButton): HeroButton {
       return {
         label: spec.label,
         kind: "link",
-        variant: "primary",
+        variant: spec.variant ?? "primary",
         ...(spec.icon ? { icon: spec.icon } : {}),
         link: { type: "custom", url: spec.url },
       };
@@ -64,6 +65,16 @@ const toBlock: BlockBuilder = async (ctx, block) => {
         // The «Условия» section of the page frame closes every page; no strip in the hero.
         showTerms: false,
         ...(block.lead ? { lead: await markdown(ctx, block.lead) } : {}),
+        ...(block.image
+          ? {
+              image: await ensureSeedImage(ctx, {
+                group: HOW_TO_ORDER_MEDIA_GROUP,
+                file: block.image.file,
+                alt: block.image.alt,
+                temporary: true,
+              }),
+            }
+          : {}),
         buttons: block.buttons.map(button),
       };
     case "richText":
@@ -128,6 +139,15 @@ const toBlock: BlockBuilder = async (ctx, block) => {
         variant: "buttons",
         tone: "light",
         buttons: block.buttons.map(button),
+      };
+    case "linkList":
+      return {
+        blockType: "linkList",
+        anchorId: block.anchorId,
+        variant: "bridge",
+        items: block.items.map((item) => ({
+          link: { type: "custom", url: item.url, label: item.label },
+        })),
       };
     case "form":
       return {

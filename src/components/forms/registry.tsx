@@ -12,7 +12,7 @@ export type { FormComponentProps, FormKey, FormParams } from "./form-dialog-prov
 
 /**
  * Registry formKey → form component (task 21) for the PAGE path: `FormSection` / the `form`
- * block (through `InlineForm`) and `UploadCard`, all `variant: 'page'`.
+ * block (through `InlineForm`) and `DrawingPanel`, all `variant: 'page'`.
  *
  * Every form is a `next/dynamic` chunk, server-rendered (`ssr` stays on): the catch-all route
  * statically references every block, so static imports would ship all six forms (and zod) with

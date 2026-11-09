@@ -1,7 +1,8 @@
 import { Container } from "@/components/ig/container";
 import { TextLink } from "@/components/ig/text-link";
-import type { TechLimits } from "@/lib/domain";
+import { holeRules, type TechLimits } from "@/lib/domain";
 import type { ThicknessView } from "@/lib/thickness-view";
+import { cn } from "@/lib/utils";
 
 /**
  * «Отверстия в стекле N мм — по ГОСТ 30698-2014» (Paper mockup `2560_zak_tolshchina_10mm`, frame
@@ -158,16 +159,53 @@ function NarrowScheme({ labels }: { labels: SchemeLabels }) {
   );
 }
 
+/** Labels of the drawing for glass N mm: the 2N / 2N / 6N distances and the diameter range. */
+function schemeLabels(n: number, holes: SchemeHoles): SchemeLabels {
+  const { edge, between, corner } = holeRules(n);
+  return {
+    edge: `≥ ${edge} мм`,
+    between: `≥ ${between} мм`,
+    corner: `≥ ${corner} мм до угла`,
+    caption: `стекло ${n} мм, отверстия Ø ${holes.dMin}–${holes.dMax} мм`,
+  };
+}
+
+type SchemeHoles = Pick<TechLimits["holes"], "dMin" | "dMax">;
+
+export interface HolesSchemeProps {
+  /** Glass thickness, mm. */
+  n: number;
+  /** Diameter range of the technological limits (`getTechLimits().holes`). */
+  holes: SchemeHoles;
+  className?: string | undefined;
+}
+
+/**
+ * The holes drawing for glass N mm in its white card: the wide drawing on ≥600 px, the narrow
+ * one on phones. Decorative (`aria-hidden`): the page states the same rules as text. Shared by
+ * the thickness cards and «Требования к чертежам» (mockup `2560_kak-zakazat_trebovaniya`,
+ * frame `sec-holes`).
+ */
+export function HolesScheme({ n, holes, className }: HolesSchemeProps) {
+  const labels = schemeLabels(n, holes);
+  return (
+    <div
+      className={cn(
+        "bg-surface border-hairline flex justify-center rounded-xl border p-8 max-lg:p-6 max-sm:rounded-lg max-sm:p-4",
+        className
+      )}
+      data-testid="holes-scheme"
+    >
+      <WideScheme labels={labels} />
+      <NarrowScheme labels={labels} />
+    </div>
+  );
+}
+
 export function HolesRules({ view, holes, heading, headingId }: HolesRulesProps) {
   const { n } = view;
   const { edge, between, corner, minDiameter } = view.holeRules;
   const range = `${holes.dMin}–${holes.dMax}`;
-  const labels: SchemeLabels = {
-    edge: `≥ ${edge} мм`,
-    between: `≥ ${between} мм`,
-    corner: `≥ ${corner} мм до угла`,
-    caption: `стекло ${n} мм, отверстия Ø ${range} мм`,
-  };
   const rules: Array<[number, string]> = [
     [edge, "до кромки стекла — не менее"],
     [between, "между отверстиями — не менее"],
@@ -186,10 +224,11 @@ export function HolesRules({ view, holes, heading, headingId }: HolesRulesProps)
       data-section="holes"
     >
       <Container className="flex items-center gap-16 max-lg:gap-10 max-md:flex-col max-md:items-stretch max-md:gap-8">
-        <div className="bg-surface border-hairline flex w-[760px] shrink-0 justify-center rounded-xl border p-8 max-lg:w-[520px] max-lg:p-6 max-md:w-full max-md:max-w-[760px] max-sm:rounded-lg max-sm:p-4">
-          <WideScheme labels={labels} />
-          <NarrowScheme labels={labels} />
-        </div>
+        <HolesScheme
+          n={n}
+          holes={holes}
+          className="w-[760px] shrink-0 max-lg:w-[520px] max-md:w-full max-md:max-w-[760px]"
+        />
         <div className="flex min-w-0 flex-1 flex-col gap-7 max-sm:gap-4">
           <h2 id={headingId} className="ig-h2 m-0 text-balance">
             {heading}

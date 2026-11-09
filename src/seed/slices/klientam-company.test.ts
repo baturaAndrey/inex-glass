@@ -147,6 +147,9 @@ const VERBATIM: Array<[string, string | null, string[]]> = [
 const EDGE_APPROVED: readonly string[] = EDGE_TERMINOLOGY_APPROVED_STRINGS["klientam-company"];
 const edgeApproved = new Set(EDGE_APPROVED);
 
+/** Installation wording decided by the client on 2026-11-09 (site-wide): not in teksty. */
+const montageApproved = new Set<string>([HUB.bridge]);
+
 /** All visible copy of a page for the stop-word and bracket checks. */
 const PAGE_TEXT: Record<string, string> = Object.fromEntries(
   VERBATIM.map(([pagePath, , strings]) => [pagePath, stripLinks(strings.join("\n"))])
@@ -160,7 +163,7 @@ describe("klientam-company content: verbatim teksty", () => {
   for (const [pagePath, source, strings] of VERBATIM) {
     it.skipIf(source === null)(`${pagePath}: every string is from teksty`, () => {
       const missing = strings
-        .filter((text) => !edgeApproved.has(text))
+        .filter((text) => !edgeApproved.has(text) && !montageApproved.has(text))
         .filter((text) => !source?.includes(normalize(text)));
       expect(missing).toEqual([]);
     });

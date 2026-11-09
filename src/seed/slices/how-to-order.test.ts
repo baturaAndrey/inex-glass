@@ -5,6 +5,7 @@ import { checkStopWords } from "@/lib/domain";
 import { splitStepText } from "@/lib/service/page-compose";
 import { EDGE_TERMINOLOGY_APPROVED_STRINGS } from "../content/edge-terminology";
 import {
+  HOW_TO_ORDER_MOCKUP_COPY,
   HOW_TO_ORDER_PAGES,
   PAYMENT_TERMS_COLUMNS,
   TEKSTY_HOW_TO_ORDER,
@@ -91,6 +92,8 @@ function blockStrings(block: ServiceBlock): string[] {
       return block.buttons.map(buttonLabel);
     case "form":
       return [block.label];
+    case "linkList":
+      return block.items.map((item) => item.label);
   }
 }
 
@@ -102,6 +105,8 @@ const bodyStrings = (page: ServicePageSeed) => [
 /** Client-approved edge terminology of 2026-11-08: exempt from the verbatim teksty check only. */
 const EDGE_APPROVED: readonly string[] = EDGE_TERMINOLOGY_APPROVED_STRINGS["how-to-order"];
 const edgeApproved = new Set(EDGE_APPROVED);
+/** Wording of the Paper mockups pending approval (2026-11-09): exempt from the verbatim check only. */
+const mockupCopy = new Set(HOW_TO_ORDER_MOCKUP_COPY);
 
 const allText = HOW_TO_ORDER_PAGES.flatMap((page) => [
   ...Object.values(page.seo),
@@ -121,7 +126,7 @@ describe("how-to-order content", () => {
       for (const page of HOW_TO_ORDER_PAGES) {
         const source = sources[page.source] ?? "";
         const missing = bodyStrings(page)
-          .filter((text) => !edgeApproved.has(text))
+          .filter((text) => !edgeApproved.has(text) && !mockupCopy.has(text))
           .map(normalize)
           .filter((text) => text !== "" && !source.includes(text));
         expect(missing, `${page.path} (${page.source})`).toEqual([]);
@@ -135,6 +140,11 @@ describe("how-to-order content", () => {
         expect(meta, `${page.path} seo.${field}`).toContain(normalize(value));
       }
     }
+  });
+
+  it("keeps the Paper mockup strings in the content", () => {
+    const content = new Set(HOW_TO_ORDER_PAGES.flatMap(bodyStrings));
+    expect(HOW_TO_ORDER_MOCKUP_COPY.filter((text) => !content.has(text))).toEqual([]);
   });
 
   it("keeps the client-approved edge strings in the content", () => {

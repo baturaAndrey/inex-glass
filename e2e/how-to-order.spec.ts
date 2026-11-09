@@ -6,6 +6,8 @@ import { checkStopWords } from "../src/lib/domain/stop-words";
 /**
  * Task 28 — «Как заказать» section and «Проектирование» (10 pages, seed slice `how-to-order`).
  * Runs in the three viewport projects; mutating checks (promo) run in one project only.
+ * Layout: Paper mockups `2560_kak-zakazat` (hub) and `2560_kak-zakazat_trebovaniya` (template of
+ * every subpage), 2026-11.
  */
 
 interface PageCase {
@@ -150,29 +152,42 @@ test.describe("how-to-order: common checks", () => {
   }
 });
 
+/** Subpage cards of the hub's `linkList` block (`#subpages`), in order. */
+const SUBPAGE_LINKS: ReadonlyArray<readonly [string, string]> = [
+  ["Требования к чертежам", "/kak-zakazat/trebovaniya-k-chertezham/"],
+  ["Допуски по ГОСТ 30698-2014", "/kak-zakazat/dopuski-i-gost/"],
+  ["Сроки изготовления", "/kak-zakazat/sroki/"],
+  ["Упаковка и доставка", "/kak-zakazat/upakovka-i-dostavka/"],
+  ["Документы на стекло", "/kak-zakazat/dokumenty/"],
+  ["Оплата и договор", "/kak-zakazat/oplata/"],
+  ["Приёмка стекла", "/kak-zakazat/priemka/"],
+  ["Контроль качества", "/kak-zakazat/kontrol-kachestva/"],
+];
+
+/** Pathnames of the links inside a locator. */
+const pathnames = (links: ReturnType<Page["locator"]>) =>
+  links.evaluateAll((nodes) =>
+    nodes.map((node) => new URL((node as HTMLAnchorElement).href).pathname)
+  );
+
 test.describe("/kak-zakazat/", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/kak-zakazat/");
   });
 
-  test("timeline: 6 steps in order with the right links", async ({ page }) => {
-    const steps = page.getByTestId("ht-steps").locator(":scope > li");
+  test("hero photo, 6 steps in order with the right links", async ({ page }) => {
+    await expect(page.getByTestId("processing-hero").locator("img")).toHaveCount(1);
+    const steps = page.getByTestId("order-steps").locator(":scope > li");
     await expect(steps).toHaveCount(6);
     await expect(steps.locator("h2")).toHaveText([
-      "Пришлите файл.",
-      "Согласуйте спецификацию.",
-      "Получите КП.",
-      "Подпишите договор.",
-      "Производство.",
-      "Упаковка и отправка.",
+      "Пришлите файл",
+      "Согласуйте спецификацию",
+      "Получите КП",
+      "Подпишите договор",
+      "Производство",
+      "Упаковка и отправка",
     ]);
-    const hrefs = async (index: number) =>
-      steps
-        .nth(index)
-        .locator("a")
-        .evaluateAll((links) =>
-          links.map((link) => new URL((link as HTMLAnchorElement).href).pathname)
-        );
+    const hrefs = (index: number) => pathnames(steps.nth(index).locator("a"));
     expect(await hrefs(0)).toEqual(["/kak-zakazat/trebovaniya-k-chertezham/"]);
     expect(await hrefs(1)).toEqual(["/kak-zakazat/dopuski-i-gost/"]);
     expect(await hrefs(2)).toEqual(["/raschet-stoimosti/"]);
@@ -183,37 +198,92 @@ test.describe("/kak-zakazat/", () => {
       "/kak-zakazat/dokumenty/",
     ]);
 
-    const circle = steps.first().locator("[data-step-circle]");
-    const size = await circle.boundingBox();
-    if (isMobile(page)) expect(size?.width).toBeLessThanOrEqual(48);
-    else expect(size?.width).toBe(72);
+    // 6 columns ≥1536, 3 below, a vertical timeline on phones.
+    const tops = await steps.evaluateAll((items) =>
+      items.map((item) => Math.round(item.getBoundingClientRect().top))
+    );
+    const rows = new Set(tops).size;
+    const width = page.viewportSize()?.width ?? 0;
+    expect(rows).toBe(width >= 1536 ? 1 : width >= 600 ? 2 : 6);
   });
 
-  test("«Условия» card: sticky on desktop, static on phones", async ({ page }) => {
-    const aside = page.getByTestId("ht-aside");
-    await expect(aside.locator("li")).toHaveText([
+  test("«Условия» tiles and «Кто за что отвечает» table", async ({ page }) => {
+    const terms = page.locator("[data-section='terms'] li");
+    await expect(terms).toHaveText([
       "Заказы от 50 м²",
       "Срочного изготовления нет",
-      "Монтаж не выполняем",
+      "Монтаж — бригада-партнёр или шеф-монтаж",
       "Принимаем файлы, физические шаблоны — нет",
     ]);
-    const position = await aside.evaluate((node) => getComputedStyle(node).position);
-    expect(position).toBe(isMobile(page) ? "static" : "sticky");
+    const whoPays = page.getByTestId("who-pays");
+    if (isMobile(page)) {
+      await expect(whoPays.locator("[data-order-card]")).toHaveCount(3);
+      await expect(whoPays.locator("table")).toBeHidden();
+    } else {
+      await expect(whoPays.locator("table tbody tr")).toHaveCount(3);
+    }
   });
 
-  test("«Кто за что отвечает»: table on desktop, cards on phones, payer badges", async ({
-    page,
-  }) => {
-    const section = page.locator("section", { has: page.locator("#ht-who") });
-    if (isMobile(page)) {
-      await expect(section.locator(".ig-mcard")).toHaveCount(3);
-      await expect(section.locator("table")).toBeHidden();
+  test("8 subpage cards, then the two buttons", async ({ page }) => {
+    const cards = page.getByTestId("subpage-links").locator("a");
+    await expect(cards).toHaveText(SUBPAGE_LINKS.map(([label]) => label));
+    expect(await pathnames(cards)).toEqual(SUBPAGE_LINKS.map(([, href]) => href));
+    await expect(cards.locator("[aria-current]")).toHaveCount(0);
+  });
+});
+
+test.describe("subpage template", () => {
+  for (const item of PAGES.filter((entry) => entry.path !== "/kak-zakazat/")) {
+    test(`${item.path} — photo hero, «На странице», form panel, subpage cards`, async ({
+      page,
+    }) => {
+      await page.goto(item.path);
+      await expect(page.getByTestId("processing-hero").locator("img")).toHaveCount(1);
+      const hero = page.getByTestId("processing-hero");
+      await expect(hero.getByRole("link", { name: "Рассчитать стоимость" })).toBeVisible();
+      await expect(hero.getByRole("link", { name: "Загрузить чертёж" })).toHaveAttribute(
+        "href",
+        "#dr-up"
+      );
+
+      // «На странице» lists the H2 of the article.
+      const toc = page.getByTestId("subpage-toc");
+      const h2 = await page
+        .getByTestId("subpage-article")
+        .locator("h2")
+        .evaluateAll((nodes) => nodes.map((node) => node.id));
+      expect(h2.length).toBeGreaterThanOrEqual(2);
+      const tocLinks = toc.locator(
+        isMobile(page) || (page.viewportSize()?.width ?? 0) <= 1100
+          ? ":scope > details a"
+          : ":scope > div a"
+      );
+      expect(
+        await tocLinks.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("href")))
+      ).toEqual(h2.map((id) => `#${id}`));
+
+      await expect(page.locator("#dr-up")).toHaveCount(1);
+      const cards = page.getByTestId("subpage-links").locator("a");
+      await expect(cards).toHaveCount(8);
+      const current = cards.and(page.locator("[aria-current='page']"));
+      await expect(current).toHaveCount(item.path === "/proektirovanie/" ? 0 : 1);
+    });
+  }
+
+  test("TOC is sticky on desktop and a disclosure ≤1100 px", async ({ page }) => {
+    await page.goto("/kak-zakazat/sroki/");
+    const width = page.viewportSize()?.width ?? 0;
+    const toc = page.getByTestId("subpage-toc");
+    if (width <= 1100) {
+      await expect(toc.locator("details")).toBeVisible();
+      await expect(toc.locator("details a").first()).toBeHidden();
+      await toc.locator("summary").click();
+      await expect(toc.locator("details a").first()).toBeVisible();
     } else {
-      await expect(section.locator("table")).toBeVisible();
-      await expect(section.locator("table tbody tr")).toHaveCount(3);
+      const position = await toc.evaluate((node) => getComputedStyle(node.parentElement!).position);
+      expect(position).toBe("sticky");
+      await expect(toc.locator(":scope > div a[aria-current='true']")).toHaveCount(1);
     }
-    const visible = section.locator("[data-payer]:visible");
-    await expect(visible).toHaveText(["Завод", "Заказчик", "Заказчик"]);
   });
 });
 
@@ -222,15 +292,28 @@ test.describe("/kak-zakazat/trebovaniya-k-chertezham/", () => {
     await page.goto("/kak-zakazat/trebovaniya-k-chertezham/");
   });
 
-  test("three file kinds, the third one is «Не принимаем»", async ({ page }) => {
+  test("article sections in the mockup order", async ({ page }) => {
+    await expect(page.getByTestId("subpage-article").locator("h2")).toHaveText([
+      "Какие файлы принимаем",
+      "Что указать в чертеже",
+      "Технологические ограничения",
+      "Отверстия по ГОСТ 30698-2014",
+      "Как мы проверяем файл",
+    ]);
+  });
+
+  test("three file kinds, the third one is not accepted", async ({ page }) => {
     const cards = page.getByTestId("file-kinds").locator(":scope > li");
     await expect(cards).toHaveCount(3);
-    await expect(cards.nth(2)).toContainText("Не принимаем");
+    await expect(cards.nth(2)).toContainText("Физические шаблоны не принимаем");
     await expect(cards.nth(2)).toHaveAttribute("data-tone", "no");
   });
 
-  test("«Загрузить чертёж» scrolls to the upload card", async ({ page }) => {
-    await page.locator("main").getByRole("link", { name: "Загрузить чертёж" }).first().click();
+  test("«Загрузить чертёж» scrolls to the drawing-form panel", async ({ page }) => {
+    await page
+      .getByTestId("processing-hero")
+      .getByRole("link", { name: "Загрузить чертёж" })
+      .click();
     await expect(page).toHaveURL(/#dr-up$/);
     await expect(page.locator("#dr-up")).toBeInViewport();
     const margin = await page
@@ -239,40 +322,42 @@ test.describe("/kak-zakazat/trebovaniya-k-chertezham/", () => {
     expect(margin).toBeGreaterThanOrEqual(96);
   });
 
-  test("the limits table has 6 rows", async ({ page }) => {
-    const section = page.locator("section", { has: page.locator("#dr-lim") });
-    const rows = isMobile(page) ? section.locator(".ig-mcard") : section.locator("table tbody tr");
-    await expect(rows).toHaveCount(6);
+  test("6 limit tiles, the holes drawing and 4 check steps", async ({ page }) => {
+    const tiles = page.getByTestId("limit-tiles").locator(":scope > div");
+    await expect(tiles).toHaveCount(6);
+    await expect(tiles.last()).toContainText("Шелкография до 1100 × 700 мм");
+    await expect(tiles.last()).toContainText("УФ-печать и фотопечать — до 2000 × 3180 мм");
+    await expect(page.getByTestId("holes-scheme")).toBeVisible();
+    const steps = page.getByTestId("article-steps").locator(":scope > li");
+    await expect(steps).toHaveCount(4);
+    await expect(page.getByTestId("article-note")).toContainText("Если ошибся завод");
   });
 
-  test("the upload card has an unchecked consent checkbox", async ({ page }) => {
-    const card = page.locator("#dr-up");
-    // Real form of task 21 (the registry stub renders no fields before it is merged).
-    test.skip(
-      (await card.locator("input, textarea").count()) === 0,
-      "drawing form of task 21 is not merged yet"
-    );
-    const consent = card.getByRole("checkbox");
+  test("the drawing form has an unchecked consent checkbox", async ({ page }) => {
+    const consent = page.locator("#dr-up").getByRole("checkbox");
     await expect(consent.first()).not.toBeChecked();
+  });
+
+  test("the current subpage card is highlighted", async ({ page }) => {
+    const current = page.getByTestId("subpage-links").locator("a[aria-current='page']");
+    await expect(current).toHaveText("Требования к чертежам");
   });
 });
 
 test.describe("/kak-zakazat/dopuski-i-gost/", () => {
   test("three tolerance tables and the holes calculator block", async ({ page }) => {
     await page.goto("/kak-zakazat/dopuski-i-gost/");
-    const tables = page.locator("main .ig-table-wrap");
-    // Length/width, flatness, holes (the calculator may add its own table after task 25).
-    expect(await tables.count()).toBeGreaterThanOrEqual(3);
+    await expect(page.getByTestId("article-table")).toHaveCount(3);
     for (const heading of ["Длина и ширина", "Плоскостность", "Отверстия"]) {
       await expect(page.getByRole("heading", { level: 2, name: heading })).toBeVisible();
     }
     await expect(page.getByText("введите толщину стекла")).toBeVisible();
+    await expect(page.locator("#kalkulyator")).toHaveCount(1);
   });
 
-  test("calculator: 10 mm → 20 / 20 / 60 mm (after task 25)", async ({ page }) => {
+  test("calculator: 10 mm → 20 / 20 / 60 mm", async ({ page }) => {
     await page.goto("/kak-zakazat/dopuski-i-gost/");
     const chip = page.locator("main").getByRole("radio", { name: /^10/ });
-    test.skip((await chip.count()) === 0, "holes calculator of task 25 is not merged yet");
     await chip.first().click();
     const live = page.locator("main [aria-live]").first();
     await expect(live).toContainText("20");
@@ -380,7 +465,7 @@ test.describe("/kak-zakazat/oplata/ — «Скидка» follows the promo", () 
   const termsRows = (page: Page) =>
     page
       .getByTestId("payment-terms")
-      .locator(isMobile(page) ? ".ig-mcard dt" : "tbody tr td:first-child");
+      .locator(isMobile(page) ? "[data-order-card] > :first-child" : "tbody tr th");
 
   test("promo off → no «Скидка» row; promo on → row with the promo text", async ({
     page,
