@@ -1,19 +1,33 @@
-import { cache, type ReactNode } from "react";
+import { cache } from "react";
 import { FileText } from "lucide-react";
 import { RenderBlocks } from "@/components/blocks/render-blocks";
-import { FormSection } from "@/components/forms/form-section";
+import { asMedia, mediaSrc } from "@/components/blocks/shared";
+import { DrawingPanel } from "@/components/forms/drawing-panel";
 import { FormTrigger } from "@/components/forms/form-trigger";
 import { Button } from "@/components/ig/button";
-import { Faq } from "@/components/ig/faq";
-import { PageHero } from "@/components/ig/page-hero";
-import type { SectionVariant } from "@/components/ig/section";
+import { Container } from "@/components/ig/container";
 import { NOT_FOUND_METADATA, NotFoundResponse } from "@/components/page/not-found-response";
 import { PageShell } from "@/components/page/page-shell";
-import type { QuizPrefill } from "@/components/page/quiz-cta";
+import { QuizLink, type QuizPrefill } from "@/components/page/quiz-cta";
+import { ProcessingHero } from "@/components/processing/processing-hero";
+import { ServiceFaq } from "@/components/processing/service-faq";
 import { RichText } from "@/components/rich-text/rich-text";
-import { CtParagraph, CtSection } from "@/components/zak-hub/ct-cards-section";
+import { PROCESSING_HUB_PATH, ZAK_TEMPLATE_COPY } from "@/components/zak-hub/copy";
+import {
+  anchorOf,
+  HUB_SECTION_ANCHORS,
+  processingCards as hubProcessingCards,
+} from "@/components/zak-hub/hub-page";
+import { ProcessingStrip, type ProcessingStripCard } from "@/components/zak-hub/processing-strip";
+import { CreamBlock } from "@/components/zak-hub/zak-info";
 import { getConditions, getPlaceholderContext, getPrices, getTechLimits } from "@/lib/cms/globals";
-import { getThicknessByN, getThicknessGroups, redirectIfExists } from "@/lib/cms/queries";
+import {
+  getPageByPath,
+  getThicknessByN,
+  getThicknessGroups,
+  listPublished,
+  redirectIfExists,
+} from "@/lib/cms/queries";
 import { priceState, replacePlaceholders, THICKNESSES } from "@/lib/domain";
 import type { PlaceholderContext } from "@/lib/domain";
 import { faqLd, JsonLd, thicknessProductLd } from "@/lib/seo/jsonld";
@@ -21,20 +35,25 @@ import { buildMetadata, resolveH1 } from "@/lib/seo/metadata";
 import { pickOgImage } from "@/lib/seo/og-image";
 import { buildThicknessView, thicknessHref, thicknessLabel } from "@/lib/thickness-view";
 import { lexicalToPlainText } from "@/payload/utils/lexical-text";
-import type { Thickness, ThicknessGroup } from "@/payload-types";
+import type { ProcessingService, Thickness, ThicknessGroup } from "@/payload-types";
 import { HolesRules } from "./thickness/holes-rules";
 import { Neighbors } from "./thickness/neighbors";
-import { Passport } from "./thickness/passport";
+import { SpecTable } from "./thickness/spec-table";
 import type { Metadata } from "next";
 
 /**
- * Thickness card `/zakalennoe-steklo/{N}-mm/` (`Thick10.dc.html`, `Thick19.dc.html`): one
- * template for 4, 5, 6, 8, 10, 12, 15 and 19 mm. Texts of the template are teksty/03; the
- * group texts (selection, processing, FAQ) come from `thickness-groups` unless the thickness
- * overrides them; prices, weights and hole distances come from the domain library.
+ * Thickness card `/zakalennoe-steklo/{N}-mm/`: one template for 4, 5, 6, 8, 10, 12, 15 and
+ * 19 mm, laid out by the approved Paper mockup `2560_zak_tolshchina_10mm` (2026-11):
  *
- * The 45-day rule decides the price, the title (`seo.title` ↔ `seo.titleNoPrice`) and the
- * Product JSON-LD; the page is ISR (`revalidate` of the route) so it follows the date.
+ * hero (photo `card.image`, H1, spec table, «Заказы от 50 м².», «Рассчитать стекло N мм» /
+ * «Загрузить чертёж») → «Что входит в цену» + «Подберём толщину…» panels → holes scheme and
+ * distances → «Обработка стекла N мм» (group text + the six processing services) → neighbour
+ * thicknesses → extra `layout` blocks → cream block: FAQ and the dark drawing-form panel.
+ *
+ * Texts of the template are teksty/03; the group texts (selection, processing, FAQ) come from
+ * `thickness-groups` unless the thickness overrides them; prices, weights and hole distances
+ * come from the domain library. The 45-day rule decides the price, the title (`seo.title` ↔
+ * `seo.titleNoPrice`) and the Product JSON-LD; the page is ISR (`revalidate` of the route).
  */
 
 /** `^(4|5|6|8|10|12|15|19)-mm$` — anything else (`7-mm`, `010-mm`, `10-MM`) is not a card. */
@@ -104,12 +123,6 @@ export async function generateThicknessMetadata(n: number): Promise<Metadata> {
   });
 }
 
-interface TemplateSection {
-  key: string;
-  heading: string;
-  content: ReactNode;
-}
-
 type FaqItems = NonNullable<ThicknessGroup["faq"]>;
 
 /** FAQ of the card: its own override, otherwise the group questions. */
@@ -119,8 +132,65 @@ function faqItems(doc: Thickness, group: ThicknessGroup | null): FaqItems {
   return (group?.faq ?? []).filter((item) => item.question.trim() !== "");
 }
 
-/** Rhythm of the template sections after the hero (which is `bg`). */
-const variantAt = (index: number): SectionVariant => (index % 2 === 0 ? "sf" : "bg");
+/** Hero photo of the card (`card.image`; the same illustration for every thickness for now). */
+function heroMedia(doc: Thickness): { src: string; alt: string } | null {
+  const media = asMedia(doc.card?.image);
+  const src = media ? mediaSrc(media) : null;
+  return media && src ? { src, alt: media.alt?.trim() ?? "" } : null;
+}
+
+/** Hub of the section: its «Обработка до закалки» block is the source of the processing cards. */
+const HUB_PATH = "/zakalennoe-steklo/";
+
+/**
+ * Processing cards of the card: the hub's «Обработка до закалки» block (same titles, facts and
+ * photos as on the hub, edited in one place); without it, the processing services themselves.
+ */
+async function loadProcessingCards(ctx: PlaceholderContext): Promise<ProcessingStripCard[]> {
+  const hub = await getPageByPath(HUB_PATH);
+  const block = (hub?.layout ?? []).find(
+    (item) => item.blockType === "cards" && anchorOf(item) === HUB_SECTION_ANCHORS.processing
+  );
+  if (block?.blockType === "cards") {
+    const cards = hubProcessingCards(block, ctx);
+    if (cards.length > 0) return cards;
+  }
+  // Depth 1: the cards need the populated `heroImage` / `card.image`.
+  const services = await listPublished("processing-services", {
+    sort: "order",
+    limit: 50,
+    depth: 1,
+  });
+  return serviceCards(services.docs, ctx);
+}
+
+/** The processing services as cards: short title, main limit, service photo. */
+function serviceCards(
+  services: readonly ProcessingService[],
+  ctx: PlaceholderContext
+): ProcessingStripCard[] {
+  return services.flatMap((service) => {
+    if (!service.path) return [];
+    const media = asMedia(service.heroImage) ?? asMedia(service.card?.image);
+    const src = media ? mediaSrc(media, "card") : null;
+    const title = (service.card?.title || service.title).trim();
+    return [
+      {
+        key: service.id,
+        href: service.path,
+        title: replacePlaceholders(title, ctx),
+        text: replacePlaceholders(service.keyLimit?.trim() ?? "", ctx),
+        // The title next to the photo names the card: the image itself is decorative here.
+        photo: media && src ? { src, alt: "" } : null,
+      },
+    ];
+  });
+}
+
+const PANEL_TEXT =
+  "text-ink-3 m-0 text-[17px] leading-[1.6] max-sm:text-base [&_p]:m-0 [&_p]:max-w-none [&_p]:text-[length:inherit] [&_p]:leading-[inherit] [&_p]:text-inherit";
+
+const withPeriod = (text: string) => (/[.!?…]$/u.test(text) ? text : `${text}.`);
 
 export async function ThicknessPage({ n }: { n: number }) {
   const loaded = await loadThickness(n);
@@ -136,6 +206,7 @@ export async function ThicknessPage({ n }: { n: number }) {
     getConditions(),
     getTechLimits(),
   ]);
+  const processing = await loadProcessingCards(ctx);
   const pagePath = doc.path || path;
   const view = buildThicknessView({
     n,
@@ -170,113 +241,115 @@ export async function ThicknessPage({ n }: { n: number }) {
         description: replacePlaceholders(doc.seo?.description ?? "", ctx).trim() || null,
       })
     : null;
-  const faqJsonLd = faqLd(
-    faq.map((item) => ({
-      question: replacePlaceholders(item.question, ctx),
-      answer: replacePlaceholders(lexicalToPlainText(item.answer), ctx),
-    }))
-  );
-
-  const sections: TemplateSection[] = [
-    {
-      key: "included",
-      heading: TEXT.includedTitle,
-      content: <CtParagraph>{TEXT.included(n)}</CtParagraph>,
-    },
-    {
-      key: "podbor",
-      heading: TEXT.podborTitle,
-      content: (
-        <>
-          {podbor ? <ThicknessRichText data={podbor} ctx={ctx} /> : null}
-          <CtParagraph className="mt-4">{TEXT.podborAsk}</CtParagraph>
-          <FormTrigger
-            formKey="load"
-            params={{ label: TEXT.podborButton, source: sourceOf(n), thickness: n }}
-            asChild
-          >
-            <Button variant="secondary">{TEXT.podborButton}</Button>
-          </FormTrigger>
-        </>
-      ),
-    },
-    ...(obrabotka
-      ? [
-          {
-            key: "obrabotka",
-            heading: TEXT.obrabotkaTitle(n),
-            content: <ThicknessRichText data={obrabotka} ctx={ctx} />,
-          },
-        ]
-      : []),
-    {
-      key: "holes",
-      heading: TEXT.holesTitle(n),
-      content: <HolesRules view={view} holes={limits.holes} />,
-    },
-    { key: "neighbors", heading: TEXT.neighborsTitle, content: <Neighbors view={view} /> },
-    ...(faq.length > 0
-      ? [
-          {
-            key: "faq",
-            heading: TEXT.faqTitle,
-            content: (
-              <Faq
-                className="max-w-[1100px]"
-                items={faq.map((item) => ({
-                  question: replacePlaceholders(item.question, ctx),
-                  answer: <RichText data={item.answer} ctx={ctx} />,
-                }))}
-              />
-            ),
-          },
-        ]
-      : []),
-  ];
+  const faqJsonLd =
+    faq.length > 0
+      ? faqLd(
+          faq.map((item) => ({
+            question: replacePlaceholders(item.question, ctx),
+            answer: replacePlaceholders(lexicalToPlainText(item.answer), ctx),
+          }))
+        )
+      : null;
 
   return (
-    <PageShell path={pagePath} lastLabel={thicknessLabel(n)} quiz={false}>
+    <PageShell path={pagePath} lastLabel={thicknessLabel(n)} showConditions={false} quiz={false}>
       <JsonLd data={[productLd, faqJsonLd]} />
-      <PageHero
-        variant="ct-hero"
+      <ProcessingHero
         title={h1}
-        facts={minOrder ? withPeriod(minOrder) : undefined}
-        actions={
-          <FormTrigger
-            formKey="drawing"
-            params={{ label: TEXT.drawingButton, source: sourceOf(n) }}
-            asChild
-          >
-            <Button size="l" leftIcon={<FileText aria-hidden="true" strokeWidth={2} />}>
-              {TEXT.drawingButton}
-            </Button>
-          </FormTrigger>
+        media={heroMedia(doc)}
+        actionsGap="tight"
+        indentActions
+        lead={
+          <div className="flex flex-col gap-6 max-sm:gap-4">
+            <SpecTable view={view} />
+            {minOrder || view.promoText ? (
+              <div className="text-ink-3 text-[15px] leading-[1.2] font-medium" data-min-order="">
+                {minOrder ? withPeriod(minOrder) : null}
+                {minOrder && view.promoText ? " " : null}
+                {view.promoText ? <span data-spec-promo="">{view.promoText}</span> : null}
+              </div>
+            ) : null}
+          </div>
         }
-        aside={<Passport view={view} prefill={prefill} src={pagePath} ctx={ctx} />}
-      >
-        <p
-          aria-hidden="true"
-          className="text-primary-dark m-0 mt-2 text-[120px] leading-[0.9] font-bold tracking-[-0.03em] tabular-nums max-sm:text-[72px]"
-        >
-          {n}
-          <small className="text-text-2 ml-2 text-[40px] font-medium tracking-normal max-sm:text-[28px]">
-            мм
-          </small>
-        </p>
-      </PageHero>
+        actions={
+          <>
+            <QuizLink prefill={prefill} src={pagePath} size="l" ctx={ctx} />
+            <FormTrigger
+              formKey="drawing"
+              params={{ label: TEXT.drawingButton, source: sourceOf(n) }}
+              asChild
+            >
+              <Button
+                size="l"
+                variant="secondary"
+                leftIcon={<FileText aria-hidden="true" strokeWidth={2} />}
+              >
+                {TEXT.drawingButton}
+              </Button>
+            </FormTrigger>
+          </>
+        }
+      />
 
-      {sections.map((section, index) => (
-        <CtSection
-          key={section.key}
-          variant={variantAt(index)}
-          id={section.key === "faq" ? "faq" : undefined}
-          headingId={`th-${section.key}-title`}
-          heading={section.heading}
-          data-section={section.key}
-        >
-          {section.content}
-        </CtSection>
-      ))}
+      <section
+        aria-label={`${TEXT.includedTitle}. ${TEXT.podborTitle}`}
+        className="py-16 max-md:py-12 max-sm:py-8"
+        data-section="price-select"
+      >
+        <Container className="grid grid-cols-2 items-stretch gap-6 max-md:grid-cols-1 max-sm:gap-4">
+          <div
+            className="bg-surface border-hairline flex flex-col gap-5 rounded-xl border p-10 max-sm:rounded-lg max-sm:p-5"
+            data-section="included"
+          >
+            <h2 className="text-h3 m-0 font-bold text-balance">{TEXT.includedTitle}</h2>
+            <p className={PANEL_TEXT}>{TEXT.included(n)}</p>
+          </div>
+          <div
+            className="bg-primary-light flex flex-col items-start gap-5 rounded-xl p-10 max-sm:rounded-lg max-sm:p-5"
+            data-section="podbor"
+          >
+            <h2 className="text-h3 m-0 font-bold text-balance">{TEXT.podborTitle}</h2>
+            {podbor ? (
+              <div className={PANEL_TEXT}>
+                <RichText data={podbor} ctx={ctx} disableContainer />
+              </div>
+            ) : null}
+            <p className={PANEL_TEXT}>{TEXT.podborAsk}</p>
+            <FormTrigger
+              formKey="load"
+              params={{ label: TEXT.podborButton, source: sourceOf(n), thickness: n }}
+              asChild
+            >
+              <Button variant="secondary" size="m">
+                {TEXT.podborButton}
+              </Button>
+            </FormTrigger>
+          </div>
+        </Container>
+      </section>
+
+      <HolesRules
+        view={view}
+        holes={limits.holes}
+        heading={TEXT.holesTitle(n)}
+        headingId="th-holes-title"
+      />
+
+      <ProcessingStrip
+        heading={TEXT.obrabotkaTitle(n)}
+        headingId="th-obrabotka-title"
+        lead={obrabotka ? <RichText data={obrabotka} ctx={ctx} disableContainer /> : undefined}
+        link={{ href: PROCESSING_HUB_PATH, label: ZAK_TEMPLATE_COPY.processingLink }}
+        cards={processing}
+      />
+
+      <Neighbors
+        view={view}
+        prices={ctx.prices}
+        now={ctx.now}
+        heading={TEXT.neighborsTitle}
+        headingId="th-neighbors-title"
+      />
 
       <RenderBlocks
         blocks={doc.layout}
@@ -284,26 +357,25 @@ export async function ThicknessPage({ n }: { n: number }) {
         page={{ path: pagePath, title: h1, quizPrefill: doc.quizPrefill }}
       />
 
-      <FormSection formKey="full" source={sourceOf(n)} />
+      <CreamBlock>
+        {faq.length > 0 ? (
+          <div id="faq" className="scroll-mt-24">
+            <ServiceFaq
+              heading={TEXT.faqTitle}
+              headingId="th-faq-title"
+              items={faq.map((item, index) => ({
+                key: item.id ?? String(index),
+                question: item.question,
+                answer: item.answer,
+              }))}
+              ctx={ctx}
+              jsonLd={false}
+              bare
+            />
+          </div>
+        ) : null}
+        <DrawingPanel headingId="th-form-title" params={{ source: sourceOf(n) }} anchorId="form" />
+      </CreamBlock>
     </PageShell>
   );
 }
-
-/** Group / override texts: `{N}`, `{2N}`, `{вес}` … substituted with the card thickness. */
-function ThicknessRichText({
-  data,
-  ctx,
-}: {
-  data: NonNullable<ThicknessGroup["podborText"]>;
-  ctx: PlaceholderContext;
-}) {
-  return (
-    <RichText
-      data={data}
-      ctx={ctx}
-      className="text-ink-3 max-w-[880px] text-[17px] leading-[1.6] max-sm:text-base [&_p]:max-w-none"
-    />
-  );
-}
-
-const withPeriod = (text: string) => (/[.!?…]$/u.test(text) ? text : `${text}.`);

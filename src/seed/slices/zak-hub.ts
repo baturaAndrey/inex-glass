@@ -20,7 +20,8 @@ import {
 } from "../content/zak-hub";
 import { mayOverwrite, upsertByPath } from "../context";
 import { markdown } from "../lexical";
-import type { HubCard, HubLink } from "../content/zak-hub";
+import { ensureSeedImage } from "../seed-media";
+import type { HubCard, HubImage, HubLink } from "../content/zak-hub";
 import type { SeedContext } from "../context";
 
 /**
@@ -32,6 +33,11 @@ import type { SeedContext } from "../context";
  * Every section has an explicit background (the prototype rhythm `bg` ↔ `sf`); the objects feed
  * shares the background of «Для кого» (the prototype pairs them: «Для кого + 3–4 объекта»), so
  * the rhythm holds whether or not published objects exist.
+ *
+ * Photos (hero, kinds and processing cards) are seed media (`../seed-media.ts`): the
+ * illustrations of `../media/zak-hub/`, the «Матовое» photo of the glass type page and the
+ * processing service photos — found again by `sourceUrl`, so the same media documents are
+ * shared with those pages.
  *
  * Update rule: created when missing; an existing document is overwritten with `--force` or while
  * it is still untouched (the mini-seed stub); an edited hub is skipped with a log line.
@@ -52,25 +58,35 @@ const linkButton = (link: HubLink, variant: "primary" | "secondary" = "secondary
 
 const formParams = (label: string) => ({ label, source: HUB_SOURCE });
 
-const cards = (items: readonly HubCard[]): CardItem[] =>
-  items.map((item) => ({
-    title: item.title,
-    text: item.text,
-    ...(item.url ? { link: customLink(item.url) } : {}),
-  }));
+const imageId = (ctx: SeedContext, image: HubImage) => ensureSeedImage(ctx, image);
 
-const cardsBlock = (
+async function cards(ctx: SeedContext, items: readonly HubCard[]): Promise<CardItem[]> {
+  const result: CardItem[] = [];
+  for (const item of items) {
+    result.push({
+      title: item.title,
+      text: item.text,
+      ...(item.url ? { link: customLink(item.url) } : {}),
+      ...(item.icon ? { icon: item.icon } : {}),
+      ...(item.image ? { image: await imageId(ctx, item.image) } : {}),
+    });
+  }
+  return result;
+}
+
+const cardsBlock = async (
+  ctx: SeedContext,
   heading: string,
   anchorId: string,
   background: "bg" | "sf",
   items: readonly HubCard[]
-): CardsBlock => ({
+): Promise<CardsBlock> => ({
   blockType: "cards",
   heading,
   anchorId,
   background,
   layout: "ctCards",
-  items: cards(items),
+  items: await cards(ctx, items),
 });
 
 async function buildLayout(ctx: SeedContext): Promise<LayoutBlock[]> {
@@ -82,6 +98,7 @@ async function buildLayout(ctx: SeedContext): Promise<LayoutBlock[]> {
     variant: "ctHero",
     facts: hero.facts,
     strong: hero.strong,
+    image: await imageId(ctx, hero.image),
     showTerms: true,
     termsMode: "full",
     buttons: [
@@ -215,15 +232,15 @@ async function buildLayout(ctx: SeedContext): Promise<LayoutBlock[]> {
     heroBlock,
     pricesBlock,
     checklistBlock,
-    cardsBlock(risk.heading, HUB_ANCHORS.risk, "sf", risk.items),
+    await cardsBlock(ctx, risk.heading, HUB_ANCHORS.risk, "sf", risk.items),
     weightsBlock,
     weightsCta,
-    cardsBlock(kinds.heading, HUB_ANCHORS.kinds, "sf", kinds.items),
+    await cardsBlock(ctx, kinds.heading, HUB_ANCHORS.kinds, "sf", kinds.items),
     kindsBridge,
-    cardsBlock(processing.heading, HUB_ANCHORS.processing, "bg", processing.items),
+    await cardsBlock(ctx, processing.heading, HUB_ANCHORS.processing, "bg", processing.items),
     timingBlock,
     timingCta,
-    cardsBlock(audiences.heading, HUB_ANCHORS.audiences, "bg", audiences.items),
+    await cardsBlock(ctx, audiences.heading, HUB_ANCHORS.audiences, "bg", audiences.items),
     objectsBlock,
     faqBlock,
     formBlock,

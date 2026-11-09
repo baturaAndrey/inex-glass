@@ -49,40 +49,53 @@ const MIST =
 
 type CardItem = NonNullable<BlockOf<"cards">["items"]>[number];
 
-interface ResolvedCard {
+export interface ResolvedCard {
   key: string;
-  href: string;
+  /** Page of the card; `null` — a plain card without the arrow (e.g. «Прозрачное»). */
+  href: string | null;
   title: string;
   text: string;
   photo: { src: string; alt: string } | null;
 }
 
-function resolveCard(item: CardItem, index: number, ctx: PlaceholderContext): ResolvedCard | null {
+/** Card of a `cards` block item; `null` without a title. */
+export function resolveCard(
+  item: CardItem,
+  index: number,
+  ctx: PlaceholderContext
+): ResolvedCard | null {
   const link = resolveLink(item.link);
   const title = fill(item.title, ctx);
-  if (!link || !title) return null;
+  if (!title) return null;
   const media = asMedia(item.image);
   const src = media ? mediaSrc(media) : null;
   return {
     key: item.id ?? String(index),
-    href: link.href,
+    href: link?.href ?? null,
     title,
     text: fill(item.text, ctx),
     photo: media && src ? { src, alt: media.alt?.trim() ?? "" } : null,
   };
 }
 
-function HubCard({ card }: { card: ResolvedCard }) {
-  return (
-    <Link
-      href={card.href}
-      className={cn(
-        "group/card ease-ig border-line bg-well text-text hover:shadow-card-hover focus-visible:outline-brand relative isolate flex w-full items-end overflow-hidden rounded-xl border no-underline transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0",
-        CARD_HEIGHT,
-        CARD_PADDING
-      )}
-      data-testid="construction-card"
-    >
+const CARD_CLASS =
+  "ease-ig border-line bg-well text-text relative isolate flex w-full items-end overflow-hidden rounded-xl border no-underline";
+const LINK_CLASS =
+  "group/card hover:shadow-card-hover focus-visible:outline-brand transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0";
+
+/**
+ * Photo card (title, text, round arrow) linking to its page; without `href` a plain card with no
+ * arrow. Shared with the kinds grid of the tempered-glass hub (`@/components/zak-hub`).
+ */
+export function HubCard({
+  card,
+  testId = "construction-card",
+}: {
+  card: ResolvedCard;
+  testId?: string | undefined;
+}) {
+  const content = (
+    <>
       {card.photo ? (
         <Image
           src={card.photo.src}
@@ -105,15 +118,27 @@ function HubCard({ card }: { card: ResolvedCard }) {
           ) : (
             <span />
           )}
-          <span
-            aria-hidden="true"
-            className="bg-primary group-hover/card:bg-primary-hover flex size-16 shrink-0 items-center justify-center rounded-full text-white transition-colors duration-200 max-sm:size-12"
-          >
-            <ArrowUpRight strokeWidth={2} className="size-7 max-sm:size-6" />
-          </span>
+          {card.href ? (
+            <span
+              aria-hidden="true"
+              className="bg-primary group-hover/card:bg-primary-hover flex size-16 shrink-0 items-center justify-center rounded-full text-white transition-colors duration-200 max-sm:size-12"
+            >
+              <ArrowUpRight strokeWidth={2} className="size-7 max-sm:size-6" />
+            </span>
+          ) : null}
         </span>
       </span>
+    </>
+  );
+  const className = cn(CARD_CLASS, CARD_HEIGHT, CARD_PADDING);
+  return card.href ? (
+    <Link href={card.href} className={cn(className, LINK_CLASS)} data-testid={testId}>
+      {content}
     </Link>
+  ) : (
+    <div className={className} data-testid={testId}>
+      {content}
+    </div>
   );
 }
 
@@ -160,7 +185,8 @@ function MontagePanel({
 export function HubCards({ cards, montage, ctx, page }: HubCardsProps) {
   const items = (cards?.items ?? []).flatMap((item, index) => {
     const card = resolveCard(item, index, ctx);
-    return card ? [card] : [];
+    // Construction cards always lead to their page.
+    return card?.href ? [card] : [];
   });
   const showMontage = Boolean(
     montage && (hasText(montage.title) || (montage.buttons ?? []).length > 0)

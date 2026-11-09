@@ -38,6 +38,11 @@ export interface ProcessingHeroProps {
    * `2560_steklyannye-konstrukcii`); by default they align with the H1.
    */
   indentActions?: boolean | undefined;
+  /**
+   * Space between the text and the buttons: `wide` (136 px at 1920, the section hubs) or
+   * `tight` (36 px: the thickness cards, whose spec table already fills the first screen).
+   */
+  actionsGap?: "wide" | "tight" | undefined;
 }
 
 const DEFAULT_TITLE_ID = "page-title";
@@ -68,6 +73,7 @@ export function ProcessingHero({
   media,
   placeholder,
   indentActions = false,
+  actionsGap = "wide",
 }: ProcessingHeroProps) {
   return (
     <section
@@ -103,7 +109,14 @@ export function ProcessingHero({
       ) : null}
       {/* Mockup: 136 px above the buttons at 1920; below 1536 px less, so «Рассчитать стоимость»
           stays on the first screen of a 1366 × 768 laptop even with a long intro. */}
-      <div className="relative flex flex-col gap-[136px] px-(--ig-gutter) pt-8 pb-16 max-xl:gap-16 max-md:gap-10 max-sm:gap-6 max-sm:pt-6 max-sm:pb-10">
+      <div
+        className={cn(
+          "relative flex flex-col px-(--ig-gutter) pt-8 pb-16 max-sm:pt-6 max-sm:pb-10",
+          actionsGap === "wide"
+            ? "gap-[136px] max-xl:gap-16 max-md:gap-10 max-sm:gap-6"
+            : "gap-9 max-md:gap-8 max-sm:gap-6"
+        )}
+      >
         <div className="flex flex-col items-start gap-6 max-sm:gap-4">
           <h1 id={titleId} className="ig-h1 m-0 max-w-[1100px] text-balance">
             {title}

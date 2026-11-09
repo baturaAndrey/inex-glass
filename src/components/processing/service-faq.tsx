@@ -30,6 +30,11 @@ export interface ServiceFaqProps {
   ctx: PlaceholderContext;
   /** Emit `FAQPage` JSON-LD (off when another block of the page already does). */
   jsonLd: boolean;
+  /**
+   * Inside a block that already has the gutters and the rhythm (the cream block of the
+   * tempered-glass hub and the thickness cards): no section padding, no container.
+   */
+  bare?: boolean | undefined;
 }
 
 /** `\_` keeps the BEM underscores literal in the arbitrary variants (an `_` means a space). */
@@ -42,7 +47,14 @@ const ACCORDION = cn(
   String.raw`[&_.ig-acc\_\_panel]:text-ink-3 [&_.ig-acc\_\_panel]:pr-0 [&_.ig-acc\_\_panel_p]:max-w-[900px]`
 );
 
-export function ServiceFaq({ heading, headingId, items, ctx, jsonLd }: ServiceFaqProps) {
+export function ServiceFaq({
+  heading,
+  headingId,
+  items,
+  ctx,
+  jsonLd,
+  bare = false,
+}: ServiceFaqProps) {
   const questions = items.filter((item) => item.question.trim() !== "");
   if (questions.length === 0) return null;
   const text = (value: string) => replacePlaceholders(value, ctx);
@@ -50,10 +62,15 @@ export function ServiceFaq({ heading, headingId, items, ctx, jsonLd }: ServiceFa
   return (
     <section
       aria-labelledby={headingId}
-      className="py-16 max-md:py-12 max-sm:py-8"
+      className={bare ? undefined : "py-16 max-md:py-12 max-sm:py-8"}
       data-testid="service-faq"
     >
-      <Container className="flex items-start gap-16 max-md:flex-col max-md:gap-6">
+      <Container
+        className={cn(
+          "flex items-start gap-16 max-md:flex-col max-md:gap-6",
+          bare && "max-w-none px-0"
+        )}
+      >
         <h2
           id={headingId}
           className="ig-h2 text-primary-dark m-0 w-[520px] shrink-0 text-balance max-lg:w-[360px] max-md:w-auto"

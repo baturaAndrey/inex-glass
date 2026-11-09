@@ -7,7 +7,16 @@
  * Pure data (no Payload imports): the slice (`../slices/zak-hub.ts`) builds the document from
  * it and `../slices/zak-hub-thicknesses.test.ts` checks it against teksty.
  * CMS placeholders (`{дата_цен}`, `{акция_текст}`) are stored as they are.
+ *
+ * Laid out by the approved Paper mockup `2560_zakalennoe-steklo` (2026-11): the wording it
+ * changes (facts split into four checks, capitalised card captions, processing facts of the
+ * service pages, timing paragraphs without the lead-time numbers that moved into tiles) is
+ * listed in `ZAK_MOCKUP_COPY`; photos are generated illustrations until the client's photos.
  */
+
+import { GLASS_TYPES_CONTENT } from "./glass-types";
+import { SERVICES } from "./processing";
+import { ZAK_TEMPLATE_COPY } from "../../components/zak-hub/copy";
 
 export const HUB_PATH = "/zakalennoe-steklo/";
 /** Lead source label of the hub buttons and form. */
@@ -18,12 +27,133 @@ export const HUB_SOURCE = "zakalennoe-steklo";
  */
 export const HUB_FORM_SOURCE_LABEL = "Закалённое стекло — форма «Отправить чертёж»";
 
+/** A photo shipped with the seed (`src/seed/media/<group>/<file>`, see `../seed-media.ts`). */
+export interface HubImage {
+  group: string;
+  file: string;
+  /** Russian alt text describing the picture. */
+  alt: string;
+  temporary?: boolean;
+}
+
 export interface HubCard {
   title: string;
   text: string;
   /** Page of the card; a card without a page is a plain card. */
   url?: string;
+  /** Lucide icon name (risk cards). */
+  icon?: string;
+  image?: HubImage;
 }
+
+const MEDIA_GROUP = "zak-hub";
+const zakImage = (file: string, alt: string): HubImage => ({ group: MEDIA_GROUP, file, alt });
+
+/** Hero photo of every thickness card (`thicknesses.card.image`). */
+export const THICKNESS_HERO_IMAGE: HubImage = zakImage(
+  "tolshchina-hero.webp",
+  "Стопка листов закалённого стекла разной толщины в цехе, за ними стол раскроя и рабочие"
+);
+
+/** The «Матовое» card reuses the photo of the glass type page (same media document). */
+function glassTypeImage(slug: string): HubImage {
+  const image = GLASS_TYPES_CONTENT.find((item) => item.slug === slug)?.heroImage;
+  if (!image) throw new Error(`glass type ${slug}: нет heroImage`);
+  return { group: "glass-types", ...image };
+}
+
+/**
+ * «Обработка до закалки» cards: titles from teksty/02, the caption is the main fact of the
+ * service page (`keyLimit`), the photo is the service photo (same media document).
+ */
+function processingCard(title: string, url: string): HubCard {
+  const service = SERVICES.find((item) => url === `/obrabotka-stekla/${item.slug}/`);
+  if (!service) throw new Error(`processing card ${url}: нет услуги`);
+  return { title, text: service.keyLimit, url, image: { group: "processing", ...service.image } };
+}
+
+/** Hero facts, one check per line (mockup: the teksty line split into four). */
+const HERO_FACTS = [
+  "По вашему чертежу DWG или DXF",
+  "Толщина 4–19 мм · заказы от 50 м²",
+  "От 10 рабочих дней с даты договора",
+  "Доставка по Уралу, Сибири и Поволжью",
+];
+
+/** Kinds cards: teksty/02 captions, capitalised by the mockup. */
+const KIND_CARDS: readonly HubCard[] = [
+  {
+    title: "Прозрачное",
+    text: "Базовое стекло для перегородок, дверей, ограждений",
+    image: zakImage(
+      "prozrachnoe.webp",
+      "Лист прозрачного закалённого стекла на пирамиде в светлом цехе"
+    ),
+  },
+  {
+    title: "Осветлённое",
+    text: "Без зеленоватого оттенка на торце",
+    url: "/zakalennoe-steklo/osvetlennoe/",
+    image: zakImage(
+      "osvetlennoe.webp",
+      "Торцы двух стёкол рядом: обычное с зеленоватым оттенком и прозрачное осветлённое"
+    ),
+  },
+  {
+    title: "Матовое",
+    text: "Приватность без потери света",
+    url: "/zakalennoe-steklo/matovoe/",
+    image: glassTypeImage("matovoe"),
+  },
+  {
+    title: "Тонированное",
+    text: "Бронза, графит, серое",
+    url: "/zakalennoe-steklo/tonirovannoe/",
+    image: zakImage(
+      "tonirovannoe.webp",
+      "Три образца стекла — бронзовое, графитовое и прозрачное — на столе в офисе"
+    ),
+  },
+  {
+    title: "Крашеное по RAL",
+    text: "Толщина 4–15 мм, размер до 3000 × 1600 мм",
+    url: "/zakalennoe-steklo/okrashennoe/",
+    image: zakImage(
+      "okrashennoe.webp",
+      "Панели крашеного стекла — зелёная, бежевая, графитовая и белая — на фоне кухни"
+    ),
+  },
+  {
+    title: "Рифлёное",
+    text: "Узорчатое стекло",
+    url: "/zakalennoe-steklo/riflenoe/",
+    image: zakImage(
+      "riflenoe.webp",
+      "Перегородка из рифлёного стекла с вертикальными рёбрами в чёрном профиле"
+    ),
+  },
+  {
+    title: "Гнутое",
+    text: "До 1200 × 2000 мм; радиус от 1000 мм для 4–6 мм и от 1500 мм для 8–12 мм",
+    url: "/zakalennoe-steklo/mollirovannoe/",
+    image: zakImage("mollirovannoe.webp", "Изогнутый лист закалённого стекла на полу цеха"),
+  },
+];
+
+const PROCESSING_CARDS: readonly HubCard[] = [
+  processingCard("Кромка", "/obrabotka-stekla/kromka/"),
+  processingCard("Отверстия и вырезы", "/obrabotka-stekla/otverstiya-i-vyrezy/"),
+  processingCard("Фацет", "/obrabotka-stekla/facet/"),
+  processingCard("Матирование", "/obrabotka-stekla/matirovanie/"),
+  processingCard("Печать на стекле", "/obrabotka-stekla/pechat/"),
+  processingCard("Плёнки", "/obrabotka-stekla/plenki/"),
+];
+
+/** «Сроки и доставка» paragraphs: the lead times moved into the tiles (`conditions` global). */
+const TIMING_PARAGRAPHS = [
+  "Срок изготовления считается от даты договора. Срок увеличивают сложная обработка, гнутое и крашеное стекло, крупные партии. Ориентировочная дата готовности — в КП.",
+  "Отправляем по Уралу, Сибири и Поволжью транспортной компанией; стоимость и срок доставки зависят от партии и считаются в КП. Самовывоз — в Челябинске.",
+];
 
 export interface HubLink {
   label: string;
@@ -41,8 +171,12 @@ export const ZAK_HUB = {
   },
 
   hero: {
-    facts:
-      "По вашему чертежу DWG или DXF · толщина 4–19 мм · заказы от 50 м² · от 10 рабочих дней с даты договора · доставка по Уралу, Сибири и Поволжью",
+    /** One check per line. */
+    facts: HERO_FACTS.join("\n"),
+    image: zakImage(
+      "zak-hero.webp",
+      "Листы закалённого стекла на пирамиде у печи закалки, рабочие в цехе"
+    ),
     strong: "Проверяем чертёж до закалки — после неё стекло уже не изменить.",
     quizLabel: "Рассчитать стоимость",
     drawingLabel: "Загрузить чертёж DWG / DXF",
@@ -102,22 +236,27 @@ export const ZAK_HUB = {
     items: [
       {
         title: "Спецификация на согласование.",
+        icon: "clipboard-check",
         text: "Проверяем размеры, отверстия и ограничения и присылаем спецификацию. В производство она уходит только после вашего подтверждения.",
       },
       {
         title: "Отклонения — только с вашего согласия.",
+        icon: "phone",
         text: "Если завод не может сделать отверстие нужного диаметра или выдержать размер, сначала звоним вам, а не меняем молча.",
       },
       {
         title: "Кто за что отвечает.",
+        icon: "scale",
         text: "Ошибся завод — стекло переделывают за его счёт. Ошибка в согласованном чертеже — переделка за счёт заказчика. Доставку повторной партии оплачивает заказчик.",
       },
       {
         title: "Упаковка под дорогу.",
+        icon: "box",
         text: "Обрешётка, фото упаковки при отгрузке. Состав упаковки — плёнка, картон, усиление ящика — согласуем под ваш маршрут и разгрузку.",
       },
       {
         title: "Документы на партию.",
+        icon: "file-check",
         text: "Паспорт качества, сертификат соответствия, протоколы испытаний. Закалённое стекло — по ГОСТ 30698-2014.",
       },
     ] satisfies HubCard[],
@@ -136,35 +275,7 @@ export const ZAK_HUB = {
 
   kinds: {
     heading: "Виды закалённого стекла",
-    items: [
-      { title: "Прозрачное", text: "базовое стекло для перегородок, дверей, ограждений" },
-      {
-        title: "Осветлённое",
-        text: "без зеленоватого оттенка на торце",
-        url: "/zakalennoe-steklo/osvetlennoe/",
-      },
-      {
-        title: "Матовое",
-        text: "приватность без потери света",
-        url: "/zakalennoe-steklo/matovoe/",
-      },
-      {
-        title: "Тонированное",
-        text: "бронза, графит, серое",
-        url: "/zakalennoe-steklo/tonirovannoe/",
-      },
-      {
-        title: "Крашеное по RAL",
-        text: "толщина 4–15 мм, размер до 3000 × 1600 мм",
-        url: "/zakalennoe-steklo/okrashennoe/",
-      },
-      { title: "Рифлёное", text: "узорчатое стекло", url: "/zakalennoe-steklo/riflenoe/" },
-      {
-        title: "Гнутое",
-        text: "до 1200 × 2000 мм; радиус от 1000 мм для 4–6 мм и от 1500 мм для 8–12 мм",
-        url: "/zakalennoe-steklo/mollirovannoe/",
-      },
-    ] satisfies HubCard[],
+    items: KIND_CARDS,
     /** «Рядом: **Триплекс** · **Обработка стекла** · **Стеклянные конструкции**» with links. */
     bridge:
       "Рядом: [Триплекс](/tripleks/) · [Обработка стекла](/obrabotka-stekla/) · [Стеклянные конструкции](/steklyannye-konstrukcii/)",
@@ -172,43 +283,12 @@ export const ZAK_HUB = {
 
   processing: {
     heading: "Обработка до закалки",
-    items: [
-      {
-        title: "Кромка",
-        text: "шлифовка, полировка, «еврокромка» (трапеция), «карандаш»",
-        url: "/obrabotka-stekla/kromka/",
-      },
-      {
-        title: "Отверстия и вырезы",
-        text: "Ø 4–130 мм, фрезерованные вырезы",
-        url: "/obrabotka-stekla/otverstiya-i-vyrezy/",
-      },
-      {
-        title: "Фацет",
-        text: "на зеркалах, ширина 30 или 50 мм",
-        url: "/obrabotka-stekla/facet/",
-      },
-      {
-        title: "Матирование",
-        text: "пескоструйное, в том числе рисунок и логотип",
-        url: "/obrabotka-stekla/matirovanie/",
-      },
-      {
-        title: "Печать на стекле",
-        text: "шелкография до 1100 × 700 мм",
-        url: "/obrabotka-stekla/pechat/",
-      },
-      { title: "Плёнки", text: "по согласованию", url: "/obrabotka-stekla/plenki/" },
-    ] satisfies HubCard[],
+    items: PROCESSING_CARDS,
   },
 
   timing: {
     heading: "Сроки и доставка",
-    markdown: [
-      "Срок изготовления считается от даты договора: **от 10 рабочих дней**, для триплекса — **от 14**. Срок увеличивают сложная обработка, гнутое и крашеное стекло, крупные партии. Ориентировочная дата готовности — в КП.",
-      "",
-      "Отправляем по Уралу, Сибири и Поволжью транспортной компанией; стоимость и срок доставки зависят от партии и считаются в КП. Самовывоз — в Челябинске.",
-    ].join("\n"),
+    markdown: TIMING_PARAGRAPHS.join("\n\n"),
     links: [
       { label: "Сроки изготовления", url: "/kak-zakazat/sroki/" },
       { label: "Упаковка и доставка", url: "/kak-zakazat/upakovka-i-dostavka/" },
@@ -220,17 +300,17 @@ export const ZAK_HUB = {
     items: [
       {
         title: "Подрядчикам",
-        text: "стекло для ограждений, перегородок и козырьков, которое встаёт с первого раза.",
+        text: "Стекло для ограждений, перегородок и козырьков, которое встаёт с первого раза.",
         url: "/klientam/podryadchikam/",
       },
       {
         title: "Производителям мебели",
-        text: "фасады и столешницы серией, кромка и отверстия под фурнитуру, без клейма по запросу.",
+        text: "Фасады и столешницы серией, кромка и отверстия под фурнитуру, без клейма по запросу.",
         url: "/klientam/proizvoditelyam-mebeli/",
       },
       {
         title: "Крупным объектам",
-        text: "торговые центры, арены, офисы: документы на партию и проектирование узлов.",
+        text: "Торговые центры, арены, офисы: документы на партию и проектирование узлов.",
         url: "/klientam/zastrojshchikam/",
       },
     ] satisfies HubCard[],
@@ -265,6 +345,26 @@ export const ZAK_HUB = {
     ] as ReadonlyArray<readonly [string, string]>,
   },
 } as const;
+
+/** The audience captions, capitalised by the mockup (teksty/02 starts them lower-case). */
+const AUDIENCE_TEXTS = ZAK_HUB.audiences.items.map((item) => item.text);
+
+/**
+ * Hub wording that is not verbatim in teksty/02, from the approved Paper mockup
+ * `2560_zakalennoe-steklo` (2026-11), on approval by the client
+ * (`docs/inex/drafts/service-pages-paper-drafts.md`): the hero facts split into four checks,
+ * capitalised card captions, the processing facts of the service pages, the timing paragraphs
+ * without the lead-time numbers (now tiles from the `conditions` global) and the template
+ * words of the hub and thickness cards (`ZAK_TEMPLATE_COPY`). Everything else is teksty.
+ */
+export const ZAK_MOCKUP_COPY: readonly string[] = [
+  ...HERO_FACTS,
+  ...KIND_CARDS.map((item) => item.text),
+  ...PROCESSING_CARDS.map((item) => item.text),
+  ...TIMING_PARAGRAPHS,
+  ...AUDIENCE_TEXTS,
+  ...Object.values(ZAK_TEMPLATE_COPY),
+];
 
 /**
  * Anchors (`anchorId`) of the hub sections: `HubPage` picks its section components by them;

@@ -11,8 +11,9 @@ import type { Metadata } from "next";
 
 /**
  * Hub «Закалённое стекло» (`/zakalennoe-steklo/`): the `pages` document with `template: 'hub'`
- * rendered by `HubPage` (price table from the `prices` global, checklist, risk, thickness choice,
- * kinds, processing, timing, audiences, objects, FAQ, form).
+ * rendered by `HubPage` in the layout of the Paper mockup `2560_zakalennoe-steklo` (photo hero,
+ * price tiles from the `prices` global, checklist, risk, thickness choice, kinds, processing,
+ * cream block with timing, audiences, FAQ and the drawing-form panel).
  *
  * ISR: prices and the promo depend on the DATE (45-day rule), not only on edits, so the page is
  * re-rendered at least hourly; edits expire it through the cache tags of the globals/pages.

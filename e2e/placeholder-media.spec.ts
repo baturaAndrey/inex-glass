@@ -16,8 +16,8 @@ import { VIEWPORTS } from "./helpers/viewports";
  * photos are seed photos (`src/seed/media/processing/`, `src/seed/media/constructions/`), not
  * generated placeholders.
  *
- * The `/zakalennoe-steklo/` hub template has no photo slots by design (prototype): the data are
- * attached for editors, the page is only checked for broken images there.
+ * The `/zakalennoe-steklo/` hub uses seed photos too (`src/seed/media/zak-hub/`, Paper mockup
+ * `2560_zakalennoe-steklo`): the page is only checked for broken images there.
  */
 
 /** The shared dev server compiles routes on first hit and runs other specs meanwhile. */

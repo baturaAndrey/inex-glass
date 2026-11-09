@@ -13,7 +13,13 @@ import {
   THICKNESS_SEO,
   THICKNESS_VALUES,
 } from "../content/thicknesses";
-import { HUB_ANCHORS, HUB_PATH, ZAK_HUB } from "../content/zak-hub";
+import {
+  HUB_ANCHORS,
+  HUB_PATH,
+  THICKNESS_HERO_IMAGE,
+  ZAK_HUB,
+  ZAK_MOCKUP_COPY,
+} from "../content/zak-hub";
 import type { SeedContext } from "../context";
 
 /*
@@ -63,6 +69,12 @@ vi.mock("../context", async () => {
     ),
   };
 });
+/** Seed photos: an id per `group/file` (no Payload, no file reads). */
+vi.mock("../seed-media", () => ({
+  ensureSeedImage: vi.fn(async (_ctx: unknown, image: { group: string; file: string }) =>
+    Promise.resolve(`media:${image.group}/${image.file}`)
+  ),
+}));
 vi.mock("../lexical", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../lexical")>();
   return {
@@ -112,7 +124,7 @@ function hubStrings(): string[] {
     seo.h1,
     seo.title,
     seo.description,
-    hero.facts,
+    ...hero.facts.split("\n"),
     hero.strong,
     hero.quizLabel,
     hero.drawingLabel,
@@ -149,6 +161,9 @@ function hubStrings(): string[] {
 const EDGE_APPROVED: readonly string[] = EDGE_TERMINOLOGY_APPROVED_STRINGS["zak-hub"];
 const edgeApproved = new Set(EDGE_APPROVED);
 
+/** Wording of the Paper mockup `2560_zakalennoe-steklo` (on approval): exempt as well. */
+const mockupApproved = new Set(ZAK_MOCKUP_COPY);
+
 function thicknessStrings(): string[] {
   return [
     ...THICKNESS_GROUPS.flatMap((group) => [group.podbor, group.obrabotka, ...group.faq.flat()]),
@@ -171,7 +186,7 @@ describe.skipIf(!HAS_SOURCES)("zak-hub / thicknesses content matches teksty and 
 
   it("hub strings are verbatim teksty/02 (meta from 17-meta)", () => {
     const missing = hubStrings()
-      .filter((text) => !edgeApproved.has(text))
+      .filter((text) => !edgeApproved.has(text) && !mockupApproved.has(text))
       .filter((text) => {
         const value = plain(text);
         return !teksty02.includes(value) && !meta.includes(value);
@@ -205,6 +220,18 @@ describe("zak-hub / thicknesses content rules", () => {
       checkStopWords(text).map((finding) => `${finding.match}: ${text}`)
     );
     expect(findings).toEqual([]);
+  });
+
+  it("mockup wording: every listed string is used, and is a teksty fact rephrased", () => {
+    const content = new Set(hubStrings());
+    const template = ["Закалённое стекло", "Триплекс", "Обработка стекла", "Эта страница"];
+    expect(
+      ZAK_MOCKUP_COPY.filter((text) => !content.has(text) && !template.includes(text))
+    ).toEqual([]);
+    // Processing captions are the service pages' main facts, not new claims.
+    expect(ZAK_HUB.processing.items.map((item) => item.text)).toContain(
+      "Ø 4–130 мм; от кромки — не ближе двух толщин стекла"
+    );
   });
 
   it("keeps the client-approved edge strings in the hub content", () => {
@@ -293,6 +320,31 @@ describe("seed zak-hub", () => {
       "faq:faq",
       "form:form",
     ]);
+    const hero = data.layout.find((block) => block.blockType === "hero");
+    expect(hero).toMatchObject({ image: "media:zak-hub/zak-hero.webp" });
+    expect(String(hero?.facts).split("\n")).toHaveLength(4);
+    const kinds = data.layout.find((block) => block.anchorId === HUB_ANCHORS.kinds) as {
+      items: Array<{ image?: string }>;
+    };
+    expect(kinds.items.map((item) => item.image)).toEqual([
+      "media:zak-hub/prozrachnoe.webp",
+      "media:zak-hub/osvetlennoe.webp",
+      "media:glass-types/matovoe.webp",
+      "media:zak-hub/tonirovannoe.webp",
+      "media:zak-hub/okrashennoe.webp",
+      "media:zak-hub/riflenoe.webp",
+      "media:zak-hub/mollirovannoe.webp",
+    ]);
+    const processing = data.layout.find((block) => block.anchorId === HUB_ANCHORS.processing) as {
+      items: Array<{ image?: string }>;
+    };
+    expect(processing.items.every((item) => item.image?.startsWith("media:processing/"))).toBe(
+      true
+    );
+    const risk = data.layout.find((block) => block.anchorId === HUB_ANCHORS.risk) as {
+      items: Array<{ icon?: string }>;
+    };
+    expect(risk.items.every((item) => Boolean(item.icon))).toBe(true);
     const faq = data.layout.find((block) => block.blockType === "faq") as { items: unknown[] };
     expect(faq.items).toHaveLength(7);
     const prices = data.layout.find((block) => block.blockType === "pricesTable");
@@ -332,6 +384,7 @@ describe("seed thicknesses", () => {
       kindsText: "по запросу; крашеное и гнутое — нет",
       sizeText: "до 3000 × 2000 мм; точнее — после согласования с заводом",
       seo: THICKNESS_SEO,
+      card: { image: `media:${THICKNESS_HERO_IMAGE.group}/${THICKNESS_HERO_IMAGE.file}` },
     });
   });
 

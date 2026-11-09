@@ -2,7 +2,8 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 /**
- * Hub «Закалённое стекло» and the 8 thickness cards (task 23).
+ * Hub «Закалённое стекло» and the 8 thickness cards (task 23), laid out by the Paper mockups
+ * `2560_zakalennoe-steklo` / `2560_zak_tolshchina_10mm` (2026-11).
  *
  * Precondition: `pnpm seed --minimal`, then `pnpm seed --only=zak-hub,thicknesses --force`
  * (CI runs the full seed). The price date of the seed may be fresh or older than 45 days, so the
@@ -75,33 +76,23 @@ test.describe("hub /zakalennoe-steklo/", () => {
     expect(ld.some((item) => item["@type"] === "Product")).toBe(false);
   });
 
-  test("price table follows the 45-day rule", async ({ page }) => {
+  test("price tiles follow the 45-day rule", async ({ page }) => {
     await page.goto(HUB);
     const section = page.locator("#ceny");
     await expect(section).toHaveCount(1);
     const state = await section.getAttribute("data-price-state");
-    const isMobile = (page.viewportSize()?.width ?? 0) < 600;
-
-    if (isMobile) {
-      await expect(section.locator("table")).toBeHidden();
-      await expect(section.locator("a.ig-mcard")).toHaveCount(8);
-    } else {
-      await expect(section.locator("table")).toBeVisible();
-    }
-    const rows = isMobile ? section.locator("a.ig-mcard") : section.locator("tbody tr");
-    await expect(rows).toHaveCount(8);
+    const tiles = section.locator("a[data-price-tile]");
+    await expect(tiles).toHaveCount(8);
 
     for (const [index, n] of THICKNESSES.entries()) {
-      const row = rows.nth(index);
-      const text = await row.textContent();
-      if (REQUEST_ONLY.has(n)) expect(norm(text)).toContain("по запросу");
-      else if (state === "price") expect(text).toMatch(new RegExp(`от${"\\s"}?\\d`));
-      else expect(norm(text)).toContain("Цена по расчёту");
-      expect(norm(text)).toContain(`${weightOf(n)} кг/м²`);
+      const text = norm(await tiles.nth(index).textContent());
+      expect(text).toContain(`${n} мм`);
+      if (REQUEST_ONLY.has(n)) expect(text).toContain("по запросу");
+      else if (state === "price") expect(text).toMatch(/от, ₽\/м² ?\d/);
+      else expect(text).toContain("по расчёту");
     }
     if (state === "price") {
-      const priced = await rows.nth(4).textContent();
-      expect(priced).toContain(`1${NBSP}400`);
+      expect(await tiles.nth(4).textContent()).toContain(`1${NBSP}400`);
       await expect(section.locator("[data-prices-caption]")).toContainText(
         /Ориентировочные цены на \d{2}\.\d{2}\.\d{4}/
       );
@@ -111,10 +102,10 @@ test.describe("hub /zakalennoe-steklo/", () => {
 
     await expect(section.locator('[data-included="in"] li')).toHaveCount(3);
     await expect(section.locator('[data-included="out"] li')).toHaveCount(3);
-    await expect(section.getByRole("note")).toContainText("минимальный заказ — от 50 м²");
+    await expect(section.getByRole("note")).toContainText("Минимальный заказ — от 50 м²");
 
-    // The whole row / card is a link to the thickness card.
-    await rows.nth(4).click({ position: { x: 200, y: 10 } });
+    // Each tile is a link to the thickness card.
+    await tiles.nth(4).click();
     await expect(page).toHaveURL(/\/zakalennoe-steklo\/10-mm\/$/, { timeout: 60_000 });
   });
 
@@ -140,14 +131,38 @@ test.describe("hub /zakalennoe-steklo/", () => {
     const sectionOf = (title: string) =>
       page.locator("section").filter({ has: page.getByRole("heading", { level: 2, name: title }) });
     await expect(sectionOf("Что проверить до заказа").locator("ol > li")).toHaveCount(7);
+    await expect(sectionOf("Что проверить до заказа").locator("ul a")).toHaveCount(3);
     await expect(
-      sectionOf("Как мы снижаем риск ошибки").locator("[data-ct-cards] > li")
+      sectionOf("Как мы снижаем риск ошибки").locator("[data-risk-cards] > li")
     ).toHaveCount(5);
-    await expect(sectionOf("Как выбрать толщину").locator("tbody tr")).toHaveCount(8);
-    await expect(page.locator("#vidy [data-ct-cards] > li")).toHaveCount(7);
-    await expect(page.locator("#vidy [data-ct-cards] a")).toHaveCount(6);
-    await expect(sectionOf("Обработка до закалки").locator("[data-ct-cards] > li")).toHaveCount(6);
-    await expect(page.locator("#vidy")).toContainText("Рядом:");
+    await expect(
+      sectionOf("Как мы снижаем риск ошибки").locator("[data-risk-cards] svg")
+    ).toHaveCount(5);
+    await expect(sectionOf("Как выбрать толщину").locator("[data-weight-row]")).toHaveCount(8);
+    await expect(page.getByTestId("kind-card")).toHaveCount(7);
+    // «Прозрачное» has no page: six cards link to the glass types.
+    await expect(page.locator("a[data-testid=kind-card]")).toHaveCount(6);
+    await expect(page.locator("#vidy [data-kinds-bridge]")).toContainText("Рядом");
+    await expect(page.locator("#vidy [data-kinds-bridge] a")).toHaveCount(3);
+    await expect(sectionOf("Обработка до закалки").getByTestId("zak-processing-card")).toHaveCount(
+      6
+    );
+    const processingImages = sectionOf("Обработка до закалки").locator("img");
+    await expect(processingImages).toHaveCount(6);
+    // The photos are lazy: each one actually loads once scrolled into view.
+    for (const img of await processingImages.all()) {
+      await img.scrollIntoViewIfNeeded();
+      await expect
+        .poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth), {
+          timeout: 15_000,
+        })
+        .toBeGreaterThan(0);
+    }
+    await expect(page.locator("#vidy img")).toHaveCount(7);
+    await expect(page.locator("[data-lead-time]")).toHaveCount(2);
+    await expect(
+      page.getByTestId("processing-hero").getByRole("list", { name: "Условия" }).locator("li")
+    ).toHaveCount(4);
 
     const body = await page.locator("main").innerText();
     expect(body).not.toMatch(/[{}]/);
@@ -159,10 +174,11 @@ test.describe("hub /zakalennoe-steklo/", () => {
     const faq = page
       .locator("section")
       .filter({ has: page.getByRole("heading", { level: 2, name: "Частые вопросы" }) });
+    // The first answer is open (mockup); a click closes it.
     const first = faq.getByRole("button").first();
-    await expect(first).toHaveAttribute("aria-expanded", "false");
-    await first.click();
     await expect(first).toHaveAttribute("aria-expanded", "true");
+    await first.click();
+    await expect(first).toHaveAttribute("aria-expanded", "false");
     const second = faq.getByRole("button").nth(1);
     await second.focus();
     await page.keyboard.press("Enter");
@@ -171,7 +187,9 @@ test.describe("hub /zakalennoe-steklo/", () => {
 
   test("hero buttons: quiz link and drawing dialog", async ({ page }) => {
     await page.goto(HUB);
-    const quiz = page.locator("#page-title ~ div a", { hasText: "Рассчитать стоимость" }).first();
+    const quiz = page
+      .getByTestId("processing-hero")
+      .getByRole("link", { name: "Рассчитать стоимость" });
     const href = await quiz.getAttribute("href");
     expect(href).toContain("/raschet-stoimosti/");
     expect(href).toContain("type=tempered");
@@ -180,7 +198,14 @@ test.describe("hub /zakalennoe-steklo/", () => {
 
   test("lead form at the bottom", async ({ page }) => {
     await page.goto(HUB);
-    await expect(page.getByRole("button", { name: "Получить расчёт" }).last()).toBeVisible();
+    const panel = page.getByTestId("drawing-panel");
+    await expect(panel.getByRole("heading", { level: 2 })).toHaveText(
+      "Отправьте чертёж — посчитаем стоимость и срок"
+    );
+    await expect(panel).toContainText(
+      "КП в среднем за 2–3 рабочих дня · заказы от 50 м² · цена в договоре фиксируется"
+    );
+    await expect(panel.getByRole("button", { name: "Получить расчёт" })).toBeVisible();
   });
 });
 
@@ -192,8 +217,8 @@ test.describe("thickness cards", () => {
       expect(response?.status()).toBe(200);
       await expect(page.locator("h1")).toHaveText(`Закалённое стекло ${n} мм`);
 
-      const passport = page.locator("[data-thickness-passport]");
-      const state = await passport.getAttribute("data-price-state");
+      const spec = page.locator("[data-thickness-spec]");
+      const state = await spec.getAttribute("data-price-state");
       if (REQUEST_ONLY.has(n)) expect(state).toBe("calc");
 
       const title = await page.title();
@@ -203,7 +228,7 @@ test.describe("thickness cards", () => {
         );
       } else {
         expect(title).toBe(`Закалённое стекло ${n} мм — под заказ | Inex Glass`);
-        await expect(passport.locator("[data-passport-price]")).toHaveText("Цена по расчёту");
+        await expect(spec.locator("[data-spec-price]")).toHaveText("Цена по расчёту");
       }
       await expect(page.locator('meta[name="description"]')).toHaveAttribute(
         "content",
@@ -219,11 +244,9 @@ test.describe("thickness cards", () => {
         (await page.locator('meta[name="robots"]').first().getAttribute("content")) ?? "";
       if (NOINDEX.has(n)) expect(robots).toContain("noindex");
 
-      // Passport values.
-      await expect(passport.locator('[data-passport-row="Вес"]')).toHaveText(
-        `${weightOf(n)} кг/м²`
-      );
-      await expect(passport.locator('[data-passport-row="Размер"]')).toHaveText(
+      // Spec table values.
+      await expect(spec.locator('[data-spec-row="Вес"]')).toHaveText(`${weightOf(n)} кг/м²`);
+      await expect(spec.locator('[data-spec-row="Размер"]')).toHaveText(
         REQUEST_ONLY.has(n)
           ? "до 3000 × 2000 мм; точнее — после согласования с заводом"
           : "от 150 × 300 до 3000 × 2000 мм"
@@ -235,28 +258,24 @@ test.describe("thickness cards", () => {
         [`${2 * n} мм`, `${2 * n} мм`, `${6 * n} мм`].map((t) => t.replace(" ", NBSP))
       );
 
-      // Neighbours.
-      const chips = page.locator("[data-neighbor-chips] a");
+      await expect(page.locator("[data-hole-diameter]")).toContainText(
+        `меньше ${n} мм — по согласованию`
+      );
+
+      // Neighbours: N− / N / N+ cards, the current one is not a link.
+      const neighbours = page.locator("[data-neighbors] > li");
       const expectedColumns = n === 4 || n === 19 ? 2 : 3;
-      await expect(chips).toHaveCount(expectedColumns);
-      await expect(chips.filter({ hasText: `${n} мм` })).toHaveAttribute("aria-current", "page");
-      const neighbourHeads = page.locator("[data-neighbors-table] thead th[data-thickness]");
-      await expect(neighbourHeads).toHaveCount(expectedColumns);
+      await expect(neighbours).toHaveCount(expectedColumns);
+      await expect(page.locator("[data-neighbors] [aria-current=page]")).toContainText(`${n}`);
+      await expect(page.locator("[data-neighbors] a")).toHaveCount(expectedColumns - 1);
       for (const other of [15, 19]) {
-        const cell = page.locator(`[data-neighbors-table] thead th[data-thickness="${other}"]`);
-        if ((await cell.count()) === 0) continue;
-        const heads = await neighbourHeads.evaluateAll((els) =>
-          els.map((el) => el.getAttribute("data-thickness"))
-        );
-        const index = heads.indexOf(String(other));
-        await expect(
-          page
-            .locator("[data-neighbors-table] tbody tr")
-            .first()
-            .locator("td")
-            .nth(index + 1)
-        ).toHaveText("по запросу");
+        const card = page.locator(`[data-neighbors] > li[data-thickness="${other}"]`);
+        if ((await card.count()) === 0) continue;
+        await expect(card.locator("[data-neighbor-price]")).toHaveText("по запросу");
       }
+
+      // Processing: the six cards of the hub block.
+      await expect(page.getByTestId("zak-processing-card")).toHaveCount(6);
 
       // Product JSON-LD iff the price is shown.
       const ld = await jsonLdTypes(page);
@@ -265,17 +284,20 @@ test.describe("thickness cards", () => {
         expect(product).toBeDefined();
         const offers = product?.offers as Record<string, unknown>;
         expect(offers["@type"]).toBe("AggregateOffer");
-        const passportPrice = norm(
-          await passport.locator("[data-passport-price]").textContent()
-        ).replace(/\D/g, "");
-        expect(String(offers.lowPrice)).toBe(passportPrice);
+        const specPrice = norm(await spec.locator("[data-spec-price]").textContent()).replace(
+          /\D/g,
+          ""
+        );
+        expect(String(offers.lowPrice)).toBe(specPrice);
       } else {
         expect(product).toBeUndefined();
       }
       expect(ld.some((item) => item["@type"] === "FAQPage")).toBe(true);
 
       // Quiz link with the thickness.
-      const quiz = passport.getByRole("link", { name: `Рассчитать стекло ${n} мм` });
+      const quiz = page
+        .getByTestId("processing-hero")
+        .getByRole("link", { name: `Рассчитать стекло ${n} мм` });
       await expect(quiz).toHaveAttribute(
         "href",
         new RegExp(`/raschet-stoimosti/\\?.*thick=${n}(&|$)`)

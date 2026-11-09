@@ -61,6 +61,37 @@ export function tablePriceLabel(
   return { state: "calc", label: resolved.label };
 }
 
+/** Caption / value of a price tile whose number stands alone (hub tiles, neighbour cards). */
+export interface PriceTile {
+  state: PriceState;
+  /** «от, ₽/м²» above a number; «цена» above a word. */
+  caption: string;
+  /** «1 400» (NBSP), «по запросу» (15, 19 mm) or «по расчёту» (stale price list). */
+  value: string;
+}
+
+const TILE_CAPTION_PRICE = "от, ₽/м²";
+const TILE_CAPTION_WORD = "цена";
+/** Stale price list: the tile caption already says «цена», so the value is the rest. */
+const TILE_VALUE_CALC = "по расчёту";
+
+/**
+ * Price tile of the Paper mockups (`2560_zakalennoe-steklo` «prices», thickness «neighbors»):
+ * the number without «от» under the caption «от, ₽/м²»; otherwise the caption «цена» and
+ * «по запросу» / «по расчёту». Same 45-day rule as `tablePriceLabel`.
+ */
+export function priceTile(n: number, prices: PricesInput, now: Date): PriceTile {
+  const resolved = resolvePrice(n, prices, now);
+  if (resolved.state === "price" && resolved.price !== null) {
+    return { state: "price", caption: TILE_CAPTION_PRICE, value: formatPrice(resolved.price) };
+  }
+  return {
+    state: "calc",
+    caption: TILE_CAPTION_WORD,
+    value: resolved.label === PRICE_BY_CALC_LABEL ? TILE_VALUE_CALC : resolved.label,
+  };
+}
+
 /**
  * Whether the price list itself is fresh: at least one thickness shows its price. `false` when
  * the price date is older than `staleAfterDays`, missing, or no thickness has a price.

@@ -5,6 +5,7 @@ import {
   buildPricesCaption,
   buildThicknessView,
   isPriceListFresh,
+  priceTile,
   tablePriceLabel,
 } from "./thickness-view";
 import type { ThicknessViewInput } from "./thickness-view";
@@ -178,6 +179,29 @@ describe("tablePriceLabel / isPriceListFresh", () => {
     expect(isPriceListFresh(prices, DAY_45)).toBe(true);
     expect(isPriceListFresh(prices, DAY_46)).toBe(false);
     expect(isPriceListFresh({ ...prices, priceDate: null }, FRESH)).toBe(false);
+  });
+});
+
+describe("priceTile", () => {
+  it("shows the bare number under «от, ₽/м²» while the price is fresh", () => {
+    expect(priceTile(10, prices, FRESH)).toEqual({
+      state: "price",
+      caption: "от, ₽/м²",
+      value: `1${NBSP}400`,
+    });
+  });
+
+  it("says «по запросу» for 15 / 19 mm and «по расчёту» for a stale list", () => {
+    expect(priceTile(19, prices, FRESH)).toEqual({
+      state: "calc",
+      caption: "цена",
+      value: "по запросу",
+    });
+    expect(priceTile(10, prices, DAY_46)).toEqual({
+      state: "calc",
+      caption: "цена",
+      value: "по расчёту",
+    });
   });
 });
 

@@ -5,8 +5,10 @@ import {
   THICKNESS_SEO,
   THICKNESS_VALUES,
 } from "../content/thicknesses";
+import { THICKNESS_HERO_IMAGE } from "../content/zak-hub";
 import { mayOverwrite, upsertByField } from "../context";
 import { paragraphs } from "../lexical";
+import { ensureSeedImage } from "../seed-media";
 import type { SeedContext } from "../context";
 import type { Where } from "payload";
 
@@ -52,6 +54,9 @@ async function seedGroups(ctx: SeedContext): Promise<Map<string, string>> {
 }
 
 async function seedThicknessCards(ctx: SeedContext, groupIds: Map<string, string>): Promise<void> {
+  // Hero photo of every card (Paper mockup `2560_zak_tolshchina_10mm`): one generated
+  // illustration until the client's photos, uploaded once (`../seed-media.ts`).
+  const heroImage = await ensureSeedImage(ctx, THICKNESS_HERO_IMAGE);
   for (const item of THICKNESS_VALUES) {
     const groupId = groupIds.get(item.groupLabel);
     if (!groupId) throw new Error(`группа толщин «${item.groupLabel}» не найдена`);
@@ -69,6 +74,7 @@ async function seedThicknessCards(ctx: SeedContext, groupIds: Map<string, string
         // `null` clears a stale override; the template then uses the size of `tech-params`.
         sizeText: item.sizeText ?? null,
         seo: { ...THICKNESS_SEO },
+        card: { image: heroImage },
         // `thickness` is derived from `n` by the collection hook.
         quizPrefill: { type: "tempered", ctaLabel: THICKNESS_CTA_LABEL },
       },
