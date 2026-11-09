@@ -41,6 +41,13 @@ export const LINKS = {
 /* Types                                                                                       */
 /* ------------------------------------------------------------------------------------------ */
 
+/** A photo shipped with the seed (`src/seed/media/constructions/<file>`, see `../seed-media.ts`). */
+export interface ImageSeed {
+  file: string;
+  /** Russian alt text describing the picture. */
+  alt: string;
+}
+
 export interface SystemSeed {
   name: string;
   subtitle?: string;
@@ -74,7 +81,17 @@ export type LayoutSeed =
       type: "cards";
       heading: string;
       layout: "g3" | "g4" | "ctCards" | "p5Cards" | "seg";
-      items: Array<{ title: string; text: string; url: string }>;
+      items: Array<{ title: string; text: string; url: string; image?: ImageSeed }>;
+    }
+  | {
+      /** `cta` block; the hub renders a `primaryDark` one as the dark «Монтаж» panel. */
+      type: "cta";
+      title: string;
+      /** Markdown. */
+      md: string;
+      tone: "light" | "primaryDark";
+      /** One button opening the drawing form. */
+      formButton: { label: string };
     };
 
 export interface FaqSeed {
@@ -96,6 +113,8 @@ export interface ConstructionSeed {
   seo: { h1: string; title: string; description: string };
   /** Markdown, `{условия}` substituted at render time. */
   intro: string;
+  /** Hero photo (`heroImage`). */
+  heroImage?: ImageSeed;
   ctaPrimaryLabel: string;
   ctaSecondaryLabel?: string;
   secondaryFormKey: "drawing" | "load" | "none";
@@ -151,7 +170,73 @@ const INEX_SU_LABEL = "inex.su";
 /* Documents                                                                                   */
 /* ------------------------------------------------------------------------------------------ */
 
-/** teksty/09 §1 — hub «Стеклянные конструкции». */
+/**
+ * Montage wording approved by the client on 2026-11-09 (the home row «Монтаж»,
+ * `src/seed/content/home.ts`): a partner crew or chef-montage instead of «ваша бригада».
+ */
+const MONTAGE_LEAD =
+  "Подберём проверенную монтажную бригаду или проведём шеф-монтаж с вашими специалистами.";
+const MONTAGE_TEXT = `${MONTAGE_LEAD} Консультируем на всех этапах, от подготовки проёмов до сдачи объекта.`;
+
+/** Hub card descriptions: teksty/09 §1, capitalised as in the approved Paper mockup. */
+const HUB_CARDS: ReadonlyArray<{ title: string; text: string; url: string; image: ImageSeed }> = [
+  {
+    title: "Стеклянные перегородки",
+    text: "Офисы, ТЦ, банки, медцентры",
+    url: LINKS.peregorodki,
+    image: { file: "peregorodki.webp", alt: "Цельностеклянная перегородка в светлом офисе" },
+  },
+  {
+    title: "Ограждения и перила",
+    text: "Лестницы, атриумы, балконы",
+    url: LINKS.ograzhdeniya,
+    image: { file: "ograzhdeniya.webp", alt: "Стеклянное ограждение галереи в атриуме" },
+  },
+  {
+    title: "Козырьки",
+    text: "Над входом, из триплекса под снеговую нагрузку",
+    url: LINKS.kozyrki,
+    image: { file: "kozyrki.webp", alt: "Стеклянный козырёк на тягах над входом в здание" },
+  },
+  {
+    title: "Душевые перегородки для проектов",
+    text: "Гостиницы, спортивные объекты",
+    url: LINKS.dushevye,
+    image: { file: "dushevye.webp", alt: "Стеклянные душевые перегородки в ряд" },
+  },
+  {
+    title: "Торговые витрины",
+    text: "Для магазинов и сетей, на заказ",
+    url: LINKS.vitriny,
+    image: { file: "vitriny.webp", alt: "Стеклянная торговая витрина с подсветкой в магазине" },
+  },
+  {
+    title: "Зеркала",
+    text: "Для залов и салонов",
+    url: LINKS.zerkala,
+    image: { file: "zerkala.webp", alt: "Зеркальная стена в светлом зале" },
+  },
+  {
+    title: "Остекление зданий",
+    text: "Фасады, витрины, лифтовые шахты, веранды",
+    url: LINKS.osteklenie,
+    image: { file: "osteklenie.webp", alt: "Стеклянный фасад на точечных креплениях" },
+  },
+];
+
+/** «Кто что делает», right column «Монтаж» (approved wording of 2026-11-09). */
+const HUB_MONTAGE_ITEMS = [
+  "Проверенная бригада-партнёр",
+  "Или шеф-монтаж с вашими специалистами",
+  "Консультации от подготовки проёмов до сдачи объекта",
+];
+
+/**
+ * teksty/09 §1 — hub «Стеклянные конструкции», laid out by the approved Paper mockup
+ * `2560_steklyannye-konstrukcii` (2026-11): hero, 7 photo cards + the dark «Монтаж» panel
+ * (`cta` block), cream block with «Кто что делает» and «Почему комплект» (its second sentence
+ * quoted: the warning note), objects. Wording outside teksty: `HUB_MOCKUP_COPY`.
+ */
 const HUB: ConstructionSeed = {
   slug: "steklyannye-konstrukcii",
   url: "/steklyannye-konstrukcii/",
@@ -168,10 +253,14 @@ const HUB: ConstructionSeed = {
     h1: "Стеклянные конструкции для объектов",
     title: "Стеклянные конструкции — проект и комплектация | Inex Glass",
     description:
-      "Перегородки, ограждения, душевые, козырьки и фасады: проектируем узлы, комплектуем стекло, профиль и фурнитуру. Монтаж — ваша бригада.",
+      "Перегородки, ограждения, душевые, козырьки и фасады: проектируем узлы, комплектуем стекло, профиль и фурнитуру. Монтаж — бригада-партнёр или шеф-монтаж.",
   },
-  intro:
-    "Перегородки, ограждения, козырьки, душевые, фасады и витрины. Мы проектируем узлы, комплектуем стекло, профиль и фурнитуру и отправляем комплект на объект. Монтаж выполняет ваша бригада. {условия}",
+  // The conditions are the checklist of the hero (from the `conditions` global): no `{условия}`.
+  intro: `Перегородки, ограждения, козырьки, душевые, фасады и витрины. Мы проектируем узлы, комплектуем стекло, профиль и фурнитуру и отправляем комплект на объект. ${MONTAGE_LEAD}`,
+  heroImage: {
+    file: "hub-hero.webp",
+    alt: "Монтажники несут стеклянную панель вдоль стеклянного ограждения в атриуме",
+  },
   ctaPrimaryLabel: "Рассчитать стоимость",
   ctaSecondaryLabel: "Отправить проект",
   secondaryFormKey: "drawing",
@@ -184,57 +273,47 @@ const HUB: ConstructionSeed = {
       "Комплектуем стекло, профиль и фурнитуру одним заказом",
       "Контролируем изготовление и упаковку, отправляем на объект",
     ],
-    right: ["Снимает размеры по месту", "Принимает партию на объекте", "Монтирует"],
-  },
-  inexSuBridge: {
-    title: TURNKEY_TITLE,
-    text: "Проект с монтажом выполняет инжиниринговая компания Inex",
-    buttonLabel: INEX_SU_LABEL,
-    url: LINKS.inexSu,
+    right: HUB_MONTAGE_ITEMS,
   },
   layout: [
     {
       type: "cards",
       heading: "Конструкции",
       layout: "p5Cards",
-      items: [
-        {
-          title: "Стеклянные перегородки",
-          text: "офисы, ТЦ, банки, медцентры",
-          url: LINKS.peregorodki,
-        },
-        {
-          title: "Ограждения и перила",
-          text: "лестницы, атриумы, балконы",
-          url: LINKS.ograzhdeniya,
-        },
-        {
-          title: "Козырьки",
-          text: "над входом, из триплекса под снеговую нагрузку",
-          url: LINKS.kozyrki,
-        },
-        {
-          title: "Душевые перегородки для проектов",
-          text: "гостиницы, спортивные объекты",
-          url: LINKS.dushevye,
-        },
-        { title: "Торговые витрины", text: "для магазинов и сетей, на заказ", url: LINKS.vitriny },
-        { title: "Зеркала", text: "для залов и салонов", url: LINKS.zerkala },
-        {
-          title: "Остекление зданий",
-          text: "фасады, витрины, лифтовые шахты, веранды",
-          url: LINKS.osteklenie,
-        },
-      ],
+      items: [...HUB_CARDS],
+    },
+    {
+      type: "cta",
+      title: "Монтаж",
+      md: MONTAGE_TEXT,
+      tone: "primaryDark",
+      formButton: { label: "Отправить проект" },
     },
     {
       type: "richText",
       heading: "Почему комплект, а не стекло отдельно",
       anchorId: "slot-b-why",
-      md: "Стекло изготавливается под конкретный профиль и фурнитуру: отверстия, зазоры и кромка рассчитаны под них. Когда стекло, профиль и фурнитура приходят из разных мест, несовпадение обнаруживается на объекте — а закалённое стекло там уже не подогнать.",
+      md: [
+        "Стекло изготавливается под конкретный профиль и фурнитуру: отверстия, зазоры и кромка рассчитаны под них.",
+        "",
+        "> Когда стекло, профиль и фурнитура приходят из разных мест, несовпадение обнаруживается на объекте — а закалённое стекло там уже не подогнать.",
+      ].join("\n"),
     },
   ],
 };
+
+/**
+ * Hub copy that is not verbatim in teksty/09 §1: the montage wording approved on 2026-11-09
+ * (ТЗ §11, note of 08.11.2026) and the card descriptions capitalised by the Paper mockup.
+ * Everything else on the hub is teksty.
+ */
+export const HUB_MOCKUP_COPY: readonly string[] = [
+  HUB.intro,
+  "Монтаж",
+  MONTAGE_TEXT,
+  ...HUB_MONTAGE_ITEMS,
+  ...HUB_CARDS.map((item) => item.text),
+];
 
 /** teksty/11 §1 — «Стеклянные перегородки». */
 const PARTITIONS: ConstructionSeed = {
@@ -717,6 +796,14 @@ const HARDWARE: ConstructionSeed = {
 };
 
 /** All documents of the slice, in `order`. */
+/** Every seed photo of a document (hero, card images), in document order. */
+export function seedImagesOf(item: ConstructionSeed): ImageSeed[] {
+  const cards = item.layout.flatMap((block) =>
+    block.type === "cards" ? block.items.flatMap((card) => (card.image ? [card.image] : [])) : []
+  );
+  return [...(item.heroImage ? [item.heroImage] : []), ...cards];
+}
+
 export const CONSTRUCTIONS: readonly ConstructionSeed[] = [
   HUB,
   PARTITIONS,

@@ -3,7 +3,12 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { checkStopWords } from "@/lib/domain";
 import { sanitizeSvg } from "@/lib/svg-sanitize";
-import { CONSTRUCTIONS, type ConstructionSeed } from "../content/constructions";
+import {
+  CONSTRUCTIONS,
+  HUB_MOCKUP_COPY,
+  seedImagesOf,
+  type ConstructionSeed,
+} from "../content/constructions";
 import { EDGE_TERMINOLOGY_APPROVED_STRINGS } from "../content/edge-terminology";
 
 /**
@@ -14,6 +19,7 @@ import { EDGE_TERMINOLOGY_APPROVED_STRINGS } from "../content/edge-terminology";
 const ROOT = path.resolve(import.meta.dirname, "../../..");
 const TEKSTY_DIR = path.join(ROOT, "res/inex-glass-handoff/teksty");
 const META_FILE = path.join(ROOT, "docs/inex/17-meta.md");
+const MEDIA_DIR = path.join(ROOT, "src/seed/media/constructions");
 
 /** teksty file of each document. */
 const SOURCES: Record<string, string> = {
@@ -33,7 +39,7 @@ function plain(text: string): string {
     .replace(/→\s*/g, "")
     .replace(/\*\*/g, "")
     .replace(/[[\]]/g, "")
-    .replace(/^\s*(?:[-*]|\d+\.)\s+/gm, "")
+    .replace(/^\s*(?:[-*>]|\d+\.)\s+/gm, "")
     .replace(/^#+\s*/gm, "")
     .replace(/\|/g, " ")
     .replace(/\s+/g, " ")
@@ -59,6 +65,7 @@ function fragments(doc: ConstructionSeed): string[] {
   for (const block of doc.layout) {
     if (block.type === "richText") texts.push(block.heading ?? "", block.md);
     if (block.type === "callout") texts.push(block.heading ?? "", block.md);
+    if (block.type === "cta") texts.push(block.title, block.md, block.formButton.label);
     if (block.type === "table") {
       texts.push(block.heading, block.sub ?? "", block.table.footnote ?? "");
       texts.push(...block.table.columns, ...block.table.rows.flat());
@@ -84,6 +91,10 @@ function toFragments(texts: readonly string[]): string[] {
  */
 const EDGE_APPROVED_FRAGMENTS = toFragments(EDGE_TERMINOLOGY_APPROVED_STRINGS.constructions);
 const edgeApproved = new Set(EDGE_APPROVED_FRAGMENTS);
+
+/** Hub wording of the approved Paper mockup and the montage decision of 2026-11-09. */
+const MOCKUP_FRAGMENTS = toFragments(HUB_MOCKUP_COPY);
+const mockupApproved = new Set(MOCKUP_FRAGMENTS);
 
 /** Every internal / external href of a document. */
 function links(doc: ConstructionSeed): string[] {
@@ -117,9 +128,32 @@ describe("constructions seed content", () => {
       const file = SOURCES[doc.slug];
       expect(file, doc.slug).toBeDefined();
       const source = plain(readFileSync(path.join(TEKSTY_DIR, file as string), "utf8"));
-      for (const fragment of fragments(doc).filter((text) => !edgeApproved.has(text))) {
+      const exempt = (text: string) =>
+        edgeApproved.has(text) ||
+        (doc.slug === "steklyannye-konstrukcii" && mockupApproved.has(text));
+      for (const fragment of fragments(doc).filter((text) => !exempt(text))) {
         expect(source.includes(fragment), `${doc.slug}: «${fragment}»`).toBe(true);
       }
+    }
+  });
+
+  it("hub: montage per the 2026-11-09 decision, no «ваша бригада», mockup copy in use", () => {
+    const hub = bySlug("steklyannye-konstrukcii");
+    const content = new Set(fragments(hub));
+    expect(MOCKUP_FRAGMENTS.filter((text) => !content.has(text))).toEqual([]);
+    const text = [...fragments(hub), hub.seo.description].join("\n");
+    expect(text).not.toMatch(/ваша бригада|Монтаж выполняет/);
+    expect(hub.inexSuBridge).toBeUndefined();
+    expect(hub.intro).not.toContain("{условия}");
+    expect(hub.seo.description).toContain("Монтаж — бригада-партнёр или шеф-монтаж.");
+  });
+
+  it("hub: every seed photo exists and has a Russian alt", () => {
+    const images = CONSTRUCTIONS.flatMap(seedImagesOf);
+    expect(images).toHaveLength(8);
+    for (const image of images) {
+      expect(existsSync(path.join(MEDIA_DIR, image.file)), image.file).toBe(true);
+      expect(image.alt, image.file).toMatch(/^[А-ЯЁ][а-яё]/);
     }
   });
 

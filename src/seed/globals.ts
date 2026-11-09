@@ -415,6 +415,7 @@ const CATALOG_MENU: MegaMenu = {
     {
       title: "Конструкции",
       links: [
+        megaLink("Стеклянные конструкции", "/steklyannye-konstrukcii/"),
         megaLink("Стеклянные перегородки", "/steklyannye-peregorodki/"),
         megaLink("Ограждения и перила", "/steklyannye-ograzhdeniya/"),
         megaLink("Козырьки", "/steklyannye-kozyrki/"),
@@ -546,6 +547,7 @@ async function seedNavigation(ctx: SeedContext): Promise<void> {
           links: [
             link("Закалённое стекло", Z),
             link("Триплекс", "/tripleks/"),
+            link("Стеклянные конструкции", "/steklyannye-konstrukcii/"),
             link("Стеклянные перегородки", "/steklyannye-peregorodki/"),
             link("Ограждения", "/steklyannye-ograzhdeniya/"),
             link("Козырьки", "/steklyannye-kozyrki/"),

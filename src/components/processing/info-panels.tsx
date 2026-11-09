@@ -26,7 +26,11 @@ export interface InfoPanel {
   lead?: boolean | undefined;
   /** `warning` adds the warning icon to the heading (service callouts). */
   tone?: "default" | "warning" | undefined;
+  /** Icon of the note cards (quotes): the document (default) or the warning triangle. */
+  noteIcon?: NoteIcon | undefined;
 }
+
+export type NoteIcon = "document" | "warning";
 
 export interface InfoPanelsProps {
   panels: readonly InfoPanel[];
@@ -44,7 +48,7 @@ type LexicalNode = { type?: unknown; children?: unknown; [key: string]: unknown 
  * Cream background of the block: radial `#FFFAF1 → #FCF6EA` in the mockup; the centre is the
  * warning background lightened with the surface colour, so no colour outside the tokens.
  */
-const CREAM =
+export const CREAM =
   "bg-[radial-gradient(ellipse_at_center,color-mix(in_oklab,var(--ig-warning-bg),var(--ig-surface)_40%)_0%,var(--ig-warning-bg)_100%)]";
 
 /** Panel typography over the `RichText` output (its classes are on the elements themselves). */
@@ -66,13 +70,20 @@ const LEAD =
  * screens split the width equally. Three panels share the width equally. A single panel keeps a
  * readable measure.
  */
+/**
+ * Shell of a light-teal panel on the cream block; shared with the hub of «Стеклянные
+ * конструкции» (`@/components/constructions/hub-info`), whose panels hold more than rich text.
+ */
+export const PANEL_SHELL =
+  "bg-primary-light border-warning-bg shadow-card flex w-full min-w-0 flex-col gap-6 rounded-4xl border p-8 max-sm:gap-4 max-sm:rounded-xl max-sm:p-5";
+
 const PANEL_WIDTH = {
   single: "max-w-[1100px]",
   pair: "md:max-w-[730px] md:even:justify-self-end",
   triple: "",
 } as const;
 
-type PanelWidth = keyof typeof PANEL_WIDTH;
+export type PanelWidth = keyof typeof PANEL_WIDTH;
 
 const GRID: Readonly<Record<PanelWidth, string>> = {
   single: "grid-cols-1",
@@ -231,14 +242,30 @@ function PanelTable({
   );
 }
 
-function NoteCard({ data, ctx }: { data: RichTextData; ctx: PlaceholderContext }) {
+function NoteCard({
+  data,
+  ctx,
+  icon = "document",
+}: {
+  data: RichTextData;
+  ctx: PlaceholderContext;
+  icon?: NoteIcon | undefined;
+}) {
   return (
     <div className="bg-surface shadow-card flex items-center gap-6 rounded-lg p-6 max-sm:gap-4 max-sm:p-4">
-      <FileCheck2
-        aria-hidden="true"
-        strokeWidth={1.75}
-        className="text-navy size-16 shrink-0 max-sm:size-10"
-      />
+      {icon === "warning" ? (
+        <TriangleAlert
+          aria-hidden="true"
+          strokeWidth={1.75}
+          className="text-warning-text size-10 shrink-0 max-sm:size-8"
+        />
+      ) : (
+        <FileCheck2
+          aria-hidden="true"
+          strokeWidth={1.75}
+          className="text-navy size-16 shrink-0 max-sm:size-10"
+        />
+      )}
       <div className="border-text text-h4 max-sm:text-body border-l pl-6 leading-normal font-normal max-sm:pl-4 [&_a]:text-[length:inherit] [&_a]:leading-[inherit] [&_p]:max-w-none [&_p]:text-[length:inherit] [&_p]:leading-[inherit]">
         <RichText data={data} ctx={ctx} />
       </div>
@@ -246,22 +273,20 @@ function NoteCard({ data, ctx }: { data: RichTextData; ctx: PlaceholderContext }
   );
 }
 
-function Panel({
-  panel,
-  ctx,
-  width,
-}: {
+export interface InfoPanelCardProps {
   panel: InfoPanel;
   ctx: PlaceholderContext;
-  width: PanelWidth;
-}) {
+  /** Width rule of the panel inside its grid (`triple`: none, the grid cell decides). */
+  width?: PanelWidth | undefined;
+  className?: string | undefined;
+}
+
+/** One panel (heading, rich text, note cards); `InfoPanels` lays several of them out. */
+export function InfoPanelCard({ panel, ctx, width = "triple", className }: InfoPanelCardProps) {
   const { segments, notes } = splitPanel(panel.body);
   return (
     <div
-      className={cn(
-        "bg-primary-light border-warning-bg shadow-card flex w-full min-w-0 flex-col gap-6 rounded-4xl border p-8 max-sm:gap-4 max-sm:rounded-xl max-sm:p-5",
-        PANEL_WIDTH[width]
-      )}
+      className={cn(PANEL_SHELL, PANEL_WIDTH[width], className)}
       {...(panel.heading ? { role: "group", "aria-labelledby": panel.headingId } : {})}
     >
       {panel.heading ? (
@@ -291,7 +316,7 @@ function Panel({
         // The note cards close the panel even when the text above is short.
         <div className="mt-auto flex flex-col gap-4 pt-2">
           {notes.map((note, index) => (
-            <NoteCard key={index} data={note} ctx={ctx} />
+            <NoteCard key={index} data={note} ctx={ctx} icon={panel.noteIcon} />
           ))}
         </div>
       ) : null}
@@ -313,7 +338,7 @@ export function InfoPanels({ panels, ctx, attachedToFooter = false }: InfoPanels
     >
       <div className={cn("grid items-stretch gap-6", GRID[width])}>
         {panels.map((panel) => (
-          <Panel key={panel.key} panel={panel} ctx={ctx} width={width} />
+          <InfoPanelCard key={panel.key} panel={panel} ctx={ctx} width={width} />
         ))}
       </div>
     </section>

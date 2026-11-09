@@ -33,6 +33,11 @@ export interface ProcessingHeroProps {
    * ≤1100 px the text runs over the whole hero and a placeholder would only push it down.
    */
   placeholder?: string | undefined;
+  /**
+   * Buttons indented like the lead (hub of «Стеклянные конструкции», mockup
+   * `2560_steklyannye-konstrukcii`); by default they align with the H1.
+   */
+  indentActions?: boolean | undefined;
 }
 
 const DEFAULT_TITLE_ID = "page-title";
@@ -62,6 +67,7 @@ export function ProcessingHero({
   actions,
   media,
   placeholder,
+  indentActions = false,
 }: ProcessingHeroProps) {
   return (
     <section
@@ -134,7 +140,9 @@ export function ProcessingHero({
             </ul>
           ) : null}
         </div>
-        {actions ? <div className={ACTIONS_CLASS}>{actions}</div> : null}
+        {actions ? (
+          <div className={cn(ACTIONS_CLASS, indentActions && INDENT)}>{actions}</div>
+        ) : null}
       </div>
     </section>
   );

@@ -26,6 +26,7 @@ import { Section, SectionHead, type SectionVariant } from "@/components/ig/secti
 import { NOT_FOUND_METADATA, NotFoundResponse } from "@/components/page/not-found-response";
 import { PageShell } from "@/components/page/page-shell";
 import { RichText } from "@/components/rich-text/rich-text";
+import { ConstructionHubPage } from "@/components/templates/construction-hub-template";
 import {
   getObjectsByProduct,
   listShowerConfigs,
@@ -46,8 +47,10 @@ import type { Construction, Object as PortfolioObject, ShowerConfig } from "@/pa
 import type { Metadata } from "next";
 
 /**
- * Template of the `constructions` collection (task 26): the hub `/steklyannye-konstrukcii/`, the
- * six root construction pages and — unchanged — the glazing / mirrors pages of task 27.
+ * Template of the `constructions` collection (task 26): the six root construction pages and —
+ * unchanged — the glazing / mirrors pages of task 27 (their hubs `/osteklenie/`, `/zerkala/`
+ * included). The hub of the «constructions» group, `/steklyannye-konstrukcii/`, is rendered by
+ * `ConstructionHubPage` (Paper mockup layout).
  *
  * Section order (each optional, driven by the document): hero → shower configurations →
  * systems → profile systems + glass → layout blocks (`main` slot) → «main risk» callout →
@@ -83,6 +86,10 @@ function ogImageOf(doc: Construction): { url: string; alt?: string | null } | nu
   // Generated placeholders (`gen-*`) never become og:image (task-38, `pickOgImage`).
   return pickOgImage([doc.seo?.ogImage, doc.heroImage]);
 }
+
+/** The hub of the «constructions» group (`/steklyannye-konstrukcii/`), not the glazing / mirrors hubs. */
+const isConstructionsHub = (doc: Construction) =>
+  doc.kind === "hub" && doc.group === "constructions";
 
 /** `generateMetadata` of a construction route: SEO group of the document, or the 404 metadata. */
 export async function generateConstructionMetadata(
@@ -308,6 +315,21 @@ export async function ConstructionPage(input: ConstructionPageInput): Promise<JS
     const missing = requestedPath(input);
     if (missing) await redirectIfExists(missing);
     return <NotFoundResponse />;
+  }
+
+  if (isConstructionsHub(doc)) {
+    const ctx = await getPlaceholderContext();
+    const path = doc.path ?? requestedPath(input) ?? "/";
+    const crumbLabel = resolveSeoText(doc.breadcrumbLabel || doc.title, ctx);
+    return (
+      <ConstructionHubPage
+        doc={doc}
+        title={resolveH1(doc.seo, doc.title, ctx)}
+        path={path}
+        crumbs={buildBreadcrumbs(path, { lastLabel: crumbLabel })}
+        ctx={ctx}
+      />
+    );
   }
 
   const isHub = doc.kind === "hub";

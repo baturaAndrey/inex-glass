@@ -4,10 +4,13 @@ import {
   CONSTRUCTIONS,
   type ConstructionSeed,
   type FaqSeed,
+  type ImageSeed,
   type LayoutSeed,
+  seedImagesOf,
 } from "../content/constructions";
 import { mayOverwrite, upsertBySlug } from "../context";
 import { getEditorConfig, markdownToLexical, type LexicalState } from "../lexical";
+import { ensureSeedImage } from "../seed-media";
 import type { SeedContext } from "../context";
 import type { RequiredDataFromCollectionSlug } from "payload";
 
@@ -20,14 +23,22 @@ import type { RequiredDataFromCollectionSlug } from "payload";
  * e.g. the mini-seed stub of `steklyannye-peregorodki`); otherwise it is skipped with a log
  * line, so editor changes survive a re-run. `productTag` links an EXISTING `products` record
  * (matched by `quizType`); the slice never creates taxonomy records or objects.
+ *
+ * Photos of the hub (hero, construction cards) live in `../media/constructions/` and are
+ * uploaded once (`../seed-media.ts`, found again by `sourceUrl`).
  */
+
+const MEDIA_GROUP = "constructions";
 
 type LayoutBlock = NonNullable<Construction["layout"]>[number];
 type ConstructionData = RequiredDataFromCollectionSlug<"constructions">;
 
 type Md = (markdown: string) => LexicalState;
 
-function layoutBlock(block: LayoutSeed, md: Md): LayoutBlock {
+/** `media` id of a seed photo (resolved before the document is built). */
+export type MediaId = (image: ImageSeed) => string;
+
+function layoutBlock(block: LayoutSeed, md: Md, media: MediaId): LayoutBlock {
   switch (block.type) {
     case "richText":
       return {
@@ -69,7 +80,25 @@ function layoutBlock(block: LayoutSeed, md: Md): LayoutBlock {
           title: item.title,
           text: item.text,
           link: { type: "custom" as const, url: item.url },
+          ...(item.image ? { image: media(item.image) } : {}),
         })),
+      };
+    case "cta":
+      return {
+        blockType: "cta",
+        variant: "banner",
+        tone: block.tone,
+        title: block.title,
+        body: md(block.md),
+        buttons: [
+          {
+            label: block.formButton.label,
+            kind: "form",
+            formKey: "drawing",
+            variant: "secondary",
+            formParams: { label: block.formButton.label },
+          },
+        ],
       };
   }
 }
@@ -94,7 +123,8 @@ async function findProductId(ctx: SeedContext, quizType: QuizTypeId): Promise<st
 export function constructionData(
   item: ConstructionSeed,
   md: Md,
-  productId: string | null
+  productId: string | null,
+  media: MediaId
 ): ConstructionData {
   return {
     title: item.title,
@@ -107,6 +137,8 @@ export function constructionData(
     card: { title: item.card.title, text: item.card.text },
     seo: { ...item.seo, noindex: false },
     intro: md(item.intro),
+    // Only set a seed photo; otherwise keep whatever the document has (generated placeholders).
+    ...(item.heroImage ? { heroImage: media(item.heroImage) } : {}),
     ctaPrimaryLabel: item.ctaPrimaryLabel,
     ctaSecondaryLabel: item.ctaSecondaryLabel ?? null,
     secondaryFormKey: item.secondaryFormKey,
@@ -156,7 +188,7 @@ export function constructionData(
       : { enabled: false },
     showShowerConfigs: item.showShowerConfigs ?? false,
     faq: faqItems(item.faq ?? [], md),
-    layout: item.layout.map((block) => layoutBlock(block, md)),
+    layout: item.layout.map((block) => layoutBlock(block, md, media)),
     _status: "published",
   };
 }
@@ -174,7 +206,16 @@ export async function seed(ctx: SeedContext): Promise<void> {
         `constructions ${item.slug}: нет записи products (${item.productQuizType}), productTag не задан`
       );
     }
-    await upsertBySlug(ctx, "constructions", constructionData(item, md, productId), {
+    const mediaIds = new Map<string, string>();
+    for (const image of seedImagesOf(item)) {
+      mediaIds.set(image.file, await ensureSeedImage(ctx, { group: MEDIA_GROUP, ...image }));
+    }
+    const media: MediaId = (image) => {
+      const id = mediaIds.get(image.file);
+      if (!id) throw new Error(`constructions ${item.slug}: нет media для ${image.file}`);
+      return id;
+    };
+    await upsertBySlug(ctx, "constructions", constructionData(item, md, productId, media), {
       overwrite: true,
     });
   }

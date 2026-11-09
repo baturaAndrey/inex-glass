@@ -19,6 +19,11 @@ interface PageCase {
   secondary: string | null;
   quizType: string;
   faq: number;
+  /**
+   * Hub layout (Paper mockup `2560_steklyannye-konstrukcii`): crumbs above the hero and no
+   * conditions section (the hero lists the terms, the cream block meets the footer).
+   */
+  hub?: true;
 }
 
 const PAGES: PageCase[] = [
@@ -27,12 +32,13 @@ const PAGES: PageCase[] = [
     h1: "Стеклянные конструкции для объектов",
     title: "Стеклянные конструкции — проект и комплектация | Inex Glass",
     description:
-      "Перегородки, ограждения, душевые, козырьки и фасады: проектируем узлы, комплектуем стекло, профиль и фурнитуру. Монтаж — ваша бригада.",
+      "Перегородки, ограждения, душевые, козырьки и фасады: проектируем узлы, комплектуем стекло, профиль и фурнитуру. Монтаж — бригада-партнёр или шеф-монтаж.",
     crumb: "Стеклянные конструкции",
     primary: "Рассчитать стоимость",
     secondary: "Отправить проект",
     quizType: "other",
     faq: 0,
+    hub: true,
   },
   {
     url: "/steklyannye-peregorodki/",
@@ -150,7 +156,9 @@ test.describe("constructions", () => {
       const robots = await page.locator('meta[name="robots"]').getAttribute("content");
       if (process.env.SITE_ENV === "production") expect(robots ?? "").not.toContain("noindex");
 
-      const crumbs = hero(page).getByRole("navigation", { name: "Хлебные крошки" });
+      const crumbs = (item.hub ? page.locator("main") : hero(page)).getByRole("navigation", {
+        name: "Хлебные крошки",
+      });
       await expect(crumbs.locator('[aria-current="page"]')).toHaveText(item.crumb);
       await expect(crumbs.getByRole("link", { name: "Главная" })).toBeVisible();
 
@@ -183,7 +191,9 @@ test.describe("constructions", () => {
       const text = (await page.locator("main").innerText()) ?? "";
       expect(text).not.toMatch(/[{}]/);
       expect(text).not.toMatch(/ждёт ответа|Каталог конфигураций/);
-      await expect(page.getByRole("heading", { name: "Условия", level: 2 })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Условия", level: 2 })).toHaveCount(
+        item.hub ? 0 : 1
+      );
 
       if (isMobile(testInfo.project.name)) {
         const overflow = await page.evaluate(
@@ -194,12 +204,17 @@ test.describe("constructions", () => {
     });
   }
 
-  test("hub: cards, who-does-what, inex.su strip, «Почему комплект»", async ({ page }) => {
+  test("hub: photo cards, «Монтаж» panel, cream block, objects", async ({ page }) => {
     await page.goto("/steklyannye-konstrukcii/");
-    const cards = page.locator("section", {
-      has: page.getByRole("heading", { name: "Конструкции", exact: true }),
-    });
-    await expect(cards.locator("a.ig-card")).toHaveCount(7);
+    const heroSection = hero(page);
+    await expect(heroSection.getByRole("list", { name: "Условия" }).locator("li")).toHaveCount(4);
+    await expect(heroSection.getByTestId("construction-intro")).toContainText(
+      "Подберём проверенную монтажную бригаду или проведём шеф-монтаж с вашими специалистами."
+    );
+
+    const cards = page.getByTestId("construction-cards");
+    await expect(cards.getByRole("heading", { name: "Конструкции", level: 2 })).toBeVisible();
+    await expect(cards.getByTestId("construction-card")).toHaveCount(7);
     for (const href of [
       "/steklyannye-peregorodki/",
       "/steklyannye-ograzhdeniya/",
@@ -211,19 +226,52 @@ test.describe("constructions", () => {
     ]) {
       await expect(cards.locator(`a[href="${href}"]`)).toHaveCount(1);
     }
-    const who = page.locator("[data-section='who-does-what']");
+    // Seed photos (not generated placeholders), each with a descriptive alt.
+    const photos = cards.locator("[data-testid='construction-card'] img");
+    await expect(photos).toHaveCount(7);
+    for (const alt of await photos.evaluateAll((els) => els.map((el) => el.getAttribute("alt")))) {
+      expect(alt ?? "").toMatch(/^[А-ЯЁ]/);
+    }
+
+    const montage = page.getByTestId("construction-montage");
+    await expect(montage.getByRole("heading", { name: "Монтаж" })).toBeVisible();
+    await expect(montage).toContainText("шеф-монтаж с вашими специалистами");
+    await expect(montage.locator("[data-form-trigger]")).toHaveText("Отправить проект");
+    await expect(montage.locator("a")).toHaveCount(0);
+
+    const info = page.getByTestId("construction-hub-info");
+    const who = info.locator("[data-section='who-does-what']");
     await expect(who.getByRole("heading", { name: "Кто что делает" })).toBeVisible();
     await expect(who.locator("[data-who='inex'] li")).toHaveCount(4);
-    await expect(who.locator("[data-who='team'] li")).toHaveCount(3);
-    const strip = page.locator("[data-inex-su-strip]");
-    await expect(strip).toContainText("Нужен монтаж «под ключ»?");
-    const link = strip.getByRole("link", { name: "inex.su" });
-    await expect(link).toHaveAttribute("href", "https://inex.su/");
-    await expect(link).toHaveAttribute("target", "_blank");
-    expect(await link.getAttribute("rel")).toContain("noopener");
+    await expect(who.locator("[data-who='montage'] h3")).toHaveText("Монтаж");
+    await expect(who.locator("[data-who='montage'] li")).toHaveCount(3);
     await expect(
-      page.getByRole("heading", { name: "Почему комплект, а не стекло отдельно" })
+      info.getByRole("heading", { name: "Почему комплект, а не стекло отдельно" })
     ).toBeVisible();
+    await expect(info).toContainText("закалённое стекло там уже не подогнать");
+
+    // «Объекты» only with published objects (else no empty heading); the buttons always stay.
+    const objects = info.locator("[data-section='objects']");
+    const objectCards = objects.getByTestId("hub-object-card");
+    const sectionCount = await objects.count();
+    if (sectionCount > 0) {
+      await expect(objects.getByRole("heading", { name: "Объекты", level: 2 })).toBeVisible();
+      await expect(objects.getByRole("link", { name: "Все объекты" })).toHaveAttribute(
+        "href",
+        "/obekty/"
+      );
+      const cardCount = await objectCards.count();
+      expect(cardCount).toBeGreaterThan(0);
+      expect(cardCount).toBeLessThanOrEqual(4);
+    } else {
+      await expect(info.getByRole("heading", { name: "Объекты" })).toHaveCount(0);
+    }
+    await expect(info.locator("[data-section='closing-cta'] a[data-quiz-cta]")).toHaveCount(1);
+
+    // The montage decision of 2026-11-09: no «под ключ», no inex.su strip, no «ваша бригада».
+    await expect(page.locator("[data-inex-su-strip]")).toHaveCount(0);
+    const text = await page.locator("main").innerText();
+    expect(text).not.toMatch(/под ключ|ваша бригада|Монтаж выполняет/i);
   });
 
   test("partitions: systems, plates, risk callout, documents, bridge, FAQ", async ({
