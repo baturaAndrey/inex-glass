@@ -10,6 +10,7 @@ import {
   FAQ_HEADING,
   PROFILE_SYSTEMS_HEADING,
 } from "@/components/constructions/copy";
+import { CreamObjects, objectsGroupOf } from "@/components/constructions/cream-objects";
 import {
   GlassPanel,
   PANEL_TEXT,
@@ -29,16 +30,19 @@ import {
   objectCards,
 } from "@/components/constructions/objects-column";
 import { ShowerConfigsGrid } from "@/components/constructions/shower-configs-grid";
+import type { SiblingNav } from "@/components/constructions/sibling-links";
 import { SnowCalcSection } from "@/components/constructions/snow-calc-section";
 import { SystemPhotoCards } from "@/components/constructions/system-photo-cards";
 import { DEFAULT_SYSTEMS_HEADING } from "@/components/constructions/systems-section";
 import { DrawingPanel } from "@/components/forms/drawing-panel";
+import { SubpageLinks } from "@/components/how-to-order/subpage-links";
 import type { Crumb } from "@/components/ig/breadcrumbs";
 import { Button } from "@/components/ig/button";
 import { Container } from "@/components/ig/container";
 import { PageShell } from "@/components/page/page-shell";
 import { ProcessingHero } from "@/components/processing/processing-hero";
 import { ServiceFaq } from "@/components/processing/service-faq";
+import { splitTrailingLinks } from "@/components/rich-text/lexical-parts";
 import type { RichTextData } from "@/components/rich-text/rich-text";
 import { RichText } from "@/components/rich-text/rich-text";
 import { heroMedia, heroTerms } from "@/components/templates/construction-hub-template";
@@ -64,7 +68,16 @@ import type { Construction } from "@/payload-types";
  * монтаж «под ключ»?» (`inexSuBridge`, dark panel) → FAQ (+ FAQPage JSON-LD) → cream block with
  * the drawing-form panel, which closes the page (no «Условия» strip, no closing button row).
  *
- * Glazing / mirrors subpages and «Зажимной профиль» keep the task-26 template.
+ * The same template serves the subpages of «Остекление» and «Зеркала» (`/osteklenie/<slug>/`,
+ * `/zerkala/<slug>/`, approved without an own mockup): there `siblings` is given and
+ *
+ * - «Объекты» (the `slot-objects` text as the lead, the tagged objects as photo cards) moves
+ *   into the cream block, before the drawing-form panel, as on the hubs;
+ * - the inex.su panel («Стеклянные двери изготавливает…») follows the main blocks it belongs to,
+ *   before the blocks of the slot `b` («Для торговых сетей»), as in teksty;
+ * - the cream block ends with the tiles of the sibling subpages (the current one dark).
+ *
+ * «Зажимной профиль» keeps the task-26 template.
  */
 
 export interface ConstructionDetailPageProps {
@@ -74,6 +87,8 @@ export interface ConstructionDetailPageProps {
   crumbs: Crumb[];
   crumbLabel: string;
   ctx: PlaceholderContext;
+  /** Glazing / mirrors subpage: the sibling navigation of its hub (switches the subpage layout). */
+  siblings?: SiblingNav | null | undefined;
 }
 
 const FORM_HEADING_ID = "construction-form-title";
@@ -148,7 +163,10 @@ export async function ConstructionDetailPage({
   crumbs,
   crumbLabel,
   ctx,
+  siblings,
 }: ConstructionDetailPageProps): Promise<JSX.Element> {
+  // Subpage layout: objects in the cream block, the inex.su panel before the slot `b`.
+  const isSubpage = siblings !== undefined;
   const productId = relationId(doc.productTag);
   const [terms, configs, objects] = await Promise.all([
     heroTerms(ctx),
@@ -267,6 +285,9 @@ export async function ConstructionDetailPage({
   const objectsSlot = slots.objects.filter((block) => block.blockType === "richText");
   const hasObjects = objectCards(objects).length > 0;
   const showObjects = objectsSlot.length > 0 || hasObjects;
+  // Subpage: the slot text leads the cream «Объекты»; its closing «Все объекты» is in the header.
+  const firstObjectsText = objectsSlot[0]?.blockType === "richText" ? objectsSlot[0].content : null;
+  const objectsLead = isSubpage ? splitTrailingLinks(firstObjectsText).body : null;
   const docsPanel = doc.documents ? (
     <TextPanel
       key="documents"
@@ -276,22 +297,26 @@ export async function ConstructionDetailPage({
       testId="construction-documents"
     />
   ) : null;
-  const objectsPanel = showObjects ? (
-    <TextPanel
-      key="objects"
-      heading={fill(doc.objectsHeading, ctx) || DEFAULT_OBJECTS_HEADING}
-      headingId="construction-objects-title"
-      body={objectsSlot[0]?.blockType === "richText" ? objectsSlot[0].content : null}
-      ctx={ctx}
-      extraLinks={[{ label: ALL_OBJECTS_LABEL, href: OBJECTS_PATH, external: false }]}
-      testId="construction-objects"
-    >
-      {hasObjects ? <ObjectsList objects={objects} mode="column" /> : null}
-    </TextPanel>
-  ) : null;
+  const objectsPanel =
+    showObjects && !isSubpage ? (
+      <TextPanel
+        key="objects"
+        heading={fill(doc.objectsHeading, ctx) || DEFAULT_OBJECTS_HEADING}
+        headingId="construction-objects-title"
+        body={firstObjectsText}
+        ctx={ctx}
+        extraLinks={[{ label: ALL_OBJECTS_LABEL, href: OBJECTS_PATH, external: false }]}
+        testId="construction-objects"
+      >
+        {hasObjects ? <ObjectsList objects={objects} mode="column" /> : null}
+      </TextPanel>
+    ) : null;
   if (docsPanel || objectsPanel) {
     parts.push(
-      <PanelRow key="documents-objects" count={Number(Boolean(docsPanel)) + Number(showObjects)}>
+      <PanelRow
+        key="documents-objects"
+        count={Number(Boolean(docsPanel)) + Number(Boolean(objectsPanel))}
+      >
         {docsPanel}
         {objectsPanel}
       </PanelRow>
@@ -310,6 +335,11 @@ export async function ConstructionDetailPage({
     );
   }
 
+  const turnkey = hasInexSuBridge(doc.inexSuBridge) ? (
+    <TurnkeyPanel key="turnkey" bridge={doc.inexSuBridge} ctx={ctx} />
+  ) : null;
+  if (isSubpage && turnkey) parts.push(turnkey);
+
   if (slots.after.length > 0) {
     parts.push(
       <BlockPanels
@@ -325,9 +355,7 @@ export async function ConstructionDetailPage({
   const who = doc.whoDoesWhat;
   if (who?.enabled) parts.push(<WhoPanel key="who" data={who} ctx={ctx} />);
 
-  if (hasInexSuBridge(doc.inexSuBridge)) {
-    parts.push(<TurnkeyPanel key="turnkey" bridge={doc.inexSuBridge} ctx={ctx} />);
-  }
+  if (!isSubpage && turnkey) parts.push(turnkey);
 
   const faq = (doc.faq ?? []).filter((item) => hasText(item.question));
   if (faq.length > 0) {
@@ -379,11 +407,31 @@ export async function ConstructionDetailPage({
       ) : null}
 
       <CreamBlock>
+        {isSubpage && showObjects ? (
+          <CreamObjects
+            heading={fill(doc.objectsHeading, ctx) || DEFAULT_OBJECTS_HEADING}
+            headingId="construction-objects-title"
+            group={objectsGroupOf(objects)}
+            lead={
+              objectsLead ? <RichText data={objectsLead} ctx={ctx} className={PANEL_TEXT} /> : null
+            }
+          />
+        ) : null}
         <DrawingPanel
           headingId={FORM_HEADING_ID}
           anchorId={FORM_ANCHOR}
           params={{ source: `${path}#${FORM_ANCHOR}` }}
         />
+        {siblings ? (
+          <SubpageLinks
+            links={siblings.links}
+            currentPath={path}
+            label={siblings.label}
+            id="razdely"
+            testId="sibling-links"
+            columns={siblings.links.length >= 5 ? 5 : 4}
+          />
+        ) : null}
       </CreamBlock>
     </PageShell>
   );

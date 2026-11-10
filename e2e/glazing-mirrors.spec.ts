@@ -4,7 +4,9 @@ import { VIEWPORTS } from "./helpers/viewports";
 /**
  * «Остекление» and «Зеркала» (task 27): 9 pages filled by the seed slice `glazing-mirrors` (CI
  * runs `pnpm seed --full` before e2e). The hubs follow the Paper mockup `2560_osteklenie`
- * (`GlazingHubPage`: tables as the white table card); the subpages keep the task-26 template.
+ * (`GlazingHubPage`); the subpages use the construction page template (`ConstructionDetailPage`,
+ * approved without an own mockup). Tables are the white table card everywhere (`OrderTable`: a
+ * card list on phones).
  *
  * Runs in all three viewport projects. URL normalisation, 404 and the hub links are raw HTTP
  * checks and run in the 1366 project only.
@@ -18,8 +20,6 @@ interface Expected {
   /** Secondary button (opens the drawing form). */
   secondary: string;
   hasTable: boolean;
-  /** Paper hub: its tables are the white table card (`OrderTable`, a card list on phones). */
-  hub?: true;
 }
 
 /** H1 / Title / Description from `docs/inex/17-meta.md`. */
@@ -32,7 +32,6 @@ const PAGES: readonly Expected[] = [
       "Стеклянные фасады, спайдерное остекление, витрины, лифтовые шахты и веранды: стекло, профиль и узлы для подрядчика.",
     secondary: "Отправить проект",
     hasTable: false,
-    hub: true,
   },
   {
     path: "/osteklenie/fasadov/",
@@ -87,7 +86,6 @@ const PAGES: readonly Expected[] = [
       "Зеркала для гостиниц, офисов, салонов и залов: по размерам, с фацетом и обработкой кромки, партиями от 50 м².",
     secondary: "Отправить размеры",
     hasTable: true,
-    hub: true,
   },
   {
     path: "/zerkala/dlya-zalov/",
@@ -181,24 +179,13 @@ test.describe("glazing & mirrors pages", () => {
       const text = await page.locator("main").innerText();
       expect(text).not.toMatch(/[{}]/);
 
-      // Tables: cards on phones, the table on desktop. A table without column labels (no
-      // <thead>, e.g. «Отверстия — главный узел» on /osteklenie/spajdernoe/) scrolls sideways on
-      // phones instead (DataTable, task-42 FL-02).
-      if (expected.hasTable && expected.hub) {
+      // Tables: the white table card on desktop, one card per row on phones.
+      if (expected.hasTable) {
         const table = page.locator("main [data-order-table]").first();
-        if (isMobile(page)) await expect(table).toBeHidden();
-        else await expect(table).toBeVisible();
-      } else if (expected.hasTable) {
-        const labelled = page.locator("main table.ig-table:has(thead)");
-        const card = page.locator("main .ig-mcard").first();
-        const table = (await labelled.count()) > 0 ? labelled.first() : null;
-        if (!table) {
-          // Only label-less tables: the table itself on every width, never empty cards.
-          await expect(page.locator("main table.ig-table").first()).toBeVisible();
-          await expect(card).toHaveCount(0);
-        } else if (isMobile(page)) {
-          await expect(card).toBeVisible();
+        const card = page.locator("main [data-order-card]").first();
+        if (isMobile(page)) {
           await expect(table).toBeHidden();
+          await expect(card).toBeVisible();
         } else {
           await expect(table).toBeVisible();
           await expect(card).toBeHidden();
@@ -219,14 +206,14 @@ test.describe("glazing & mirrors pages", () => {
   }
 });
 
-test.describe("glazing & mirrors hubs (Paper mockup 2560_osteklenie)", () => {
-  /** Alts of the photos inside a locator: every one is a Russian description. */
-  async function expectPhotoAlts(images: ReturnType<Page["locator"]>) {
-    for (const alt of await images.evaluateAll((els) => els.map((el) => el.getAttribute("alt")))) {
-      expect(alt ?? "").toMatch(/^[А-ЯЁ]/);
-    }
+/** Alts of the photos inside a locator: every one is a Russian description. */
+async function expectPhotoAlts(images: ReturnType<Page["locator"]>) {
+  for (const alt of await images.evaluateAll((els) => els.map((el) => el.getAttribute("alt")))) {
+    expect(alt ?? "").toMatch(/^[А-ЯЁ]/);
   }
+}
 
+test.describe("glazing & mirrors hubs (Paper mockup 2560_osteklenie)", () => {
   test("/osteklenie/: photo hero with terms, six photo cards, steps, objects, form panel", async ({
     page,
   }) => {
@@ -277,6 +264,118 @@ test.describe("glazing & mirrors hubs (Paper mockup 2560_osteklenie)", () => {
       page.getByTestId("construction-table").getByRole("heading", { name: "Что делаем" })
     ).toBeVisible();
     await expect(page.getByRole("heading", { name: "Условия", level: 2 })).toHaveCount(0);
+  });
+});
+
+/** Subpages and the sibling tiles at the bottom of their cream block (hub card titles). */
+const SUBPAGES = [
+  { path: "/osteklenie/fasadov/", siblings: 5 },
+  { path: "/osteklenie/spajdernoe/", siblings: 5 },
+  { path: "/osteklenie/vitrin-i-magazinov/", siblings: 5 },
+  { path: "/osteklenie/liftovyh-shaht/", siblings: 5 },
+  { path: "/osteklenie/verand-terras-besedok/", siblings: 5 },
+  { path: "/zerkala/dlya-zalov/", siblings: 2 },
+  { path: "/zerkala/dlya-salonov/", siblings: 2 },
+] as const;
+
+test.describe("glazing & mirrors subpages (construction page template)", () => {
+  for (const { path, siblings } of SUBPAGES) {
+    test(`${path}: photo hero with terms, cream block with form panel and sibling tiles`, async ({
+      page,
+    }) => {
+      await page.goto(path);
+      const hero = page.locator("section[aria-labelledby='page-title']");
+      await expect(hero.locator("img")).toHaveCount(1);
+      await expectPhotoAlts(hero.locator("img"));
+      await expect(hero.getByRole("list", { name: "Условия" }).locator("li")).toHaveCount(4);
+      // The terms checklist replaces the intro's `{условия}` sentence.
+      await expect(hero.getByTestId("construction-intro")).not.toContainText("Заказы от");
+
+      // Crumbs: Главная › hub › page.
+      const crumbs = page.getByRole("navigation", { name: "Хлебные крошки" }).locator("li");
+      await expect(crumbs).toHaveCount(3);
+
+      // Cream block: the form panel, then the tiles of the sibling subpages (current one dark).
+      await expect(page.getByTestId("drawing-panel")).toBeVisible();
+      const tiles = page.getByTestId("sibling-links").locator("a");
+      await expect(tiles).toHaveCount(siblings);
+      await expect(tiles.and(page.locator('[aria-current="page"]'))).toHaveAttribute("href", path);
+      await expect(page.locator("[data-section='closing-cta']")).toHaveCount(0);
+      await expect(page.getByRole("heading", { name: "Условия", level: 2 })).toHaveCount(0);
+    });
+  }
+
+  test("fasadov: 4 system photo cards, profile pills, glass, info note, objects", async ({
+    page,
+  }) => {
+    await page.goto("/osteklenie/fasadov/");
+    const cards = page.locator("#sistemy").getByTestId("system-card");
+    await expect(cards).toHaveCount(4);
+    await expect(cards.locator("img")).toHaveCount(4);
+    await expectPhotoAlts(cards.locator("img"));
+    await expect(cards.first()).toContainText("Стоечно-ригельный");
+    // No «Где уместна» facts on this page: just the name and the subtitle.
+    await expect(cards.locator("dt")).toHaveCount(0);
+    await expect(page.getByTestId("construction-profiles")).toContainText("СИАЛ");
+    await expect(page.getByTestId("construction-glass").locator("li")).toHaveCount(3);
+    await expect(
+      page.getByRole("heading", { name: "Что важно для фасада", level: 2 })
+    ).toBeVisible();
+    const objects = page.locator("[data-section='objects']");
+    await expect(objects).toContainText("Фасады и витражи из портфолио Inex");
+    await expect(objects.getByRole("link", { name: "Все объекты" })).toHaveAttribute(
+      "href",
+      "/obekty/"
+    );
+  });
+
+  test("verandy: 4 system photo cards with «Где уместна», warning block", async ({ page }) => {
+    await page.goto("/osteklenie/verand-terras-besedok/");
+    const cards = page.locator("#sistemy").getByTestId("system-card");
+    await expect(cards).toHaveCount(4);
+    await expect(cards.locator("img")).toHaveCount(4);
+    await expect(cards.locator("dt")).toHaveCount(4);
+    await expect(page.getByTestId("construction-warning")).toContainText("только из триплекса");
+    await expect(page.locator("[data-section='objects']")).toContainText(
+      "Веранды, беседки и террасы из портфолио Inex"
+    );
+  });
+
+  test("spajdernoe: the coordinates note closes the holes table panel", async ({ page }) => {
+    await page.goto("/osteklenie/spajdernoe/");
+    const table = page.getByTestId("construction-table");
+    await expect(table.getByRole("heading", { name: "Отверстия — главный узел" })).toBeVisible();
+    await expect(table.getByTestId("construction-table-note")).toContainText("DWG или DXF");
+    await expect(table.getByRole("link", { name: "Отверстия и вырезы" })).toBeVisible();
+  });
+
+  test("vitriny: the inex.su dark panel comes before «Для торговых сетей»", async ({ page }) => {
+    await page.goto("/osteklenie/vitrin-i-magazinov/");
+    const turnkey = page.getByTestId("construction-turnkey");
+    await expect(turnkey).toContainText("Стеклянные двери изготавливает инжиниринговая компания");
+    await expect(turnkey.getByRole("link", { name: "inex.su" })).toHaveAttribute(
+      "href",
+      "https://inex.su/"
+    );
+    const chains = page.getByRole("heading", { name: "Для торговых сетей", level: 2 });
+    const [turnkeyBox, chainsBox] = await Promise.all([
+      turnkey.boundingBox(),
+      chains.boundingBox(),
+    ]);
+    expect(turnkeyBox!.y).toBeLessThan(chainsBox!.y);
+  });
+
+  test("dlya-zalov: warning block with the film title, paired text panels", async ({ page }) => {
+    await page.goto("/zerkala/dlya-zalov/");
+    await expect(
+      page
+        .getByTestId("construction-warning")
+        .getByRole("heading", { name: "Безопасность — противоосколочная плёнка" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Как собрать зеркальную стену", level: 2 })
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Что прислать", level: 2 })).toBeVisible();
   });
 });
 

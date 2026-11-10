@@ -87,6 +87,9 @@ export function ArticleTable({
   }));
   const tableCaption = caption || fill(table?.caption, ctx) || fill(block.heading, ctx);
   const footnote = fill(table?.footnote, ctx);
+  // Key → value tables keep blank (no-break space) labels: no empty header row, key-above-value
+  // cards on phones.
+  const headerless = columns.every((column) => column.label.trim() === "");
 
   return (
     <OrderTable
@@ -94,6 +97,7 @@ export function ArticleTable({
       rows={rows}
       {...(tableCaption ? { caption: tableCaption } : {})}
       {...(footnote ? { footnote } : {})}
+      headerless={headerless}
       data-testid="article-table"
     />
   );

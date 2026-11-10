@@ -4,15 +4,19 @@ import { fill } from "@/components/blocks/shared";
 import type { BlockOf, BlockPageContext, LayoutBlock } from "@/components/blocks/types";
 import { PANEL_HEADING, WHITE_PANEL } from "@/components/company/company-pieces";
 import { ArticleCallout, ArticleTable } from "@/components/how-to-order/article-pieces";
+import { splitLeadingHeading, splitTrailingLinks } from "@/components/rich-text/lexical-parts";
+import { RichText, type RichTextData } from "@/components/rich-text/rich-text";
 import type { PlaceholderContext } from "@/lib/domain";
 import { cn } from "@/lib/utils";
-import { PanelRow, TextPanel, WarningPanel } from "./detail-panels";
+import { PANEL_TEXT, PanelLinks, PanelRow, TextPanel, WarningPanel } from "./detail-panels";
 
 /**
  * Layout blocks of a construction / glazing page in the Paper panel language (mockups
  * `2560_steklyannye-peregorodki`, `2560_osteklenie`): every block becomes a white panel inside
  * the page container — consecutive rich-text blocks two per row, a table as a panel with the
- * site table card, a warning callout as the warning block. Other block kinds (rare in these
+ * site table card, a warning callout as the warning block. A rich text without any heading right
+ * after a table is that table's note (spider holes: «Координаты каждого отверстия…») and closes
+ * the table panel instead of opening a row of its own. Other block kinds (rare in these
  * documents) keep their own rendering, so nothing an editor adds is lost.
  */
 
@@ -24,12 +28,30 @@ export interface BlockPanelsProps {
   idPrefix: string;
 }
 
+/** A rich text with neither a heading field nor a leading heading in its content. */
+function isHeadless(block: BlockOf<"richText">, ctx: PlaceholderContext): boolean {
+  return !fill(block.heading, ctx) && splitLeadingHeading(block.content).heading === null;
+}
+
+/** Note under a table: panel text and its closing links as arrow links. */
+function TableNote({ body, ctx }: { body: RichTextData; ctx: PlaceholderContext }) {
+  const { body: text, links } = splitTrailingLinks(body);
+  return (
+    <div className="flex flex-col gap-4" data-testid="construction-table-note">
+      {text ? <RichText data={text} ctx={ctx} className={PANEL_TEXT} /> : null}
+      <PanelLinks links={links} />
+    </div>
+  );
+}
+
 function TablePanel({
   block,
+  note,
   ctx,
   headingId,
 }: {
   block: BlockOf<"table">;
+  note?: BlockOf<"richText"> | null | undefined;
   ctx: PlaceholderContext;
   headingId: string;
 }) {
@@ -54,6 +76,7 @@ function TablePanel({
         </div>
       ) : null}
       <ArticleTable block={block} ctx={ctx} caption={heading || undefined} />
+      {note ? <TableNote body={note.content} ctx={ctx} /> : null}
     </section>
   );
 }
@@ -111,7 +134,11 @@ export function BlockPanels({ blocks, ctx, page, idPrefix }: BlockPanelsProps) {
     );
   };
 
+  // Rich texts consumed as the note of the table before them.
+  const notes = new Set<LayoutBlock>();
+
   blocks.forEach((block, index) => {
+    if (notes.has(block)) return;
     if (block.blockType === "richText") {
       pending.push({ block, index });
       if (pending.length === 2) flush();
@@ -120,8 +147,17 @@ export function BlockPanels({ blocks, ctx, page, idPrefix }: BlockPanelsProps) {
     flush();
     const headingId = `${idPrefix}-${index}`;
     if (block.blockType === "table") {
+      const next = blocks[index + 1];
+      const note = next?.blockType === "richText" && isHeadless(next, ctx) ? next : null;
+      if (note) notes.add(note);
       out.push(
-        <TablePanel key={block.id ?? index} block={block} ctx={ctx} headingId={headingId} />
+        <TablePanel
+          key={block.id ?? index}
+          block={block}
+          note={note}
+          ctx={ctx}
+          headingId={headingId}
+        />
       );
     } else if (block.blockType === "callout") {
       out.push(

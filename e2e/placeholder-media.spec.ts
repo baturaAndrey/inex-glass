@@ -12,8 +12,8 @@ import { VIEWPORTS } from "./helpers/viewports";
  * `pnpm payload run scripts/attach-generated-media.ts`. Without the attach step the pages
  * have no generated images and the page checks are skipped (the admin check still runs).
  *
- * Processing pages and the hubs `/steklyannye-konstrukcii/`, `/osteklenie/`, `/zerkala/` are not
- * listed: their hero / card photos are seed photos (`src/seed/media/processing/`,
+ * Processing pages, the hubs `/steklyannye-konstrukcii/`, `/osteklenie/`, `/zerkala/` and their
+ * subpages are not listed: their hero / card / system photos are seed photos (`src/seed/media/processing/`,
  * `src/seed/media/constructions/`, `src/seed/media/glazing/`, `src/seed/media/mirrors/`), not
  * generated placeholders.
  *

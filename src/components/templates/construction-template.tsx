@@ -22,6 +22,7 @@ import {
 } from "@/components/constructions/objects-column";
 import { ProfilePlates } from "@/components/constructions/profile-plates";
 import { ShowerConfigsGrid } from "@/components/constructions/shower-configs-grid";
+import { loadSiblingNav } from "@/components/constructions/sibling-links";
 import { SnowCalcSection } from "@/components/constructions/snow-calc-section";
 import { SystemsSection } from "@/components/constructions/systems-section";
 import { WhoDoesWhatSection } from "@/components/constructions/who-does-what";
@@ -54,11 +55,11 @@ import type { Construction, Object as PortfolioObject, ShowerConfig } from "@/pa
 import type { Metadata } from "next";
 
 /**
- * Template of the `constructions` collection (task 26): «Зажимной профиль» (`/furnitura/`) and —
- * unchanged — the glazing / mirrors subpages of task 27. The Paper mockup layouts (2026-11) are
- * dispatched from here: the hub `/steklyannye-konstrukcii/` → `ConstructionHubPage`, the hubs
- * `/osteklenie/` and `/zerkala/` → `GlazingHubPage`, the five construction pages of the group
- * «constructions» → `ConstructionDetailPage`.
+ * Template of the `constructions` collection (task 26): «Зажимной профиль» (`/furnitura/`). The
+ * Paper mockup layouts (2026-11) are dispatched from here: the hub `/steklyannye-konstrukcii/` →
+ * `ConstructionHubPage`, the hubs `/osteklenie/` and `/zerkala/` → `GlazingHubPage`, the five
+ * construction pages of the group «constructions» and the glazing / mirrors subpages →
+ * `ConstructionDetailPage`.
  *
  * Section order (each optional, driven by the document): hero → shower configurations →
  * systems → profile systems + glass → layout blocks (`main` slot) → «main risk» callout →
@@ -104,6 +105,10 @@ const isGlazingHub = (doc: Construction) =>
 /** The five root construction pages (`ConstructionDetailPage`), not «Зажимной профиль» (hardware). */
 const isConstructionDetail = (doc: Construction) =>
   doc.kind === "construction" && doc.group === "constructions";
+
+/** Subpages of `/osteklenie/` and `/zerkala/` (`ConstructionDetailPage` with sibling tiles). */
+const isGlazingSubpage = (doc: Construction) =>
+  doc.kind === "construction" && (doc.group === "glazing" || doc.group === "mirrors");
 
 /** `generateMetadata` of a construction route: SEO group of the document, or the 404 metadata. */
 export async function generateConstructionMetadata(
@@ -346,8 +351,9 @@ export async function ConstructionPage(input: ConstructionPageInput): Promise<JS
     );
   }
 
-  // Paper layouts (2026-11): the glazing / mirrors hubs and the five construction pages.
-  if (isGlazingHub(doc) || isConstructionDetail(doc)) {
+  // Paper layouts (2026-11): the glazing / mirrors hubs, the five construction pages and the
+  // glazing / mirrors subpages (on the construction page template).
+  if (isGlazingHub(doc) || isConstructionDetail(doc) || isGlazingSubpage(doc)) {
     const ctx = await getPlaceholderContext();
     const path = doc.path ?? requestedPath(input) ?? "/";
     const crumbLabel = resolveSeoText(doc.breadcrumbLabel || doc.title, ctx);
@@ -358,11 +364,9 @@ export async function ConstructionPage(input: ConstructionPageInput): Promise<JS
       crumbs: buildBreadcrumbs(path, { lastLabel: crumbLabel }),
       ctx,
     };
-    return isGlazingHub(doc) ? (
-      <GlazingHubPage {...props} />
-    ) : (
-      <ConstructionDetailPage {...props} crumbLabel={crumbLabel} />
-    );
+    if (isGlazingHub(doc)) return <GlazingHubPage {...props} />;
+    const siblings = isGlazingSubpage(doc) ? await loadSiblingNav(path, ctx) : undefined;
+    return <ConstructionDetailPage {...props} crumbLabel={crumbLabel} siblings={siblings} />;
   }
 
   const isHub = doc.kind === "hub";

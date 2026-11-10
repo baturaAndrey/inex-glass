@@ -4,13 +4,9 @@ import type { BlockOf, BlockPageContext, LayoutBlock } from "@/components/blocks
 import { PILL, splitDotList } from "@/components/company/company-pieces";
 import { BlockPanels } from "@/components/constructions/block-panels";
 import { ConstructionActions } from "@/components/constructions/construction-hero";
+import { CreamObjects, objectsGroupOf } from "@/components/constructions/cream-objects";
 import { HubCards } from "@/components/constructions/hub-cards";
-import { HubObjects } from "@/components/constructions/hub-objects";
-import {
-  AllObjectsLink,
-  DEFAULT_OBJECTS_HEADING,
-  OBJECTS_LIMIT,
-} from "@/components/constructions/objects-column";
+import { DEFAULT_OBJECTS_HEADING, OBJECTS_LIMIT } from "@/components/constructions/objects-column";
 import { DrawingPanel } from "@/components/forms/drawing-panel";
 import { NumberedCards } from "@/components/how-to-order/article-pieces";
 import type { Crumb } from "@/components/ig/breadcrumbs";
@@ -23,9 +19,8 @@ import { heroMedia, heroTerms } from "@/components/templates/construction-hub-te
 import { CreamBlock } from "@/components/zak-hub/zak-info";
 import { getObjectsByProduct } from "@/lib/cms/construction-queries";
 import { layoutSlotOf } from "@/lib/cms/layout-slots";
-import { toObjectCard } from "@/lib/cms/objects";
 import type { PlaceholderContext } from "@/lib/domain";
-import { HUB_OBJECTS_ALL_KEY, type HubObjectsGroup } from "@/lib/objects/hub-feed";
+import type { HubObjectsGroup } from "@/lib/objects/hub-feed";
 import { cn } from "@/lib/utils";
 import { lexicalToPlainText } from "@/payload/utils/lexical-text";
 import type { Construction } from "@/payload-types";
@@ -44,7 +39,7 @@ import type { Construction } from "@/payload-types";
  * section) and the drawing-form panel, as on the other redesigned pages. The cream block meets the
  * footer: no «Условия» strip, no quiz CTA, no closing button row (the hero has the buttons).
  *
- * Their subpages (`/osteklenie/<slug>/`, `/zerkala/<slug>/`) keep the task-26 template.
+ * Their subpages (`/osteklenie/<slug>/`, `/zerkala/<slug>/`) use `ConstructionDetailPage`.
  */
 
 export interface GlazingHubPageProps {
@@ -76,24 +71,9 @@ const relationId = (value: unknown): string | null =>
       ? String((value as { id: unknown }).id)
       : null;
 
-/** The objects of the hub as one group of hub cards (no type chips on these hubs). */
+/** The objects of the hub (its product tag, else the featured ones) as one group of hub cards. */
 async function objectsGroup(doc: Construction): Promise<HubObjectsGroup | null> {
-  const docs = await getObjectsByProduct(relationId(doc.productTag), OBJECTS_LIMIT);
-  const objects = docs.flatMap((object) => {
-    const card = toObjectCard(object);
-    return card
-      ? [
-          {
-            id: card.id,
-            href: card.href,
-            name: card.name,
-            type: card.products[0]?.name ?? "",
-            photo: card.photo,
-          },
-        ]
-      : [];
-  });
-  return objects.length > 0 ? { key: HUB_OBJECTS_ALL_KEY, label: "", objects } : null;
+  return objectsGroupOf(await getObjectsByProduct(relationId(doc.productTag), OBJECTS_LIMIT));
 }
 
 export async function GlazingHubPage({
@@ -187,33 +167,26 @@ export async function GlazingHubPage({
           </section>
         ) : null}
         {showObjects ? (
-          <section
-            aria-labelledby={OBJECTS_HEADING_ID}
-            className="flex flex-col gap-8 max-sm:gap-6"
-            data-section="objects"
-          >
-            <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-              <h2 id={OBJECTS_HEADING_ID} className="ig-h2 m-0">
-                {objectsHeading}
-              </h2>
-              <AllObjectsLink />
-            </div>
-            {group ? (
-              <HubObjects groups={[group]} />
-            ) : objectNames.length > 0 ? (
-              // No published object yet: the object names of the CMS text.
-              <ul
-                className="m-0 flex list-none flex-wrap gap-2.5 p-0"
-                data-testid="glazing-object-names"
-              >
-                {objectNames.map((name, index) => (
-                  <li key={`${index}-${name}`} className={cn(PILL, "bg-surface text-text")}>
-                    {name}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </section>
+          <CreamObjects
+            heading={objectsHeading}
+            headingId={OBJECTS_HEADING_ID}
+            group={group}
+            fallback={
+              objectNames.length > 0 ? (
+                // No published object yet: the object names of the CMS text.
+                <ul
+                  className="m-0 flex list-none flex-wrap gap-2.5 p-0"
+                  data-testid="glazing-object-names"
+                >
+                  {objectNames.map((name, index) => (
+                    <li key={`${index}-${name}`} className={cn(PILL, "bg-surface text-text")}>
+                      {name}
+                    </li>
+                  ))}
+                </ul>
+              ) : null
+            }
+          />
         ) : null}
         <DrawingPanel
           headingId={FORM_HEADING_ID}

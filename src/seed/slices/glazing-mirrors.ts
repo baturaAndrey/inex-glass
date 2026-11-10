@@ -44,12 +44,13 @@ export type MediaResolver = (image: PageImage) => string;
 
 const imageKey = (image: PageImage) => `${image.group}/${image.file}`;
 
-/** Every seed photo of a page (hero, card photos), in document order. */
+/** Every seed photo of a page (hero, system photos, card photos), in document order. */
 export function pageImages(page: GlazingMirrorsPageContent): PageImage[] {
+  const systems = (page.systems ?? []).flatMap((system) => (system.image ? [system.image] : []));
   const cards = page.layout.flatMap((block) =>
     block.type === "cards" ? block.items.flatMap((item) => (item.image ? [item.image] : [])) : []
   );
-  return [...(page.heroImage ? [page.heroImage] : []), ...cards];
+  return [...(page.heroImage ? [page.heroImage] : []), ...systems, ...cards];
 }
 
 /** Product tag (`products.quizType`) per page; pages without an own product stay untagged. */
@@ -177,6 +178,7 @@ export async function buildConstructionData(
             name: system.name,
             ...(system.subtitle ? { subtitle: system.subtitle } : {}),
             ...(system.whereFits ? { whereFits: system.whereFits } : {}),
+            ...(system.image && media ? { image: media(system.image) } : {}),
           })),
         }
       : {}),

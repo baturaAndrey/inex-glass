@@ -400,6 +400,28 @@ describe("seed", () => {
       "media:mirrors/zerkala-salony.webp",
       "media:mirrors/zerkala-gostinicy.webp",
     ]);
-    expect(bySlug.get("fasadov")?.heroImage).toBeUndefined();
+    // Subpages (construction page template, 2026-11): 16:9 hero + photos of the system cards.
+    expect(bySlug.get("fasadov")?.heroImage).toBe("media:glazing/hero/fasadov.webp");
+    expect(bySlug.get("dlya-salonov")?.heroImage).toBe("media:mirrors/hero/dlya-salonov.webp");
+    const systemImages = (slug: string) =>
+      ((bySlug.get(slug)?.systems ?? []) as Array<{ image?: unknown }>).map(
+        (system) => system.image ?? null
+      );
+    expect(systemImages("fasadov")).toEqual([
+      "media:glazing/systems/fasadov-1.webp",
+      "media:glazing/systems/fasadov-2.webp",
+      "media:glazing/systems/fasadov-3.webp",
+      "media:glazing/spajdernoe.webp",
+    ]);
+    expect(systemImages("verand-terras-besedok")).toEqual([
+      "media:glazing/verandy.webp",
+      "media:glazing/systems/verandy-gilotina.webp",
+      "media:glazing/systems/verandy-3.webp",
+      "media:glazing/systems/verandy-4.webp",
+    ]);
+    // Every subpage has its hero photo.
+    for (const route of GLAZING_MIRRORS_ROUTES) {
+      expect(bySlug.get(route.docSlug)?.heroImage, route.path).toBeTruthy();
+    }
   }, 30_000);
 });

@@ -81,6 +81,8 @@ export interface SystemContent {
   name: string;
   subtitle?: string;
   whereFits?: string;
+  /** Photo of the system card (construction page template, 2026-11). */
+  image?: PageImage;
 }
 
 export interface GlazingMirrorsPageContent {
@@ -94,7 +96,7 @@ export interface GlazingMirrorsPageContent {
   /** Card in hubs / menus: `text` is copied from the hub table of teksty. */
   card?: { text: string };
   intro: string;
-  /** Hero photo (`heroImage`), hubs only. */
+  /** Hero photo (`heroImage`, 16:9): hubs and subpages. */
   heroImage?: PageImage;
   quizType: QuizTypeId;
   /** Secondary hero / final button («Отправить проект» …), opens the `drawing` form. */
@@ -270,6 +272,10 @@ const fasadov: GlazingMirrorsPageContent = {
   card: { text: "профили СИАЛ и Алютех, спандрель, маркировка по монтажной схеме" },
   intro:
     "Стекло и профильные системы для фасадов — комплексно или отдельными разделами. Для фасадных компаний и генподрядчиков. {условия}",
+  heroImage: glazingImage(
+    "hero/fasadov.webp",
+    "Стеклянный фасад в алюминиевом профиле крупным планом, за стеклом — улица"
+  ),
   quizType: "facade",
   secondaryLabel: "Отправить проект",
   systemsHeading: "Системы",
@@ -277,18 +283,35 @@ const fasadov: GlazingMirrorsPageContent = {
     {
       name: "Стоечно-ригельный",
       subtitle: "Каркас из стоек и ригелей, стекло в прижимной планке",
+      image: glazingImage(
+        "systems/fasadov-1.webp",
+        "Узел стоечно-ригельного фасада: стеклопакет в алюминиевом профиле с прижимной планкой"
+      ),
     },
     {
       name: "Структурный",
       subtitle:
         "Снаружи видно только стекло: оно крепится к каркасу на структурном герметике, без прижимных планок",
+      image: glazingImage(
+        "systems/fasadov-2.webp",
+        "Структурный фасад: снаружи видно только стекло с тонкими швами"
+      ),
     },
     {
       name: "На зажимном профиле",
       subtitle: "Стекло зажато в профиле по контуру — для входных групп и витражей первых этажей",
+      image: glazingImage(
+        "systems/fasadov-3.webp",
+        "Стекло, зажатое в алюминиевом профиле по нижней кромке"
+      ),
     },
     // teksty links this row to the spider page; system cards have no link field (the hub links it).
-    { name: "Спайдерный", subtitle: "Стекло на точечных креплениях" },
+    {
+      name: "Спайдерный",
+      subtitle: "Стекло на точечных креплениях",
+      // The hub card photo (same `media` document).
+      image: glazingImage("spajdernoe.webp", "Стекло на спайдерном креплении в светлом холле"),
+    },
   ],
   profileSystems: ["СИАЛ", "Алютех"],
   glassHeading: "Стекло",
@@ -344,6 +367,10 @@ const spajdernoe: GlazingMirrorsPageContent = {
   card: { text: "стекло на точечных креплениях" },
   intro:
     "Стекло на точечных креплениях — без рамы, «невесомый» фасад, атриум или вход. Стекло и спайдеры — одним комплектом, отверстия точно под крепления. {условия}",
+  heroImage: glazingImage(
+    "hero/spajdernoe.webp",
+    "Четырёхлучевой спайдер держит стёкла в светлом холле"
+  ),
   quizType: "facade",
   secondaryLabel: "Отправить проект",
   layout: [
@@ -396,6 +423,10 @@ const vitrinIMagazinov: GlazingMirrorsPageContent = {
   },
   card: { text: "осветлённое стекло, триплекс" },
   intro: "Стекло для витрин и входных групп магазинов, торговых центров и шоурумов. {условия}",
+  heroImage: glazingImage(
+    "hero/vitrin-i-magazinov.webp",
+    "Стеклянная витрина магазина одежды, вид с улицы"
+  ),
   quizType: "shopfronts",
   secondaryLabel: "Отправить проект",
   inexSuBridge: {
@@ -455,6 +486,10 @@ const liftovyhShaht: GlazingMirrorsPageContent = {
   card: { text: "триплекс по ГОСТ 33984.1-2016" },
   intro:
     "Шахты панорамных лифтов в торговых центрах, бизнес-центрах и атриумах: большие стёкла на виду, рядом с движущейся кабиной. {условия}",
+  heroImage: glazingImage(
+    "hero/liftovyh-shaht.webp",
+    "Стеклянная шахта лифта на точечных креплениях в атриуме торгового центра"
+  ),
   quizType: "triplex",
   secondaryLabel: "Отправить проект",
   layout: [
@@ -492,6 +527,10 @@ const verandTerrasBesedok: GlazingMirrorsPageContent = {
   card: { text: "раздвижные, гильотинные, складные системы, стеклянная крыша" },
   intro:
     "Стекло и системы для веранд, террас, беседок и балконов — для подрядчиков загородного строительства, ресторанов и кафе с летними верандами. {условия}",
+  heroImage: glazingImage(
+    "hero/verand-terras-besedok.webp",
+    "Открытая раздвижная стеклянная створка веранды с видом на сад"
+  ),
   quizType: "verandas",
   secondaryLabel: "Отправить проект",
   systemsHeading: "Системы",
@@ -500,21 +539,35 @@ const verandTerrasBesedok: GlazingMirrorsPageContent = {
       name: "Раздвижная безрамная",
       subtitle: "Закалённые стёкла без рам сдвигаются по направляющей и складываются в пачку",
       whereFits: "Веранды, террасы, балконы и лоджии",
+      // The hub card photo (same `media` document).
+      image: glazingImage("verandy.webp", "Раздвижная стеклянная стена веранды с видом на сад"),
     },
     {
       name: "Гильотинная",
       subtitle: "Стёкла поднимаются и опускаются вертикально",
       whereFits: "Рестораны, кафе, террасы — где нужно открыть проём целиком",
+      image: glazingImage(
+        "systems/verandy-gilotina.webp",
+        "Боковая стойка гильотинной системы и приподнятое стекло на летней террасе"
+      ),
     },
     {
       name: "Складная (гармошка)",
       subtitle: "Створки складываются к краю проёма",
       whereFits: "Широкие проёмы, зимние сады",
+      image: glazingImage(
+        "systems/verandy-3.webp",
+        "Створки складной системы, собранные в пачку у края проёма"
+      ),
     },
     {
       name: "Стеклянная крыша",
       subtitle: "Кровля из закалённого триплекса",
       whereFits: "Навесы над террасами, зимние сады",
+      image: glazingImage(
+        "systems/verandy-4.webp",
+        "Кромка стеклянной крыши из триплекса на алюминиевом профиле"
+      ),
     },
   ],
   layout: [
@@ -638,6 +691,7 @@ const zerkalaDlyaZalov: GlazingMirrorsPageContent = {
   // No `{условия}` in teksty here: the conditions block of the page frame covers it.
   intro:
     "Зеркальная стена в зале — это большие полотна рядом с людьми в движении. Главное — чтобы при ударе зеркало не рассыпалось острыми осколками.",
+  heroImage: mirrorsImage("hero/dlya-zalov.webp", "Кромка зеркальной стены в тренажёрном зале"),
   quizType: "mirrors",
   secondaryLabel: "Отправить размеры зала",
   layout: [
@@ -681,6 +735,10 @@ const zerkalaDlyaSalonov: GlazingMirrorsPageContent = {
   card: { text: "одинаковые зеркала на все рабочие места, с подсветкой" },
   intro:
     "Одинаковые зеркала на все рабочие места — для нового салона или сразу для сети. {условия}",
+  heroImage: mirrorsImage(
+    "hero/dlya-salonov.webp",
+    "Зеркало с фацетом над рабочим местом в салоне красоты"
+  ),
   quizType: "mirrors",
   secondaryLabel: "Отправить размеры",
   layout: [
