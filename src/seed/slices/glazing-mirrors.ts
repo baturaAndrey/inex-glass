@@ -9,10 +9,12 @@ import {
 } from "../content/glazing-mirrors";
 import { upsertBySlug } from "../context";
 import { markdown } from "../lexical";
+import { ensureSeedImage } from "../seed-media";
 import type {
   GlazingMirrorsPageContent,
   LayoutContent,
   LayoutSlot,
+  PageImage,
 } from "../content/glazing-mirrors";
 import type { SeedContext } from "../context";
 import type { LexicalState } from "../lexical";
@@ -37,6 +39,19 @@ type LayoutBlock = NonNullable<Construction["layout"]>[number];
 /** Markdown → Lexical; injected so the builder is testable without a Payload instance. */
 export type MarkdownConverter = (md: string) => Promise<LexicalState>;
 
+/** `media` id of a seed photo, resolved (uploaded) before the document is built. */
+export type MediaResolver = (image: PageImage) => string;
+
+const imageKey = (image: PageImage) => `${image.group}/${image.file}`;
+
+/** Every seed photo of a page (hero, card photos), in document order. */
+export function pageImages(page: GlazingMirrorsPageContent): PageImage[] {
+  const cards = page.layout.flatMap((block) =>
+    block.type === "cards" ? block.items.flatMap((item) => (item.image ? [item.image] : [])) : []
+  );
+  return [...(page.heroImage ? [page.heroImage] : []), ...cards];
+}
+
 /** Product tag (`products.quizType`) per page; pages without an own product stay untagged. */
 const PRODUCT_TAG_TYPE: Readonly<Record<string, QuizTypeId>> = {
   "/osteklenie/fasadov/": "facade",
@@ -55,7 +70,8 @@ function slotAnchor(slot: LayoutSlot | undefined, index: number): string | undef
 async function buildBlock(
   block: LayoutContent,
   index: number,
-  md: MarkdownConverter
+  md: MarkdownConverter,
+  media: MediaResolver | null
 ): Promise<LayoutBlock> {
   switch (block.type) {
     case "richText": {
@@ -92,7 +108,8 @@ async function buildBlock(
         items: block.items.map((item) => ({
           title: item.title,
           text: item.text,
-          link: { type: "custom", url: item.href },
+          ...(item.href ? { link: { type: "custom" as const, url: item.href } } : {}),
+          ...(item.image && media ? { image: media(item.image) } : {}),
         })),
       };
     case "callout": {
@@ -119,15 +136,19 @@ export interface BuildOptions {
   /** Id of the hub document (children only). */
   parentId?: string | null;
   productTagId?: string | null;
+  /** Seed photos → `media` ids; without it the photos are left out (tests). */
+  media?: MediaResolver | null;
 }
 
 /** `constructions` document data of one page (pure apart from the injected converter). */
 export async function buildConstructionData(
   page: GlazingMirrorsPageContent,
   route: GlazingMirrorsRoute,
-  { md, parentId = null, productTagId = null }: BuildOptions
+  { md, parentId = null, productTagId = null, media = null }: BuildOptions
 ): Promise<ConstructionData> {
-  const layout = await Promise.all(page.layout.map((block, index) => buildBlock(block, index, md)));
+  const layout = await Promise.all(
+    page.layout.map((block, index) => buildBlock(block, index, md, media))
+  );
   const hasObjectsSlot = page.layout.some(
     (block) => block.type === "richText" && block.slot === "objects"
   );
@@ -143,6 +164,8 @@ export async function buildConstructionData(
     productTag: productTagId,
     card: { title: route.label, ...(page.card ? { text: page.card.text } : {}) },
     intro: await md(page.intro),
+    // Only set a seed photo; otherwise keep whatever the document has.
+    ...(page.heroImage && media ? { heroImage: media(page.heroImage) } : {}),
     ctaPrimaryLabel: QUIZ_CTA_LABEL,
     ctaSecondaryLabel: page.secondaryLabel,
     secondaryFormKey: "drawing",
@@ -223,10 +246,20 @@ export async function seed(ctx: SeedContext): Promise<void> {
       throw new Error(`glazing-mirrors: хаб ${route.parentSlug} должен идти раньше ${route.path}`);
     }
     const productType = PRODUCT_TAG_TYPE[route.path];
+    const mediaIds = new Map<string, string>();
+    for (const image of pageImages(page)) {
+      mediaIds.set(imageKey(image), await ensureSeedImage(ctx, image));
+    }
+    const media: MediaResolver = (image) => {
+      const id = mediaIds.get(imageKey(image));
+      if (!id) throw new Error(`glazing-mirrors ${route.path}: нет media для ${imageKey(image)}`);
+      return id;
+    };
     const data = await buildConstructionData(page, route, {
       md,
       parentId,
       productTagId: productType ? (productTags.get(productType) ?? null) : null,
+      media,
     });
 
     const { doc } = await upsertBySlug(ctx, "constructions", { ...data, slug: route.docSlug });

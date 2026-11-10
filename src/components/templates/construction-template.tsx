@@ -6,6 +6,11 @@ import {
   ConstructionActions,
   ConstructionHero,
 } from "@/components/constructions/construction-hero";
+import {
+  DEFAULT_GLASS_HEADING,
+  FAQ_HEADING,
+  PROFILE_SYSTEMS_HEADING,
+} from "@/components/constructions/copy";
 import { InexSuStrip, hasInexSuBridge } from "@/components/constructions/inex-su-strip";
 import {
   AllObjectsLink,
@@ -26,7 +31,9 @@ import { Section, SectionHead, type SectionVariant } from "@/components/ig/secti
 import { NOT_FOUND_METADATA, NotFoundResponse } from "@/components/page/not-found-response";
 import { PageShell } from "@/components/page/page-shell";
 import { RichText } from "@/components/rich-text/rich-text";
+import { ConstructionDetailPage } from "@/components/templates/construction-detail-template";
 import { ConstructionHubPage } from "@/components/templates/construction-hub-template";
+import { GlazingHubPage } from "@/components/templates/glazing-hub-template";
 import {
   getObjectsByProduct,
   listShowerConfigs,
@@ -47,10 +54,11 @@ import type { Construction, Object as PortfolioObject, ShowerConfig } from "@/pa
 import type { Metadata } from "next";
 
 /**
- * Template of the `constructions` collection (task 26): the six root construction pages and —
- * unchanged — the glazing / mirrors pages of task 27 (their hubs `/osteklenie/`, `/zerkala/`
- * included). The hub of the «constructions» group, `/steklyannye-konstrukcii/`, is rendered by
- * `ConstructionHubPage` (Paper mockup layout).
+ * Template of the `constructions` collection (task 26): «Зажимной профиль» (`/furnitura/`) and —
+ * unchanged — the glazing / mirrors subpages of task 27. The Paper mockup layouts (2026-11) are
+ * dispatched from here: the hub `/steklyannye-konstrukcii/` → `ConstructionHubPage`, the hubs
+ * `/osteklenie/` and `/zerkala/` → `GlazingHubPage`, the five construction pages of the group
+ * «constructions» → `ConstructionDetailPage`.
  *
  * Section order (each optional, driven by the document): hero → shower configurations →
  * systems → profile systems + glass → layout blocks (`main` slot) → «main risk» callout →
@@ -62,9 +70,7 @@ import type { Metadata } from "next";
  * colour and does not advance the counter. Slots: see `@/lib/cms/layout-slots`.
  */
 
-export const PROFILE_SYSTEMS_HEADING = "Профильные системы";
-export const DEFAULT_GLASS_HEADING = "Стекло";
-export const FAQ_HEADING = "Частые вопросы";
+export { DEFAULT_GLASS_HEADING, FAQ_HEADING, PROFILE_SYSTEMS_HEADING };
 
 type ConstructionPageInput = ResolveConstructionInput;
 
@@ -90,6 +96,14 @@ function ogImageOf(doc: Construction): { url: string; alt?: string | null } | nu
 /** The hub of the «constructions» group (`/steklyannye-konstrukcii/`), not the glazing / mirrors hubs. */
 const isConstructionsHub = (doc: Construction) =>
   doc.kind === "hub" && doc.group === "constructions";
+
+/** Hubs `/osteklenie/` and `/zerkala/` (`GlazingHubPage`). */
+const isGlazingHub = (doc: Construction) =>
+  doc.kind === "hub" && (doc.group === "glazing" || doc.group === "mirrors");
+
+/** The five root construction pages (`ConstructionDetailPage`), not «Зажимной профиль» (hardware). */
+const isConstructionDetail = (doc: Construction) =>
+  doc.kind === "construction" && doc.group === "constructions";
 
 /** `generateMetadata` of a construction route: SEO group of the document, or the 404 metadata. */
 export async function generateConstructionMetadata(
@@ -329,6 +343,25 @@ export async function ConstructionPage(input: ConstructionPageInput): Promise<JS
         crumbs={buildBreadcrumbs(path, { lastLabel: crumbLabel })}
         ctx={ctx}
       />
+    );
+  }
+
+  // Paper layouts (2026-11): the glazing / mirrors hubs and the five construction pages.
+  if (isGlazingHub(doc) || isConstructionDetail(doc)) {
+    const ctx = await getPlaceholderContext();
+    const path = doc.path ?? requestedPath(input) ?? "/";
+    const crumbLabel = resolveSeoText(doc.breadcrumbLabel || doc.title, ctx);
+    const props = {
+      doc,
+      title: resolveH1(doc.seo, doc.title, ctx),
+      path,
+      crumbs: buildBreadcrumbs(path, { lastLabel: crumbLabel }),
+      ctx,
+    };
+    return isGlazingHub(doc) ? (
+      <GlazingHubPage {...props} />
+    ) : (
+      <ConstructionDetailPage {...props} crumbLabel={crumbLabel} />
     );
   }
 

@@ -34,6 +34,13 @@ vi.mock("../context", () => ({
   }),
 }));
 
+/** Seed photos: an id per `group/file` (no Payload, no file reads). */
+vi.mock("../seed-media", () => ({
+  ensureSeedImage: vi.fn(async (_ctx: unknown, image: { group: string; file: string }) =>
+    Promise.resolve(`media:${image.group}/${image.file}`)
+  ),
+}));
+
 const ROOT = path.resolve(import.meta.dirname, "../../..");
 const TEKSTY_DIR = path.join(ROOT, "res/inex-glass-handoff/teksty");
 const META_FILE = path.join(ROOT, "docs/inex/17-meta.md");
@@ -248,7 +255,7 @@ describe("glazing-mirrors content rules", () => {
         .flatMap((value) => [...value.matchAll(/\]\(([^)]+)\)/g)].map((m) => m[1] ?? ""));
       const fromBlocks = page.layout.flatMap((block) =>
         block.type === "cards"
-          ? block.items.map((item) => item.href)
+          ? block.items.flatMap((item) => (item.href ? [item.href] : []))
           : block.type === "table"
             ? block.rows.flat().flatMap((cell) => (cell.href ? [cell.href] : []))
             : []
@@ -372,5 +379,27 @@ describe("seed", () => {
     expect(bySlug.get("fasadov")?.productTag).toBe("p-facade");
     expect(bySlug.get("dlya-salonov")?.productTag).toBe("p-mirrors");
     expect(bySlug.get("liftovyh-shaht")?.productTag).toBeNull();
+    // Hub photos (Paper mockup `2560_osteklenie`): hero + one photo per card.
+    expect(bySlug.get("osteklenie")?.heroImage).toBe("media:glazing/hero-osteklenie.webp");
+    expect(bySlug.get("zerkala")?.heroImage).toBe("media:mirrors/hero-zerkala.webp");
+    const cardImages = (slug: string) =>
+      ((bySlug.get(slug)?.layout ?? []) as Array<{ blockType: string; items?: unknown[] }>)
+        .filter((block) => block.blockType === "cards")
+        .flatMap((block) => (block.items ?? []) as Array<{ image?: unknown }>)
+        .map((item) => item.image ?? null);
+    expect(cardImages("osteklenie")).toEqual([
+      "media:glazing/fasady.webp",
+      "media:glazing/spajdernoe.webp",
+      "media:constructions/vitriny.webp",
+      "media:glazing/liftovye-shahty.webp",
+      "media:glazing/verandy.webp",
+      "media:constructions/kozyrki.webp",
+    ]);
+    expect(cardImages("zerkala")).toEqual([
+      "media:mirrors/zerkala-zaly.webp",
+      "media:mirrors/zerkala-salony.webp",
+      "media:mirrors/zerkala-gostinicy.webp",
+    ]);
+    expect(bySlug.get("fasadov")?.heroImage).toBeUndefined();
   }, 30_000);
 });

@@ -205,13 +205,91 @@ export function ArticleNote({
 
 const twoDigits = (index: number) => String(index + 1).padStart(2, "0");
 
+export interface NumberedCardItem {
+  key: string;
+  /** Main text of the card (plain or rich: rendered in a `div`). */
+  title: ReactNode;
+  text?: string | undefined;
+  link?: { href: string; label: string } | null | undefined;
+}
+
 /**
- * A `steps` block as numbered cards (mockup «Как мы проверяем файл»): «01»… in brand teal over the
- * step text; the last card is primary-dark (the step that starts production). Up to 4 columns,
- * 2 at ≤1100 px, 1 at ≤599 px.
+ * Numbered cards (mockups «Как мы проверяем файл», «Как работаем с объектом»): «01»… in brand
+ * teal over the text; the last card is primary-dark (the step that starts production). Up to 4
+ * columns, 2 at ≤1100 px, 1 at ≤599 px.
  */
+export function NumberedCards({
+  items,
+  testId = "article-steps",
+  className,
+}: {
+  items: readonly NumberedCardItem[];
+  testId?: string | undefined;
+  className?: string | undefined;
+}) {
+  if (items.length === 0) return null;
+  const last = items.length - 1;
+  const columns = Math.min(items.length, 4);
+  return (
+    <ol
+      className={cn(
+        "m-0 grid list-none gap-4 p-0 max-md:grid-cols-2 max-sm:grid-cols-1 max-sm:gap-3",
+        columns === 4 && "grid-cols-4",
+        columns === 3 && "grid-cols-3",
+        columns === 2 && "grid-cols-2",
+        columns === 1 && "grid-cols-1",
+        className
+      )}
+      data-testid={testId}
+    >
+      {items.map((item, index) => {
+        const dark = index === last && items.length > 1;
+        return (
+          <li
+            key={item.key}
+            className={cn(
+              "flex flex-col gap-3 rounded-lg p-6 max-sm:p-5",
+              dark ? "bg-primary-dark text-white" : "bg-surface border-hairline border"
+            )}
+          >
+            <span
+              aria-hidden="true"
+              className={cn(
+                "text-[32px] leading-10 font-bold tabular-nums max-sm:text-[28px] max-sm:leading-9",
+                dark ? "text-line-teal" : "text-brand"
+              )}
+            >
+              {twoDigits(index)}
+            </span>
+            <div className="text-base leading-[1.55]">{item.title}</div>
+            {item.text ? (
+              <span
+                className={cn("text-[15px] leading-[1.55]", dark ? "text-on-navy-2" : "text-ink-3")}
+              >
+                {item.text}
+              </span>
+            ) : null}
+            {item.link ? (
+              <Link
+                href={item.link.href}
+                className={cn(
+                  "mt-auto self-start text-[15px] font-medium underline underline-offset-[3px]",
+                  dark ? "text-white hover:text-white" : "text-primary-pressed"
+                )}
+              >
+                {item.link.label}
+              </Link>
+            ) : null}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+/** A `steps` block as `NumberedCards`, with the block footnote under them. */
 export function ArticleSteps({ block, ctx }: { block: BlockOf<"steps">; ctx: PlaceholderContext }) {
-  const items = (block.items ?? []).flatMap((item, index) => {
+  const items = (block.items ?? []).flatMap((item, index): NumberedCardItem[] => {
     const title = fill(item.title, ctx);
     if (!title) return [];
     const link = resolveLink(item.link);
@@ -226,67 +304,11 @@ export function ArticleSteps({ block, ctx }: { block: BlockOf<"steps">; ctx: Pla
     ];
   });
   if (items.length === 0) return null;
-  const last = items.length - 1;
-  const columns = Math.min(items.length, 4);
   const footnote = fill(block.footnote, ctx);
 
   return (
     <div className="flex flex-col gap-4">
-      <ol
-        className={cn(
-          "m-0 grid list-none gap-4 p-0 max-md:grid-cols-2 max-sm:grid-cols-1 max-sm:gap-3",
-          columns === 4 && "grid-cols-4",
-          columns === 3 && "grid-cols-3",
-          columns === 2 && "grid-cols-2",
-          columns === 1 && "grid-cols-1"
-        )}
-        data-testid="article-steps"
-      >
-        {items.map((item, index) => {
-          const dark = index === last && items.length > 1;
-          return (
-            <li
-              key={item.key}
-              className={cn(
-                "flex flex-col gap-3 rounded-lg p-6 max-sm:p-5",
-                dark ? "bg-primary-dark text-white" : "bg-surface border-hairline border"
-              )}
-            >
-              <span
-                aria-hidden="true"
-                className={cn(
-                  "text-[32px] leading-10 font-bold tabular-nums max-sm:text-[28px] max-sm:leading-9",
-                  dark ? "text-line-teal" : "text-brand"
-                )}
-              >
-                {twoDigits(index)}
-              </span>
-              <span className="text-base leading-[1.55]">{item.title}</span>
-              {item.text ? (
-                <span
-                  className={cn(
-                    "text-[15px] leading-[1.55]",
-                    dark ? "text-on-navy-2" : "text-ink-3"
-                  )}
-                >
-                  {item.text}
-                </span>
-              ) : null}
-              {item.link ? (
-                <Link
-                  href={item.link.href}
-                  className={cn(
-                    "mt-auto self-start text-[15px] font-medium underline underline-offset-[3px]",
-                    dark ? "text-white hover:text-white" : "text-primary-pressed"
-                  )}
-                >
-                  {item.link.label}
-                </Link>
-              ) : null}
-            </li>
-          );
-        })}
-      </ol>
+      <NumberedCards items={items} />
       {footnote ? <p className="text-small text-text-2 m-0">{footnote}</p> : null}
     </div>
   );

@@ -12,8 +12,9 @@ import { VIEWPORTS } from "./helpers/viewports";
  * `pnpm payload run scripts/attach-generated-media.ts`. Without the attach step the pages
  * have no generated images and the page checks are skipped (the admin check still runs).
  *
- * Processing pages and the hub `/steklyannye-konstrukcii/` are not listed: their hero / card
- * photos are seed photos (`src/seed/media/processing/`, `src/seed/media/constructions/`), not
+ * Processing pages and the hubs `/steklyannye-konstrukcii/`, `/osteklenie/`, `/zerkala/` are not
+ * listed: their hero / card photos are seed photos (`src/seed/media/processing/`,
+ * `src/seed/media/constructions/`, `src/seed/media/glazing/`, `src/seed/media/mirrors/`), not
  * generated placeholders.
  *
  * The `/zakalennoe-steklo/` hub uses seed photos too (`src/seed/media/zak-hub/`, Paper mockup
@@ -39,7 +40,6 @@ interface PageCase {
 const PAGES: PageCase[] = [
   { path: "/", min: 10, cardAlt: true },
   { path: "/zakalennoe-steklo/matovoe/", min: 1, cardAlt: false },
-  { path: "/osteklenie/", min: 5, cardAlt: true },
   // Article cards use `alt=""` on purpose: the card title next to the image names it.
   { path: "/blog/", min: 6, cardAlt: false },
 ];

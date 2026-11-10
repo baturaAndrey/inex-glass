@@ -153,9 +153,10 @@ describe("constructions seed content", () => {
     expect(hub.seo.description).toContain("Монтаж — бригада-партнёр или шеф-монтаж.");
   });
 
-  it("hub: every seed photo exists and has a Russian alt", () => {
+  it("every seed photo (hub, heroes, system photos) exists and has a Russian alt", () => {
     const images = CONSTRUCTIONS.flatMap(seedImagesOf);
-    expect(images).toHaveLength(8);
+    // Hub: hero + 7 cards; construction pages: 5 heroes + 10 system photos.
+    expect(images).toHaveLength(23);
     for (const image of images) {
       expect(existsSync(path.join(MEDIA_DIR, image.file)), image.file).toBe(true);
       expect(image.alt, image.file).toMatch(/^[А-ЯЁ][а-яё]/);

@@ -2,8 +2,9 @@ import { expect, test, type Page } from "@playwright/test";
 import { VIEWPORTS } from "./helpers/viewports";
 
 /**
- * «Остекление» and «Зеркала» (task 27): 9 pages on the `ConstructionPage` template, filled by
- * the seed slice `glazing-mirrors` (CI runs `pnpm seed --full` before e2e).
+ * «Остекление» and «Зеркала» (task 27): 9 pages filled by the seed slice `glazing-mirrors` (CI
+ * runs `pnpm seed --full` before e2e). The hubs follow the Paper mockup `2560_osteklenie`
+ * (`GlazingHubPage`: tables as the white table card); the subpages keep the task-26 template.
  *
  * Runs in all three viewport projects. URL normalisation, 404 and the hub links are raw HTTP
  * checks and run in the 1366 project only.
@@ -17,6 +18,8 @@ interface Expected {
   /** Secondary button (opens the drawing form). */
   secondary: string;
   hasTable: boolean;
+  /** Paper hub: its tables are the white table card (`OrderTable`, a card list on phones). */
+  hub?: true;
 }
 
 /** H1 / Title / Description from `docs/inex/17-meta.md`. */
@@ -29,6 +32,7 @@ const PAGES: readonly Expected[] = [
       "Стеклянные фасады, спайдерное остекление, витрины, лифтовые шахты и веранды: стекло, профиль и узлы для подрядчика.",
     secondary: "Отправить проект",
     hasTable: false,
+    hub: true,
   },
   {
     path: "/osteklenie/fasadov/",
@@ -83,6 +87,7 @@ const PAGES: readonly Expected[] = [
       "Зеркала для гостиниц, офисов, салонов и залов: по размерам, с фацетом и обработкой кромки, партиями от 50 м².",
     secondary: "Отправить размеры",
     hasTable: true,
+    hub: true,
   },
   {
     path: "/zerkala/dlya-zalov/",
@@ -179,7 +184,11 @@ test.describe("glazing & mirrors pages", () => {
       // Tables: cards on phones, the table on desktop. A table without column labels (no
       // <thead>, e.g. «Отверстия — главный узел» on /osteklenie/spajdernoe/) scrolls sideways on
       // phones instead (DataTable, task-42 FL-02).
-      if (expected.hasTable) {
+      if (expected.hasTable && expected.hub) {
+        const table = page.locator("main [data-order-table]").first();
+        if (isMobile(page)) await expect(table).toBeHidden();
+        else await expect(table).toBeVisible();
+      } else if (expected.hasTable) {
         const labelled = page.locator("main table.ig-table:has(thead)");
         const card = page.locator("main .ig-mcard").first();
         const table = (await labelled.count()) > 0 ? labelled.first() : null;
@@ -208,6 +217,67 @@ test.describe("glazing & mirrors pages", () => {
       }).toPass({ timeout: 30_000 });
     });
   }
+});
+
+test.describe("glazing & mirrors hubs (Paper mockup 2560_osteklenie)", () => {
+  /** Alts of the photos inside a locator: every one is a Russian description. */
+  async function expectPhotoAlts(images: ReturnType<Page["locator"]>) {
+    for (const alt of await images.evaluateAll((els) => els.map((el) => el.getAttribute("alt")))) {
+      expect(alt ?? "").toMatch(/^[А-ЯЁ]/);
+    }
+  }
+
+  test("/osteklenie/: photo hero with terms, six photo cards, steps, objects, form panel", async ({
+    page,
+  }) => {
+    await page.goto("/osteklenie/");
+    const hero = page.locator("section[aria-labelledby='page-title']");
+    await expect(hero.locator("img")).toHaveCount(1);
+    await expect(hero.getByRole("list", { name: "Условия" }).locator("li")).toHaveCount(4);
+    await expect(hero.getByTestId("construction-intro")).not.toContainText("Заказы от");
+
+    const cards = page.getByTestId("glazing-cards");
+    await expect(cards.getByRole("heading", { name: "Что остекляем", level: 2 })).toBeVisible();
+    await expect(cards.getByTestId("construction-card")).toHaveCount(6);
+    await expect(cards.locator("img")).toHaveCount(6);
+    await expectPhotoAlts(cards.locator("img"));
+
+    const steps = page.locator("[data-section='steps']");
+    await expect(steps.getByRole("heading", { name: "Как работаем с объектом" })).toBeVisible();
+    await expect(steps.getByTestId("glazing-steps").locator("li")).toHaveCount(4);
+
+    const objects = page.locator("[data-section='objects']");
+    await expect(objects.getByRole("heading", { name: "Объекты", level: 2 })).toBeVisible();
+    await expect(objects.getByRole("link", { name: "Все объекты" })).toHaveAttribute(
+      "href",
+      "/obekty/"
+    );
+    // The cream block closes with the drawing-form panel, not a button row.
+    await expect(page.getByTestId("drawing-panel")).toBeVisible();
+    await expect(page.locator("[data-section='closing-cta']")).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Условия", level: 2 })).toHaveCount(0);
+  });
+
+  test("/zerkala/: three «Куда» photo cards, «Что делаем» table panel, form panel", async ({
+    page,
+  }) => {
+    await page.goto("/zerkala/");
+    const cards = page.getByTestId("glazing-cards");
+    await expect(cards.getByRole("heading", { name: "Куда", level: 2 })).toBeVisible();
+    await expect(cards.getByTestId("construction-card")).toHaveCount(3);
+    await expect(cards.locator('a[href="/zerkala/dlya-zalov/"]')).toHaveCount(1);
+    await expect(cards.locator('a[href="/zerkala/dlya-salonov/"]')).toHaveCount(1);
+    await expect(cards.locator("img")).toHaveCount(3);
+    // «Гостиницы и офисы» has no page: a photo card without the arrow link.
+    await expect(cards.locator("a")).toHaveCount(2);
+    await expectPhotoAlts(cards.locator("img"));
+    await expect(cards).toContainText("Гостиницы и офисы");
+    await expect(page.getByTestId("drawing-panel")).toBeVisible();
+    await expect(
+      page.getByTestId("construction-table").getByRole("heading", { name: "Что делаем" })
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Условия", level: 2 })).toHaveCount(0);
+  });
 });
 
 test.describe("glazing & mirrors routing", () => {

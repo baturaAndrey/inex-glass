@@ -1,4 +1,5 @@
 import { BlockImage, asMedia } from "@/components/blocks/shared";
+import { PANEL_HEADING, WHITE_PANEL } from "@/components/company/company-pieces";
 import { Chip } from "@/components/ig/chip";
 import { Placeholder } from "@/components/ig/placeholder";
 import { Section, SectionHead, type SectionVariant } from "@/components/ig/section";
@@ -49,29 +50,47 @@ function ConfigCard({ config }: { config: ShowerConfig }) {
 export function ShowerConfigsGrid({
   configs,
   variant,
+  bare = false,
 }: {
   configs: ShowerConfig[];
   variant: SectionVariant;
+  /**
+   * Inside the page container of the Paper layout (construction pages): a white panel with the
+   * H2 instead of a full-width section.
+   */
+  bare?: boolean | undefined;
 }) {
   const headingId = "construction-shower-configs-title";
+  const content =
+    configs.length > 0 ? (
+      <ul className={GRID_CLASS}>
+        {configs.map((config) => (
+          <ConfigCard key={config.id} config={config} />
+        ))}
+      </ul>
+    ) : (
+      <ul className="ig-chips m-0 list-none p-0" data-shower-fallback="">
+        {SHOWER_CONFIG_FALLBACK.map((name) => (
+          <li key={name}>
+            <Chip static>{name}</Chip>
+          </li>
+        ))}
+      </ul>
+    );
+  if (bare) {
+    return (
+      <section aria-labelledby={headingId} className={WHITE_PANEL} data-section="shower-configs">
+        <h2 id={headingId} className={PANEL_HEADING}>
+          {SHOWER_CONFIGS_HEADING}
+        </h2>
+        {content}
+      </section>
+    );
+  }
   return (
     <Section variant={variant} aria-labelledby={headingId} data-section="shower-configs">
       <SectionHead title={SHOWER_CONFIGS_HEADING} headingId={headingId} />
-      {configs.length > 0 ? (
-        <ul className={GRID_CLASS}>
-          {configs.map((config) => (
-            <ConfigCard key={config.id} config={config} />
-          ))}
-        </ul>
-      ) : (
-        <ul className="ig-chips m-0 list-none p-0" data-shower-fallback="">
-          {SHOWER_CONFIG_FALLBACK.map((name) => (
-            <li key={name}>
-              <Chip static>{name}</Chip>
-            </li>
-          ))}
-        </ul>
-      )}
+      {content}
     </Section>
   );
 }

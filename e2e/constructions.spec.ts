@@ -3,8 +3,9 @@ import { expect, test, type Page } from "@playwright/test";
 import { VIEWPORTS } from "./helpers/viewports";
 
 /**
- * Constructions slice (task 26): the hub and six construction pages on the `ConstructionPage`
- * template. Precondition: `pnpm seed --minimal` then `pnpm seed --only=constructions --force`
+ * Constructions slice (task 26): the hub and six construction pages. The hub and the five
+ * construction pages follow the Paper mockups (`2560_steklyannye-konstrukcii`,
+ * `2560_steklyannye-peregorodki`); «Зажимной профиль» keeps the task-26 template. Precondition: `pnpm seed --minimal` then `pnpm seed --only=constructions --force`
  * (CI's `pnpm seed --full` includes the slice).
  */
 
@@ -20,10 +21,11 @@ interface PageCase {
   quizType: string;
   faq: number;
   /**
-   * Hub layout (Paper mockup `2560_steklyannye-konstrukcii`): crumbs above the hero and no
-   * conditions section (the hero lists the terms, the cream block meets the footer).
+   * Paper layout (mockups `2560_steklyannye-konstrukcii` / `2560_steklyannye-peregorodki`):
+   * crumbs above the hero and no conditions section (the hero lists the terms, the cream block
+   * meets the footer).
    */
-  hub?: true;
+  paper?: true;
 }
 
 const PAGES: PageCase[] = [
@@ -38,7 +40,7 @@ const PAGES: PageCase[] = [
     secondary: "Отправить проект",
     quizType: "other",
     faq: 0,
-    hub: true,
+    paper: true,
   },
   {
     url: "/steklyannye-peregorodki/",
@@ -50,6 +52,7 @@ const PAGES: PageCase[] = [
     primary: "Рассчитать комплект",
     secondary: "Отправить планировку",
     quizType: "partitions",
+    paper: true,
     faq: 5,
   },
   {
@@ -62,6 +65,7 @@ const PAGES: PageCase[] = [
     primary: "Рассчитать партию",
     secondary: "Отправить проект",
     quizType: "shower",
+    paper: true,
     faq: 0,
   },
   {
@@ -74,6 +78,7 @@ const PAGES: PageCase[] = [
     primary: "Рассчитать комплект",
     secondary: "Отправить проект",
     quizType: "railings",
+    paper: true,
     faq: 0,
   },
   {
@@ -86,6 +91,7 @@ const PAGES: PageCase[] = [
     primary: "Рассчитать козырёк",
     secondary: "Отправить проект",
     quizType: "canopies",
+    paper: true,
     faq: 3,
   },
   {
@@ -98,6 +104,7 @@ const PAGES: PageCase[] = [
     primary: "Рассчитать стоимость",
     secondary: "Отправить проект",
     quizType: "shopfronts",
+    paper: true,
     faq: 0,
   },
   {
@@ -156,7 +163,7 @@ test.describe("constructions", () => {
       const robots = await page.locator('meta[name="robots"]').getAttribute("content");
       if (process.env.SITE_ENV === "production") expect(robots ?? "").not.toContain("noindex");
 
-      const crumbs = (item.hub ? page.locator("main") : hero(page)).getByRole("navigation", {
+      const crumbs = (item.paper ? page.locator("main") : hero(page)).getByRole("navigation", {
         name: "Хлебные крошки",
       });
       await expect(crumbs.locator('[aria-current="page"]')).toHaveText(item.crumb);
@@ -192,7 +199,7 @@ test.describe("constructions", () => {
       expect(text).not.toMatch(/[{}]/);
       expect(text).not.toMatch(/ждёт ответа|Каталог конфигураций/);
       await expect(page.getByRole("heading", { name: "Условия", level: 2 })).toHaveCount(
-        item.hub ? 0 : 1
+        item.paper ? 0 : 1
       );
 
       if (isMobile(testInfo.project.name)) {
@@ -274,38 +281,64 @@ test.describe("constructions", () => {
     expect(text).not.toMatch(/под ключ|ваша бригада|Монтаж выполняет/i);
   });
 
-  test("partitions: systems, plates, risk callout, documents, bridge, FAQ", async ({
+  test("partitions: system photo cards, panels, risk block, turnkey panel, FAQ, form", async ({
     page,
-  }, testInfo) => {
+  }) => {
     await page.goto("/steklyannye-peregorodki/");
-    const systems = page.locator("[data-systems-count]");
-    await expect(systems.locator("article")).toHaveCount(4);
-    if (isMobile(testInfo.project.name)) {
-      const strip = await systems.evaluate((el) => ({
-        scrollable: el.scrollWidth > el.clientWidth,
-        snap: getComputedStyle(el).scrollSnapType,
-      }));
-      expect(strip.scrollable).toBe(true);
-      expect(strip.snap).toContain("x");
-      await expect(systems).toHaveAttribute("role", "region");
-      const overflow = await page.evaluate(
-        () => document.documentElement.scrollWidth - document.documentElement.clientWidth
-      );
-      expect(overflow).toBeLessThanOrEqual(0);
-    }
-    await expect(page.locator("[data-profile-plates] li")).toHaveCount(6);
-    const risk = page.locator("[data-section='risk']");
-    await expect(risk).toContainText("Главный риск — проём");
-    await expect(risk.locator("ol > li")).toHaveCount(3);
-    await expect(
-      page
-        .locator("[data-column='documents']")
-        .getByRole("heading", { name: "Документы для сдачи объекта" })
-    ).toBeVisible();
-    await expect(page.locator("[data-column='objects']")).toContainText("Сургутнефтегаз");
-    await expect(page.locator("[data-inex-su-strip]")).toBeVisible();
+    await expect(hero(page).getByRole("list", { name: "Условия" }).locator("li")).toHaveCount(4);
+    // The terms checklist replaces the intro's «{условия}» sentence.
+    await expect(hero(page).getByTestId("construction-intro")).not.toContainText("Заказы от");
 
-    const faq = page.locator("[data-section='faq']");
+    const systems = page.locator("#sistemy");
+    await expect(systems.getByRole("heading", { name: "Какую систему выбрать" })).toBeVisible();
+    const cards = systems.getByTestId("system-card");
+    await expect(cards).toHaveCount(4);
+    await expect(cards.locator("img")).toHaveCount(4);
+    for (const alt of await cards
+      .locator("img")
+      .evaluateAll((els) => els.map((el) => el.getAttribute("alt")))) {
+      expect(alt ?? "").toMatch(/^[А-ЯЁ]/);
+    }
+    await expect(cards.first()).toContainText("Где уместна");
+    await expect(cards.first()).toContainText("Что важно знать");
+
+    const profiles = page.getByTestId("construction-profiles");
+    await expect(profiles.getByRole("heading", { name: "Профильные системы" })).toBeVisible();
+    await expect(profiles.locator("li")).toHaveCount(6);
+    await expect(profiles).toContainText("Поставляем перегородочные системы");
+    const glass = page.getByTestId("construction-glass");
+    await expect(glass.getByRole("heading", { name: "Стекло для перегородки" })).toBeVisible();
+    await expect(glass.locator("li")).toHaveCount(4);
+
+    const risk = page.getByTestId("construction-risk");
+    await expect(risk.getByRole("heading", { name: "Главный риск — проём" })).toBeVisible();
+    await expect(risk.locator("ol > li")).toHaveCount(3);
+    await expect(risk.getByRole("link", { name: "Требования к чертежам" })).toHaveAttribute(
+      "href",
+      "/kak-zakazat/trebovaniya-k-chertezham/"
+    );
+
+    const documents = page.getByTestId("construction-documents");
+    await expect(
+      documents.getByRole("heading", { name: "Документы для сдачи объекта" })
+    ).toBeVisible();
+    await expect(documents.getByRole("link", { name: "Документы", exact: true })).toBeVisible();
+    const objects = page.getByTestId("construction-objects");
+    await expect(objects).toContainText("Сургутнефтегаз");
+    await expect(objects.getByRole("link", { name: "Все объекты" })).toHaveAttribute(
+      "href",
+      "/obekty/"
+    );
+
+    const turnkey = page.getByTestId("construction-turnkey");
+    await expect(turnkey.getByRole("heading", { name: "Нужен монтаж «под ключ»?" })).toBeVisible();
+    await expect(turnkey.getByRole("link", { name: "inex.su" })).toHaveAttribute(
+      "href",
+      "https://inex.su/"
+    );
+    await expect(page.getByTestId("drawing-panel")).toBeVisible();
+
+    const faq = page.getByTestId("service-faq");
     const buttons = faq.locator("button[aria-expanded]");
     await expect(buttons).toHaveCount(5);
     await expect(buttons.first()).toHaveAttribute("aria-expanded", "true");
@@ -316,28 +349,26 @@ test.describe("constructions", () => {
     }
   });
 
-  test("railings: systems table and the load table", async ({ page }, testInfo) => {
+  test("railings: system photo cards and the load table", async ({ page }, testInfo) => {
     await page.goto("/steklyannye-ograzhdeniya/");
     const systems = page.locator("#sistemy");
-    if (isMobile(testInfo.project.name)) {
-      await expect(systems.locator(".ig-mcard")).toHaveCount(3);
-      await expect(systems.locator("table")).toBeHidden();
-    } else {
-      await expect(systems.locator("table tbody tr")).toHaveCount(3);
-    }
-    const load = page.locator("section", {
-      has: page.getByRole("heading", { name: "Нагрузка и нормы" }),
-    });
-    await expect(load.locator("table tbody tr")).toHaveCount(3);
+    await expect(systems.getByTestId("system-card")).toHaveCount(3);
+    await expect(systems.getByTestId("system-card").locator("img")).toHaveCount(3);
+    const load = page.getByTestId("construction-table");
+    await expect(load.getByRole("heading", { name: "Нагрузка и нормы" })).toBeVisible();
+    const rows = isMobile(testInfo.project.name)
+      ? load.locator("ul > li")
+      : load.locator("table tbody tr");
+    await expect(rows).toHaveCount(3);
   });
 
-  test("canopies: 3 labelled schemes, dark snow section, dialog", async ({ page }) => {
+  test("canopies: 3 system photos, dark snow panel, dialog", async ({ page }) => {
     await page.goto("/steklyannye-kozyrki/");
-    const schemes = page.locator("[data-systems-count] svg[role='img']");
-    await expect(schemes).toHaveCount(3);
-    for (let index = 0; index < 3; index++) {
-      expect(await schemes.nth(index).getAttribute("aria-label")).toMatch(/^Схема /);
-    }
+    const cards = page.locator("#sistemy").getByTestId("system-card");
+    await expect(cards).toHaveCount(3);
+    // The photos replace the seed schemes visually.
+    await expect(cards.locator("img")).toHaveCount(3);
+    await expect(cards.first()).toContainText("Как держится стекло");
     const snow = page.locator("[data-section='snow-calc']");
     await expect(snow.getByRole("heading", { name: "Расчёт под снег" })).toBeVisible();
     expect(await snow.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(
@@ -355,6 +386,12 @@ test.describe("constructions", () => {
     const fallback = section.locator("[data-shower-fallback] li");
     const cards = section.locator("article.ig-card");
     expect((await fallback.count()) === 5 || (await cards.count()) > 0).toBe(true);
+    const callout = page.getByTestId("construction-warning");
+    await expect(callout.getByRole("heading", { name: "Что важно знать" })).toBeVisible();
+    await expect(callout.locator("ul > li")).toHaveCount(3);
+    await expect(
+      page.getByRole("heading", { name: "Для объекта, а не для одной ванной", level: 2 })
+    ).toBeVisible();
   });
 
   test("shopfronts: four text sections and the ordered «Как заказать» list", async ({ page }) => {

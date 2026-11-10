@@ -29,7 +29,7 @@ export const WHITE_PANEL =
 export const PANEL_HEADING = "ig-h3 m-0 text-balance";
 
 /** Pill: 44 px tall touch target (DESIGN §11), 16 px medium text. */
-const PILL =
+export const PILL =
   "inline-flex min-h-11 items-center rounded-full px-5 py-3 text-base leading-5 font-medium";
 
 /* ------------------------------------------------------------------------------------------ */

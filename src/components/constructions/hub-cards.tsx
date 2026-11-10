@@ -24,6 +24,20 @@ export interface HubCardsProps {
   montage: BlockOf<"cta"> | null;
   ctx: PlaceholderContext;
   page: BlockPageContext;
+  /** Heading when the block has none (default «Конструкции»). */
+  defaultHeading?: string | undefined;
+  headingId?: string | undefined;
+  testId?: string | undefined;
+  /**
+   * Keep cards without a link (plain cards, no arrow), e.g. «Гостиницы и офисы» of «Зеркала»;
+   * by default only linked cards are shown (construction cards always lead to their page).
+   */
+  keepPlain?: boolean | undefined;
+  /**
+   * Card texts start with a capital letter (Paper mockups): the glazing / mirrors cards keep the
+   * lower-case teksty wording in the CMS («профили СИАЛ и Алютех…»).
+   */
+  capitalizeText?: boolean | undefined;
 }
 
 const HEADING_ID = "construction-cards-title";
@@ -90,9 +104,11 @@ const LINK_CLASS =
 export function HubCard({
   card,
   testId = "construction-card",
+  capitalizeText = false,
 }: {
   card: ResolvedCard;
   testId?: string | undefined;
+  capitalizeText?: boolean | undefined;
 }) {
   const content = (
     <>
@@ -105,14 +121,21 @@ export function HubCard({
           className="-z-20 object-cover"
         />
       ) : null}
-      <span aria-hidden="true" className={cn("absolute inset-0 -z-10", MIST)} />
+      {card.photo ? (
+        <span aria-hidden="true" className={cn("absolute inset-0 -z-10", MIST)} />
+      ) : null}
       <span className="flex w-full flex-col gap-3">
         <h3 className="text-h3 max-xl:text-h4 max-md:text-h3 m-0 max-w-[420px] text-balance">
           {card.title}
         </h3>
         <span className="flex items-center justify-between gap-6 max-sm:gap-4">
           {card.text ? (
-            <span className="text-text-2 max-w-[340px] text-[16px] leading-[1.45] text-pretty">
+            <span
+              className={cn(
+                "text-text-2 max-w-[340px] text-[16px] leading-[1.45] text-pretty",
+                capitalizeText && "first-letter:uppercase"
+              )}
+            >
               {card.text}
             </span>
           ) : (
@@ -130,7 +153,8 @@ export function HubCard({
       </span>
     </>
   );
-  const className = cn(CARD_CLASS, CARD_HEIGHT, CARD_PADDING);
+  // Without a photo the card is a white tile (no grey well under a mist).
+  const className = cn(CARD_CLASS, CARD_HEIGHT, CARD_PADDING, !card.photo && "bg-surface");
   return card.href ? (
     <Link href={card.href} className={cn(className, LINK_CLASS)} data-testid={testId}>
       {content}
@@ -182,32 +206,42 @@ function MontagePanel({
   );
 }
 
-export function HubCards({ cards, montage, ctx, page }: HubCardsProps) {
+export function HubCards({
+  cards,
+  montage,
+  ctx,
+  page,
+  defaultHeading = DEFAULT_HEADING,
+  headingId = HEADING_ID,
+  testId = "construction-cards",
+  keepPlain = false,
+  capitalizeText = false,
+}: HubCardsProps) {
   const items = (cards?.items ?? []).flatMap((item, index) => {
     const card = resolveCard(item, index, ctx);
-    // Construction cards always lead to their page.
-    return card?.href ? [card] : [];
+    if (!card) return [];
+    return card.href || keepPlain ? [card] : [];
   });
   const showMontage = Boolean(
     montage && (hasText(montage.title) || (montage.buttons ?? []).length > 0)
   );
   if (items.length === 0 && !showMontage) return null;
-  const heading = fill(cards?.heading, ctx) || DEFAULT_HEADING;
+  const heading = fill(cards?.heading, ctx) || defaultHeading;
 
   return (
     <section
-      aria-labelledby={HEADING_ID}
+      aria-labelledby={headingId}
       className="py-16 max-md:py-12 max-sm:py-8"
-      data-testid="construction-cards"
+      data-testid={testId}
     >
       <Container className="flex flex-col gap-6">
-        <h2 id={HEADING_ID} className="ig-h2 m-0 pb-4 max-sm:pb-0">
+        <h2 id={headingId} className="ig-h2 m-0 pb-4 max-sm:pb-0">
           {heading}
         </h2>
         <ul className="m-0 grid list-none grid-cols-3 gap-6 p-0 max-md:grid-cols-2 max-sm:grid-cols-1 max-sm:gap-4">
           {items.map((card) => (
             <li key={card.key} className="flex">
-              <HubCard card={card} />
+              <HubCard card={card} capitalizeText={capitalizeText} />
             </li>
           ))}
           {showMontage && montage ? (

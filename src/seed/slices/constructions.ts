@@ -160,6 +160,8 @@ export function constructionData(
       howHeld: system.howHeld ?? null,
       requiresInGlass: system.requiresInGlass ?? null,
       schemeSvg: system.schemeSvg ?? null,
+      // Only set a seed photo; otherwise keep whatever the document has.
+      ...(system.image ? { image: media(system.image) } : {}),
     })),
     profileSystems: (item.profileSystems ?? []).map((name) => ({ name })),
     glassHeading: item.glassHeading ?? null,

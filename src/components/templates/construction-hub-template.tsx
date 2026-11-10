@@ -42,12 +42,12 @@ export interface ConstructionHubPageProps {
 const OBJECTS_HEADING_ID = "construction-objects-title";
 
 /** Terms checklist of the hero: the full terms bar of the `conditions` global. */
-async function heroTerms(ctx: PlaceholderContext): Promise<string[]> {
+export async function heroTerms(ctx: PlaceholderContext): Promise<string[]> {
   const conditions = await getConditions();
   return (conditions?.termsBar ?? []).map((item) => fill(item.text, ctx)).filter(Boolean);
 }
 
-function heroMedia(value: unknown): { src: string; alt: string } | null {
+export function heroMedia(value: unknown): { src: string; alt: string } | null {
   const media = asMedia(value);
   const src = media ? mediaSrc(media) : null;
   return media && src ? { src, alt: media.alt?.trim() ?? "" } : null;

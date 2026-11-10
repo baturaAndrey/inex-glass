@@ -67,7 +67,7 @@ function WhoColumn({
   );
 }
 
-function WhoPanel({ data, ctx }: { data: WhoDoesWhat; ctx: PlaceholderContext }) {
+export function WhoPanel({ data, ctx }: { data: WhoDoesWhat; ctx: PlaceholderContext }) {
   const left = (data.leftItems ?? []).map((item) => fill(item.text, ctx)).filter(Boolean);
   const right = (data.rightItems ?? []).map((item) => fill(item.text, ctx)).filter(Boolean);
   if (left.length === 0 && right.length === 0) return null;

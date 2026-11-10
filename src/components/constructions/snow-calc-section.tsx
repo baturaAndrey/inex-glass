@@ -36,57 +36,77 @@ export function SnowCalcSection({
   block,
   ctx,
   source,
+  bare = false,
 }: {
   block: SnowCalcBlock;
   ctx: PlaceholderContext;
   /** Document slug: the lead source. */
   source: string;
+  /**
+   * A rounded `primary-dark` panel inside the page container (Paper layout of the construction
+   * pages) instead of a full-width section.
+   */
+  bare?: boolean | undefined;
 }) {
   const title = fill(block.title, ctx);
   const sideText = fill(block.sideText, ctx);
   const ctaLabel = fill(block.ctaLabel, ctx) || SNOW_CALC_DEFAULT_CTA;
   const headingId = "construction-snow-title";
+  const content = (
+    <div className="grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center gap-12 max-md:grid-cols-1 max-md:gap-6">
+      <div className="flex flex-col gap-5">
+        {title ? (
+          <h2 id={headingId} className="ig-h2 m-0 text-white">
+            {title}
+          </h2>
+        ) : null}
+        <RichText
+          data={block.body}
+          ctx={ctx}
+          className="text-[#D7E6E3] [&_a]:text-white [&_a:hover]:text-white [&_li]:text-[#D7E6E3] [&_p]:max-w-none [&_p]:text-[18px] [&_p]:leading-[1.6] [&_p]:text-[#D7E6E3] max-sm:[&_p]:text-[16px] [&_strong]:text-white"
+        />
+      </div>
+      <div className="flex flex-col gap-[18px] rounded-[20px] border border-white/18 bg-white/8 p-7 max-sm:p-5">
+        {hasText(sideText) ? (
+          <p className="m-0 text-[18px] leading-[1.6] text-[#D7E6E3] max-sm:text-[16px]">
+            {sideText}
+          </p>
+        ) : null}
+        <FormTrigger
+          formKey="drawing"
+          params={snowCalcFormParams(block.formParams, ctaLabel, source)}
+          asChild
+        >
+          <Button
+            variant="onDark"
+            size="l"
+            className="self-start max-sm:w-full max-sm:self-stretch"
+            leftIcon={<FileText aria-hidden="true" strokeWidth={2} />}
+          >
+            {ctaLabel}
+          </Button>
+        </FormTrigger>
+      </div>
+    </div>
+  );
+  if (bare) {
+    return (
+      <section
+        aria-labelledby={title ? headingId : undefined}
+        className="bg-primary-dark text-on-navy rounded-xl px-16 py-14 max-lg:px-12 max-lg:py-12 max-sm:px-5 max-sm:py-8"
+        data-section="snow-calc"
+      >
+        {content}
+      </section>
+    );
+  }
   return (
     <Section
       variant="primary-dark"
       aria-labelledby={title ? headingId : undefined}
       data-section="snow-calc"
     >
-      <div className="grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center gap-12 max-md:grid-cols-1 max-md:gap-6">
-        <div className="flex flex-col gap-5">
-          {title ? (
-            <h2 id={headingId} className="ig-h2 m-0 text-white">
-              {title}
-            </h2>
-          ) : null}
-          <RichText
-            data={block.body}
-            ctx={ctx}
-            className="text-[#D7E6E3] [&_a]:text-white [&_a:hover]:text-white [&_li]:text-[#D7E6E3] [&_p]:max-w-none [&_p]:text-[18px] [&_p]:leading-[1.6] [&_p]:text-[#D7E6E3] max-sm:[&_p]:text-[16px] [&_strong]:text-white"
-          />
-        </div>
-        <div className="flex flex-col gap-[18px] rounded-[20px] border border-white/18 bg-white/8 p-7 max-sm:p-5">
-          {hasText(sideText) ? (
-            <p className="m-0 text-[18px] leading-[1.6] text-[#D7E6E3] max-sm:text-[16px]">
-              {sideText}
-            </p>
-          ) : null}
-          <FormTrigger
-            formKey="drawing"
-            params={snowCalcFormParams(block.formParams, ctaLabel, source)}
-            asChild
-          >
-            <Button
-              variant="onDark"
-              size="l"
-              className="self-start max-sm:w-full max-sm:self-stretch"
-              leftIcon={<FileText aria-hidden="true" strokeWidth={2} />}
-            >
-              {ctaLabel}
-            </Button>
-          </FormTrigger>
-        </div>
-      </div>
+      {content}
     </Section>
   );
 }

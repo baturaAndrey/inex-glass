@@ -48,10 +48,22 @@ export interface TableContent {
   rows: TableCellContent[][];
 }
 
+/**
+ * A photo shipped with the seed (`src/seed/media/<group>/<file>`, uploaded by
+ * `../seed-media.ts`): hub heroes and card photos of the Paper mockup `2560_osteklenie`.
+ */
+export interface PageImage {
+  group: string;
+  file: string;
+  /** Russian alt text describing the picture. */
+  alt: string;
+}
+
 export interface CardsContent {
   type: "cards";
   heading: string;
-  items: Array<{ title: string; text: string; href: string }>;
+  /** A card without `href` is a plain card (no arrow). */
+  items: Array<{ title: string; text: string; href?: string; image?: PageImage }>;
 }
 
 export interface CalloutContent {
@@ -82,6 +94,8 @@ export interface GlazingMirrorsPageContent {
   /** Card in hubs / menus: `text` is copied from the hub table of teksty. */
   card?: { text: string };
   intro: string;
+  /** Hero photo (`heroImage`), hubs only. */
+  heroImage?: PageImage;
   quizType: QuizTypeId;
   /** Secondary hero / final button («Отправить проект» …), opens the `drawing` form. */
   secondaryLabel: string;
@@ -131,6 +145,25 @@ export const LINKS = {
   inexSu: "https://inex.su/",
 } as const;
 
+const GLAZING_MEDIA = "glazing";
+const MIRRORS_MEDIA = "mirrors";
+const glazingImage = (file: string, alt: string): PageImage => ({
+  group: GLAZING_MEDIA,
+  file,
+  alt,
+});
+const mirrorsImage = (file: string, alt: string): PageImage => ({
+  group: MIRRORS_MEDIA,
+  file,
+  alt,
+});
+/** Photos of the constructions hub reused by the «Остекление» cards (same `media` documents). */
+const constructionsImage = (file: string, alt: string): PageImage => ({
+  group: "constructions",
+  file,
+  alt,
+});
+
 // ---------------------------------------------------------------------------------------------
 // «Остекление» — teksty/13 §2–§7
 // ---------------------------------------------------------------------------------------------
@@ -148,6 +181,10 @@ const osteklenie: GlazingMirrorsPageContent = {
   },
   intro:
     "Фасады, витрины и входные группы, лифтовые шахты, веранды и террасы. Комплектуем объект стеклом, профильными системами и креплениями по проекту; инженер рассчитывает стекло под нагрузку. {условия}",
+  heroImage: glazingImage(
+    "hero-osteklenie.webp",
+    "Стеклянный фасад на точечных креплениях, вид с улицы снизу"
+  ),
   quizType: "other",
   secondaryLabel: "Отправить проект",
   layout: [
@@ -159,31 +196,43 @@ const osteklenie: GlazingMirrorsPageContent = {
           title: "Стеклянные фасады и структурное остекление",
           text: "профили СИАЛ и Алютех, спандрель, маркировка по монтажной схеме",
           href: LINKS.fasady,
+          image: glazingImage("fasady.webp", "Стеклянный фасад в алюминиевом профиле, угол здания"),
         },
         {
           title: "Спайдерное остекление",
           text: "стекло на точечных креплениях",
           href: LINKS.spajdernoe,
+          image: glazingImage("spajdernoe.webp", "Стекло на спайдерном креплении в светлом холле"),
         },
         {
           title: "Витрины и входные группы магазинов",
           text: "осветлённое стекло, триплекс",
           href: LINKS.vitriny,
+          image: constructionsImage(
+            "vitriny.webp",
+            "Стеклянная торговая витрина с подсветкой в магазине"
+          ),
         },
         {
           title: "Лифтовые шахты",
           text: "триплекс по ГОСТ 33984.1-2016",
           href: LINKS.lifty,
+          image: glazingImage("liftovye-shahty.webp", "Стеклянная шахта лифта у входа в здание"),
         },
         {
           title: "Веранды и террасы",
           text: "раздвижные, гильотинные, складные системы, стеклянная крыша",
           href: LINKS.verandy,
+          image: glazingImage("verandy.webp", "Раздвижная стеклянная стена веранды с видом на сад"),
         },
         {
           title: "Козырьки",
           text: "триплекс под снеговую нагрузку",
           href: LINKS.kozyrki,
+          image: constructionsImage(
+            "kozyrki.webp",
+            "Стеклянный козырёк на тягах над входом в здание"
+          ),
         },
       ],
     },
@@ -504,6 +553,10 @@ const zerkala: GlazingMirrorsPageContent = {
   },
   intro:
     "Зеркала для залов, салонов, гостиниц и офисов — партиями по вашим размерам, с обработкой кромки и креплением. {условия}",
+  heroImage: mirrorsImage(
+    "hero-zerkala.webp",
+    "Зеркальное полотно в светлом зале с балетным станком и деревянным полом"
+  ),
   quizType: "mirrors",
   secondaryLabel: "Отправить размеры",
   layout: [
@@ -537,13 +590,35 @@ const zerkala: GlazingMirrorsPageContent = {
       ],
     },
     {
-      type: "richText",
+      // teksty «Куда» («**Залы** — текст → [Страница]») as the photo cards of the hub (Paper
+      // mockup `2560_osteklenie`): a card links its page; «Гостиницы и офисы» has none (no arrow).
+      type: "cards",
       heading: "Куда",
-      markdown: [
-        `- **Танцевальные и спортивные залы** — зеркальные стены с противоосколочной плёнкой [Зеркала для залов](${LINKS.zerkalaZaly})`,
-        `- **Салоны красоты и барбершопы** — одинаковые зеркала на все рабочие места, с подсветкой [Зеркала для салонов](${LINKS.zerkalaSalony})`,
-        "- **Гостиницы и офисы** — серии зеркал для номеров и санузлов",
-      ].join("\n"),
+      items: [
+        {
+          title: "Танцевальные и спортивные залы",
+          text: "зеркальные стены с противоосколочной плёнкой",
+          href: LINKS.zerkalaZaly,
+          image: mirrorsImage("zerkala-zaly.webp", "Зеркальная стена в светлом фитнес-зале"),
+        },
+        {
+          title: "Салоны красоты и барбершопы",
+          text: "одинаковые зеркала на все рабочие места, с подсветкой",
+          href: LINKS.zerkalaSalony,
+          image: mirrorsImage(
+            "zerkala-salony.webp",
+            "Зеркало над рабочим местом мастера в салоне красоты"
+          ),
+        },
+        {
+          title: "Гостиницы и офисы",
+          text: "серии зеркал для номеров и санузлов",
+          image: mirrorsImage(
+            "zerkala-gostinicy.webp",
+            "Зеркало без рамы над раковиной в санузле гостиничного номера"
+          ),
+        },
+      ],
     },
   ],
 };

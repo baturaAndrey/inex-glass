@@ -56,6 +56,8 @@ export interface SystemSeed {
   howHeld?: string;
   requiresInGlass?: string;
   schemeSvg?: string;
+  /** Photo of the system (Paper mockup `2560_steklyannye-peregorodki`); shown instead of the scheme. */
+  image?: ImageSeed;
 }
 
 export interface TableSeed {
@@ -340,12 +342,15 @@ const PARTITIONS: ConstructionSeed = {
     description:
       "Цельностеклянные и в алюминиевом профиле: стекло, профиль и фурнитура одним заказом, проверка узлов до запуска. Объекты от 50 м².",
   },
-  intro:
-    `Офисы, торговые центры, банки, медицинские центры: стекло, профиль и фурнитура одним комплектом. Проверяем узлы до запуска производства, чтобы перегородка собралась на объекте без доработок. ${MONTAGE_LEAD} {условия}`,
+  intro: `Офисы, торговые центры, банки, медицинские центры: стекло, профиль и фурнитура одним комплектом. Проверяем узлы до запуска производства, чтобы перегородка собралась на объекте без доработок. ${MONTAGE_LEAD} {условия}`,
   ctaPrimaryLabel: "Рассчитать комплект",
   ctaSecondaryLabel: "Отправить планировку",
   secondaryFormKey: "drawing",
   quizType: "partitions",
+  heroImage: {
+    file: "hero/peregorodki.webp",
+    alt: "Стеклянная перегородка с дверью и ручкой в светлом офисе",
+  },
   productQuizType: "partitions",
   systemsHeading: "Какую систему выбрать",
   systemsLayout: "cards",
@@ -357,6 +362,10 @@ const PARTITIONS: ConstructionSeed = {
         "Переговорные, кабинеты руководителей, шоурумы — где нужен максимум света и минимум металла",
       important: "Стекло работает без каркаса, поэтому толщину подбирают под высоту и нагрузку",
       schemeSvg: PARTITION_SCHEMES[0],
+      image: {
+        file: "systems/peregorodki-1.webp",
+        alt: "Цельностеклянная перегородка в зажимном профиле в офисе",
+      },
     },
     {
       name: "В алюминиевом профиле",
@@ -365,12 +374,20 @@ const PARTITIONS: ConstructionSeed = {
         "Офисы open space, банки, медцентры — где нужны двери, звукоизоляция, частые перепланировки",
       important: "Каркас держит стекло по контуру, можно встроить двери и жалюзи",
       schemeSvg: PARTITION_SCHEMES[1],
+      image: {
+        file: "systems/peregorodki-2.webp",
+        alt: "Перегородка в алюминиевом профиле с дверью в офисе open space",
+      },
     },
     {
       name: "Раздвижная",
       whereFits: "Зонирование, которое иногда нужно открыть: переговорные, залы",
       important: "Подвесная или напольная направляющая; стекло — с отверстиями под ролики",
       schemeSvg: PARTITION_SCHEMES[2],
+      image: {
+        file: "systems/peregorodki-3.webp",
+        alt: "Раздвижная стеклянная перегородка на подвесной направляющей с роликами",
+      },
     },
     {
       name: "С дверью",
@@ -379,6 +396,7 @@ const PARTITIONS: ConstructionSeed = {
       important:
         "Отверстия и вырезы под петли и замок делаются до закалки — модель фурнитуры нужна до заказа",
       schemeSvg: PARTITION_SCHEMES[3],
+      image: { file: "systems/peregorodki-4.webp", alt: "Стеклянная дверь с замком в перегородке" },
     },
   ],
   profileSystems: ["Алютех", "СИАЛ", "Татпроф", "Доксал", "Loft-Gratec", "Фристайл"],
@@ -468,12 +486,15 @@ const RAILINGS: ConstructionSeed = {
     description:
       "Ограждения для лестниц, атриумов и балконов: закалённое стекло или триплекс под нагрузку, профиль и фурнитура одним заказом.",
   },
-  intro:
-    `Стекло и профиль одним комплектом, рассчитанные под нагрузку вашего объекта. ${MONTAGE_LEAD} {условия}`,
+  intro: `Стекло и профиль одним комплектом, рассчитанные под нагрузку вашего объекта. ${MONTAGE_LEAD} {условия}`,
   ctaPrimaryLabel: "Рассчитать комплект",
   ctaSecondaryLabel: "Отправить проект",
   secondaryFormKey: "drawing",
   quizType: "railings",
+  heroImage: {
+    file: "hero/ograzhdeniya.webp",
+    alt: "Стеклянное ограждение с поручнем на галерее торгового центра",
+  },
   productQuizType: "railings",
   systemsHeading: "Типы систем",
   systemsLayout: "table",
@@ -482,16 +503,28 @@ const RAILINGS: ConstructionSeed = {
       name: "На зажимном профиле",
       howHeld: "Стекло зажато в алюминиевом профиле по полу или по торцу плиты",
       whereFits: "Атриумы, балконы, лестницы — сплошное стеклянное полотно без стоек",
+      image: {
+        file: "systems/ograzhdeniya-1.webp",
+        alt: "Стеклянное ограждение в зажимном профиле на полу",
+      },
     },
     {
       name: "На точечных креплениях",
       howHeld: "Стекло держится на спайдерах или стеклодержателях через отверстия",
       whereFits: "Лестницы, торцы перекрытий, фасадные ограждения",
+      image: {
+        file: "systems/ograzhdeniya-2.webp",
+        alt: "Стеклянное ограждение на точечных креплениях у торца перекрытия",
+      },
     },
     {
       name: "С поручнем",
       howHeld: "Поверх стекла — поручень по проекту",
       whereFits: "Общественные здания, где поручень требуется по нормам",
+      image: {
+        file: "systems/ograzhdeniya-3.webp",
+        alt: "Стеклянное ограждение с поручнем на кронштейне",
+      },
     },
   ],
   layout: [
@@ -571,6 +604,10 @@ const CANOPIES: ConstructionSeed = {
   ctaSecondaryLabel: "Отправить проект",
   secondaryFormKey: "drawing",
   quizType: "canopies",
+  heroImage: {
+    file: "hero/kozyrki.webp",
+    alt: "Стеклянный козырёк на тягах над входом в здание на городской улице",
+  },
   productQuizType: "canopies",
   systemsHeading: "Схемы крепления",
   systemsLayout: "cards",
@@ -580,18 +617,27 @@ const CANOPIES: ConstructionSeed = {
       howHeld: "Стекло опирается на кронштейны у стены, вынос держат тяги",
       requiresInGlass: "Отверстия под кронштейны и узлы тяг",
       schemeSvg: CANOPY_SCHEMES[0],
+      image: {
+        file: "systems/kozyrki-1.webp",
+        alt: "Козырёк из триплекса на тяге с кронштейном у стены",
+      },
     },
     {
       name: "Консольный на зажимном профиле",
       howHeld: "Стекло зажато в профиле на стене, без тяг",
       requiresInGlass: "Без отверстий; толщина триплекса больше",
       schemeSvg: CANOPY_SCHEMES[1],
+      image: {
+        file: "systems/kozyrki-2.webp",
+        alt: "Консольный стеклянный козырёк в зажимном профиле на стене",
+      },
     },
     {
       name: "На спайдерах",
       howHeld: "Стекло крепится точечно через отверстия",
       requiresInGlass: "Цилиндрические или конусные отверстия по ГОСТ",
       schemeSvg: CANOPY_SCHEMES[2],
+      image: { file: "systems/kozyrki-3.webp", alt: "Стеклянный козырёк на спайдерном креплении" },
     },
   ],
   snowCalcBlock: {
@@ -658,6 +704,10 @@ const SHOWERS: ConstructionSeed = {
   ctaSecondaryLabel: "Отправить проект",
   secondaryFormKey: "drawing",
   quizType: "shower",
+  heroImage: {
+    file: "hero/dushevye.webp",
+    alt: "Стеклянная душевая перегородка с дверью на петлях",
+  },
   productQuizType: "shower",
   showShowerConfigs: true,
   layout: [
@@ -706,6 +756,10 @@ const SHOPFRONTS: ConstructionSeed = {
   ctaSecondaryLabel: "Отправить проект",
   secondaryFormKey: "drawing",
   quizType: "shopfronts",
+  heroImage: {
+    file: "hero/vitriny.webp",
+    alt: "Стеклянное полотно на петлях на фоне торгового зала",
+  },
   productQuizType: "shopfronts",
   layout: [
     {
@@ -816,12 +870,13 @@ export const MONTAGE_DECISION_COPY: readonly string[] = [
   MONTAGE_FAQ_ANSWER,
 ];
 
-/** Every seed photo of a document (hero, card images), in document order. */
+/** Every seed photo of a document (hero, card images, system photos), in document order. */
 export function seedImagesOf(item: ConstructionSeed): ImageSeed[] {
   const cards = item.layout.flatMap((block) =>
     block.type === "cards" ? block.items.flatMap((card) => (card.image ? [card.image] : [])) : []
   );
-  return [...(item.heroImage ? [item.heroImage] : []), ...cards];
+  const systems = (item.systems ?? []).flatMap((system) => (system.image ? [system.image] : []));
+  return [...(item.heroImage ? [item.heroImage] : []), ...cards, ...systems];
 }
 
 /** All documents of the slice, in `order`. */
