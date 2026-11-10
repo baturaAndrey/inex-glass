@@ -55,74 +55,73 @@ export function requisitesDownload(
   return { href, label: text(requisites?.cardLabel) || DEFAULT_CARD_LABEL };
 }
 
-export interface RequisitesCardProps {
+/** Whether the requisites panel has anything to show (rows, or the PDF button). */
+export function hasRequisites(
+  requisites: Requisite | null | undefined,
+  contacts?: Contact | null,
+  showDownload = true
+): boolean {
+  return (
+    requisiteRows(requisites, contacts).length > 0 ||
+    (showDownload && requisitesDownload(requisites) !== null)
+  );
+}
+
+export interface RequisitesPanelProps {
   requisites: Requisite | null;
   contacts?: Contact | null | undefined;
-  /** Section background (continues the page rhythm). */
-  variant?: SectionVariant | undefined;
-  /** Anchor id of the section (`rekvizity`). */
+  /** Anchor id of the panel (`rekvizity`); none when the wrapping section carries it. */
   id?: string | undefined;
-  /** Id of the heading (the section is labelled by it). */
+  /** Id of the heading (the panel is labelled by it). */
   headingId?: string | undefined;
   title?: string | undefined;
   headingLevel?: "h2" | "h3" | undefined;
   /** `requisites.showDownload` of the block (default `true`); the button needs an uploaded PDF. */
   showDownload?: boolean | undefined;
+  /** Panel on a dark section: the page colour instead of white. */
+  onDarkSection?: boolean | undefined;
   className?: string | undefined;
 }
 
 /**
- * «Реквизиты» (`Contacts.dc.html`, `.ct-req`): a framed card with the filled requisites of the
- * `requisites` global and «Скачать карточку предприятия» — the button only when the PDF exists.
- * Implements the `{реквизиты}` marker of teksty/06 on `/o-kompanii/` and `/kontakty/`.
- * Renders nothing when the global has no data.
+ * The «Реквизиты» panel of the Paper mockups `2560_o-kompanii` / `2560_kontakty` (2026-11): a
+ * white 24 px card, the heading with «Скачать карточку предприятия» on the right (only when the
+ * PDF exists), then the filled requisites as label → value rows split by hairlines. ≤599 px the
+ * label sits above its value and the button goes full width under the heading.
+ * Returns `null` when the global has no data.
  */
-export function RequisitesCard({
+export function RequisitesPanel({
   requisites,
   contacts,
-  variant = "sf",
-  id = REQUISITES_ANCHOR,
+  id,
   headingId = `${REQUISITES_ANCHOR}-title`,
   title = REQUISITES_TITLE,
   headingLevel = "h2",
   showDownload = true,
+  onDarkSection = false,
   className,
-}: RequisitesCardProps) {
+}: RequisitesPanelProps) {
   const rows = requisiteRows(requisites, contacts);
   const download = showDownload ? requisitesDownload(requisites) : null;
   if (rows.length === 0 && !download) return null;
   const Heading = headingLevel;
 
   return (
-    <Section
-      variant={variant}
+    <section
       id={id}
       aria-labelledby={headingId}
-      // ≥ 96 px: the section stays clear of the fixed header after `/kontakty/#rekvizity`.
-      className={cn("scroll-mt-24", className)}
+      className={cn(
+        // ≥ 96 px: the anchor stays clear of the fixed header after `/kontakty/#rekvizity`.
+        "border-hairline flex min-w-0 scroll-mt-24 flex-col gap-7 rounded-xl border p-12 max-lg:p-10 max-md:p-8 max-sm:gap-5 max-sm:p-5",
+        onDarkSection ? "bg-bg" : "bg-surface",
+        className
+      )}
+      data-testid="requisites"
     >
-      <div
-        className={cn(
-          "flex flex-wrap items-start justify-between gap-6 rounded-xl p-8 max-sm:p-5",
-          // Light sections share the page background (DESIGN.md §7): the card is white there.
-          variant === "bg" || variant === "sf" ? "bg-surface shadow-card" : "bg-bg"
-        )}
-      >
-        <div className="flex min-w-0 flex-col gap-4">
-          <Heading id={headingId} className="ig-h4 m-0">
-            {title}
-          </Heading>
-          {rows.length > 0 ? (
-            <dl className="m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-6 gap-y-2 text-base leading-normal max-sm:grid-cols-1 max-sm:gap-y-0.5">
-              {rows.map((row) => (
-                <div key={row.label} className="contents">
-                  <dt className="text-text-2 max-sm:mt-2 max-sm:text-sm">{row.label}</dt>
-                  <dd className="m-0 break-words">{row.value}</dd>
-                </div>
-              ))}
-            </dl>
-          ) : null}
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <Heading id={headingId} className="ig-h3 m-0">
+          {title}
+        </Heading>
         {download ? (
           <Button
             asChild
@@ -136,6 +135,53 @@ export function RequisitesCard({
           </Button>
         ) : null}
       </div>
+      {rows.length > 0 ? (
+        <dl className="m-0 flex flex-col">
+          {rows.map((row) => (
+            <div
+              key={row.label}
+              className="border-hairline flex gap-6 border-0 border-b py-3.5 last:border-b-0 max-sm:flex-col max-sm:gap-1 max-sm:py-3"
+            >
+              <dt className="text-text-2 w-55 shrink-0 text-[15px] leading-5 max-sm:w-auto max-sm:text-sm">
+                {row.label}
+              </dt>
+              <dd className="m-0 min-w-0 text-base leading-5 break-words tabular-nums">
+                {row.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+    </section>
+  );
+}
+
+export interface RequisitesCardProps extends Omit<RequisitesPanelProps, "onDarkSection" | "id"> {
+  /** Section background (continues the page rhythm). */
+  variant?: SectionVariant | undefined;
+  /** Anchor id of the section (`rekvizity`). */
+  id?: string | undefined;
+}
+
+/**
+ * «Реквизиты» as a page section (the `requisites` block, any `pages` document): the
+ * `RequisitesPanel` inside a `Section`; the section carries the anchor.
+ * Implements the `{реквизиты}` marker of teksty/06. Renders nothing when the global has no data.
+ */
+export function RequisitesCard({
+  variant = "sf",
+  id = REQUISITES_ANCHOR,
+  className,
+  ...panel
+}: RequisitesCardProps) {
+  if (!hasRequisites(panel.requisites, panel.contacts, panel.showDownload)) return null;
+  return (
+    // The panel is the labelled region; the section only frames it and carries the anchor.
+    <Section as="div" variant={variant} id={id} className={cn("scroll-mt-24", className)}>
+      <RequisitesPanel
+        {...panel}
+        onDarkSection={variant === "dark" || variant === "primary-dark"}
+      />
     </Section>
   );
 }

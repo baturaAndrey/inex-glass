@@ -1,4 +1,5 @@
 import type {
+  CardsBlock,
   CtaBlock,
   FormBlock,
   HeroBlock,
@@ -11,6 +12,7 @@ import type {
 import {
   CLIENTS_MEDIA_GROUP,
   COMPANY,
+  COMPANY_MEDIA_GROUP,
   CONTACTS,
   CONTRACTORS,
   DESIGNERS,
@@ -91,6 +93,10 @@ const hero = (
 /** Media id of a section photo (uploaded on the first run, then reused). */
 const clientsImage = (ctx: SeedContext, image: ClientsImage) =>
   ensureSeedImage(ctx, { group: CLIENTS_MEDIA_GROUP, ...image });
+
+/** Media id of a «О компании» photo (`src/seed/media/company/`). */
+const companyImage = (ctx: SeedContext, image: ClientsImage) =>
+  ensureSeedImage(ctx, { group: COMPANY_MEDIA_GROUP, ...image });
 
 /** Numbered step cards (teksty «1. …»); a trailing «→ [link]» is the step link. */
 const steps = (heading: string, items: readonly StepContent[]): StepsBlock => ({
@@ -287,13 +293,42 @@ async function designersLayout(ctx: SeedContext): Promise<LayoutBlock[]> {
   ];
 }
 
-/** «О компании»: the route appends «Команда» (team not empty) and «Реквизиты». */
+/** Dark panel with an outline button («Двери, лестницы и монтаж → Перейти на inex.su»). */
+const darkPanel = (heading: string, text: string, url: string, label: string): CtaBlock => ({
+  blockType: "cta",
+  variant: "banner",
+  tone: "primaryDark",
+  title: heading,
+  body: paragraphs(text),
+  buttons: [{ label, kind: "link", variant: "secondary", link: { type: "custom", url } }],
+});
+
+/**
+ * «О компании» (Paper mockup `2560_o-kompanii`, 2026-11; the route places the blocks by role):
+ * photo hero with the experience line, the roles table, the two photo panels (a `cards` block),
+ * «С кем работаем» chips, «Объекты» strip (pills), the dark inex.su panel. The route appends
+ * «Команда» (team not empty), «Реквизиты» and the drawing-form panel.
+ */
 async function companyLayout(ctx: SeedContext): Promise<LayoutBlock[]> {
   const s = COMPANY;
   const companyHero: HeroBlock = {
-    ...hero(s.lead, [quizButton(), drawingButton("Отправить чертёж")], { terms: false }),
+    ...hero(s.lead, [quizButton(), drawingButton("Отправить чертёж")], {
+      terms: false,
+      image: await companyImage(ctx, s.heroImage),
+    }),
     // Second lead paragraph of teksty, emphasised (the experience wording is fixed).
     strong: s.experience,
+  };
+  const about: CardsBlock = {
+    blockType: "cards",
+    layout: "g3",
+    items: await Promise.all(
+      s.about.map(async (item) => ({
+        title: item.heading,
+        text: item.text,
+        image: await companyImage(ctx, item.image),
+      }))
+    ),
   };
   const clients: LinkListBlock = {
     blockType: "linkList",
@@ -306,10 +341,10 @@ async function companyLayout(ctx: SeedContext): Promise<LayoutBlock[]> {
   return [
     companyHero,
     table(s.roles),
-    richText(await markdown(ctx, s.about)),
+    about,
     clients,
-    ctaStrip(s.inexSu.heading, s.inexSu.text, s.inexSu.href, s.inexSu.linkLabel),
     ctaStrip(s.objects.heading, s.objects.text, s.objects.href, s.objects.linkLabel),
+    darkPanel(s.inexSu.heading, s.inexSu.text, s.inexSu.href, s.inexSu.linkLabel),
   ];
 }
 
@@ -318,8 +353,18 @@ function teamLayout(): LayoutBlock[] {
   return [hero(TEAM.intro, [quizButton()], { terms: false })];
 }
 
-/** «Контакты»: only the form — the route renders addresses, map and requisites from globals. */
+/**
+ * «Контакты» (Paper mockup `2560_kontakty`, 2026-11): a hero with the two buttons (no lead, no
+ * photo) and the form — the route renders addresses, map and requisites from globals.
+ */
 function contactsLayout(): LayoutBlock[] {
+  const contactsHero: HeroBlock = {
+    blockType: "hero",
+    variant: "ctHero",
+    buttons: [quizButton(), drawingButton("Отправить чертёж")],
+    showTerms: false,
+    termsMode: "full",
+  };
   const form: FormBlock = {
     blockType: "form",
     formKey: "contacts",
@@ -329,7 +374,7 @@ function contactsLayout(): LayoutBlock[] {
     submitLabel: CONTACTS.form.submitLabel,
     showContacts: false,
   };
-  return [form];
+  return [contactsHero, form];
 }
 
 /* ------------------------------------------------------------------------------------------ */

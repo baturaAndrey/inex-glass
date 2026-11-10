@@ -5,6 +5,7 @@ import { checkStopWords, EXPERIENCE_PHRASE } from "@/lib/domain";
 import { EDGE_TERMINOLOGY_APPROVED_STRINGS } from "../content/edge-terminology";
 import {
   COMPANY,
+  COMPANY_MEDIA_GROUP,
   CONTACTS,
   CONTRACTORS,
   DESIGNERS,
@@ -134,7 +135,7 @@ const VERBATIM: Array<[string, string | null, string[]]> = [
       COMPANY.roles.heading,
       COMPANY.roles.columns.join(" | "),
       ...COMPANY.roles.rows.map((cells) => cells.join(" | ")),
-      ...lines(COMPANY.about),
+      ...COMPANY.about.flatMap((item) => [item.heading, item.text]),
       COMPANY.clients.heading,
       COMPANY.clients.items.map((item) => item.label).join(" · "),
       COMPANY.inexSu.heading,
@@ -270,6 +271,18 @@ describe("klientam-company pages", () => {
     expect(new Set(files).size).toBe(files.length);
     for (const file of files) {
       expect(existsSync(path.join(ROOT, "src", "seed", "media", "clients", file))).toBe(true);
+    }
+  });
+
+  it("the company hero and photo panels have their own photos", () => {
+    const files = [COMPANY.heroImage, ...COMPANY.about.map((item) => item.image)].map(
+      (image) => image.file
+    );
+    expect(new Set(files).size).toBe(files.length);
+    for (const file of files) {
+      expect(existsSync(path.join(ROOT, "src", "seed", "media", COMPANY_MEDIA_GROUP, file))).toBe(
+        true
+      );
     }
   });
 

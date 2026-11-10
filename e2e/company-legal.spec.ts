@@ -290,16 +290,81 @@ test.describe("«Для кого»", () => {
   });
 });
 
+test.describe("«О компании»", () => {
+  test("photo hero, roles table, photo panels, pills, inex.su panel, requisites, form", async ({
+    page,
+  }, testInfo) => {
+    await page.goto("/o-kompanii/");
+    const main = page.locator("main");
+    const hero = main.getByTestId("processing-hero");
+    await expect(hero.locator("img")).toHaveAttribute("alt", /Стол инженера/);
+    await expect(hero).toContainText("За 21 год специалисты Inex выполнили более 1500 проектов");
+    await expect(hero.locator("a[data-quiz-cta]")).toHaveCount(1);
+    await expect(hero.getByRole("button", { name: "Отправить чертёж" })).toBeVisible();
+
+    const roles = main.getByTestId("company-roles");
+    await expect(roles.getByRole("heading", { level: 2 })).toHaveText(
+      "Что делаем мы, а что — заводы-партнёры"
+    );
+    if (testInfo.project.name === "mobile-375") {
+      await expect(roles.locator("[data-order-card]:visible")).toHaveCount(6);
+    } else {
+      await expect(roles.locator("table tbody tr")).toHaveCount(6);
+    }
+
+    const panels = main.getByTestId("company-photo-panels");
+    await expect(panels.getByRole("heading", { level: 2 })).toHaveText([
+      "Как мы выбираем заводы",
+      "Где работаем",
+    ]);
+    for (const img of await panels.locator("img").all()) {
+      await expect(img).toHaveAttribute("alt", /\S/);
+    }
+
+    const clients = main.getByTestId("company-clients").getByRole("link");
+    await expect(clients).toHaveCount(5);
+    expect(
+      new Set(await clients.evaluateAll((links) => links.map((a) => a.getAttribute("href"))))
+    ).toEqual(new Set(SEGMENT_PATHS));
+
+    const objects = main.getByTestId("company-objects");
+    await expect(objects.getByRole("listitem")).toHaveCount(6);
+    await expect(objects.getByRole("link", { name: "Все объекты" })).toHaveAttribute(
+      "href",
+      "/obekty/"
+    );
+
+    const montage = main.getByTestId("clients-montage");
+    await expect(montage.getByRole("heading", { name: "Двери, лестницы и монтаж" })).toBeVisible();
+    await expect(montage.getByRole("link", { name: "Перейти на inex.su" })).toHaveAttribute(
+      "href",
+      "https://inex.su/"
+    );
+
+    await expect(page.locator("#rekvizity")).toContainText("744700156319");
+    await expect(main.getByTestId("drawing-panel")).toBeVisible();
+    await expect(main.getByTestId("drawing-panel")).toHaveAttribute("data-form-section", "full");
+  });
+});
+
 test.describe("«Контакты»", () => {
   test("cards, contact links, form, requisites, LocalBusiness ×2", async ({ page }) => {
     await page.goto("/kontakty/");
     const main = page.locator("main");
+    await expect(main.getByTestId("processing-hero").locator("img")).toHaveCount(0);
+    await expect(main.getByTestId("processing-hero").locator("a[data-quiz-cta]")).toHaveCount(1);
+    const panel = main.getByTestId("drawing-panel");
+    await expect(panel).toHaveAttribute("data-form-section", "contacts");
+    await expect(panel.getByRole("heading", { name: "Отправьте чертёж" })).toBeVisible();
+    await expect(panel).toContainText(
+      "КП — в среднем за 2–3 рабочих дня. Работаем с заказами от 50 м²."
+    );
     await expect(main.locator("article").filter({ has: page.locator("h2") })).toHaveCount(3);
     await expect(main.locator('a[href="tel:+73512470557"]').first()).toBeVisible();
     await expect(main.locator('a[href="mailto:sale@inex.su"]').first()).toBeVisible();
 
     await expect(main.locator('input[type="checkbox"]').first()).not.toBeChecked();
-    await expect(main.getByRole("button", { name: "Отправить" })).toBeVisible();
+    await expect(main.getByRole("button", { name: "Отправить", exact: true })).toBeVisible();
 
     await expect(page.locator("#rekvizity")).toBeVisible();
     await expect(page.locator("#rekvizity")).toContainText("744700156319");

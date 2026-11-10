@@ -28,6 +28,11 @@ export interface OrderTableProps {
   /** No header row (key → value tables). */
   headerless?: boolean | undefined;
   footnote?: string | undefined;
+  /**
+   * The first column is «ours» (mockup `2560_o-kompanii`, «Inex Glass» vs «Заводы-партнёры»):
+   * its header label is in the brand text colour.
+   */
+  accentFirstColumn?: boolean | undefined;
   className?: string | undefined;
   "data-testid"?: string | undefined;
 }
@@ -41,6 +46,7 @@ export function OrderTable({
   caption,
   headerless = false,
   footnote,
+  accentFirstColumn = false,
   className,
   "data-testid": testId,
 }: OrderTableProps) {
@@ -69,6 +75,7 @@ export function OrderTable({
                     className={cn(
                       HEAD,
                       "px-7 py-4 align-bottom max-md:px-5",
+                      accentFirstColumn && index === 0 && "text-primary-pressed font-semibold",
                       column.numeric ? "text-right" : "text-left"
                     )}
                   >

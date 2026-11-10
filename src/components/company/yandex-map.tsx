@@ -21,13 +21,21 @@ export interface YandexMapProps {
   className?: string | undefined;
 }
 
+/** Static «map» plate: the well colour with a 48 px grid of line-colour rules (no requests). */
+const PLATE =
+  "bg-well bg-[linear-gradient(0deg,var(--ig-line)_1px,transparent_1px),linear-gradient(90deg,var(--ig-line)_1px,transparent_1px)] bg-[size:48px_48px]";
+
 /**
- * Click-to-load Yandex map (152-FZ: no third-party request before the visitor asks for it).
+ * Click-to-load Yandex map (152-FZ: no third-party request before the visitor asks for it),
+ * styled to the Paper mockup `2560_kontakty` (2026-11, frame `map`): a 24 px frame, the point
+ * chips in its top-left corner (numbered like the address cards), «Открыть в Яндекс.Картах» as
+ * a white pill in the bottom-right corner. ≤599 px the chips move above the frame, so they do
+ * not cover the small map.
  *
- * Until «Показать карту» is pressed the frame is a static plate (light grid, no network
- * requests); the point switches only choose which address the map will show. After the click an
- * `<iframe>` of the Yandex map widget is created for the selected point (search by address — no
- * invented coordinates). «Открыть в Яндекс.Картах» is always available as a plain external link.
+ * Until «Показать карту» is pressed the frame is a static plate (grid, no network requests); the
+ * point switches only choose which address the map will show. After the click an `<iframe>` of
+ * the Yandex map widget is created for the selected point (search by address — no invented
+ * coordinates). «Открыть в Яндекс.Картах» is always available as a plain external link.
  * No Metrika goals are attached here.
  */
 export function YandexMap({ points, className }: YandexMapProps) {
@@ -38,34 +46,44 @@ export function YandexMap({ points, className }: YandexMapProps) {
   if (!point) return null;
 
   return (
-    <div className={cn("flex flex-col gap-4", className)}>
+    <div className={cn("relative flex flex-col max-sm:gap-3", className)} data-testid="yandex-map">
       {points.length > 1 ? (
-        <div role="group" aria-label={POINTS_LABEL} className="flex flex-wrap gap-2">
-          {points.map((item, index) => (
-            <Chip
-              key={item.key}
-              active={index === selected}
-              onClick={() => setSelected(index)}
-              icon={
-                <span
-                  aria-hidden="true"
-                  className="bg-brand grid size-5 place-items-center rounded-full text-[11px] leading-none font-bold text-white"
-                >
-                  {item.number}
-                </span>
-              }
-            >
-              {item.title}
-            </Chip>
-          ))}
+        <div
+          role="group"
+          aria-label={POINTS_LABEL}
+          className="absolute top-6 left-6 z-10 flex max-w-[calc(100%-48px)] flex-wrap gap-2 max-sm:static max-sm:max-w-none"
+        >
+          {points.map((item, index) => {
+            const active = index === selected;
+            return (
+              <Chip
+                key={item.key}
+                active={active}
+                onClick={() => setSelected(index)}
+                className={cn("rounded-full", !active && "bg-surface")}
+                icon={
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "grid size-5 place-items-center rounded-full text-[11px] leading-none font-bold",
+                      active ? "bg-surface text-primary-pressed" : "bg-primary text-white"
+                    )}
+                  >
+                    {item.number}
+                  </span>
+                }
+              >
+                {item.title}
+              </Chip>
+            );
+          })}
         </div>
       ) : null}
 
       <div
         className={cn(
-          "relative h-[440px] overflow-hidden rounded-xl max-sm:h-[300px]",
-          // Static «map» plate: light teal wash with a 48 px grid, drawn in CSS (no requests).
-          "bg-[#E3ECE9] bg-[linear-gradient(rgba(22,64,61,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(22,64,61,.06)_1px,transparent_1px)] bg-[size:48px_48px]"
+          "border-line relative h-[520px] overflow-hidden rounded-xl border max-md:h-[440px] max-sm:h-[360px]",
+          PLATE
         )}
       >
         {loaded ? (
@@ -79,12 +97,12 @@ export function YandexMap({ points, className }: YandexMapProps) {
             className="absolute inset-0 size-full border-0"
           />
         ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 pb-20 text-center">
             <span
               aria-hidden="true"
-              className="bg-surface text-primary-pressed shadow-card grid size-14 place-items-center rounded-full"
+              className="bg-primary grid size-11 place-items-center rounded-full border-[3px] border-white text-[17px] leading-none font-semibold text-white"
             >
-              <MapPin strokeWidth={2} className="size-7" />
+              {point.number}
             </span>
             <p className="text-ink-2 m-0 text-lg leading-snug font-semibold">{point.title}</p>
             <Button
@@ -100,20 +118,18 @@ export function YandexMap({ points, className }: YandexMapProps) {
             </p>
           </div>
         )}
-      </div>
 
-      <p className="m-0">
         <a
           href={point.openUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="ig-link inline-flex items-center gap-1.5"
+          className="bg-surface border-line text-primary-pressed hover:border-brand focus-visible:outline-brand absolute right-6 bottom-6 z-10 inline-flex min-h-11 items-center gap-2 rounded-full border px-5 py-3 text-[15px] leading-[18px] font-medium no-underline transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 max-sm:right-4 max-sm:bottom-4"
         >
           {OPEN_LABEL}
           <span className="sr-only">: {point.title}</span>
-          <ExternalLink aria-hidden="true" strokeWidth={2} className="size-4" />
+          <ExternalLink aria-hidden="true" strokeWidth={2} className="size-4 shrink-0" />
         </a>
-      </p>
+      </div>
     </div>
   );
 }

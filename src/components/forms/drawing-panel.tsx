@@ -20,6 +20,16 @@ import type { FormParams } from "./form-dialog-provider";
 export interface DrawingPanelProps {
   /** Heading; the default is the heading of the site's full form section. */
   heading?: string | undefined;
+  /**
+   * Line under the heading; the default is built from the `conditions` global. `/kontakty/`
+   * passes the teksty line of its form block.
+   */
+  sub?: string | undefined;
+  /**
+   * Form of the card: `full` (default) or `contacts` (`/kontakty/`: company, name, phone,
+   * e-mail, file, comment — teksty/06).
+   */
+  formKey?: "full" | "contacts" | undefined;
   headingId: string;
   /** Lead params (`source`, `label` = CRM caption, …). */
   params: FormParams;
@@ -43,13 +53,15 @@ export function drawingPanelSubline(
 
 export async function DrawingPanel({
   heading,
+  sub,
+  formKey = "full",
   headingId,
   params,
   anchorId,
   className,
 }: DrawingPanelProps) {
   const [config, conditions] = await Promise.all([getServerFormsConfig(), getConditions()]);
-  const subline = drawingPanelSubline(conditions);
+  const subline = sub?.trim() || drawingPanelSubline(conditions);
 
   return (
     <section
@@ -59,7 +71,7 @@ export async function DrawingPanel({
         "bg-primary-dark grid scroll-mt-24 grid-cols-[minmax(0,480px)_minmax(0,1fr)] items-start gap-14 rounded-4xl p-14 max-lg:gap-10 max-lg:p-10 max-md:grid-cols-1 max-md:gap-8 max-sm:gap-6 max-sm:rounded-xl max-sm:p-5",
         className
       )}
-      data-form-section="full"
+      data-form-section={formKey}
       data-testid="drawing-panel"
     >
       <div className="flex flex-col gap-5 max-sm:gap-3">
@@ -74,7 +86,7 @@ export async function DrawingPanel({
       </div>
       <div className="bg-surface text-text rounded-xl p-8 max-sm:p-5">
         <InlineForm
-          formKey="full"
+          formKey={formKey}
           params={params}
           config={{
             phone: config.phone,
