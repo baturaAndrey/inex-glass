@@ -17,11 +17,16 @@ import { SYSTEM_FACTS } from "./system-card";
  * The cards of a row share their rows (CSS subgrid), so names, labels and hairlines line up
  * whatever the text length. A system without a photo shows its scheme (SVG of the seed), else a
  * placeholder. 4 / 3 columns by the number of systems (≥1366), 2 below, 1 on phones.
+ *
+ * `factLabels` renames the fact labels for a page whose facts mean something else (the
+ * «Что поставляем» cards of `/furnitura/`: `whereFits` is the teksty column «Для чего»).
  */
 
 export interface SystemPhotoCardsProps {
   systems: readonly SystemItem[];
   ctx: PlaceholderContext;
+  /** Labels replacing the default ones of `SYSTEM_FACTS`, by fact key. */
+  factLabels?: Partial<Record<FactKey, string>> | undefined;
 }
 
 /** A quarter / third of the 1780 px content at 1920, half ≤1365, the full width ≤599. */
@@ -74,7 +79,7 @@ function SystemPicture({ system }: { system: SystemItem }) {
   return <Placeholder label="фото" className="absolute inset-0 aspect-auto rounded-none" />;
 }
 
-export function SystemPhotoCards({ systems, ctx }: SystemPhotoCardsProps) {
+export function SystemPhotoCards({ systems, ctx, factLabels }: SystemPhotoCardsProps) {
   // Only facts some system has, in the fixed order: every card gets the same rows.
   const factKeys: FactKey[] = SYSTEM_FACTS.map((fact) => fact.key).filter((key) =>
     systems.some((system) => hasText(system[key]))
@@ -113,7 +118,8 @@ export function SystemPhotoCards({ systems, ctx }: SystemPhotoCardsProps) {
               ) : null}
             </h3>
             {factKeys.map((key, factIndex) => {
-              const label = SYSTEM_FACTS.find((fact) => fact.key === key)?.label ?? "";
+              const label =
+                factLabels?.[key] ?? SYSTEM_FACTS.find((fact) => fact.key === key)?.label ?? "";
               const value = hasText(system[key]) ? fill(system[key], ctx) : "";
               const first = factIndex === 0;
               const last = factIndex === factKeys.length - 1;

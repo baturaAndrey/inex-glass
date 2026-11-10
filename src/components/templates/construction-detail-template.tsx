@@ -9,6 +9,7 @@ import {
   DEFAULT_GLASS_HEADING,
   FAQ_HEADING,
   PROFILE_SYSTEMS_HEADING,
+  SUPPLY_PURPOSE_LABEL,
 } from "@/components/constructions/copy";
 import { CreamObjects, objectsGroupOf } from "@/components/constructions/cream-objects";
 import {
@@ -77,7 +78,13 @@ import type { Construction } from "@/payload-types";
  *   before the blocks of the slot `b` («Для торговых сетей»), as in teksty;
  * - the cream block ends with the tiles of the sibling subpages (the current one dark).
  *
- * «Зажимной профиль» keeps the task-26 template.
+ * «Зажимной профиль» (`/furnitura/`, group «hardware», mockup `2560_furnitura`) uses the same
+ * layout without siblings: its systems are the «Что поставляем» cards (the fact labelled «Для
+ * чего»), the profile panel is titled by the heading of its slot-`profile` text and shows the
+ * glass thicknesses as large plates.
+ *
+ * A profile panel without a glass panel shares its row with the first main block when that is a
+ * rich text («Зажимной профиль» | «Отверстия под спайдеры»).
  */
 
 export interface ConstructionDetailPageProps {
@@ -167,6 +174,8 @@ export async function ConstructionDetailPage({
 }: ConstructionDetailPageProps): Promise<JSX.Element> {
   // Subpage layout: objects in the cream block, the inex.su panel before the slot `b`.
   const isSubpage = siblings !== undefined;
+  // «Зажимной профиль»: «Для чего» cards and thickness plates (see the comment above).
+  const isHardware = doc.group === "hardware";
   const productId = relationId(doc.productTag);
   const [terms, configs, objects] = await Promise.all([
     heroTerms(ctx),
@@ -205,7 +214,11 @@ export async function ConstructionDetailPage({
         <h2 id="construction-systems-title" className="ig-h2 m-0">
           {heading}
         </h2>
-        <SystemPhotoCards systems={systems} ctx={ctx} />
+        <SystemPhotoCards
+          systems={systems}
+          ctx={ctx}
+          factLabels={isHardware ? { whereFits: SUPPLY_PURPOSE_LABEL } : undefined}
+        />
       </section>
     );
     if (slots.systems.length > 0) {
@@ -227,14 +240,36 @@ export async function ConstructionDetailPage({
   );
   const showProfiles = profiles.length > 0 || slots.profile.length > 0;
   const showGlass = bullets.length > 0;
+  // A heading on the slot text titles the panel («Зажимной профиль»), else the template one.
+  const firstProfile = slots.profile[0];
+  const profileHeading =
+    (firstProfile?.blockType === "richText" ? fill(firstProfile.heading, ctx) : "") ||
+    PROFILE_SYSTEMS_HEADING;
+  // Without a glass panel the first main rich text takes the second half of the row.
+  const firstMain = slots.main[0];
+  const partner =
+    showProfiles && !showGlass && firstMain?.blockType === "richText" ? firstMain : null;
+  const mainBlocks = partner ? slots.main.slice(1) : slots.main;
   if (showProfiles || showGlass) {
     parts.push(
-      <PanelRow key="profile-glass" count={Number(showProfiles) + Number(showGlass)}>
+      <PanelRow
+        key="profile-glass"
+        count={Number(showProfiles) + Number(showGlass) + Number(Boolean(partner))}
+      >
         {showProfiles ? (
           <ProfilePanel
-            heading={PROFILE_SYSTEMS_HEADING}
+            heading={profileHeading}
             intro={<SlotText blocks={slots.profile} ctx={ctx} page={page} />}
             systems={profiles}
+            ctx={ctx}
+            size={isHardware ? "plate" : "pill"}
+          />
+        ) : null}
+        {partner ? (
+          <TextPanel
+            heading={fill(partner.heading, ctx) || null}
+            headingId="construction-profile-partner-title"
+            body={partner.content}
             ctx={ctx}
           />
         ) : null}
@@ -249,11 +284,11 @@ export async function ConstructionDetailPage({
     );
   }
 
-  if (slots.main.length > 0) {
+  if (mainBlocks.length > 0) {
     parts.push(
       <BlockPanels
         key="main"
-        blocks={slots.main}
+        blocks={mainBlocks}
         ctx={ctx}
         page={page}
         idPrefix="construction-block"

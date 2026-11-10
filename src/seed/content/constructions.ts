@@ -799,6 +799,15 @@ const SHOPFRONTS: ConstructionSeed = {
   ],
 };
 
+/**
+ * Thickness plates of «Зажимной профиль» (Paper mockup `2560_furnitura`, approved 2026-11-10):
+ * the values of the teksty sentence «…толщиной 10, 12, 16 и 20 мм», one per plate.
+ */
+const HARDWARE_THICKNESS_PLATES = ["10 мм", "12 мм", "16 мм", "20 мм"] as const;
+
+/** Wording of the «Зажимной профиль» page outside teksty (the thickness plates of the mockup). */
+export const HARDWARE_MOCKUP_COPY: readonly string[] = [...HARDWARE_THICKNESS_PLATES];
+
 /** teksty/12 §9 — «Зажимной профиль и спайдеры». */
 const HARDWARE: ConstructionSeed = {
   slug: "furnitura",
@@ -820,35 +829,52 @@ const HARDWARE: ConstructionSeed = {
   },
   intro:
     "Профиль и крепления — отдельно или одним комплектом со стеклом. В комплекте стекло изготавливается под конкретный профиль и крепления: отверстия, зазоры и толщина совпадают без подбора на объекте.",
+  heroImage: {
+    file: "hardware/hero.webp",
+    alt: "Стекло в зажимном профиле и спайдер с двумя стёклами",
+  },
   ctaPrimaryLabel: "Рассчитать комплект",
   secondaryFormKey: "none",
   quizType: "other",
-  layout: [
+  // The teksty table «Что поставляем» (Изделие / Для чего) as the photo cards of the Paper mockup
+  // `2560_furnitura`: «Изделие» → name, «Для чего» → the one labelled fact (`whereFits`).
+  systemsHeading: "Что поставляем",
+  systems: [
     {
-      type: "table",
-      heading: "Что поставляем",
-      table: {
-        caption: "Что поставляем",
-        columns: ["Изделие", "Для чего"],
-        rows: [
-          [
-            "Зажимной профиль",
-            "Ограждения, цельностеклянные перегородки, козырьки — стекло зажимается без отверстий",
-          ],
-          [
-            "Спайдеры и рутели",
-            "Спайдерное остекление, ограждения, козырьки на точечных креплениях",
-          ],
-          [
-            "Комплектующие для козырьков",
-            "Тяги, консоли, крепления — продаём и отдельно от стекла",
-          ],
-        ],
+      name: "Зажимной профиль",
+      whereFits:
+        "Ограждения, цельностеклянные перегородки, козырьки — стекло зажимается без отверстий",
+      image: {
+        file: "hardware/zazhimnoj-profil.webp",
+        alt: "Стеклянное ограждение в алюминиевом зажимном профиле",
       },
     },
     {
+      name: "Спайдеры и рутели",
+      whereFits: "Спайдерное остекление, ограждения, козырьки на точечных креплениях",
+      image: {
+        file: "hardware/spajdery-ruteli.webp",
+        alt: "Спайдер с рутелями на стыке двух стёкол",
+      },
+    },
+    {
+      name: "Комплектующие для козырьков",
+      whereFits: "Тяги, консоли, крепления — продаём и отдельно от стекла",
+      image: {
+        file: "hardware/kozyrki-komplektuyushchie.webp",
+        alt: "Тяги, кронштейны и зажимы для стеклянного козырька",
+      },
+    },
+  ],
+  // Thickness plates of the «Зажимной профиль» panel (mockup wording, `HARDWARE_MOCKUP_COPY`).
+  profileSystems: [...HARDWARE_THICKNESS_PLATES],
+  layout: [
+    {
+      // Slot `profile`: its heading titles the panel with the thickness plates.
       type: "richText",
-      md: "Зажимной профиль — под стекло и триплекс толщиной **10, 12, 16 и 20 мм**.",
+      heading: "Зажимной профиль",
+      anchorId: "slot-profile-thickness",
+      md: "Зажимной профиль — под стекло и триплекс толщиной 10, 12, 16 и 20 мм.",
     },
     {
       type: "richText",

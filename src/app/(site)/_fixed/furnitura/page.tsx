@@ -4,7 +4,7 @@ import {
 } from "@/components/templates/construction-template";
 import type { Metadata } from "next";
 
-/** `/furnitura/`: construction document `furnitura` (template of task 26). */
+/** `/furnitura/`: construction document `furnitura` (construction page template). */
 const SLUG = "furnitura";
 
 export function generateMetadata(): Promise<Metadata> {

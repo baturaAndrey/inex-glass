@@ -117,6 +117,7 @@ const PAGES: PageCase[] = [
     primary: "Рассчитать комплект",
     secondary: null,
     quizType: "other",
+    paper: true,
     faq: 0,
   },
 ];
@@ -412,16 +413,50 @@ test.describe("constructions", () => {
     await expect(order.locator("ol > li")).toHaveCount(3);
   });
 
-  test("hardware: «Что поставляем» table, no secondary hero button", async ({ page }, testInfo) => {
+  test("hardware: photo hero, «Что поставляем» cards, thickness plates, drawing form", async ({
+    page,
+  }) => {
     await page.goto("/furnitura/");
-    const table = page.locator("section", {
-      has: page.getByRole("heading", { name: "Что поставляем" }),
+    const heroSection = hero(page);
+    await expect(heroSection.getByRole("list", { name: "Условия" }).locator("li")).toHaveCount(4);
+    await expect(heroSection.locator("img")).toHaveAttribute(
+      "alt",
+      "Стекло в зажимном профиле и спайдер с двумя стёклами"
+    );
+    // A single hero button: the quiz («Рассчитать комплект»), no secondary form.
+    await expect(heroSection.locator("[data-form-trigger]")).toHaveCount(0);
+
+    const systems = page.locator("#sistemy");
+    await expect(systems.getByRole("heading", { name: "Что поставляем", level: 2 })).toBeVisible();
+    const cards = systems.getByTestId("system-card");
+    await expect(cards).toHaveCount(3);
+    await expect(cards.locator("img")).toHaveCount(3);
+    await expect(cards.locator("h3")).toHaveText([
+      "Зажимной профиль",
+      "Спайдеры и рутели",
+      "Комплектующие для козырьков",
+    ]);
+    await expect(cards.locator("dt")).toHaveText(["Для чего", "Для чего", "Для чего"]);
+    await expect(page.locator("main table")).toHaveCount(0);
+
+    const profile = page.getByTestId("construction-profiles");
+    await expect(
+      profile.getByRole("heading", { name: "Зажимной профиль", level: 2 })
+    ).toBeVisible();
+    await expect(profile).toContainText("под стекло и триплекс толщиной 10, 12, 16 и 20 мм");
+    await expect(profile.locator("li")).toHaveText(["10 мм", "12 мм", "16 мм", "20 мм"]);
+
+    const holes = page.getByTestId("construction-panel").filter({
+      has: page.getByRole("heading", { name: "Отверстия под спайдеры", level: 2 }),
     });
-    const rows = isMobile(testInfo.project.name)
-      ? table.locator(".ig-mcard")
-      : table.locator("table tbody tr");
-    await expect(rows).toHaveCount(3);
-    await expect(hero(page).locator("[data-form-trigger]")).toHaveCount(0);
+    await expect(holes.getByRole("link", { name: "Отверстия и вырезы" })).toHaveAttribute(
+      "href",
+      "/obrabotka-stekla/otverstiya-i-vyrezy/"
+    );
+
+    // The cream block closes the page with the drawing form; no closing button row.
+    await expect(page.getByTestId("drawing-panel")).toBeVisible();
+    await expect(page.locator("[data-section='closing-cta']")).toHaveCount(0);
   });
 
   for (const url of [

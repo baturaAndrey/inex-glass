@@ -55,11 +55,12 @@ import type { Construction, Object as PortfolioObject, ShowerConfig } from "@/pa
 import type { Metadata } from "next";
 
 /**
- * Template of the `constructions` collection (task 26): «Зажимной профиль» (`/furnitura/`). The
- * Paper mockup layouts (2026-11) are dispatched from here: the hub `/steklyannye-konstrukcii/` →
- * `ConstructionHubPage`, the hubs `/osteklenie/` and `/zerkala/` → `GlazingHubPage`, the five
- * construction pages of the group «constructions» and the glazing / mirrors subpages →
- * `ConstructionDetailPage`.
+ * Template of the `constructions` collection (task 26). The Paper mockup layouts (2026-11) are
+ * dispatched from here: the hub `/steklyannye-konstrukcii/` → `ConstructionHubPage`, the hubs
+ * `/osteklenie/` and `/zerkala/` → `GlazingHubPage`, the five construction pages of the group
+ * «constructions», the glazing / mirrors subpages and «Зажимной профиль» (`/furnitura/`) →
+ * `ConstructionDetailPage`. The task-26 layout below remains for any other document (e.g. a
+ * future hub of another group).
  *
  * Section order (each optional, driven by the document): hero → shower configurations →
  * systems → profile systems + glass → layout blocks (`main` slot) → «main risk» callout →
@@ -105,6 +106,9 @@ const isGlazingHub = (doc: Construction) =>
 /** The five root construction pages (`ConstructionDetailPage`), not «Зажимной профиль» (hardware). */
 const isConstructionDetail = (doc: Construction) =>
   doc.kind === "construction" && doc.group === "constructions";
+
+/** «Зажимной профиль» (`/furnitura/`, mockup `2560_furnitura`): `ConstructionDetailPage`. */
+const isHardware = (doc: Construction) => doc.kind === "construction" && doc.group === "hardware";
 
 /** Subpages of `/osteklenie/` and `/zerkala/` (`ConstructionDetailPage` with sibling tiles). */
 const isGlazingSubpage = (doc: Construction) =>
@@ -351,9 +355,9 @@ export async function ConstructionPage(input: ConstructionPageInput): Promise<JS
     );
   }
 
-  // Paper layouts (2026-11): the glazing / mirrors hubs, the five construction pages and the
-  // glazing / mirrors subpages (on the construction page template).
-  if (isGlazingHub(doc) || isConstructionDetail(doc) || isGlazingSubpage(doc)) {
+  // Paper layouts (2026-11): the glazing / mirrors hubs, the five construction pages, the
+  // glazing / mirrors subpages and «Зажимной профиль» (on the construction page template).
+  if (isGlazingHub(doc) || isConstructionDetail(doc) || isGlazingSubpage(doc) || isHardware(doc)) {
     const ctx = await getPlaceholderContext();
     const path = doc.path ?? requestedPath(input) ?? "/";
     const crumbLabel = resolveSeoText(doc.breadcrumbLabel || doc.title, ctx);

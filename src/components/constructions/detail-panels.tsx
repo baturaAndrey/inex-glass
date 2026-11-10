@@ -131,18 +131,31 @@ export function PanelRow({ children, count }: { children: ReactNode; count: numb
 
 type ProfileSystem = NonNullable<Construction["profileSystems"]>[number];
 
-/** «Профильные системы»: intro text (slot `profile`) and the systems as tinted pills. */
+/**
+ * Large value plates (mockup `2560_furnitura`, «Зажимной профиль»: the glass thicknesses):
+ * 26 px bold on primary-light, smaller on phones.
+ */
+const PLATE =
+  "inline-flex items-center rounded-full px-[30px] py-[18px] text-[26px] leading-8 font-bold tabular-nums max-sm:px-5 max-sm:py-3 max-sm:text-[20px] max-sm:leading-6";
+
+/**
+ * «Профильные системы»: intro text (slot `profile`) and the systems as tinted pills; with
+ * `size="plate"` the entries are large value plates («10 мм», «12 мм»… on `/furnitura/`).
+ */
 export function ProfilePanel({
   heading,
   intro,
   systems,
   ctx,
+  size = "pill",
 }: {
   heading: string;
   intro: ReactNode;
   systems: readonly ProfileSystem[];
   ctx: PlaceholderContext;
+  size?: "pill" | "plate" | undefined;
 }) {
+  const shape = size === "plate" ? PLATE : cn(PILL, "font-semibold");
   const headingId = "construction-profiles-title";
   const pills = systems.flatMap((system, index) => {
     const name = fill(system.name, ctx);
@@ -166,16 +179,14 @@ export function ProfilePanel({
                 <Link
                   href={pill.url}
                   className={cn(
-                    PILL,
-                    "bg-primary-light text-primary-dark hover:bg-line-teal focus-visible:outline-brand font-semibold no-underline focus-visible:outline-2 focus-visible:outline-offset-2"
+                    shape,
+                    "bg-primary-light text-primary-dark hover:bg-line-teal focus-visible:outline-brand no-underline focus-visible:outline-2 focus-visible:outline-offset-2"
                   )}
                 >
                   {pill.name}
                 </Link>
               ) : (
-                <span className={cn(PILL, "bg-primary-light text-primary-dark font-semibold")}>
-                  {pill.name}
-                </span>
+                <span className={cn(shape, "bg-primary-light text-primary-dark")}>{pill.name}</span>
               )}
             </li>
           ))}

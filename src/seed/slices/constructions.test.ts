@@ -5,6 +5,7 @@ import { checkStopWords } from "@/lib/domain";
 import { sanitizeSvg } from "@/lib/svg-sanitize";
 import {
   CONSTRUCTIONS,
+  HARDWARE_MOCKUP_COPY,
   HUB_MOCKUP_COPY,
   MONTAGE_DECISION_COPY,
   seedImagesOf,
@@ -100,6 +101,9 @@ const mockupApproved = new Set(MOCKUP_FRAGMENTS);
 /** Installation wording of 2026-11-09 on the inner pages (not in teksty). */
 const montageApproved = new Set(toFragments(MONTAGE_DECISION_COPY));
 
+/** Thickness plates of the «Зажимной профиль» mockup (not in teksty). */
+const hardwareApproved = new Set(toFragments(HARDWARE_MOCKUP_COPY));
+
 /** Every internal / external href of a document. */
 function links(doc: ConstructionSeed): string[] {
   const markdown = [
@@ -135,7 +139,8 @@ describe("constructions seed content", () => {
       const exempt = (text: string) =>
         edgeApproved.has(text) ||
         montageApproved.has(text) ||
-        (doc.slug === "steklyannye-konstrukcii" && mockupApproved.has(text));
+        (doc.slug === "steklyannye-konstrukcii" && mockupApproved.has(text)) ||
+        (doc.slug === "furnitura" && hardwareApproved.has(text));
       for (const fragment of fragments(doc).filter((text) => !exempt(text))) {
         expect(source.includes(fragment), `${doc.slug}: «${fragment}»`).toBe(true);
       }
@@ -155,8 +160,8 @@ describe("constructions seed content", () => {
 
   it("every seed photo (hub, heroes, system photos) exists and has a Russian alt", () => {
     const images = CONSTRUCTIONS.flatMap(seedImagesOf);
-    // Hub: hero + 7 cards; construction pages: 5 heroes + 10 system photos.
-    expect(images).toHaveLength(23);
+    // Hub: hero + 7 cards; construction pages: 5 heroes + 10 system photos; furnitura: hero + 3.
+    expect(images).toHaveLength(27);
     for (const image of images) {
       expect(existsSync(path.join(MEDIA_DIR, image.file)), image.file).toBe(true);
       expect(image.alt, image.file).toMatch(/^[А-ЯЁ][а-яё]/);
@@ -261,6 +266,23 @@ describe("constructions seed content", () => {
     }
     expect(doc.snowCalcBlock?.ctaLabel).toBe("Отправить проект на расчёт");
     expect(doc.faq).toHaveLength(3);
+  });
+
+  it("furnitura: «Что поставляем» as photo cards, thickness plates in the profile slot", () => {
+    const doc = bySlug("furnitura");
+    expect(doc.systemsHeading).toBe("Что поставляем");
+    expect(doc.systems?.map((system) => system.name)).toEqual([
+      "Зажимной профиль",
+      "Спайдеры и рутели",
+      "Комплектующие для козырьков",
+    ]);
+    expect(doc.systems?.every((system) => system.whereFits && system.image)).toBe(true);
+    expect(doc.layout.some((block) => block.type === "table")).toBe(false);
+    expect(doc.profileSystems).toEqual(["10 мм", "12 мм", "16 мм", "20 мм"]);
+    const profile = doc.layout.find(
+      (block) => block.type === "richText" && block.anchorId?.startsWith("slot-profile-")
+    );
+    expect(profile?.type === "richText" ? profile.heading : null).toBe("Зажимной профиль");
   });
 
   it("primary CTA is always «Рассчитать …», furnitura has no secondary form", () => {

@@ -7,3 +7,9 @@
 export const PROFILE_SYSTEMS_HEADING = "Профильные системы";
 export const DEFAULT_GLASS_HEADING = "Стекло";
 export const FAQ_HEADING = "Частые вопросы";
+
+/**
+ * Fact label of the «Что поставляем» cards of `/furnitura/`: the teksty table column «Для чего»
+ * (the cards keep the purpose in `whereFits`).
+ */
+export const SUPPLY_PURPOSE_LABEL = "Для чего";
