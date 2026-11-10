@@ -173,9 +173,12 @@ export function ArticleCallout({
 export function ArticleNote({
   data,
   ctx,
+  text,
 }: {
-  data: RichTextData | null | undefined;
+  data?: RichTextData | null | undefined;
   ctx: PlaceholderContext;
+  /** Plain one-line note instead of rich text («{условия} · {акция_текст}» of «Клиентам»). */
+  text?: string | undefined;
 }) {
   return (
     <aside
@@ -183,11 +186,15 @@ export function ArticleNote({
       data-testid="article-note"
     >
       <Info aria-hidden="true" strokeWidth={1.75} className="text-navy size-[26px] shrink-0" />
-      <RichText
-        data={data}
-        ctx={ctx}
-        className="text-ink-3 flex flex-col gap-2 [&_a]:text-[length:inherit] [&_p]:max-w-none [&_p]:text-base [&_p]:leading-[1.55]"
-      />
+      {text ? (
+        <p className="text-ink-3 m-0 text-base leading-[1.55]">{text}</p>
+      ) : (
+        <RichText
+          data={data}
+          ctx={ctx}
+          className="text-ink-3 flex flex-col gap-2 [&_a]:text-[length:inherit] [&_p]:max-w-none [&_p]:text-base [&_p]:leading-[1.55]"
+        />
+      )}
     </aside>
   );
 }

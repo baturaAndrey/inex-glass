@@ -4,6 +4,7 @@ import { Container } from "@/components/ig/container";
 import { NOT_FOUND_METADATA, NotFoundResponse } from "@/components/page/not-found-response";
 import { pageBlockContext } from "@/components/page/page-context";
 import { PageShell } from "@/components/page/page-shell";
+import { ClientsPage } from "@/components/templates/clients-template";
 import { getPlaceholderContext } from "@/lib/cms/globals";
 import { pathFromSegments } from "@/lib/cms/path";
 import { getPageByPath, redirectIfExists } from "@/lib/cms/queries";
@@ -26,7 +27,8 @@ import type { Metadata } from "next";
  * 2. Published page with that path → `PageShell` + blocks; a page with the template «Услуга /
  *    сервис» → `HowToOrderSubpage` (the «Как заказать» subpage template). The blocks receive
  *    the document (`pageBlockContext`): the hero renders its H1, FAQ / quiz blocks read `faq` /
- *    `quizPrefill`.
+ *    `quizPrefill`. Pages with the template «Сегмент» (`/klientam/` and its segment pages) →
+ *    `ClientsPage` (Paper mockups `2560_klientam`, `2560_klientam_podryadchikam`).
  * 3. Otherwise an active record of `redirects` → `permanentRedirect` (HTTP 308: search engines
  *    treat it as permanent, like 301 — see requirements «Техническое SEO»), otherwise 404 via
  *    `<NotFoundResponse />` (HTTP 404 with the 404 body in the server HTML; a bare `notFound()`
@@ -101,6 +103,8 @@ export default async function CatchAllPage({ params }: { params: Params }) {
   // «Услуга / сервис» pages (the «Как заказать» subpages): the subpage template of the Paper
   // mockup `2560_kak-zakazat_trebovaniya` (article with «На странице», drawing-form panel).
   if (page.template === "service") return <HowToOrderSubpage path={path} />;
+  // «Сегмент» pages: the «С кем мы работаем» hub and its segment pages.
+  if (page.template === "segment") return <ClientsPage path={path} />;
 
   const placeholders = await getPlaceholderContext();
   const blockPage = pageBlockContext(page, path, placeholders);

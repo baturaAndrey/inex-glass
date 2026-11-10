@@ -176,22 +176,36 @@ test.describe("company / legal pages: common checks", () => {
 });
 
 test.describe("«Для кого»", () => {
-  test("hub: 4 rows linking the segment pages; cards on phones", async ({ page }, testInfo) => {
+  test("hub: photo cards of the 4 segments, «Монтаж» panel, drawing form", async ({ page }) => {
     await page.goto("/klientam/");
-    const more = page.locator("main").getByRole("link", { name: "Подробнее" });
-    const isPhone = testInfo.project.name === "mobile-375";
-    if (isPhone) {
-      await expect(page.locator("main table:visible")).toHaveCount(0);
-      await expect(page.locator("main .ig-mcard:visible")).toHaveCount(4);
-    } else {
-      await expect(page.locator("main table tbody tr")).toHaveCount(4);
-    }
-    const visible = more.filter({ visible: true });
-    await expect(visible).toHaveCount(4);
-    const hrefs = await visible.evaluateAll((links) =>
-      links.map((link) => link.getAttribute("href"))
-    );
+    const main = page.locator("main");
+    await expect(main.getByTestId("processing-hero").locator("img")).toHaveCount(1);
+    await expect(main.getByRole("list", { name: "Условия" })).toBeVisible();
+
+    const cards = main.getByTestId("segment-card");
+    await expect(cards).toHaveCount(4);
+    // The title is the card link (stretched over the card); every card has its photo.
+    const hrefs = await cards
+      .getByRole("heading", { level: 2 })
+      .getByRole("link")
+      .evaluateAll((links) => links.map((link) => link.getAttribute("href")));
     expect(hrefs).toEqual(SEGMENT_PATHS);
+    for (const card of await cards.all()) {
+      await expect(card.locator("img")).toHaveAttribute("alt", /\S/);
+      await expect(card).toContainText("Ваша задача");
+      await expect(card).toContainText("Что берём на себя");
+    }
+    await expect(main.locator("table")).toHaveCount(0);
+
+    const montage = main.getByTestId("clients-montage");
+    await expect(montage.getByRole("heading", { name: "Монтаж" })).toBeVisible();
+    await expect(montage).toContainText("шеф-монтаж");
+    await expect(montage).not.toContainText("→");
+    await expect(montage.getByRole("link", { name: "Перейти на inex.su" })).toHaveAttribute(
+      "href",
+      "https://inex.su/"
+    );
+    await expect(main.getByTestId("drawing-panel")).toBeVisible();
   });
 
   for (const segment of SEGMENT_PATHS) {
@@ -210,10 +224,63 @@ test.describe("«Для кого»", () => {
     });
   }
 
-  test("contractors: the promo is its own paragraph", async ({ page }) => {
+  for (const segment of SEGMENT_PATHS) {
+    test(`${segment}: photo hero, content without TOC, note, form, segment tiles`, async ({
+      page,
+    }) => {
+      await page.goto(segment);
+      const main = page.locator("main");
+      await expect(main.getByTestId("processing-hero").locator("img")).toHaveCount(1);
+      await expect(main.getByRole("navigation", { name: "На странице" })).toHaveCount(0);
+      await expect(main.getByTestId("article-note")).toContainText("50 м²");
+      await expect(main.getByTestId("drawing-panel")).toBeVisible();
+
+      const tiles = main.getByRole("navigation", { name: "Разделы «С кем мы работаем»" });
+      await expect(tiles.getByRole("link")).toHaveCount(4);
+      await expect(tiles.locator('a[aria-current="page"]')).toHaveAttribute("href", segment);
+    });
+  }
+
+  test("contractors: problems table, three step cards with the drawings link", async ({ page }) => {
     await page.goto("/klientam/podryadchikam/");
-    const paragraphs = await page.locator("main p").allInnerTexts();
-    expect(paragraphs.some((p) => / · /.test(p) && p.includes("50 м²"))).toBe(false);
+    const main = page.locator("main");
+    await expect(main.getByRole("heading", { name: "Как начать" })).toBeVisible();
+    const steps = main.getByTestId("article-steps").locator("li");
+    await expect(steps).toHaveCount(3);
+    await expect(
+      steps.first().getByRole("link", { name: "Требования к чертежам" })
+    ).toHaveAttribute("href", "/kak-zakazat/trebovaniya-k-chertezham/");
+    await expect(main.getByTestId("article-table")).toContainText("Клеймо на видимом стекле");
+  });
+
+  test("designers: solutions table keeps the links, four step cards", async ({ page }) => {
+    await page.goto("/klientam/dizajneram-i-arhitektoram/");
+    const table = page.locator("main").getByTestId("article-table");
+    await expect(table.getByRole("link", { name: "Матирование" }).first()).toHaveAttribute(
+      "href",
+      "/obrabotka-stekla/matirovanie/"
+    );
+    await expect(page.locator("main").getByTestId("article-steps").locator("li")).toHaveCount(4);
+  });
+
+  test("furniture and developers: feature cards and the link rows", async ({ page }) => {
+    await page.goto("/klientam/proizvoditelyam-mebeli/");
+    let main = page.locator("main");
+    await expect(main.getByTestId("feature-cards").locator("li")).toHaveCount(6);
+    const types = main.getByTestId("link-row");
+    await expect(types.getByRole("link", { name: "Матовое" })).toHaveAttribute(
+      "href",
+      "/zakalennoe-steklo/matovoe/"
+    );
+    await expect(types.getByRole("link", { name: "Стекло для мебели" })).toBeVisible();
+
+    await page.goto("/klientam/zastrojshchikam/");
+    main = page.locator("main");
+    await expect(main.getByTestId("feature-cards").locator("li")).toHaveCount(4);
+    await expect(main.getByTestId("link-row")).toContainText("Аэропорт Челябинск");
+    await expect(
+      main.getByTestId("link-row").getByRole("link", { name: "Все объекты" })
+    ).toBeVisible();
   });
 
   test("furniture: quiz pre-filled with tempered glass", async ({ page }) => {

@@ -39,6 +39,22 @@ export interface TableContent {
   rows: string[][];
 }
 
+/** Seed photo of `src/seed/media/clients/` (hero of the hub and of every segment page). */
+export interface ClientsImage {
+  file: string;
+  /** Russian alt text. */
+  alt: string;
+}
+
+/** A numbered step (teksty «1. …»): its text and the trailing «→ [link]», if any. */
+export interface StepContent {
+  title: string;
+  link?: { label: string; href: string };
+}
+
+/** Folder of the section photos under `src/seed/media/`. */
+export const CLIENTS_MEDIA_GROUP = "clients";
+
 /** Site paths linked from these pages (the link map of tasks 27/28). */
 export const LINKS = {
   hub: "/klientam/",
@@ -132,6 +148,21 @@ export const HUB = {
   bridge: `Подберём проверенную монтажную бригаду или проведём шеф-монтаж с вашими специалистами. Если нужен проект «под ключ» с монтажом — его выполняет инжиниринговая компания Inex → [inex.su](${LINKS.inexSu})`,
   /** «Отправить чертёж» of the hub: the lead comes with the source label `klientam`. */
   drawingSource: "klientam",
+  heroImage: {
+    file: "hub-hero.webp",
+    alt: "Листы закалённого стекла на пирамиде на складе, за ними — погрузчик и рабочие",
+  } satisfies ClientsImage,
+  /**
+   * Dark «Монтаж» panel of the Paper mockup `2560_klientam`: the bridge text without its inline
+   * «→ [inex.su]» link, which becomes the panel button. The heading and the full stop at the
+   * end are mockup wording (`KLIENTAM_MOCKUP_COPY`).
+   */
+  montage: {
+    heading: "Монтаж",
+    text: "Подберём проверенную монтажную бригаду или проведём шеф-монтаж с вашими специалистами. Если нужен проект «под ключ» с монтажом — его выполняет инжиниринговая компания Inex.",
+    linkLabel: "Перейти на inex.su",
+    href: LINKS.inexSu,
+  },
 } as const;
 
 /* ------------------------------------------------------------------------------------------ */
@@ -155,6 +186,11 @@ export const CONTRACTORS = {
   },
   /** H1 of teksty (17-meta wins); kept for the report, not rendered. */
   tekstyH1: "Стекло, которое встаёт с первого раза",
+  /** Hero photo; also the photo of the segment card on the hub. */
+  heroImage: {
+    file: "podryadchikam.webp",
+    alt: "Монтажник на объекте рядом со стеклянной перегородкой на точечных креплениях",
+  } satisfies ClientsImage,
   lead: "Для монтажных и отделочных компаний: перегородки, ограждения, лестницы, козырьки, душевые. Вы монтируете — мы отвечаем за то, чтобы стекло пришло по чертежу и целым.",
   problems: {
     heading: "Что обычно идёт не так — и что мы делаем",
@@ -183,13 +219,17 @@ export const CONTRACTORS = {
       ["Клеймо на видимом стекле", "Можно не ставить — отметьте в заказе"],
     ],
   } satisfies TableContent,
+  /** teksty «1. … 3. …» as numbered step cards. */
   start: {
     heading: "Как начать",
-    markdown: [
-      `1. Пришлите чертёж в DWG или DXF. → [Требования к чертежам](${LINKS.drawings})`,
-      "2. Получите спецификацию и КП — в среднем за 2–3 рабочих дня.",
-      "3. Подпишите договор: цена фиксируется.",
-    ].join("\n"),
+    steps: [
+      {
+        title: "Пришлите чертёж в DWG или DXF.",
+        link: { label: "Требования к чертежам", href: LINKS.drawings },
+      },
+      { title: "Получите спецификацию и КП — в среднем за 2–3 рабочих дня." },
+      { title: "Подпишите договор: цена фиксируется." },
+    ] satisfies StepContent[],
   },
   closing: CONDITIONS_WITH_PROMO,
   secondaryLabel: "Отправить чертёж",
@@ -211,6 +251,10 @@ export const FURNITURE = {
     },
   },
   tekstyH1: "Стекло для мебельного производства — сериями",
+  heroImage: {
+    file: "proizvoditelyam-mebeli.webp",
+    alt: "Стопка стеклянных столешниц с полированной кромкой в мебельном цехе",
+  } satisfies ClientsImage,
   lead: "Фасады, дверцы, столешницы: стекло приходит с кромкой и отверстиями под петли и ручки. Вам остаётся собрать изделие.",
   series: {
     heading: "Что важно для серии — и как мы это решаем",
@@ -258,6 +302,10 @@ export const DEVELOPERS = {
     },
   },
   tekstyH1: "Стекло для объектов: в срок, с документами, без замечаний при сдаче",
+  heroImage: {
+    file: "zastrojshchikam.webp",
+    alt: "Стеклянные ограждения галерей в атриуме торгового центра",
+  } satisfies ClientsImage,
   /** Contains `EXPERIENCE_PHRASE` verbatim. */
   lead: "Торговые центры, арены, бизнес-центры, жилые комплексы: ограждения, перегородки, душевые и санкабины, козырьки, фасадное стекло. За 21 год специалисты Inex выполнили более 1500 проектов по всей России.",
   benefits: {
@@ -294,6 +342,10 @@ export const DESIGNERS = {
     },
   },
   tekstyH1: "Стекло для нестандартных решений",
+  heroImage: {
+    file: "dizajneram.webp",
+    alt: "Образцы матового, рифлёного и цветного стекла на столе дизайнера",
+  } satisfies ClientsImage,
   lead: "Поможем превратить эскиз в рабочие узлы и подобрать стекло, которое выглядит так, как задумано.",
   /**
    * «Задача | Решение» with links inside the cells: a rich-text table (Lexical table feature of
@@ -321,20 +373,42 @@ export const DESIGNERS = {
       ["Объёмный край зеркала", `Фацет 30 или 50 мм → [Фацет](${LINKS.bevel})`],
     ],
   } satisfies TableContent,
+  /** teksty «1. … 4. …» as numbered step cards. */
   process: {
     heading: "Как работаем с дизайнером",
-    markdown: [
-      "1. Присылаете эскиз или концепцию.",
-      "2. Проектируем узлы и подбираем стекло; если что-то нельзя сделать технологически — предлагаем вариант до запуска.",
-      "3. Согласовываете образец цвета или матовости. Образцы — бесплатно, изготовление около недели.",
-      "4. Стекло изготавливается и отправляется на объект; монтаж выполняет подрядчик.",
-    ].join("\n"),
+    steps: [
+      { title: "Присылаете эскиз или концепцию." },
+      {
+        title:
+          "Проектируем узлы и подбираем стекло; если что-то нельзя сделать технологически — предлагаем вариант до запуска.",
+      },
+      {
+        title:
+          "Согласовываете образец цвета или матовости. Образцы — бесплатно, изготовление около недели.",
+      },
+      { title: "Стекло изготавливается и отправляется на объект; монтаж выполняет подрядчик." },
+    ] satisfies StepContent[],
   },
   closing: CONDITIONS,
   secondaryLabel: "Отправить эскиз",
 } as const;
 
 export const SEGMENTS = [CONTRACTORS, FURNITURE, DEVELOPERS, DESIGNERS] as const;
+
+/** teksty step line: «Пришлите чертёж в DWG или DXF. → Требования к чертежам». */
+export const stepLine = (step: StepContent): string =>
+  step.link ? `${step.title} → ${step.link.label}` : step.title;
+
+/**
+ * Wording of the «Клиентам» pages that is not in teksty (Paper mockup `2560_klientam`,
+ * 2026-11), pending the client's approval — listed in
+ * `docs/inex/drafts/service-pages-paper-drafts.md` («Клиентам»).
+ */
+export const KLIENTAM_MOCKUP_COPY: readonly string[] = [
+  HUB.montage.heading,
+  HUB.montage.text,
+  HUB.montage.linkLabel,
+];
 
 /* ------------------------------------------------------------------------------------------ */
 /* /o-kompanii/ — teksty/06 §1                                                                 */

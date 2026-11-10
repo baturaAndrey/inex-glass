@@ -54,17 +54,25 @@ export async function loadSubpageLinks(ctx: PlaceholderContext): Promise<Subpage
 export function SubpageLinks({
   links,
   currentPath,
+  label = HOW_TO_ORDER_TEMPLATE_COPY.subpages,
+  id = SUBPAGES_ANCHOR,
+  testId = "subpage-links",
 }: {
   links: readonly SubpageLink[];
   /** Path of the page showing the grid: its card is highlighted. */
   currentPath?: string | undefined;
+  /** Accessible name of the navigation (the «Как заказать» one by default). */
+  label?: string | undefined;
+  /** Anchor of the navigation. */
+  id?: string | undefined;
+  testId?: string | undefined;
 }) {
   if (links.length === 0) return null;
   return (
-    <nav aria-label={HOW_TO_ORDER_TEMPLATE_COPY.subpages} id={SUBPAGES_ANCHOR}>
+    <nav aria-label={label} id={id}>
       <ul
         className="m-0 grid list-none grid-cols-4 gap-4 p-0 max-md:grid-cols-2 max-sm:grid-cols-1 max-sm:gap-3"
-        data-testid="subpage-links"
+        data-testid={testId}
       >
         {links.map((link) => {
           const current = link.href === currentPath;

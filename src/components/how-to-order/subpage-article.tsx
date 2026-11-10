@@ -204,10 +204,17 @@ export function buildArticle({
 /** Minimum number of H2 for the «На странице» card. */
 const MIN_TOC_ITEMS = 2;
 
-export function SubpageArticle({ sections }: { sections: readonly ArticleSectionData[] }) {
+export function SubpageArticle({
+  sections,
+  toc: withToc = true,
+}: {
+  sections: readonly ArticleSectionData[];
+  /** «На странице» card (from two H2 up); off — the content takes the full width («Клиентам»). */
+  toc?: boolean | undefined;
+}) {
   if (sections.length === 0) return null;
   const toc = sections.flatMap((section) => (section.heading ? [section.heading] : []));
-  const showToc = toc.length >= MIN_TOC_ITEMS;
+  const showToc = withToc && toc.length >= MIN_TOC_ITEMS;
 
   return (
     <div className="mx-auto w-full max-w-[1920px]" data-testid="subpage-article">

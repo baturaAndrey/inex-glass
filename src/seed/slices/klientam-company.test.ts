@@ -12,6 +12,8 @@ import {
   FURNITURE,
   HUB,
   KLIENTAM_COMPANY_PAGES,
+  KLIENTAM_MOCKUP_COPY,
+  stepLine,
   TEAM,
   type PageEntry,
 } from "../content/klientam-company";
@@ -70,6 +72,7 @@ const VERBATIM: Array<[string, string | null, string[]]> = [
       ...HUB.columns,
       ...HUB.rows.flatMap((row) => [`${row.segment} → ${HUB.moreLabel}`, row.task, row.take]),
       HUB.bridge,
+      ...KLIENTAM_MOCKUP_COPY,
     ],
   ],
   [
@@ -81,7 +84,7 @@ const VERBATIM: Array<[string, string | null, string[]]> = [
       ...CONTRACTORS.problems.columns,
       ...CONTRACTORS.problems.rows.map((cells) => cells.join(" | ")),
       CONTRACTORS.start.heading,
-      ...lines(CONTRACTORS.start.markdown),
+      ...CONTRACTORS.start.steps.map(stepLine),
       CONTRACTORS.secondaryLabel,
     ],
   ],
@@ -118,7 +121,7 @@ const VERBATIM: Array<[string, string | null, string[]]> = [
       DESIGNERS.solutions.columns.join(" | "),
       ...DESIGNERS.solutions.rows.map((cells) => cells.join(" | ")),
       DESIGNERS.process.heading,
-      ...lines(DESIGNERS.process.markdown),
+      ...DESIGNERS.process.steps.map(stepLine),
       DESIGNERS.secondaryLabel,
     ],
   ],
@@ -150,6 +153,9 @@ const edgeApproved = new Set(EDGE_APPROVED);
 /** Installation wording decided by the client on 2026-11-09 (site-wide): not in teksty. */
 const montageApproved = new Set<string>([HUB.bridge]);
 
+/** Mockup wording of 2026-11 (`KLIENTAM_MOCKUP_COPY`), pending approval: not in teksty. */
+const mockupCopy = new Set<string>(KLIENTAM_MOCKUP_COPY);
+
 /** All visible copy of a page for the stop-word and bracket checks. */
 const PAGE_TEXT: Record<string, string> = Object.fromEntries(
   VERBATIM.map(([pagePath, , strings]) => [pagePath, stripLinks(strings.join("\n"))])
@@ -163,7 +169,9 @@ describe("klientam-company content: verbatim teksty", () => {
   for (const [pagePath, source, strings] of VERBATIM) {
     it.skipIf(source === null)(`${pagePath}: every string is from teksty`, () => {
       const missing = strings
-        .filter((text) => !edgeApproved.has(text) && !montageApproved.has(text))
+        .filter(
+          (text) => !edgeApproved.has(text) && !montageApproved.has(text) && !mockupCopy.has(text)
+        )
         .filter((text) => !source?.includes(normalize(text)));
       expect(missing).toEqual([]);
     });
@@ -248,6 +256,20 @@ describe("klientam-company pages", () => {
         expect(page.path).toBe(`/${page.slug}/`);
       }
       seen.add(page.path);
+    }
+  });
+
+  it("the «Монтаж» panel text is the hub bridge without its inline inex.su link", () => {
+    const [bridgeText] = HUB.bridge.split(" → ");
+    expect(HUB.montage.text).toBe(`${bridgeText}.`);
+    expect(HUB.montage.href).toBe("https://inex.su/");
+  });
+
+  it("every segment page and the hub have their own hero photo", () => {
+    const files = [HUB, CONTRACTORS, FURNITURE, DEVELOPERS, DESIGNERS].map((s) => s.heroImage.file);
+    expect(new Set(files).size).toBe(files.length);
+    for (const file of files) {
+      expect(existsSync(path.join(ROOT, "src", "seed", "media", "clients", file))).toBe(true);
     }
   });
 

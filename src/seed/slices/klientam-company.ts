@@ -5,9 +5,11 @@ import type {
   LinkListBlock,
   Page,
   RichTextBlock,
+  StepsBlock,
   TableBlock,
 } from "@/payload-types";
 import {
+  CLIENTS_MEDIA_GROUP,
   COMPANY,
   CONTACTS,
   CONTRACTORS,
@@ -16,11 +18,14 @@ import {
   FURNITURE,
   HUB,
   TEAM,
+  type ClientsImage,
   type PageEntry,
+  type StepContent,
   type TableContent,
 } from "../content/klientam-company";
 import { upsertByPath } from "../context";
 import { markdown, paragraphs } from "../lexical";
+import { ensureSeedImage } from "../seed-media";
 import type { SeedContext } from "../context";
 import type { LexicalState } from "../lexical";
 
@@ -28,6 +33,12 @@ import type { LexicalState } from "../lexical";
  * Seed slice «klientam-company» (task 29): `/klientam/` + 4 segment pages, `/o-kompanii/`,
  * `/o-kompanii/sotrudniki/`, `/kontakty/` — layout, SEO, crumb labels. Copy lives in
  * `../content/klientam-company.ts` (verbatim teksty, see the tests).
+ *
+ * The «Клиентам» pages (template `segment`) follow the Paper mockups `2560_klientam` and
+ * `2560_klientam_podryadchikam` (2026-11, `@/components/clients`): the hero carries the photo
+ * of `src/seed/media/clients/` (the hub cards reuse the segment heroes), numbered lists are
+ * `steps` blocks, the closing `{условия}` line is a headless rich text (the info note), and a
+ * `form` block configures the drawing-form panel at the bottom.
  *
  * Contacts, requisites and the team are NOT seeded here: the globals belong to the globals seed
  * (task 16, SSoT values) and the team starts empty. The slice owns the full content of its pages,
@@ -63,13 +74,43 @@ const drawingButton = (label: string, params: Record<string, string> = {}): Hero
   formParams: { label, ...params },
 });
 
-const hero = (lead: string, buttons: HeroButton[], opts: { terms?: boolean } = {}): HeroBlock => ({
+const hero = (
+  lead: string,
+  buttons: HeroButton[],
+  opts: { terms?: boolean; image?: string } = {}
+): HeroBlock => ({
   blockType: "hero",
   variant: "ctHero",
   lead: paragraphs(lead),
   buttons,
   showTerms: opts.terms ?? true,
   termsMode: "full",
+  ...(opts.image ? { image: opts.image } : {}),
+});
+
+/** Media id of a section photo (uploaded on the first run, then reused). */
+const clientsImage = (ctx: SeedContext, image: ClientsImage) =>
+  ensureSeedImage(ctx, { group: CLIENTS_MEDIA_GROUP, ...image });
+
+/** Numbered step cards (teksty «1. …»); a trailing «→ [link]» is the step link. */
+const steps = (heading: string, items: readonly StepContent[]): StepsBlock => ({
+  blockType: "steps",
+  variant: "horizontal",
+  heading,
+  items: items.map((item) => ({
+    title: item.title,
+    ...(item.link
+      ? { linkLabel: item.link.label, link: { type: "custom", url: item.link.href } }
+      : {}),
+  })),
+});
+
+/** Configures the drawing-form panel closing every «Клиентам» page. */
+const drawingForm = (params: Record<string, string>): FormBlock => ({
+  blockType: "form",
+  formKey: "drawing",
+  variant: "page",
+  params,
 });
 
 const richText = (content: LexicalState, heading?: string): RichTextBlock => ({
@@ -89,20 +130,6 @@ const table = ({ heading, columns, rows }: TableContent): TableBlock => ({
     columns: columns.map((label) => ({ label })),
     rows: rows.map((cells) => ({ cells: cells.map((value) => ({ value })) })),
   },
-});
-
-/** Section with body text and the closing buttons (teksty: «{условия}» + [buttons]). */
-const ctaSection = (
-  heading: string | null,
-  body: LexicalState,
-  buttons: HeroButton[]
-): CtaBlock => ({
-  blockType: "cta",
-  variant: "buttons",
-  tone: "light",
-  heading,
-  body,
-  buttons,
 });
 
 /** One line with a trailing link («Двери, лестницы и монтаж → Перейти на inex.su»). */
@@ -151,7 +178,10 @@ function pageData(
   };
 }
 
-/** Hub: segments table with «Подробнее» links (cards on phones) and the inex.su bridge. */
+/**
+ * Hub: hero with the terms checklist, the segments table (rendered as photo cards — the photos
+ * are the segment heroes), the dark «Монтаж» panel with the inex.su button, the drawing form.
+ */
 async function hubLayout(ctx: SeedContext): Promise<LayoutBlock[]> {
   const drawing = drawingButton("Отправить чертёж", { source: HUB.drawingSource });
   const hubTable: TableBlock = {
@@ -173,67 +203,87 @@ async function hubLayout(ctx: SeedContext): Promise<LayoutBlock[]> {
       })),
     },
   };
+  const montage: CtaBlock = {
+    blockType: "cta",
+    variant: "banner",
+    tone: "primaryDark",
+    title: HUB.montage.heading,
+    body: paragraphs(HUB.montage.text),
+    buttons: [
+      {
+        label: HUB.montage.linkLabel,
+        kind: "link",
+        variant: "secondary",
+        link: { type: "custom", url: HUB.montage.href },
+      },
+    ],
+  };
   return [
-    hero(HUB.lead, [quizButton(), drawing]),
+    hero(HUB.lead, [quizButton(), drawing], { image: await clientsImage(ctx, HUB.heroImage) }),
     hubTable,
-    // teksty: the inex.su paragraph, then [Рассчитать стоимость] [Отправить чертёж].
-    ctaSection(null, await markdown(ctx, HUB.bridge), [quizButton(), drawing]),
+    montage,
+    // teksty: [Рассчитать стоимость] [Отправить чертёж] — the hero buttons and the form panel.
+    drawingForm({ source: HUB.drawingSource }),
   ];
+}
+
+type Segment = typeof CONTRACTORS | typeof FURNITURE | typeof DEVELOPERS | typeof DESIGNERS;
+
+/**
+ * Hero of a segment page: its photo, no terms checklist (the closing note carries the
+ * conditions), «Рассчитать стоимость» + the page's «Отправить …» button.
+ */
+async function segmentHero(ctx: SeedContext, s: Segment): Promise<HeroBlock> {
+  const buttons = [quizButton(), drawingButton(s.secondaryLabel)];
+  return hero(s.lead, buttons, { terms: false, image: await clientsImage(ctx, s.heroImage) });
+}
+
+/**
+ * The closing «{условия} · {акция_текст}» line as a headless rich text (the info note), then the
+ * drawing-form panel (lead caption = the page's button label).
+ */
+async function segmentClosing(ctx: SeedContext, s: Segment): Promise<LayoutBlock[]> {
+  return [richText(await markdown(ctx, s.closing)), drawingForm({ label: s.secondaryLabel })];
 }
 
 async function contractorsLayout(ctx: SeedContext): Promise<LayoutBlock[]> {
   const s = CONTRACTORS;
-  const buttons = [quizButton(), drawingButton(s.secondaryLabel)];
   return [
-    hero(s.lead, buttons),
+    await segmentHero(ctx, s),
     table(s.problems),
-    ctaSection(
-      s.start.heading,
-      await markdown(ctx, `${s.start.markdown}\n\n${s.closing}`),
-      buttons
-    ),
+    steps(s.start.heading, s.start.steps),
+    ...(await segmentClosing(ctx, s)),
   ];
 }
 
 async function furnitureLayout(ctx: SeedContext): Promise<LayoutBlock[]> {
   const s = FURNITURE;
-  const buttons = [quizButton(), drawingButton(s.secondaryLabel)];
   return [
-    hero(s.lead, buttons),
+    await segmentHero(ctx, s),
     richText(await markdown(ctx, s.series.markdown), s.series.heading),
-    ctaSection(
-      s.types.heading,
-      await markdown(ctx, `${s.types.markdown}\n\n${s.closing}`),
-      buttons
-    ),
+    richText(await markdown(ctx, s.types.markdown), s.types.heading),
+    ...(await segmentClosing(ctx, s)),
   ];
 }
 
 async function developersLayout(ctx: SeedContext): Promise<LayoutBlock[]> {
   const s = DEVELOPERS;
-  const buttons = [quizButton(), drawingButton(s.secondaryLabel)];
   return [
-    hero(s.lead, buttons),
+    await segmentHero(ctx, s),
     richText(await markdown(ctx, s.benefits.markdown), s.benefits.heading),
-    ctaSection(
-      s.objects.heading,
-      await markdown(ctx, `${s.objects.markdown}\n\n${s.closing}`),
-      buttons
-    ),
+    richText(await markdown(ctx, s.objects.markdown), s.objects.heading),
+    ...(await segmentClosing(ctx, s)),
   ];
 }
 
 async function designersLayout(ctx: SeedContext): Promise<LayoutBlock[]> {
   const s = DESIGNERS;
-  const buttons = [quizButton(), drawingButton(s.secondaryLabel)];
   return [
-    hero(s.lead, buttons),
+    await segmentHero(ctx, s),
+    // Cells carry links and arrows: a rich-text table (the `table` block has one link per cell).
     richText(await markdown(ctx, markdownTable(s.solutions)), s.solutions.heading),
-    ctaSection(
-      s.process.heading,
-      await markdown(ctx, `${s.process.markdown}\n\n${s.closing}`),
-      buttons
-    ),
+    steps(s.process.heading, s.process.steps),
+    ...(await segmentClosing(ctx, s)),
   ];
 }
 
@@ -303,8 +353,8 @@ export async function seed(ctx: SeedContext): Promise<void> {
     ids.set(entry.path, doc.id);
   };
 
-  // Commercial segment pages close with their own «{условия}» line and buttons, so the frame's
-  // «Условия» section and quiz CTA would repeat them.
+  // Commercial segment pages close with their own «{условия}» line and the form panel, so the
+  // frame's «Условия» section and quiz CTA would repeat them (the template renders neither).
   const segmentFrame: Partial<PageData> = { hideConditions: true, hideQuizCta: true };
 
   await write(HUB.page, await hubLayout(ctx), { hideQuizCta: true });
