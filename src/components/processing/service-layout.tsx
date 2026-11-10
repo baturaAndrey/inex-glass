@@ -130,6 +130,7 @@ function figureOf(block: AboutPanel | null, ctx: PlaceholderContext): AboutFigur
     caption: fill(item.caption, ctx) || media.caption || "",
     width: media.width ?? FALLBACK_SIZE.width,
     height: media.height ?? FALLBACK_SIZE.height,
+    photo: media.kind === "photo",
   };
 }
 
@@ -155,12 +156,17 @@ function tableOf(block: AboutPanel | null, ctx: PlaceholderContext): AboutTableD
 }
 
 function toUseCases(block: BlockOf<"cards">, ctx: PlaceholderContext) {
-  return (block.items ?? []).map((item, index) => ({
-    key: item.id ?? String(index),
-    title: fill(item.title, ctx),
-    text: fill(item.text, ctx),
-    href: resolveLink(item.link)?.href ?? null,
-  }));
+  return (block.items ?? []).map((item, index) => {
+    const media = asMedia(item.image);
+    const src = media ? mediaSrc(media) : null;
+    return {
+      key: item.id ?? String(index),
+      title: fill(item.title, ctx),
+      text: fill(item.text, ctx),
+      href: resolveLink(item.link)?.href ?? null,
+      photo: media && src ? { src, alt: media.alt?.trim() ?? "" } : null,
+    };
+  });
 }
 
 const anchorOf = (block: { anchorId?: string | null }) =>

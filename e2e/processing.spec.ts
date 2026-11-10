@@ -278,10 +278,19 @@ test.describe("processing pages", () => {
     await expect(about.locator("figcaption")).toHaveText("Сечение края с фацетом");
     await expect(about.locator("figure img")).toHaveAttribute("alt", /Схема сечения края/);
 
-    // use-cases: 6 numbered cards.
+    // use-cases: 6 numbered photo cards (number, title, text over the photo).
     const useCases = page.getByTestId("processing-use-cases");
     await expect(useCases.getByRole("heading", { level: 2 })).toHaveText("Где применяют");
-    await expect(useCases.getByTestId("processing-use-case")).toHaveCount(6);
+    const useCaseItems = useCases.getByTestId("processing-use-case");
+    await expect(useCaseItems).toHaveCount(6);
+    await expect(useCases.locator('[data-testid="processing-use-case"][data-photo]')).toHaveCount(
+      6
+    );
+    await expect(useCaseItems.first().locator("img")).toHaveAttribute(
+      "alt",
+      "Зеркальная стена танцевального зала из полотен с фацетом"
+    );
+    await expect(useCaseItems.first()).toContainText("01");
     await expect(useCases.getByRole("heading", { level: 3 }).last()).toHaveText("Кухни");
 
     // callout: the trailing link of the text is the button.
@@ -397,6 +406,48 @@ test.describe("holes calculator", () => {
     await expect
       .poll(async () => (await goals(page)).filter((goal) => goal.name === "calc_holes"))
       .toEqual([{ name: "calc_holes", params: { thickness: 4, source: "otverstiya-i-vyrezy" } }]);
+  });
+
+  test("matirovanie: the about panel is a photo of the variants, no zoom", async ({ page }) => {
+    await open(page, "/obrabotka-stekla/matirovanie/");
+    const figure = page.getByTestId("processing-about").locator("figure");
+    await expect(figure.locator("figcaption")).toHaveText("Варианты матирования");
+    const image = figure.locator("img");
+    await expect(image).toHaveCount(1);
+    await expect(image).toHaveAttribute("alt", /^Четыре стеклянные панели/);
+    await expect(figure.getByRole("button")).toHaveCount(0);
+    // The photo fills the panel width (a 4:3 frame), not a thumbnail.
+    await image.scrollIntoViewIfNeeded();
+    const [imageBox, figureBox] = [await image.boundingBox(), await figure.boundingBox()];
+    expect(imageBox!.width).toBeGreaterThan(figureBox!.width * 0.8);
+    expect(imageBox!.width / imageBox!.height).toBeCloseTo(4 / 3, 1);
+
+    // «Что можно сделать»: six photo cards.
+    const cards = page.locator('[data-testid="processing-use-case"][data-photo]');
+    await expect(cards).toHaveCount(6);
+    if ((page.viewportSize()?.width ?? 0) <= 375) await noHorizontalScroll(page);
+  });
+
+  test("holes page: the tolerance table card ends level with its neighbours", async ({ page }) => {
+    await open(page, HOLES_PATH);
+    const info = page.getByTestId("processing-info");
+    await info.scrollIntoViewIfNeeded();
+    const tableCard = info
+      .getByRole("group", { name: "Допуски диаметра" })
+      .locator("table")
+      .locator("xpath=..");
+    const noteCard = info
+      .getByRole("group", { name: "Как указать в чертеже" })
+      .locator("div.bg-surface")
+      .last();
+    const [table, note] = [await tableCard.boundingBox(), await noteCard.boundingBox()];
+    if ((page.viewportSize()?.width ?? 0) >= 1366) {
+      // Three panels in a row: the white cards share the bottom line.
+      expect(Math.abs(table!.y + table!.height - (note!.y + note!.height))).toBeLessThanOrEqual(2);
+    } else {
+      // Stacked panels keep their natural height: the table card does not grow.
+      expect(table!.height).toBeLessThan(400);
+    }
   });
 
   test("holes page: diameter tolerances as a two-column panel table, no FAQ", async ({ page }) => {

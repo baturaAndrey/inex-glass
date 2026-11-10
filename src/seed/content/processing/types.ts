@@ -43,6 +43,11 @@ export interface UseCaseSeed {
   text?: string;
   /** Internal path: the whole card links there (no visual change but the hover lift). */
   href?: string;
+  /**
+   * Background photo of the card (`cards/<slug>-<n>.webp`, 4:3). With photos the block renders
+   * as photo cards (like the constructions hub cards), without them as plain numbered cards.
+   */
+  image?: ImageSeed;
 }
 
 export type LayoutSeed =

@@ -216,13 +216,23 @@ describe("processing content rules", () => {
     expect(text).not.toMatch(/30 (?:и|или) 50 мм|до 30 мм/);
   });
 
-  it("every service, figure and the hub hero have an image with a Russian alt", () => {
+  it("every service, figure, card and the hub hero have an image with a Russian alt", () => {
     const figures = SERVICES.flatMap((service) =>
       service.layout.flatMap((block) =>
         block.blockType === "richText" && block.figure ? [block.figure.image] : []
       )
     );
-    const images = [HUB.heroImage, ...SERVICES.map((service) => service.image), ...figures];
+    const cards = SERVICES.flatMap((service) =>
+      service.layout.flatMap((block) => (block.blockType === "cards" ? block.items : []))
+    );
+    // Every use-case card of a service has its photo (client request 2026-11-10).
+    for (const card of cards) expect(card.image, card.title).toBeDefined();
+    const images = [
+      HUB.heroImage,
+      ...SERVICES.map((service) => service.image),
+      ...figures,
+      ...cards.flatMap((card) => (card.image ? [card.image] : [])),
+    ];
     for (const image of images) {
       expect(image.alt).toMatch(/[А-Яа-яЁё]/);
       expect(existsSync(join(MEDIA_DIR, image.file)), image.file).toBe(true);

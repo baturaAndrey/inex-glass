@@ -143,20 +143,26 @@ async function layoutBlocks(ctx: SeedContext, seed: LayoutSeed): Promise<LayoutB
           ...(seed.note ? { note: seed.note } : {}),
         },
       ];
-    case "cards":
+    case "cards": {
+      const items = [];
+      for (const item of seed.items) {
+        items.push({
+          title: item.title,
+          ...(item.text ? { text: item.text } : {}),
+          ...(item.href ? { link: { type: "custom" as const, url: item.href } } : {}),
+          ...(item.image ? { image: await imageId(ctx, item.image) } : {}),
+        });
+      }
       return [
         {
           blockType: "cards",
           heading: seed.heading,
           ...(seed.sub ? { sub: seed.sub } : {}),
           layout: seed.columns === 4 ? "g4" : "g3",
-          items: seed.items.map((item) => ({
-            title: item.title,
-            ...(item.text ? { text: item.text } : {}),
-            ...(item.href ? { link: { type: "custom" as const, url: item.href } } : {}),
-          })),
+          items,
         },
       ];
+    }
     case "twoColumns":
       return [
         {

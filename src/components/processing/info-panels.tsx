@@ -161,15 +161,22 @@ const CELL =
  * text value on phones): a row stays on one line.
  * Panel tables are short (2–3 columns), so phones keep the same layout instead of the site
  * table's cards. A first row of header cells is the `<thead>`.
+ *
+ * `stretch`: the table closes its panel (nothing after it), so the card grows to the panel
+ * bottom and the rows share the extra height — next to panels that end with a note card, all
+ * three white cards then end on one line (client request 2026-11-10, «Допуски диаметра»).
+ * Stacked panels (≤1365 px) keep their natural height, so nothing grows there.
  */
 function PanelTable({
   node,
   data,
   ctx,
+  stretch = false,
 }: {
   node: LexicalNode;
   data: RichTextData;
   ctx: PlaceholderContext;
+  stretch?: boolean | undefined;
 }) {
   const rows = childrenOf(node).filter((row) => row.type === "tablerow");
   const [first, ...rest] = rows;
@@ -185,8 +192,19 @@ function PanelTable({
   );
 
   return (
-    <div className="bg-surface shadow-card rounded-lg px-6 py-2 max-sm:px-4">
-      <table className="w-full border-collapse">
+    <div
+      className={cn(
+        "bg-surface shadow-card rounded-lg px-6 py-2 max-sm:px-4",
+        stretch && "flex flex-1 flex-col"
+      )}
+    >
+      <table
+        className={cn(
+          "w-full border-collapse",
+          // Stretched rows are tall: the row content sits in the middle of its band.
+          stretch && "flex-1 [&_tbody_td]:align-middle [&_tbody_th]:align-middle"
+        )}
+      >
         {hasHeader ? (
           <thead>
             <tr className="border-hairline border-b">
@@ -284,6 +302,8 @@ export interface InfoPanelCardProps {
 /** One panel (heading, rich text, note cards); `InfoPanels` lays several of them out. */
 export function InfoPanelCard({ panel, ctx, width = "triple", className }: InfoPanelCardProps) {
   const { segments, notes } = splitPanel(panel.body);
+  // A table that closes the panel stretches to its bottom (`PanelTable`, `stretch`).
+  const stretchTable = notes.length === 0 && segments.at(-1)?.kind === "table";
   return (
     <div
       className={cn(PANEL_SHELL, PANEL_WIDTH[width], className)}
@@ -302,12 +322,18 @@ export function InfoPanelCard({ panel, ctx, width = "triple", className }: InfoP
         </h2>
       ) : null}
       {segments.length > 0 ? (
-        <div className={cn(BODY, panel.lead && LEAD)}>
+        <div className={cn(BODY, panel.lead && LEAD, stretchTable && "flex-1")}>
           {segments.map((segment, index) =>
             segment.kind === "text" ? (
               <RichText key={index} data={segment.data} ctx={ctx} disableContainer />
             ) : (
-              <PanelTable key={index} node={segment.node} data={segment.data} ctx={ctx} />
+              <PanelTable
+                key={index}
+                node={segment.node}
+                data={segment.data}
+                ctx={ctx}
+                stretch={stretchTable && index === segments.length - 1}
+              />
             )
           )}
         </div>

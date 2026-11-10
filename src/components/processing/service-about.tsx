@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Container } from "@/components/ig/container";
 import { RichText, type RichTextData } from "@/components/rich-text/rich-text";
 import type { PlaceholderContext } from "@/lib/domain";
@@ -23,6 +24,11 @@ export interface AboutFigure {
   caption: string;
   width: number;
   height: number;
+  /**
+   * A photo (`media.kind: "photo"`), not a diagram: it covers the panel in a 4:3 frame with
+   * rounded corners and has no zoom (nothing small to read in it).
+   */
+  photo?: boolean | undefined;
 }
 
 export interface ServiceAboutProps {
@@ -38,6 +44,9 @@ export interface ServiceAboutProps {
 
 /** The figure column: 962 of 1780 px at 1920, half of the content below; full width ≤1100. */
 const FIGURE_SIZES = "(max-width: 599px) 600px, (max-width: 1100px) 100vw, 50vw";
+
+/** A photo needs no 2x zoom margin on phones: the panel width is enough. */
+const PHOTO_SIZES = "(max-width: 1100px) 100vw, 50vw";
 
 /**
  * Text typography over the `RichText` output: paragraphs 18 px, lists 16 px with 8 px teal dots
@@ -58,14 +67,26 @@ function Figure({ figure }: { figure: AboutFigure }) {
       <figcaption className="text-micro text-text-2 tracking-[0.06em] uppercase">
         {figure.caption}
       </figcaption>
-      <DiagramZoom
-        src={figure.src}
-        alt={figure.alt}
-        caption={figure.caption}
-        width={figure.width}
-        height={figure.height}
-        sizes={FIGURE_SIZES}
-      />
+      {figure.photo ? (
+        <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+          <Image
+            src={figure.src}
+            alt={figure.alt}
+            fill
+            sizes={PHOTO_SIZES}
+            className="object-cover"
+          />
+        </div>
+      ) : (
+        <DiagramZoom
+          src={figure.src}
+          alt={figure.alt}
+          caption={figure.caption}
+          width={figure.width}
+          height={figure.height}
+          sizes={FIGURE_SIZES}
+        />
+      )}
     </figure>
   );
 }

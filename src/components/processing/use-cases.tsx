@@ -1,14 +1,22 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ig/container";
 import { cn } from "@/lib/utils";
 
 /**
  * «use-cases» of a service page (Paper mockup `2560_service_facet`, «Где применяют»): H2 with
- * the sub on the right, then numbered white cards — a big pale number, a 24 px title, the text.
+ * the sub on the right, then numbered cards.
  *
- * Source: a `cards` block of the service layout (`heading`, `sub`, items `title` / `text`, an
- * optional `link` making the whole card a link). Layout `g3` → 3 in a row (the facet's 6 cards in
- * two rows), `g4` → 4 in a row; 2 ≤1100 px, 1 ≤599 px.
+ * Source: a `cards` block of the service layout (`heading`, `sub`, items `title` / `text` /
+ * `image`, an optional `link` making the whole card a link). Layout `g3` → 3 in a row (the
+ * facet's 6 cards in two rows), `g4` → 4 in a row (2 ≤1365 px); 2 ≤1100 px, 1 ≤599 px.
+ *
+ * Two looks, chosen per block:
+ * - **photo cards** (any item has an `image`; processing services, client request 2026-11-10):
+ *   the photo covers the card like the cards of the constructions hub (`HubCard`, mockup
+ *   `2560_steklyannye-konstrukcii`) — a page-colour mist from the bottom, the title and the text
+ *   on it, the number on a white chip in the top-left corner (reads on any photo);
+ * - **plain cards** (no images; glass types): white cards with a big pale number.
  */
 
 export interface UseCase {
@@ -16,6 +24,8 @@ export interface UseCase {
   title: string;
   text: string;
   href: string | null;
+  /** Background photo of the card; `null` — no photo (plain card, or the well colour). */
+  photo?: { src: string; alt: string } | null | undefined;
 }
 
 export interface UseCasesProps {
@@ -32,8 +42,29 @@ const COLUMNS = {
   4: "grid-cols-4 max-lg:grid-cols-2",
 } as const;
 
-const CARD =
+/** Photo width per column count (mirrors `COLUMNS`; content is 1780 px wide at 1920). */
+const PHOTO_SIZES = {
+  3: "(max-width: 599px) 100vw, (max-width: 1100px) 50vw, (min-width: 1920px) 600px, 33vw",
+  4: "(max-width: 599px) 100vw, (max-width: 1365px) 50vw, (min-width: 1920px) 450px, 25vw",
+} as const;
+
+const PLAIN_CARD =
   "bg-surface border-hairline flex h-full w-full flex-col gap-4 rounded-xl border p-8 max-lg:p-6 max-sm:gap-3 max-sm:p-5";
+
+/**
+ * Photo card: the constructions-hub card (24 px radius, 1 px line border, text at the bottom),
+ * 440 px tall at desktop like there, a little lower on narrower screens.
+ */
+const PHOTO_CARD =
+  "border-line bg-well text-text relative isolate flex h-full min-h-[440px] w-full flex-col justify-between gap-6 overflow-hidden rounded-xl border p-[clamp(20px,1.67vw,32px)] max-lg:min-h-[400px] max-sm:min-h-[360px]";
+
+/**
+ * Page-colour mist over the lower part of the photo (constructions hub: transparent at 30–40 %
+ * → ~90 %). The texts here run to three lines, so the mist is dense from 62 % on: the title and
+ * the text sit on ≥90 % page colour and stay AA on any photo.
+ */
+const MIST =
+  "bg-[linear-gradient(180deg,transparent_30%,color-mix(in_oklab,var(--ig-bg)_90%,transparent)_62%,color-mix(in_oklab,var(--ig-bg)_96%,transparent)_100%)]";
 
 /** Link cards lift on hover (DESIGN §8); the reduced-motion setting keeps them still. */
 const LINK_CARD =
@@ -42,7 +73,7 @@ const LINK_CARD =
 /** «01», «02», … */
 const number = (index: number) => String(index + 1).padStart(2, "0");
 
-function CardBody({ item, index }: { item: UseCase; index: number }) {
+function PlainCardBody({ item, index }: { item: UseCase; index: number }) {
   return (
     <>
       {/* The list already tells the order; the pale number is decoration. */}
@@ -55,8 +86,47 @@ function CardBody({ item, index }: { item: UseCase; index: number }) {
   );
 }
 
+function PhotoCardBody({ item, index, sizes }: { item: UseCase; index: number; sizes: string }) {
+  return (
+    <>
+      {item.photo ? (
+        <Image
+          src={item.photo.src}
+          alt={item.photo.alt}
+          fill
+          sizes={sizes}
+          className="-z-20 object-cover"
+        />
+      ) : null}
+      <span aria-hidden="true" className={cn("absolute inset-0 -z-10", MIST)} />
+      {/* The list already tells the order; the number is decoration. */}
+      <span
+        aria-hidden="true"
+        className="bg-surface text-primary-dark shadow-card text-small self-start rounded-full px-3 py-1 font-semibold tabular-nums"
+      >
+        {number(index)}
+      </span>
+      <span className="flex flex-col gap-3 max-sm:gap-2">
+        <h3 className="text-h4 text-text m-0 text-balance">{item.title}</h3>
+        {item.text ? (
+          <span className="text-body text-ink-2 max-w-[420px] text-pretty">{item.text}</span>
+        ) : null}
+      </span>
+    </>
+  );
+}
+
 export function UseCases({ heading, headingId, sub, items, columns, anchorId }: UseCasesProps) {
   if (items.length === 0) return null;
+  const withPhotos = items.some((item) => item.photo);
+  const cardClass = withPhotos ? PHOTO_CARD : PLAIN_CARD;
+  const body = (item: UseCase, index: number) =>
+    withPhotos ? (
+      <PhotoCardBody item={item} index={index} sizes={PHOTO_SIZES[columns]} />
+    ) : (
+      <PlainCardBody item={item} index={index} />
+    );
+
   return (
     <section
       id={anchorId}
@@ -78,15 +148,18 @@ export function UseCases({ heading, headingId, sub, items, columns, anchorId }: 
           )}
         >
           {items.map((item, index) => (
-            <li key={item.key} className="flex" data-testid="processing-use-case">
+            <li
+              key={item.key}
+              className="flex"
+              data-testid="processing-use-case"
+              data-photo={withPhotos && item.photo ? "" : undefined}
+            >
               {item.href ? (
-                <Link href={item.href} className={cn(CARD, LINK_CARD)}>
-                  <CardBody item={item} index={index} />
+                <Link href={item.href} className={cn(cardClass, LINK_CARD)}>
+                  {body(item, index)}
                 </Link>
               ) : (
-                <div className={CARD}>
-                  <CardBody item={item} index={index} />
-                </div>
+                <div className={cardClass}>{body(item, index)}</div>
               )}
             </li>
           ))}
