@@ -257,6 +257,35 @@ export const ARTICLES: readonly ArticleSeed[] = [
 
 export const articlePath = (slug: string) => `${BLOG_PATH}${slug}/`;
 
+/** Folder of the article covers under `src/seed/media/`. */
+export const BLOG_MEDIA_GROUP = "blog";
+
+/**
+ * Covers of the articles (`src/seed/media/blog/<slug>.webp`, 1920 px, 16:9; Paper mockups
+ * `2560_blog` / `2560_blog_statya`): the hero image of the article page and the image of its card.
+ * Real pictures, not generated placeholders — `scripts/attach-generated-media.ts` never replaces
+ * them. Alt texts describe the photo.
+ */
+export const ARTICLE_COVER_ALTS: Readonly<Record<string, string>> = {
+  "mozhno-li-rezat-zakalennoe-steklo": "Лист стекла и стеклорез на столе в цехе",
+  "chem-otlichaetsya-zakalennoe-steklo-ot-obychnogo":
+    "Длинные острые осколки обычного стекла рядом с мелкими тупыми осколками закалённого",
+  "kak-vybrat-tolshchinu-stekla": "Стопка образцов стекла разной толщины на столе",
+  "kak-snyat-razmery-dlya-stekla":
+    "Рулетка вдоль кромки стеклянной панели в готовом проёме с чистовой отделкой",
+  "tripleks-ili-zakalennoe-dlya-ograzhdenij":
+    "Стеклянные панели ограждения в торец: многослойный триплекс и однослойное закалённое стекло",
+  "markirovka-zakalennogo-stekla":
+    "Угол листа закалённого стекла с полированной кромкой и местом для заводского клейма",
+};
+
+/** Seed image of an article cover (`ensureSeedImage` input). */
+export function articleCover(slug: string): { group: string; file: string; alt: string } {
+  const alt = ARTICLE_COVER_ALTS[slug];
+  if (!alt) throw new Error(`blog seed: нет обложки статьи ${slug}`);
+  return { group: BLOG_MEDIA_GROUP, file: `${slug}.webp`, alt };
+}
+
 /** `[Название]` not followed by `(` — a link of teksty without a target yet. */
 const SOURCE_LINK = /\[([^\]]+)\](?!\()/g;
 

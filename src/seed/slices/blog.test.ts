@@ -4,7 +4,13 @@ import { describe, expect, it } from "vitest";
 import { paragraphMarkdown, WEIGHT_PAGE_COPY } from "@/components/calculators/weight-copy";
 import { estimateReadingMinutes } from "@/lib/blog/reading-time";
 import { checkStopWords } from "@/lib/domain/stop-words";
-import { ARTICLES, articleMarkdown, BLOG_LISTING, WEIGHT_TOOL_PAGE } from "../content/blog";
+import {
+  ARTICLES,
+  articleCover,
+  articleMarkdown,
+  BLOG_LISTING,
+  WEIGHT_TOOL_PAGE,
+} from "../content/blog";
 import { ARTICLE_TEXTS } from "../content/blog-texts";
 
 /**
@@ -148,6 +154,15 @@ describe("blog seed content", () => {
     for (const article of ARTICLES) {
       const { body } = articleMarkdown(article);
       expect(body).not.toMatch(/\[[^\]]+\](?!\()/);
+    }
+  });
+
+  it("ships a cover photo with a Russian alt for every article", () => {
+    const media = path.resolve(__dirname, "../media");
+    for (const article of ARTICLES) {
+      const cover = articleCover(article.slug);
+      expect(existsSync(path.join(media, cover.group, cover.file)), cover.file).toBe(true);
+      expect(cover.alt).toMatch(/[а-яё]/i);
     }
   });
 });

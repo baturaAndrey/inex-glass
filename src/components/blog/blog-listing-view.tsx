@@ -1,30 +1,42 @@
+import Link from "next/link";
+import { ArrowRight, Calculator, CircleDot, FileText } from "lucide-react";
 import { resolveLink, type ResolvedLink } from "@/components/blocks/shared";
 import type { BlockOf } from "@/components/blocks/types";
-import { Section } from "@/components/ig/section";
-import { TextLink } from "@/components/ig/text-link";
+import { FormTrigger } from "@/components/forms/form-trigger";
+import { Button } from "@/components/ig/button";
+import { ObjectsPagination } from "@/components/objects/objects-pagination";
 import { PageShell } from "@/components/page/page-shell";
+import { QuizLink } from "@/components/page/quiz-cta";
+import { ProcessingHero } from "@/components/processing/processing-hero";
 import { RichText } from "@/components/rich-text/rich-text";
 import type { ArticleSummary } from "@/lib/blog/articles";
-import { blogPageHref, pageSlice } from "@/lib/blog/pagination";
+import { blogPageHref, pageSlice, totalPages } from "@/lib/blog/pagination";
 import type { PlaceholderContext } from "@/lib/domain";
 import { buildBreadcrumbs } from "@/lib/seo/breadcrumbs";
 import { resolveH1 } from "@/lib/seo/metadata";
 import type { Page } from "@/payload-types";
-import { ARTICLE_GRID_CLASS, ArticleCard } from "./article-card";
-import { BlogPageTop } from "./blog-page-top";
-import { BlogPagination } from "./blog-pagination";
+import { ARTICLE_GRID_CLASS, ArticleCard, ArticleFeaturedCard } from "./article-card";
+import { BLOG_FORM_SOURCE, BlogFormPanel } from "./blog-form-panel";
 
 /**
- * Blog listing `/blog/` and `/blog/page/N/` (task 31, no prototype of its own: the article top
- * band + the card grid). The `pages` document `/blog/` (template `listing`) supplies the H1 / SEO,
- * the intro (its first `richText` block) and the tools links (its first `linkList` block); both are
- * shown on page 1 only.
+ * Blog listing `/blog/` and `/blog/page/N/`, restyled to the Paper mockup `2560_blog` (2026-11).
+ * One page background, no white header band:
+ * 1. hero — crumbs (PageShell), H1, the intro (first `richText` block of the `pages` document
+ *    `/blog/`, page 1 only) indented, «Рассчитать стоимость» + «Отправить чертёж»;
+ * 2. page 1: the newest article as the wide featured card, the rest in the 3-column grid;
+ *    pages 2+: every card in the grid; the round pager (shared with `/obekty/`);
+ * 3. page 1: «Инструменты» — the first `linkList` block as light-teal pills in a white panel;
+ * 4. cream block — the drawing-form panel.
  */
 
 type RichTextBlock = BlockOf<"richText">;
 type LinkListBlock = BlockOf<"linkList">;
 
+const HERO_TITLE_ID = "page-title";
 const TOOLS_HEADING_ID = "blog-tools";
+const FORM_HEADING_ID = "blog-form-title";
+/** Label of the hero's drawing-form button (teksty: «Отправить чертёж»). */
+const DRAWING_LABEL = "Отправить чертёж";
 
 function firstBlock<T extends "richText" | "linkList">(
   page: Page,
@@ -35,16 +47,13 @@ function firstBlock<T extends "richText" | "linkList">(
 
 function Intro({ block, ctx }: { block: RichTextBlock | undefined; ctx: PlaceholderContext }) {
   if (!block) return null;
-  return (
-    <RichText
-      data={block.content}
-      ctx={ctx}
-      className="text-ink-3 max-w-[820px] [&_p]:max-w-none [&_p]:text-[20px] [&_p]:leading-normal max-sm:[&_p]:text-[17px]"
-    />
-  );
+  return <RichText data={block.content} ctx={ctx} />;
 }
 
-/** «Инструменты:» — arrow links of the `linkList` block. */
+/** Icon of a tool pill: the calculator for the weight calculator, a target for the rest. */
+const toolIcon = (href: string) => (href.includes("kalkulyator") ? Calculator : CircleDot);
+
+/** «Инструменты» (mockup frame `GO6-0`): pills of the `linkList` block in a white panel. */
 function Tools({ block }: { block: LinkListBlock | undefined }) {
   const links = (block?.items ?? [])
     .map((item) => resolveLink(item.link))
@@ -53,25 +62,41 @@ function Tools({ block }: { block: LinkListBlock | undefined }) {
   const label = block.label?.trim() || block.heading?.trim() || "";
   return (
     <div
-      className="border-line mt-14 flex flex-wrap items-baseline gap-x-8 gap-y-3 border-t pt-8 max-sm:mt-10 max-sm:pt-6"
+      className="bg-surface border-hairline flex items-center gap-10 rounded-xl border px-10 py-8 max-md:flex-col max-md:items-start max-md:gap-5 max-sm:rounded-lg max-sm:p-5"
       data-testid="blog-tools"
     >
       {label ? (
-        <h2 id={TOOLS_HEADING_ID} className="ig-h5 m-0">
+        <h2 id={TOOLS_HEADING_ID} className="m-0 shrink-0 text-2xl leading-[1.25] font-semibold">
           {label}
         </h2>
       ) : null}
       <ul
         aria-labelledby={label ? TOOLS_HEADING_ID : undefined}
-        className="m-0 flex list-none flex-wrap gap-x-8 gap-y-3 p-0"
+        className="m-0 flex list-none flex-wrap gap-3 p-0 max-sm:w-full max-sm:flex-col"
       >
-        {links.map((link) => (
-          <li key={link.href}>
-            <TextLink href={link.href} variant="arrow">
-              {link.label}
-            </TextLink>
-          </li>
-        ))}
+        {links.map((link) => {
+          const Icon = toolIcon(link.href);
+          return (
+            <li key={link.href}>
+              <Link
+                href={link.href}
+                className="bg-primary-light text-primary-dark hover:bg-line-teal focus-visible:outline-brand flex min-h-14 items-center gap-3 rounded-full px-6 py-3 text-base leading-5 font-medium no-underline transition-colors duration-(--ig-dur-base) focus-visible:outline-2 focus-visible:outline-offset-2 max-sm:rounded-lg max-sm:px-5"
+              >
+                <Icon
+                  aria-hidden="true"
+                  strokeWidth={2}
+                  className="text-primary-pressed size-5 shrink-0"
+                />
+                <span className="text-pretty">{link.label}</span>
+                <ArrowRight
+                  aria-hidden="true"
+                  strokeWidth={2}
+                  className="text-primary-pressed size-[18px] shrink-0 max-sm:ml-auto"
+                />
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -91,23 +116,64 @@ export function BlogListingView({ doc, index, page, ctx }: BlogListingViewProps)
   const crumbs = buildBreadcrumbs(path, { lastLabel: doc.breadcrumbLabel || undefined });
   const articles = pageSlice(index, page);
   const isFirst = page === 1;
+  // Page 1 opens with the newest article as the wide card; later pages are grid only.
+  const featured = isFirst ? articles[0] : undefined;
+  const grid = featured ? articles.slice(1) : articles;
 
   return (
-    <PageShell path={path} breadcrumbs={crumbs} hideBreadcrumbs showConditions={false} quiz={false}>
-      <BlogPageTop crumbs={crumbs} title={title}>
-        {isFirst ? <Intro block={firstBlock(doc, "richText")} ctx={ctx} /> : null}
-      </BlogPageTop>
-      <Section variant="bg" aria-label={title}>
+    <PageShell path={path} breadcrumbs={crumbs} showConditions={false} quiz={false}>
+      <ProcessingHero
+        title={title}
+        titleId={HERO_TITLE_ID}
+        lead={isFirst ? <Intro block={firstBlock(doc, "richText")} ctx={ctx} /> : undefined}
+        actions={
+          <>
+            <QuizLink prefill={doc.quizPrefill} src={path} ctx={ctx} />
+            <FormTrigger
+              formKey="drawing"
+              params={{ label: DRAWING_LABEL, source: BLOG_FORM_SOURCE }}
+              asChild
+            >
+              <Button
+                variant="secondary"
+                size="l"
+                leftIcon={<FileText aria-hidden="true" strokeWidth={2} />}
+              >
+                {DRAWING_LABEL}
+              </Button>
+            </FormTrigger>
+          </>
+        }
+        indentActions
+        actionsGap="tight"
+      />
+
+      <section
+        aria-label={title}
+        className="mx-auto flex w-full max-w-[1920px] flex-col gap-8 px-(--ig-gutter) pt-6 pb-24 max-md:pb-[72px] max-sm:gap-6 max-sm:pt-2 max-sm:pb-12"
+      >
         <ul className={ARTICLE_GRID_CLASS} data-testid="article-list">
-          {articles.map((article) => (
+          {featured ? (
+            <li className="col-span-full flex">
+              <ArticleFeaturedCard article={featured} className="w-full" />
+            </li>
+          ) : null}
+          {grid.map((article) => (
             <li key={article.id} className="flex">
               <ArticleCard article={article} titleAs="h2" className="w-full" />
             </li>
           ))}
         </ul>
-        <BlogPagination current={page} total={index.length} className="mt-12 max-sm:mt-8" />
+        <ObjectsPagination
+          page={page}
+          totalPages={totalPages(index.length)}
+          hrefFor={blogPageHref}
+          className="mt-4 max-sm:mt-2"
+        />
         {isFirst ? <Tools block={firstBlock(doc, "linkList")} /> : null}
-      </Section>
+      </section>
+
+      <BlogFormPanel headingId={FORM_HEADING_ID} />
     </PageShell>
   );
 }

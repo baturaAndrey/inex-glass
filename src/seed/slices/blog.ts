@@ -4,6 +4,7 @@ import type { Article, Page } from "@/payload-types";
 import {
   ARTICLES,
   articleMarkdown,
+  articleCover,
   articlePath,
   BLOG_LISTING,
   BLOG_PATH,
@@ -21,6 +22,7 @@ import {
   upsertByPath,
 } from "../context";
 import { markdown, paragraphs } from "../lexical";
+import { ensureSeedImage } from "../seed-media";
 import type { SeedContext } from "../context";
 
 /**
@@ -152,6 +154,9 @@ async function seedArticle(ctx: SeedContext, article: ArticleSeed): Promise<Arti
   const date = seedDate(article.date);
   const where = { slug: { equals: article.slug } };
   const overwrite = await mayOverwrite(ctx, "articles", where, article.slug);
+  // Cover (hero of the article page + card image): a real seed photo, so the generated
+  // placeholders of `scripts/attach-generated-media.ts` never go over it.
+  const cover = await ensureSeedImage(ctx, articleCover(article.slug));
 
   const { doc, action } = await upsertByField(
     ctx,
@@ -170,6 +175,8 @@ async function seedArticle(ctx: SeedContext, article: ArticleSeed): Promise<Arti
       commercialLink: commercialLink(article),
       ctaCard: ctaCard(article),
       quizPrefill: { type: article.quizType },
+      heroImage: cover,
+      card: { image: cover },
     },
     { overwrite, label: article.slug }
   );

@@ -58,11 +58,15 @@ function quizHref(article: ArticleCtaSource): string {
   return buildQuizHref(prefillToQuizParams(article.quizPrefill, articlePathOf(article)));
 }
 
+/** Lead `source` of the article's forms (end button, aside card, closing drawing panel). */
+export function articleFormSource(article: Pick<Article, "slug">): string {
+  return FORM_SOURCE_BY_SLUG[article.slug] ?? `blog-${article.slug}`;
+}
+
 function formAction(article: ArticleCtaSource, label: string): FormAction | null {
   const formKey = article.ctaCard?.formKey;
   if (!formKey) return null;
-  const source = FORM_SOURCE_BY_SLUG[article.slug] ?? `blog-${article.slug}`;
-  return { kind: "form", formKey, label, params: { label, source } };
+  return { kind: "form", formKey, label, params: { label, source: articleFormSource(article) } };
 }
 
 /** `commercialLink` as a link action; quiz links get the article pre-fill and `src`. */
@@ -162,7 +166,10 @@ export function ArticleEndCta({ article }: { article: ArticleCtaSource }) {
   );
 }
 
-/** Dark card of the aside (`.ar-cta`): icon, title, conditions line, block button. */
+/**
+ * Dark panel of the aside (Paper mockup `2560_blog_statya`, frame `aside`): title, conditions
+ * line, block button. ≤1100 px it follows the article text.
+ */
 export function ArticleCtaCard({
   article,
   conditions,
@@ -172,18 +179,14 @@ export function ArticleCtaCard({
 }) {
   const { title, action } = asideCard(article);
   const description = article.ctaCard?.text?.trim() || asideDescription(conditions);
-  const Icon = action.kind === "form" ? FileText : Calculator;
   return (
-    <div className="bg-primary-dark text-on-navy flex flex-col gap-3 rounded-lg p-6 max-sm:p-5">
-      <span
-        aria-hidden="true"
-        className="grid size-11 place-items-center rounded-[12px] bg-white/12 [&_svg]:size-[22px]"
-      >
-        <Icon strokeWidth={2} />
-      </span>
-      <p className="m-0 text-xl leading-[1.3] font-semibold">{title}</p>
+    <div
+      className="bg-primary-dark text-on-navy flex flex-col gap-4 rounded-[20px] p-8 max-sm:rounded-lg max-sm:p-5"
+      data-testid="article-cta-card"
+    >
+      <p className="m-0 text-2xl leading-[1.25] font-bold text-balance max-sm:text-xl">{title}</p>
       {description ? (
-        <p className="text-on-navy-2 m-0 text-sm leading-normal">{description}</p>
+        <p className="text-on-navy-2 m-0 text-[15px] leading-[1.55]">{description}</p>
       ) : null}
       <ActionButton action={action} size="m" block />
     </div>

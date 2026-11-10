@@ -17,6 +17,9 @@ import { VIEWPORTS } from "./helpers/viewports";
  * `src/seed/media/constructions/`, `src/seed/media/glazing/`, `src/seed/media/mirrors/`), not
  * generated placeholders.
  *
+ * Blog articles have seed covers (`src/seed/media/blog/`, Paper mockups `2560_blog` /
+ * `2560_blog_statya`), so `/blog/` is not listed either.
+ *
  * The `/zakalennoe-steklo/` hub uses seed photos too (`src/seed/media/zak-hub/`, Paper mockup
  * `2560_zakalennoe-steklo`): the page is only checked for broken images there.
  */
@@ -40,8 +43,6 @@ interface PageCase {
 const PAGES: PageCase[] = [
   { path: "/", min: 10, cardAlt: true },
   { path: "/zakalennoe-steklo/matovoe/", min: 1, cardAlt: false },
-  // Article cards use `alt=""` on purpose: the card title next to the image names it.
-  { path: "/blog/", min: 6, cardAlt: false },
 ];
 
 /** Scrolls every image into view (lazy loading) and returns those that failed to load. */

@@ -1,52 +1,38 @@
-import { Section } from "@/components/ig/section";
-import { Terms, type TermItem } from "@/components/ig/terms";
+import { TextLink } from "@/components/ig/text-link";
 import type { ArticleSummary } from "@/lib/blog/articles";
-import type { Condition } from "@/payload-types";
+import { BLOG_PATH } from "@/lib/blog/pagination";
 import { ARTICLE_GRID_CLASS, ArticleCard } from "./article-card";
 
 const HEADING_ID = "ar-more";
 
-/**
- * The conditions strip under «Читать также» (Article.dc.html): the `termsBar` of the
- * `conditions` global («Заказы от 50 м²», «Срок от 10 рабочих дней…», «КП…», «Цена…»).
- */
-export function articleTerms(conditions: Condition | null): TermItem[] {
-  return (conditions?.termsBar ?? [])
-    .map((item) => item.text?.trim())
-    .filter((text): text is string => Boolean(text))
-    .map((text) => ({ text }));
-}
-
 export interface RelatedArticlesProps {
   articles: readonly ArticleSummary[];
-  conditions: Condition | null;
 }
 
-/** «Читать также» (3 cards) + the conditions strip, on the page background. */
-export function RelatedArticles({ articles, conditions }: RelatedArticlesProps) {
-  const terms = articleTerms(conditions);
-  if (articles.length === 0 && terms.length === 0) return null;
+/**
+ * «Читать также» of an article (Paper mockup `2560_blog_statya`, frames `read-also-head` /
+ * `read-also`): heading with «Все статьи →» on the right, then the listing cards (3 / 2 / 1
+ * columns). Nothing without related articles.
+ */
+export function RelatedArticles({ articles }: RelatedArticlesProps) {
+  if (articles.length === 0) return null;
   return (
-    <Section
-      variant="bg"
-      aria-labelledby={articles.length > 0 ? HEADING_ID : undefined}
-      containerClassName="flex flex-col gap-8"
-    >
-      {articles.length > 0 ? (
-        <>
-          <h2 id={HEADING_ID} className="ig-h2">
-            Читать также
-          </h2>
-          <ul className={ARTICLE_GRID_CLASS} data-testid="related-articles">
-            {articles.map((article) => (
-              <li key={article.id} className="flex">
-                <ArticleCard article={article} titleAs="h3" details={false} className="w-full" />
-              </li>
-            ))}
-          </ul>
-        </>
-      ) : null}
-      <Terms items={terms} />
-    </Section>
+    <section aria-labelledby={HEADING_ID} className="flex flex-col gap-8 max-sm:gap-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+        <h2 id={HEADING_ID} className="ig-h2 m-0">
+          Читать также
+        </h2>
+        <TextLink href={BLOG_PATH} variant="arrow" className="underline">
+          Все статьи
+        </TextLink>
+      </div>
+      <ul className={ARTICLE_GRID_CLASS} data-testid="related-articles">
+        {articles.map((article) => (
+          <li key={article.id} className="flex">
+            <ArticleCard article={article} titleAs="h3" className="w-full" />
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

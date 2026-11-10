@@ -393,7 +393,7 @@ test.describe("blog listing", () => {
     test.setTimeout(LISTING_TEST_TIMEOUT_MS);
   });
 
-  test("6 cards in 17-meta order, tools, no pagination; page/1 → /blog/, page/2 → 404", async ({
+  test("6 cards in 17-meta order (first featured), tools, no pagination; page/1 → /blog/, page/2 → 404", async ({
     page,
     request,
   }) => {
@@ -407,8 +407,24 @@ test.describe("blog listing", () => {
         await expect(card.getByRole("link")).toHaveAttribute("href", article.path);
         await expect(card).toContainText("Статья");
         await expect(card.getByTestId("reading-time")).toHaveText(/^\d+ мин$/);
-        await expect(card.locator(".ig-card__sub")).not.toBeEmpty();
+        await expect(card.getByTestId("article-excerpt")).not.toBeEmpty();
       }
+      // Page 1 opens with the newest article as the wide card (Paper mockup `2560_blog`).
+      await expect(cards.first().getByTestId("article-featured")).toHaveAttribute(
+        "href",
+        ARTICLES[0].path
+      );
+      await expect(page.getByTestId("article-featured")).toHaveCount(1);
+      // Hero actions: the quiz and the drawing form.
+      const hero = page.getByTestId("processing-hero");
+      await expect(hero.getByRole("link", { name: "Рассчитать стоимость" })).toHaveAttribute(
+        "href",
+        /^\/raschet-stoimosti\/\?/
+      );
+      await hero.getByRole("button", { name: "Отправить чертёж", exact: true }).click();
+      await expect(page.getByRole("dialog")).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(page.getByTestId("drawing-panel")).toContainText("Отправить чертёж на проверку");
       await expect(page.getByRole("navigation", { name: "Страницы" })).toHaveCount(0);
       const tools = page.getByTestId("blog-tools");
       await expect(tools.getByRole("link", { name: "Калькулятор веса стекла" })).toHaveAttribute(
@@ -453,10 +469,12 @@ test.describe("blog listing", () => {
         await expect(page.getByTestId("article-list").locator("li")).toHaveCount(2);
         const nav = page.getByRole("navigation", { name: "Страницы" });
         await expect(nav.locator('[aria-current="page"]')).toHaveText("2");
-        await expect(nav.getByRole("link", { name: "1", exact: true })).toHaveAttribute(
+        await expect(nav.getByRole("link", { name: "Страница 1", exact: true })).toHaveAttribute(
           "href",
           BLOG
         );
+        // No featured card after page 1.
+        await expect(page.getByTestId("article-featured")).toHaveCount(0);
         await expect(page.getByTestId("blog-tools")).toHaveCount(0);
       } finally {
         await removeFixtures(request, token);
@@ -477,6 +495,8 @@ test.describe("article", () => {
     await expect(page.getByTestId("article-lead")).toContainText("Коротко: нет.");
 
     const toc = page.getByRole("navigation", { name: "Содержание" });
+    // ≤1100 px «Содержание» is a collapsed disclosure above the text.
+    if (isMobile(testInfo.project.name)) await toc.locator("summary").click();
     const links = toc.getByRole("link");
     await expect(links).toHaveCount(4);
     await expect(links.first()).toHaveAttribute("href", "#pochemu-ono-rassypaetsya");
@@ -495,7 +515,7 @@ test.describe("article", () => {
       // ≤1100: «Содержание» → text → CTA card.
       const tocY = (await toc.boundingBox())!.y;
       const textY = (await page.locator("article").boundingBox())!.y;
-      const ctaY = (await page.getByText("КП — в среднем за").boundingBox())!.y;
+      const ctaY = (await page.getByTestId("article-cta-card").boundingBox())!.y;
       expect(tocY).toBeLessThan(textY);
       expect(textY).toBeLessThan(ctaY);
     } else {
@@ -504,9 +524,18 @@ test.describe("article", () => {
 
     await expect(page.locator("article ol > li")).toHaveCount(4);
 
+    // Cover with its alt, preloaded (LCP); «СТАТЬЯ · N мин чтения» under the H1.
+    const cover = page.getByTestId("article-hero").locator("img");
+    await expect(cover).toHaveAttribute("alt", /стекл/);
+    await expect(cover).toHaveAttribute("fetchpriority", "high");
+    await expect(page.getByTestId("article-reading-time")).toHaveText(/^\d+ мин чтения$/);
+
     const related = page.getByTestId("related-articles").locator("li");
     await expect(related).toHaveCount(3);
     await expect(related.getByRole("link", { name: /Можно ли резать/ })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Все статьи" })).toHaveAttribute("href", BLOG);
+    // The drawing-form panel closes the page; the old conditions strip is gone.
+    await expect(page.getByTestId("drawing-panel")).toContainText("Отправить чертёж на проверку");
 
     const ld = await jsonLd(page);
     const article = ld.find((item) => item["@type"] === "Article");
