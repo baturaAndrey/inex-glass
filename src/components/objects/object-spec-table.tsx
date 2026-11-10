@@ -7,10 +7,23 @@ export interface ObjectSpecTableProps {
 
 const EMPTY = "—";
 
+/** Column captions of the Paper mockup `2560_obekt` (frame `spec`). */
+const COLUMNS = {
+  product: "Изделие",
+  thickness: "Толщина",
+  kind: "Вид стекла",
+  triplex: "Формула триплекса",
+  processing: "Обработка",
+} as const;
+
+const HEAD_CELL =
+  "text-text-2 px-0 py-4 text-left text-[13px] leading-4 font-medium tracking-[0.06em] uppercase first:pl-7 last:pr-7";
+const CELL = "text-text px-0 py-4.5 pr-6 text-base leading-5 align-top first:pl-7 last:pr-7";
+
 /**
- * «Спецификация стекла» (prototype `ObjectPage.dc.html`): a table «Изделие | Толщина | Вид |
- * Триплекс | Обработка» from 600 px, `.ig-mcard` cards with a `dl` on phones. Empty cells show
- * «—». Renders nothing without filled rows.
+ * «Спецификация стекла» (Paper mockup `2560_obekt`): a white table with a tinted header row and
+ * the product in the first column (semibold) from 600 px; `.ig-mcard` cards with a `dl` on
+ * phones. Empty cells show «—». Renders nothing without filled rows.
  */
 export function ObjectSpecTable({ spec }: ObjectSpecTableProps) {
   const rows = specRows(spec).map((row) => ({
@@ -24,27 +37,37 @@ export function ObjectSpecTable({ spec }: ObjectSpecTableProps) {
 
   return (
     <>
-      <div className="ig-table-wrap max-sm:hidden">
-        <table className="ig-table">
-          <thead>
+      <div className="bg-surface border-hairline overflow-x-auto rounded-lg border max-sm:hidden">
+        <table className="w-full min-w-[720px] border-collapse">
+          <thead className="bg-tint-green">
             <tr>
-              <th scope="col">Изделие</th>
-              <th scope="col">Толщина</th>
-              <th scope="col">Вид</th>
-              <th scope="col">Триплекс</th>
-              <th scope="col">Обработка</th>
+              <th scope="col" className={`${HEAD_CELL} w-[20%]`}>
+                {COLUMNS.product}
+              </th>
+              <th scope="col" className={`${HEAD_CELL} w-[13%]`}>
+                {COLUMNS.thickness}
+              </th>
+              <th scope="col" className={`${HEAD_CELL} w-[20%]`}>
+                {COLUMNS.kind}
+              </th>
+              <th scope="col" className={`${HEAD_CELL} w-[17%]`}>
+                {COLUMNS.triplex}
+              </th>
+              <th scope="col" className={HEAD_CELL}>
+                {COLUMNS.processing}
+              </th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row, index) => (
-              <tr key={index}>
-                <th scope="row" className="text-left font-semibold">
+              <tr key={index} className="border-hairline border-b last:border-b-0">
+                <th scope="row" className={`${CELL} text-left font-semibold`}>
                   {row.product}
                 </th>
-                <td className="ig-num tabular-nums">{row.thickness}</td>
-                <td>{row.kind}</td>
-                <td className="tabular-nums">{row.triplex}</td>
-                <td>{row.processing}</td>
+                <td className={`${CELL} tabular-nums`}>{row.thickness}</td>
+                <td className={CELL}>{row.kind}</td>
+                <td className={`${CELL} tabular-nums`}>{row.triplex}</td>
+                <td className={CELL}>{row.processing}</td>
               </tr>
             ))}
           </tbody>
@@ -57,19 +80,19 @@ export function ObjectSpecTable({ spec }: ObjectSpecTableProps) {
             <span className="ig-h6">{row.product}</span>
             <dl className="m-0 flex flex-col gap-1.5">
               <div className="ig-mcard__row">
-                <dt>Толщина</dt>
+                <dt>{COLUMNS.thickness}</dt>
                 <dd className="tabular-nums">{row.thickness}</dd>
               </div>
               <div className="ig-mcard__row">
-                <dt>Вид</dt>
+                <dt>{COLUMNS.kind}</dt>
                 <dd>{row.kind}</dd>
               </div>
               <div className="ig-mcard__row">
-                <dt>Триплекс</dt>
+                <dt>{COLUMNS.triplex}</dt>
                 <dd className="tabular-nums">{row.triplex}</dd>
               </div>
               <div className="ig-mcard__row">
-                <dt>Обработка</dt>
+                <dt>{COLUMNS.processing}</dt>
                 <dd>{row.processing}</dd>
               </div>
             </dl>

@@ -61,6 +61,7 @@ const CARD_SELECT = {
   spec: true,
   photos: true,
   sortDate: true,
+  year: true,
   related: true,
   createdAt: true,
 } as const;
@@ -92,6 +93,7 @@ export function toObjectCard(doc: PortfolioObject): ObjectCardData | null {
             height: media.height ?? null,
           }
         : null,
+    year: doc.year ?? null,
     sortDate: doc.sortDate ?? doc.createdAt,
     related: (doc.related ?? [])
       .map((item) => relationId(item))

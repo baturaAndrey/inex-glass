@@ -1,17 +1,16 @@
-import { Breadcrumbs } from "@/components/ig/breadcrumbs";
-import { Container } from "@/components/ig/container";
-import { Section, SectionHead } from "@/components/ig/section";
 import { ObjectFacts } from "@/components/objects/object-facts";
 import { ObjectGallery } from "@/components/objects/object-gallery";
 import type { GalleryPhoto } from "@/components/objects/object-gallery";
 import { ObjectSpecTable } from "@/components/objects/object-spec-table";
+import { objectsClosing, ObjectsFormPanel } from "@/components/objects/objects-closing";
 import { RelatedObjects } from "@/components/objects/related-objects";
 import { NOT_FOUND_METADATA, NotFoundResponse } from "@/components/page/not-found-response";
 import { PageShell } from "@/components/page/page-shell";
 import { buildQuizHref } from "@/components/page/quiz-cta";
+import { ProcessingHero } from "@/components/processing/processing-hero";
 import { getPlaceholderContext } from "@/lib/cms/globals";
 import { getObjectBySlug, getRelatedObjects } from "@/lib/cms/objects";
-import { redirectIfExists } from "@/lib/cms/queries";
+import { getPageByPath, redirectIfExists } from "@/lib/cms/queries";
 import type { QuizTypeId } from "@/lib/domain";
 import { OBJECTS_BASE_PATH } from "@/lib/objects/filters";
 import { joinMeta, mediaPath, specRows } from "@/lib/objects/format";
@@ -23,11 +22,17 @@ import type { City, Media, Object as PortfolioObject, ObjectType, Product } from
 import type { Metadata } from "next";
 
 /**
- * Object card `/obekty/<slug>/` (prototype `ObjectPage.dc.html`): crumbs, H1 + «Город · Тип ·
- * Год», gallery with lightbox and the sticky side panel, «Спецификация стекла», «Другие
- * объекты». Only published objects; a draft or unknown slug → 404 (`redirects` first).
- * ISR: rendered on first request, invalidated by the `objects` hooks.
+ * Object card `/obekty/<slug>/`, restyled to the Paper mockup `2560_obekt` (2026-11). One page
+ * background, no white header band: crumbs, H1 + «Город · Тип · Год» under it; gallery with
+ * lightbox next to the sticky facts card; «Спецификация стекла»; «Другие объекты» (listing
+ * cards); the drawing-form panel in the cream block (heading / sub from the closing `cta` block
+ * of `/obekty/`, source `obekty-<slug>`). Only published objects; a draft or unknown slug →
+ * 404 (`redirects` first). ISR: rendered on first request, invalidated by the `objects` hooks.
  */
+
+const TITLE_ID = "object-title";
+const SPEC_HEADING_ID = "object-spec";
+const FORM_HEADING_ID = "object-form-title";
 
 type Params = Promise<{ slug: string }>;
 
@@ -139,9 +144,10 @@ export default async function ObjectPage({ params }: { params: Params }) {
     return <NotFoundResponse />;
   }
 
-  const [placeholders, related] = await Promise.all([
+  const [placeholders, related, listing] = await Promise.all([
     getPlaceholderContext(),
     getRelatedObjects(doc),
+    getPageByPath(OBJECTS_BASE_PATH),
   ]);
   const path = doc.path || pathOf(slug);
   const h1 = resolveH1(doc.seo, doc.name, placeholders);
@@ -154,47 +160,48 @@ export default async function ObjectPage({ params }: { params: Params }) {
   const meta = joinMeta([city, type, doc.year]);
   const hasSpec = specRows(doc.spec).length > 0;
   const quizHref = buildQuizHref({ type: quizTypeOf(doc), src: path });
+  const formSource = `obekty-${doc.slug}`;
+  const closing = objectsClosing(listing, placeholders);
 
   return (
-    <PageShell path={path} breadcrumbs={crumbs} hideBreadcrumbs showConditions={false} quiz={false}>
-      <section
-        aria-labelledby="object-title"
-        className="bg-surface pt-10 pb-20 max-md:pb-16 max-sm:pt-6 max-sm:pb-10"
-      >
-        <Container>
-          <Breadcrumbs items={crumbs} />
-          <div className="mt-6 mb-8 flex flex-wrap items-baseline gap-x-6 gap-y-2 max-sm:mt-4 max-sm:mb-5">
-            <h1 id="object-title" className="ig-h1 m-0">
-              {h1}
-            </h1>
-            {meta ? (
-              <p className="text-text-2 m-0 text-[18px] leading-[1.4] max-sm:text-[15px]">{meta}</p>
-            ) : null}
-          </div>
+    <PageShell path={path} breadcrumbs={crumbs} showConditions={false} quiz={false}>
+      <ProcessingHero title={h1} titleId={TITLE_ID} lead={meta || undefined} />
 
-          <div className="grid grid-cols-1 items-start gap-10 md:grid-cols-[minmax(0,1fr)_420px]">
-            <ObjectGallery photos={galleryPhotos(doc)} name={doc.name} />
-            <ObjectFacts
-              city={city}
-              type={type}
-              year={doc.year}
-              products={products}
-              task={doc.task}
-              quizHref={quizHref}
-              formSource={`obekty-${doc.slug}`}
-            />
-          </div>
-        </Container>
-      </section>
+      <div className="mx-auto flex w-full max-w-[1920px] flex-col gap-16 px-(--ig-gutter) pt-8 pb-24 max-md:gap-12 max-md:pt-6 max-md:pb-[72px] max-sm:gap-10 max-sm:pt-2 max-sm:pb-12">
+        <div className="grid grid-cols-1 items-start gap-8 max-sm:gap-6 md:grid-cols-[minmax(0,1fr)_400px] lg:grid-cols-[minmax(0,1fr)_460px]">
+          <ObjectGallery photos={galleryPhotos(doc)} name={doc.name} />
+          <ObjectFacts
+            city={city}
+            type={type}
+            year={doc.year}
+            products={products}
+            task={doc.task}
+            quizHref={quizHref}
+            formSource={formSource}
+          />
+        </div>
 
-      {hasSpec ? (
-        <Section variant="bg" aria-labelledby="object-spec" data-object-spec="">
-          <SectionHead title="Спецификация стекла" headingId="object-spec" />
-          <ObjectSpecTable spec={doc.spec} />
-        </Section>
-      ) : null}
+        {hasSpec ? (
+          <section
+            aria-labelledby={SPEC_HEADING_ID}
+            className="flex flex-col gap-7 max-sm:gap-5"
+            data-object-spec=""
+          >
+            <h2 id={SPEC_HEADING_ID} className="ig-h2 m-0">
+              Спецификация стекла
+            </h2>
+            <ObjectSpecTable spec={doc.spec} />
+          </section>
+        ) : null}
 
-      <RelatedObjects objects={related} />
+        <RelatedObjects objects={related} />
+      </div>
+
+      <ObjectsFormPanel
+        closing={closing}
+        headingId={FORM_HEADING_ID}
+        params={{ source: formSource }}
+      />
     </PageShell>
   );
 }

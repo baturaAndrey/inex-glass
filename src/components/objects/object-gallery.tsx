@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { ImageIcon } from "lucide-react";
 import { Lightbox } from "@/components/ig/lightbox";
 import type { LightboxImage } from "@/components/ig/lightbox";
-import { Placeholder } from "@/components/ig/placeholder";
 import { cn } from "@/lib/utils";
 
 export interface GalleryPhoto {
@@ -21,14 +21,18 @@ export interface ObjectGalleryProps {
   name: string;
 }
 
-/** Main photo: two thirds of the page at ≥1101, full width below (prototype `.op-grid`). */
-const MAIN_SIZES = "(min-width:1101px) 66vw, 100vw";
-const THUMB_SIZES = "(min-width:1101px) 14vw, 20vw";
+/** Main photo: the page minus the 460 px facts card at ≥1101, full width below. */
+const MAIN_SIZES = "(min-width:1920px) 1290px, (min-width:1101px) 66vw, 100vw";
+const THUMB_SIZES = "(min-width:1920px) 210px, (min-width:1101px) 11vw, 25vw";
+/** Main photo frame of the mockup: 1288 × 760 at 1920. */
+const MAIN_FRAME = "aspect-[1288/760] rounded-xl max-sm:aspect-[4/3] max-sm:rounded-lg";
 
 /**
- * Object photos (prototype `ObjectPage.dc.html`): 16:10 main photo — a button that opens the
- * lightbox at the current position — and a 5-column grid of thumbnails (`aria-pressed`) when
- * there is more than one photo. The main photo is preloaded (LCP; Next 16 `preload`).
+ * Object photos (Paper mockup `2560_obekt`, frame `gallery`): the big photo (24 px radius) — a
+ * button that opens the lightbox at the current position — with the «1 / N» counter chip in its
+ * bottom-right corner, and a 6-column grid of thumbnails (`aria-pressed`; 4 on phones) when
+ * there is more than one photo. The main photo is preloaded (LCP; Next 16 `preload`). Without
+ * photos: a neutral well with an image icon.
  */
 export function ObjectGallery({ photos, name }: ObjectGalleryProps) {
   const [current, setCurrent] = useState(0);
@@ -36,7 +40,15 @@ export function ObjectGallery({ photos, name }: ObjectGalleryProps) {
   const photo = photos[current] ?? photos[0];
 
   if (!photo) {
-    return <Placeholder ratio="16/10" label="" className="rounded-xl max-sm:rounded-lg" />;
+    return (
+      <div
+        aria-hidden="true"
+        className={cn("bg-well grid place-items-center", MAIN_FRAME)}
+        data-object-gallery=""
+      >
+        <ImageIcon className="text-gray-1 size-14 max-sm:size-10" strokeWidth={1.5} />
+      </div>
+    );
   }
 
   const images: LightboxImage[] = photos.map((item) => ({
@@ -50,7 +62,10 @@ export function ObjectGallery({ photos, name }: ObjectGalleryProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="bg-well relative block aspect-[16/10] w-full cursor-zoom-in overflow-hidden rounded-xl border-0 p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--ig-focus-outline) max-sm:rounded-lg"
+        className={cn(
+          "bg-well relative block w-full cursor-zoom-in overflow-hidden border-0 p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--ig-focus-outline)",
+          MAIN_FRAME
+        )}
       >
         <Image
           key={photo.src}
@@ -66,13 +81,22 @@ export function ObjectGallery({ photos, name }: ObjectGalleryProps) {
         <span className="sr-only">
           — фото {current + 1} из {photos.length}, открыть на весь экран
         </span>
+        {photos.length > 1 ? (
+          <span
+            aria-hidden="true"
+            className="bg-surface text-text absolute right-5 bottom-5 rounded-full px-3.5 py-2 text-[14px] leading-[18px] font-medium tabular-nums max-sm:right-3 max-sm:bottom-3"
+            data-gallery-counter=""
+          >
+            {current + 1} / {photos.length}
+          </span>
+        ) : null}
       </button>
 
       {photos.length > 1 ? (
         <div
           role="group"
           aria-label="Фотографии объекта"
-          className="grid grid-cols-5 gap-3 max-sm:gap-1.5"
+          className="grid grid-cols-6 gap-3 max-sm:grid-cols-4 max-sm:gap-2"
         >
           {photos.map((item, index) => {
             const active = index === current;
@@ -84,7 +108,7 @@ export function ObjectGallery({ photos, name }: ObjectGalleryProps) {
                 aria-label={`Фото ${index + 1}`}
                 onClick={() => setCurrent(index)}
                 className={cn(
-                  "relative aspect-[4/3] cursor-pointer overflow-hidden rounded-md border-2 bg-transparent p-0 transition-colors duration-(--ig-dur-base)",
+                  "bg-well relative aspect-[205/120] cursor-pointer overflow-hidden rounded-md border-2 p-0 transition-colors duration-200",
                   "focus-visible:shadow-(--ig-focus-ring) focus-visible:outline-none",
                   active ? "border-brand" : "hover:border-gray-1 border-transparent"
                 )}

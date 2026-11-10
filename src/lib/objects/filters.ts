@@ -81,6 +81,8 @@ export interface ObjectCardData {
   /** Card chips: editor `chips[]`, otherwise generated from the first spec rows (max 3). */
   chips: string[];
   photo: ObjectPhoto | null;
+  /** Year of the project (card meta «Город · Тип · Год»), when filled. */
+  year?: number | null | undefined;
   /** ISO date of «Сначала новые»: `sortDate`, otherwise `createdAt`. */
   sortDate: string;
   /** Hand-picked «Похожие объекты» (ids, in the editor's order). */

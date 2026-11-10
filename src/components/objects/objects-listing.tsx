@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { ActiveFilters } from "./active-filters";
 import { FilterDrawer } from "./filter-drawer";
 import { ObjectCard } from "./object-card";
+import { ObjectsFilterPanel } from "./objects-filter-panel";
 import { ObjectsToolbar } from "./objects-toolbar";
 
 export interface ObjectsListingProps {
@@ -43,11 +44,12 @@ interface ListingState {
 
 /** Grid of `Objects.dc.html` (`.g4`): 4 / 3 / 2 / 1 columns at ≥1366 / ≥1101 / ≥600 / <600. */
 const GRID =
-  "m-0 grid list-none grid-cols-1 gap-6 p-0 max-sm:gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
+  "m-0 grid list-none grid-cols-1 gap-6 p-0 max-md:gap-5 max-sm:gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
 
 /**
- * Client part of the listing: toolbar, applied-filter chips, card grid with «Показать ещё»,
- * empty state and the filter drawer.
+ * Client part of the listing (Paper mockup `2560_obekty`): the filter panel with pills from
+ * 1101 px; below it the toolbar («Фильтры», sort), applied-filter chips and the filter drawer;
+ * then the card grid with «Показать ещё» and the empty state.
  *
  * State lives in the URL: every change replaces it (`router.replace`, no scroll) inside a
  * transition and the server re-renders the page with the new slice; `useOptimistic` shows the
@@ -93,6 +95,7 @@ export function ObjectsListing({ items, total, facets, filters, sort }: ObjectsL
   const remove = (item: ActiveFilter) => toggle(item.key, item.slug);
   const clearFilters = () => navigate({ ...optimistic, filters: EMPTY_FILTERS });
   const changeSort = (next: ObjectsSort) => navigate({ ...optimistic, sort: next });
+  const changeFilters = (next: ObjectsFilters) => navigate({ ...optimistic, filters: next });
 
   const showMore = () => {
     focusIndex.current = visible;
@@ -104,15 +107,26 @@ export function ObjectsListing({ items, total, facets, filters, sort }: ObjectsL
 
   return (
     <>
-      <ObjectsToolbar
-        total={total}
+      <ObjectsFilterPanel
+        facets={facets}
+        filters={optimistic.filters}
         sort={optimistic.sort}
+        total={total}
+        onFiltersChange={changeFilters}
         onSortChange={changeSort}
-        selected={selectedCount(optimistic.filters)}
-        filtersOpen={drawerOpen}
-        onOpenFilters={() => setDrawerOpen(true)}
+        className="mb-8 max-md:hidden"
       />
-      <ActiveFilters items={chips} onRemove={remove} onClearAll={clearFilters} />
+      <div className="md:hidden">
+        <ObjectsToolbar
+          total={total}
+          sort={optimistic.sort}
+          onSortChange={changeSort}
+          selected={selectedCount(optimistic.filters)}
+          filtersOpen={drawerOpen}
+          onOpenFilters={() => setDrawerOpen(true)}
+        />
+        <ActiveFilters items={chips} onRemove={remove} onClearAll={clearFilters} />
+      </div>
 
       {items.length > 0 ? (
         <ul
@@ -132,7 +146,7 @@ export function ObjectsListing({ items, total, facets, filters, sort }: ObjectsL
           ))}
         </ul>
       ) : (
-        <div className="bg-surface flex flex-col items-start gap-3 rounded-lg p-10 max-sm:p-6">
+        <div className="bg-surface border-hairline flex flex-col items-start gap-3 rounded-xl border p-10 max-sm:rounded-lg max-sm:p-6">
           <p className="ig-h5 m-0">Нет объектов по выбранным фильтрам</p>
           <Button variant="secondary" size="s" onClick={clearFilters}>
             Сбросить фильтры

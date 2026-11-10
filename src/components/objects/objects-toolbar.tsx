@@ -4,7 +4,6 @@ import { useId } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ig/button";
 import { Select } from "@/components/ig/select";
-import { pluralObjects } from "@/lib/domain/plural";
 import { SORT_LABELS, SORT_VALUES } from "@/lib/objects/filters";
 import type { ObjectsSort } from "@/lib/objects/filters";
 
@@ -21,7 +20,7 @@ export interface ObjectsToolbarProps {
 const isSort = (value: string): value is ObjectsSort =>
   (SORT_VALUES as readonly string[]).includes(value);
 
-/** «11 объектов» + sort select + «Фильтры» button (prototype `.ob-bar`). */
+/** «Найдено: 11» + sort select + «Фильтры» button (≤1100 px; prototype `.ob-bar`). */
 export function ObjectsToolbar({
   total,
   sort,
@@ -34,11 +33,11 @@ export function ObjectsToolbar({
   return (
     <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
       <p
-        className="m-0 text-[18px] leading-[1.3] font-semibold"
+        className="m-0 text-[18px] leading-[1.3] font-semibold tabular-nums"
         aria-live="polite"
         data-objects-count=""
       >
-        {`${total} ${pluralObjects(total)}`}
+        {`Найдено: ${total}`}
       </p>
       <div className="flex flex-wrap items-center gap-3 max-sm:w-full">
         <div className="flex items-center gap-2.5 max-sm:flex-1">

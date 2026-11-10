@@ -21,9 +21,10 @@ export interface ObjectFactsProps {
 export const SIMILAR_PROJECT_LABEL = "Рассчитать похожий проект";
 
 /**
- * Side panel of an object (prototype `.op-side`): facts as a `dl` (rows without a value are
- * hidden), «Задача и сложность» when filled, the quiz CTA and the drawing form. Sticky under the
- * compact header from 1101 px (`--ig-header-compact-h` + 24 px = 88 px).
+ * Facts card of an object (Paper mockup `2560_obekt`, frame `facts`): a white card with the
+ * facts as a `dl` (hairlines between rows; rows without a value are hidden), «Задача и
+ * сложность» on a primary-light plate when filled, the quiz CTA and the drawing form. Sticky
+ * under the compact header from 1101 px (`--ig-header-compact-h` + 24 px = 88 px).
  */
 export function ObjectFacts({
   city,
@@ -47,7 +48,7 @@ export function ObjectFacts({
     <aside
       aria-label="Об объекте"
       className={cn(
-        "bg-bg flex flex-col gap-6 rounded-xl p-7 max-sm:p-5",
+        "bg-surface border-hairline flex flex-col gap-7 rounded-xl border p-10 max-lg:p-8 max-sm:gap-6 max-sm:rounded-lg max-sm:p-5",
         "md:sticky md:top-[calc(var(--ig-header-compact-h)+24px)]",
         className
       )}
@@ -58,19 +59,19 @@ export function ObjectFacts({
           {facts.map((fact) => (
             <div
               key={fact.label}
-              className="border-line flex justify-between gap-4 border-b py-3 text-[15px] leading-[1.4]"
+              className="border-hairline flex items-baseline justify-between gap-4 border-b py-3.5 last:border-b-0"
             >
-              <dt className="text-text-2">{fact.label}</dt>
-              <dd className="m-0 text-right font-medium">{fact.value}</dd>
+              <dt className="text-text-2 text-[15px] leading-[18px]">{fact.label}</dt>
+              <dd className="m-0 text-right text-base leading-5 font-medium">{fact.value}</dd>
             </div>
           ))}
         </dl>
       ) : null}
 
       {taskText ? (
-        <div className="flex flex-col gap-2">
-          <span className="ig-label">Задача и сложность</span>
-          <p className="ig-body m-0">{taskText}</p>
+        <div className="bg-primary-light flex flex-col gap-2.5 rounded-lg p-6 max-sm:p-5">
+          <span className="ig-label text-primary-pressed">Задача и сложность</span>
+          <p className="text-text m-0 text-base leading-[1.55]">{taskText}</p>
         </div>
       ) : null}
 

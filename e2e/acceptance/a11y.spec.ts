@@ -320,14 +320,26 @@ test.describe("keyboard and focus", () => {
     await expect(calcCta(page, testInfo)).toBeFocused();
   });
 
-  test("objects filters: drawer by keyboard", async ({ page, request }) => {
+  test("objects filters: panel pills / drawer by keyboard", async ({ page, request }, testInfo) => {
     // Waits for the cross-process objects lock (other projects / objects.spec).
     test.setTimeout(420_000);
     const object = (liveObject = await createTestObject(request));
     try {
       await page.goto("/obekty/", { waitUntil: "load" });
       await waitHydrated(page, "/obekty/");
-      const sort = page.getByRole("combobox", { name: "Сортировка" });
+      if (!isPhone(testInfo)) {
+        // ≥1101: the filter panel — pills (links) and the selects, each with a focus ring.
+        const pill = page.locator("[data-objects-filters] [data-filter-pill]").first();
+        await tabTo(page, pill, 120);
+        expect((await focusInfo(page))?.visibleIndicator, "filter pill focus ring").toBe(true);
+        const panelSort = page
+          .locator("[data-objects-filters]")
+          .getByRole("combobox", { name: "Сортировка" });
+        await tabTo(page, panelSort, 40);
+        expect((await focusInfo(page))?.visibleIndicator, "sort select focus ring").toBe(true);
+        return;
+      }
+      const sort = page.getByRole("combobox", { name: "Сортировка" }).locator("visible=true");
       await tabTo(page, sort, 120);
       expect((await focusInfo(page))?.visibleIndicator, "sort select focus ring").toBe(true);
 

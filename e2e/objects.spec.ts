@@ -2,6 +2,7 @@ import { expect as baseExpect, test } from "@playwright/test";
 import { skipOnMissingAdmin } from "./helpers/admin";
 import {
   acquireFixturesLock,
+  FIXTURE_CITIES,
   FIXTURE_OBJECTS,
   FIXTURE_TYPES,
   fixtureName,
@@ -27,10 +28,11 @@ import type { APIRequestContext, Page } from "@playwright/test";
 
 const LOCK_TIMEOUT_MS = 15 * 60_000;
 const SETUP_TIMEOUT_MS = LOCK_TIMEOUT_MS + 5 * 60_000;
-const COUNT_30 = `${FIXTURE_OBJECTS} объектов`;
+const COUNT_30 = `Найдено: ${FIXTURE_OBJECTS}`;
 const TYPE_TC = FIXTURE_TYPES[0];
 /** Fixture objects of the «ТЦ» type: n % 3 === 0 → 10 of 30. */
 const TC_COUNT = 10;
+const COUNT_TC = `Найдено: ${TC_COUNT}`;
 
 /** The shared dev server compiles routes on first hit and runs other specs meanwhile. */
 const expect = baseExpect.configure({ timeout: 20_000 });
@@ -102,7 +104,9 @@ const robotsOf = async (page: Page) =>
     .join(" | ");
 const canonicalOf = (page: Page) => page.locator('link[rel="canonical"]').getAttribute("href");
 const cards = (page: Page) => page.locator("[data-objects-grid] > li");
-const countLabel = (page: Page) => page.locator("[data-objects-count]");
+/** The filter panel (≥1101) and the toolbar (≤1100) both carry the count; one is visible. */
+const countLabel = (page: Page) => page.locator("[data-objects-count]").locator("visible=true");
+const isMobile = () => testInfo().project.name === VIEWPORTS.mobile.name;
 
 async function expectNoHorizontalScroll(page: Page): Promise<void> {
   const overflow = await page.evaluate(
@@ -151,32 +155,51 @@ test.describe("listing /obekty/", () => {
     await expectNotFound(request, "/obekty/page/02/");
   });
 
-  test("filters drawer, chips, reset, sort and noindex", async ({ page }) => {
+  test("filters (panel pills or drawer), chips, reset, sort and noindex", async ({ page }) => {
     await page.goto("/obekty/");
     await expect(countLabel(page)).toHaveText(COUNT_30);
     await expect(cards(page).first()).toContainText(fixtureName(FIXTURE_OBJECTS));
 
-    const filtersButton = page.getByRole("button", { name: /^Фильтры/ });
-    await filtersButton.click();
-    const drawer = page.getByRole("dialog", { name: "Фильтры" });
-    await expect(drawer).toBeVisible();
-    if (testInfo().project.name === VIEWPORTS.mobile.name) {
+    if (isMobile()) {
+      // ≤1100: «Фильтры» opens the drawer; the desktop panel is hidden.
+      await expect(page.locator("[data-objects-filters]")).toBeHidden();
+      const filtersButton = page.getByRole("button", { name: /^Фильтры/ });
+      await filtersButton.click();
+      const drawer = page.getByRole("dialog", { name: "Фильтры" });
+      await expect(drawer).toBeVisible();
       const box = await drawer.boundingBox();
       expect(Math.round(box?.width ?? 0)).toBe(VIEWPORTS.mobile.width);
+
+      await drawer.getByRole("checkbox", { name: TYPE_TC.name }).check();
+      await expect(page).toHaveURL(new RegExp(`[?&]type=${TYPE_TC.slug}`));
+      await expect(countLabel(page)).toHaveText(COUNT_TC);
+      await expect(
+        drawer.getByRole("button", { name: `Показать ${TC_COUNT} объектов` })
+      ).toBeVisible();
+
+      // Esc closes the drawer and returns focus to «Фильтры».
+      await page.keyboard.press("Escape");
+      await expect(drawer).toBeHidden();
+      await expect(filtersButton).toBeFocused();
+      await expect(filtersButton).toHaveAttribute("aria-expanded", "false");
+    } else {
+      // ≥1101: the white panel with pill rows; «Фильтры» is hidden.
+      const panel = page.locator("[data-objects-filters]");
+      await expect(panel).toBeVisible();
+      await expect(page.getByRole("button", { name: /^Фильтры/ })).toBeHidden();
+      const types = panel.getByRole("list", { name: "Тип объекта" });
+      await expect(types.getByRole("link", { name: "Все" })).toHaveAttribute(
+        "aria-current",
+        "true"
+      );
+      // Pills are real links to the filtered URL (work without JavaScript).
+      const tcPill = types.getByRole("link", { name: TYPE_TC.name });
+      await expect(tcPill).toHaveAttribute("href", `/obekty/?type=${TYPE_TC.slug}`);
+      await tcPill.click();
+      await expect(page).toHaveURL(new RegExp(`[?&]type=${TYPE_TC.slug}`));
+      await expect(countLabel(page)).toHaveText(COUNT_TC);
+      await expect(tcPill).toHaveAttribute("aria-current", "true");
     }
-
-    await drawer.getByRole("checkbox", { name: TYPE_TC.name }).check();
-    await expect(page).toHaveURL(new RegExp(`[?&]type=${TYPE_TC.slug}`));
-    await expect(countLabel(page)).toHaveText(`${TC_COUNT} объектов`);
-    await expect(
-      drawer.getByRole("button", { name: `Показать ${TC_COUNT} объектов` })
-    ).toBeVisible();
-
-    // Esc closes the drawer and returns focus to «Фильтры».
-    await page.keyboard.press("Escape");
-    await expect(drawer).toBeHidden();
-    await expect(filtersButton).toBeFocused();
-    await expect(filtersButton).toHaveAttribute("aria-expanded", "false");
 
     // Filtered URL: noindex, canonical /obekty/ (server meta after a reload).
     await page.reload();
@@ -184,22 +207,40 @@ test.describe("listing /obekty/", () => {
     expect(await canonicalOf(page)).toMatch(/\/obekty\/$/);
     await expect(cards(page)).toHaveCount(TC_COUNT);
 
-    const chip = page.getByRole("button", { name: `Убрать фильтр ${TYPE_TC.name}` });
-    await chip.click();
-    await expect(page).not.toHaveURL(/type=/);
-    await expect(countLabel(page)).toHaveText(COUNT_30);
+    if (isMobile()) {
+      const chip = page.getByRole("button", { name: `Убрать фильтр ${TYPE_TC.name}` });
+      await chip.click();
+      await expect(page).not.toHaveURL(/type=/);
+      await expect(countLabel(page)).toHaveText(COUNT_30);
 
-    await filtersButton.click();
-    await drawer.getByRole("checkbox", { name: TYPE_TC.name }).check();
-    await expect(countLabel(page)).toHaveText(`${TC_COUNT} объектов`);
-    await drawer.getByRole("button", { name: `Показать ${TC_COUNT} объектов` }).click();
-    await expect(drawer).toBeHidden();
-    await page.getByRole("button", { name: "Сбросить всё" }).click();
+      const filtersButton = page.getByRole("button", { name: /^Фильтры/ });
+      const drawer = page.getByRole("dialog", { name: "Фильтры" });
+      await filtersButton.click();
+      await drawer.getByRole("checkbox", { name: TYPE_TC.name }).check();
+      await expect(countLabel(page)).toHaveText(COUNT_TC);
+      await drawer.getByRole("button", { name: `Показать ${TC_COUNT} объектов` }).click();
+      await expect(drawer).toBeHidden();
+      await page.getByRole("button", { name: "Сбросить всё" }).click();
+    } else {
+      const panel = page.locator("[data-objects-filters]");
+      // «Все» clears the row.
+      await panel
+        .getByRole("list", { name: "Тип объекта" })
+        .getByRole("link", { name: "Все" })
+        .click();
+      await expect(page).not.toHaveURL(/type=/);
+      await expect(countLabel(page)).toHaveText(COUNT_30);
+      // City select filters by one city and «Все города» resets it.
+      await panel.getByLabel("Город").selectOption(FIXTURE_CITIES[0].slug);
+      await expect(page).toHaveURL(new RegExp(`[?&]city=${FIXTURE_CITIES[0].slug}`));
+      await expect(countLabel(page)).not.toHaveText(COUNT_30);
+      await panel.getByLabel("Город").selectOption("");
+    }
     await expect(page).toHaveURL(/\/obekty\/$/);
     await expect(countLabel(page)).toHaveText(COUNT_30);
 
     // «По алфавиту» puts «… 01» first (newest-first had «… 30»).
-    await page.getByLabel("Сортировка").selectOption("az");
+    await page.getByLabel("Сортировка").locator("visible=true").selectOption("az");
     await expect(page).toHaveURL(/[?&]sort=az/);
     await expect(cards(page).first()).toContainText(fixtureName(1));
   });
@@ -214,12 +255,15 @@ test.describe("object page", () => {
     await expect(crumbs.getByRole("link", { name: "Объекты" })).toHaveAttribute("href", "/obekty/");
     await expect(crumbs.locator('[aria-current="page"]')).toHaveText(object.name);
 
-    // Thumbnails: 5-column grid, the active one is pressed; a click switches the main photo.
+    // Thumbnails: 6-column grid (4 on phones), the active one is pressed; a click switches the
+    // main photo and the «1 / N» counter.
     const thumbs = page.getByRole("group", { name: "Фотографии объекта" });
     const columns = await thumbs.evaluate(
       (element) => getComputedStyle(element).gridTemplateColumns.split(" ").length
     );
-    expect(columns).toBe(5);
+    expect(columns).toBe(isMobile() ? 4 : 6);
+    const counter = page.locator("[data-gallery-counter]");
+    await expect(counter).toHaveText("1 / 3");
     const main = page.locator("[data-gallery-main]");
     const firstSrc = await main.getAttribute("src");
     await thumbs.getByRole("button", { name: "Фото 2" }).click();
@@ -228,6 +272,7 @@ test.describe("object page", () => {
       "true"
     );
     await expect(main).not.toHaveAttribute("src", firstSrc ?? "");
+    await expect(counter).toHaveText("2 / 3");
     await thumbs.getByRole("button", { name: "Фото 1" }).click();
 
     // Lightbox: opens at the current photo, → moves on, Esc closes.
@@ -261,6 +306,14 @@ test.describe("object page", () => {
     const href = (await cta.getAttribute("href")) ?? "";
     expect(new URL(href, "http://x").searchParams.get("src")).toBe(`/obekty/${object.slug}/`);
     await expect(facts.getByRole("button", { name: "Отправить чертёж" })).toBeVisible();
+    // One page background: no white header band above the gallery.
+    const heroBg = await page
+      .getByTestId("processing-hero")
+      .evaluate((element) => getComputedStyle(element).backgroundColor);
+    expect(heroBg).not.toBe("rgb(255, 255, 255)");
+
+    // Drawing-form panel in the cream block, with the object as the lead source.
+    await expect(page.getByTestId("drawing-panel")).toBeVisible();
 
     // «Другие объекты»: at most 4, never the object itself.
     const related = page.locator("[data-related-objects] li a");
