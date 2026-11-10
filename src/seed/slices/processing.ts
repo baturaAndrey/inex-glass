@@ -249,9 +249,14 @@ async function seedService(
       title: service.title,
       slug: service.slug,
       order: service.order,
-      card: { title: service.cardTitle, text: service.keyLimit },
+      card: {
+        title: service.cardTitle,
+        text: service.keyLimit,
+        // Without a seed card photo `card.image` is not passed: the update keeps an image
+        // attached later (generated illustration or an editor's upload).
+        ...(service.cardImage ? { image: await imageId(ctx, service.cardImage) } : {}),
+      },
       keyLimit: service.keyLimit,
-      // `card.image` is not passed: the update keeps the card illustration attached later.
       heroImage: await imageId(ctx, service.image),
       intro: await markdown(ctx, service.introMd),
       tables: service.specs?.length ? [specsTable(service.specs)] : [],

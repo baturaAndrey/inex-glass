@@ -40,6 +40,7 @@ export const PECHAT: ServiceSeed = {
     file: "pechat.webp",
     alt: "Стеклянная панель с напечатанным растительным рисунком и точечной рамкой",
   },
+  cardImage: { file: "hub-cards/pechat.webp", alt: "Стёкла с печатью: полосы и крупный цветок" },
   seo: {
     h1: "Печать на стекле",
     title: "Печать на стекле — шелкография, УФ-печать, фотопечать | Inex Glass",

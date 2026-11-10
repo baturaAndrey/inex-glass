@@ -12,11 +12,12 @@ import { cn } from "@/lib/utils";
  * facet's 6 cards in two rows), `g4` → 4 in a row (2 ≤1365 px); 2 ≤1100 px, 1 ≤599 px.
  *
  * Two looks, chosen per block:
- * - **photo cards** (any item has an `image`; processing services, client request 2026-11-10):
+ * - **photo cards** (any item has an `image`; processing services and glass types, client
+ *   requests 2026-11-10):
  *   the photo covers the card like the cards of the constructions hub (`HubCard`, mockup
  *   `2560_steklyannye-konstrukcii`) — a page-colour mist from the bottom, the title and the text
  *   on it, the number on a white chip in the top-left corner (reads on any photo);
- * - **plain cards** (no images; glass types): white cards with a big pale number.
+ * - **plain cards** (no images): white cards with a big pale number.
  */
 
 export interface UseCase {

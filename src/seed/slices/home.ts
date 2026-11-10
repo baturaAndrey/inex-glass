@@ -26,6 +26,7 @@ import {
 } from "../content/home";
 import { mayOverwrite, upsertByField } from "../context";
 import { markdown } from "../lexical";
+import { ensureSeedImage } from "../seed-media";
 import type { SeedContext } from "../context";
 
 /**
@@ -36,7 +37,7 @@ import type { SeedContext } from "../context";
  * Update rule: the document is created when missing; an existing one is overwritten only with
  * `--force` or while it is unchanged since the seed's last write (`mayOverwrite` in
  * `../context.ts`, seed markers). An edited home page is skipped with a log line.
- * The slice never creates objects, media or globals.
+ * The slice never creates objects or globals; it uploads the hero photo once (`../seed-media.ts`).
  */
 
 /** Anchors of the home sections — read by the template. */
@@ -87,6 +88,7 @@ export async function buildHomeLayout(ctx: SeedContext): Promise<LayoutBlock[]> 
     stats: HOME_HERO.stats.map((stat) => ({ ...stat })),
     showTerms: true,
     termsMode: "full",
+    image: await ensureSeedImage(ctx, { ...HOME_HERO.image, alt: HOME_HERO.imageAlt }),
     imageAlt: HOME_HERO.imageAlt,
     buttons: [
       {

@@ -154,7 +154,7 @@ function allText(doc: GlassTypeContent): string {
     doc.seo.title,
     doc.seo.description,
     doc.heroImage?.alt ?? "",
-    ...(doc.heroPhotoCaptions ?? []),
+    ...(doc.heroPhotos ?? []).map((photo) => photo.caption),
     ...copyFragments(doc),
   ].join("\n");
 }

@@ -682,6 +682,67 @@ const CANOPIES: ConstructionSeed = {
   ],
 };
 
+export interface ShowerConfigSeed {
+  /** `shower-configs.slug`: the seed finds its documents by it. */
+  slug: string;
+  /** Name, verbatim from teksty/12 §2 (the card capitalises the first letter). */
+  name: string;
+  configType: "straight-door" | "corner" | "trapezoid" | "walk-in" | "sliding";
+  /** Photo in `src/seed/media/constructions/showers/` (4:3). */
+  image: ImageSeed;
+}
+
+/**
+ * «Конфигурации» of `/dushevye-peregorodki/`: the five configurations of teksty/12 §2
+ * («Прямая с распашной дверью · угловая · трапециевидная · на штанге (walk-in) · с раздвижной
+ * дверью») as published `shower-configs` with photos (client request 2026-11-10). The imported
+ * inex.su catalog (task 37) stays in drafts.
+ */
+export const SHOWER_CONFIGS: readonly ShowerConfigSeed[] = [
+  {
+    slug: "pryamaya-raspashnaya",
+    name: "Прямая с распашной дверью",
+    configType: "straight-door",
+    image: {
+      file: "showers/pryamaya-raspashnaya.webp",
+      alt: "Прямая душевая перегородка из стекла с распашной дверью",
+    },
+  },
+  {
+    slug: "uglovaya",
+    name: "угловая",
+    configType: "corner",
+    image: { file: "showers/uglovaya.webp", alt: "Угловая душевая перегородка из стекла" },
+  },
+  {
+    slug: "trapecievidnaya",
+    name: "трапециевидная",
+    configType: "trapezoid",
+    image: {
+      file: "showers/trapecievidnaya.webp",
+      alt: "Трапециевидная душевая перегородка из стекла",
+    },
+  },
+  {
+    slug: "walk-in",
+    name: "на штанге (walk-in)",
+    configType: "walk-in",
+    image: {
+      file: "showers/walk-in.webp",
+      alt: "Душевая перегородка walk-in без двери на стабилизирующей штанге",
+    },
+  },
+  {
+    slug: "razdvizhnaya",
+    name: "с раздвижной дверью",
+    configType: "sliding",
+    image: {
+      file: "showers/razdvizhnaya.webp",
+      alt: "Душевая перегородка из стекла с раздвижной дверью",
+    },
+  },
+];
+
 /** teksty/12 §2 — «Душевые перегородки для проектов». */
 const SHOWERS: ConstructionSeed = {
   slug: "dushevye-peregorodki",

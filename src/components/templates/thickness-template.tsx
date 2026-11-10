@@ -10,6 +10,7 @@ import { NOT_FOUND_METADATA, NotFoundResponse } from "@/components/page/not-foun
 import { PageShell } from "@/components/page/page-shell";
 import { QuizLink, type QuizPrefill } from "@/components/page/quiz-cta";
 import { ProcessingHero } from "@/components/processing/processing-hero";
+import { serviceCardMedia } from "@/components/processing/service-cards";
 import { ServiceFaq } from "@/components/processing/service-faq";
 import { RichText } from "@/components/rich-text/rich-text";
 import { PROCESSING_HUB_PATH, ZAK_TEMPLATE_COPY } from "@/components/zak-hub/copy";
@@ -171,7 +172,7 @@ function serviceCards(
 ): ProcessingStripCard[] {
   return services.flatMap((service) => {
     if (!service.path) return [];
-    const media = asMedia(service.heroImage) ?? asMedia(service.card?.image);
+    const media = serviceCardMedia(service);
     const src = media ? mediaSrc(media, "card") : null;
     const title = (service.card?.title || service.title).trim();
     return [

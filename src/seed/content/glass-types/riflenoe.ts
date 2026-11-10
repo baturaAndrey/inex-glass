@@ -42,8 +42,12 @@ export const RIFLENOE: GlassTypeContent = {
       "Узорчатое стекло мору, флутс и другие в закалке. Направление рифления укажите в чертеже — проверим до запуска. Заказы от 50 м².",
   },
 
-  // 1. hero (no photo yet: the hero shows the «фото готовится» placeholder until one is
-  // uploaded in the admin). Without `{условия}`: the terms are the hero ticks.
+  // 1. hero, own 16:9 photo (client request 2026-11-10). Without `{условия}`: the terms are the
+  // hero ticks.
+  heroImage: {
+    file: "hero/riflenoe.webp",
+    alt: "Перегородка из рифлёного стекла с вертикальными рёбрами",
+  },
   intro:
     "Стекло с рельефом на одной стороне: пропускает свет, но размывает силуэты за собой. Рифлёное стекло вернулось в интерьеры — перегородки, двери, душевые, мебельные фасады. Изготавливаем в закалке по вашим чертежам.",
 
@@ -122,21 +126,31 @@ export const RIFLENOE: GlassTypeContent = {
       items: [
         {
           title: "Офисные и межкомнатные перегородки",
+          image: { file: "cards/riflenoe-1.webp", alt: "Офисная перегородка из рифлёного стекла" },
           text: "Мору и кризет: свет проходит, силуэты за стеклом размыты",
           href: GLASS_TYPE_LINKS.peregorodki.url,
         },
         {
           title: "Душевые перегородки для гостиниц",
+          image: {
+            file: "cards/riflenoe-2.webp",
+            alt: "Душевая перегородка из рифлёного стекла в гостиничном номере",
+          },
           text: "Гладкую сторону обращают внутрь, к воде",
           href: GLASS_TYPE_LINKS.dushevye.url,
         },
         {
           title: "Мебельные фасады и витрины",
+          image: {
+            file: "cards/riflenoe-3.webp",
+            alt: "Мебельные фасады и витрина с рифлёным стеклом",
+          },
           text: "Мору, флутс и дельта — для фасадов мебели и декоративных панелей",
           href: GLASS_TYPE_LINKS.mebel.url,
         },
         {
           title: "Межкомнатные двери",
+          image: { file: "cards/riflenoe-4.webp", alt: "Межкомнатная дверь с рифлёным стеклом" },
           text: "Шиншилла, дельта и кризет — для дверей и санузлов",
         },
       ],

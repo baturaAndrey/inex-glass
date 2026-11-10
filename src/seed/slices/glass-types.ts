@@ -210,20 +210,27 @@ async function layoutBlocks(ctx: SeedContext, block: LayoutContent): Promise<Lay
           items: await calloutItems(ctx, block.items),
         },
       ];
-    case "cards":
+    case "cards": {
+      // One upload at a time: parallel uploads race for the same unique filename in MEDIA_DIR.
+      const items = [];
+      for (const item of block.items) {
+        items.push({
+          title: item.title,
+          ...(item.text ? { text: item.text } : {}),
+          ...(item.href ? { link: { type: "custom" as const, url: item.href } } : {}),
+          ...(item.image ? { image: await imageId(ctx, item.image) } : {}),
+        });
+      }
       return [
         {
           blockType: "cards",
           heading: block.heading,
           ...(block.sub ? { sub: block.sub } : {}),
           layout: block.columns === 4 ? "g4" : "g3",
-          items: block.items.map((item) => ({
-            title: item.title,
-            ...(item.text ? { text: item.text } : {}),
-            ...(item.href ? { link: { type: "custom" as const, url: item.href } } : {}),
-          })),
+          items,
         },
       ];
+    }
     case "table": {
       const { heading, lead, ...table } = siteTable(block.table);
       return [
@@ -303,11 +310,14 @@ async function buildData(
   photoId: () => Promise<string>,
   related: RelatedLink[]
 ): Promise<GlassTypeData> {
-  const heroPhotos = doc.heroPhotoCaptions?.length
-    ? await Promise.all(
-        doc.heroPhotoCaptions.map(async (caption) => ({ image: await photoId(), caption }))
-      )
-    : [];
+  // Sequential: parallel uploads race for the same unique filename in MEDIA_DIR.
+  const heroPhotos = [];
+  for (const photo of doc.heroPhotos ?? []) {
+    heroPhotos.push({
+      image: photo.image ? await imageId(ctx, photo.image) : await photoId(),
+      caption: photo.caption,
+    });
+  }
 
   return {
     title: doc.title,

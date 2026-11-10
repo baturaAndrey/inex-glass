@@ -66,8 +66,12 @@ export const DLYA_MEBELI: GlassTypeContent = {
       "Закалённое стекло для мебельных фасадов и столешниц: кромка, отверстия под петли, без клейма по запросу. Серии от 50 м².",
   },
 
-  // 1. hero (teksty lead without `{условия}`: the terms are the hero ticks). No photo yet — the
-  // hero shows the «фото готовится» placeholder until one is picked in the admin.
+  // 1. hero (teksty lead without `{условия}`: the terms are the hero ticks); own 16:9 photo
+  // (client request 2026-11-10).
+  heroImage: {
+    file: "hero/dlya-mebeli.webp",
+    alt: "Стеклянная столешница, дверца и полки в интерьере",
+  },
   intro:
     "Для мебельных фабрик и цехов: стекло для фасадов, столешниц и дверей серией по вашим чертежам. Стекло приходит с обработанной кромкой и отверстиями под петли и ручки — остаётся собрать изделие.",
 
@@ -152,29 +156,38 @@ export const DLYA_MEBELI: GlassTypeContent = {
       items: [
         {
           title: "Фасады и дверцы",
+          image: { file: "cards/dlya-mebeli-1.webp", alt: "Мебельные фасады и дверцы из стекла" },
           text: "В алюминиевой рамке или цельностеклянные — с отверстиями под петли и ручки",
           href: GLASS_TYPE_LINKS.otverstiya.url,
         },
         {
           title: "Столешницы",
+          image: { file: "cards/dlya-mebeli-2.webp", alt: "Стеклянная столешница" },
           text: "Обеденные, журнальные, письменные столы. Видимый торец — полированная кромка или «карандаш»",
           href: GLASS_TYPE_LINKS.kromka.url,
         },
         {
           title: "Полки",
+          image: { file: "cards/dlya-mebeli-3.webp", alt: "Стеклянные полки" },
           text: "Для полок решают пролёт и нагрузка: подберём толщину по размерам",
         },
         {
           title: "Двери шкафов-купе",
+          image: { file: "cards/dlya-mebeli-4.webp", alt: "Стеклянные двери шкафа-купе" },
           text: "Матовое, тонированное или крашеное стекло под профиль системы",
         },
         {
           title: "Витрины и торговое оборудование",
+          image: {
+            file: "cards/dlya-mebeli-5.webp",
+            alt: "Стеклянная витрина и торговое оборудование",
+          },
           text: "Витрины, стеллажи, кубы для экспонатов",
           href: GLASS_TYPE_LINKS.osvetlennoe.url,
         },
         {
           title: "Офисная мебель",
+          image: { file: "cards/dlya-mebeli-6.webp", alt: "Офисная мебель со стеклом" },
           text: "Столы, тумбы, экраны рабочих мест",
         },
       ],

@@ -48,6 +48,7 @@ function contentStrings(): string[] {
     ...HOME_HERO.stats.flatMap((stat) => [stat.value, stat.text]),
     HOME_HERO.quizLabel,
     HOME_HERO.drawingLabel,
+    HOME_HERO.imageAlt,
     HOME_WHY.heading,
     HOME_WHY.sub,
     HOME_WHY.leftTitle,

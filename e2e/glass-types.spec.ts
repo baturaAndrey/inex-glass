@@ -215,6 +215,15 @@ test.describe("glass types", () => {
         4
       );
       await expect(page.locator("main").getByRole("heading", { name: "Условия" })).toHaveCount(0);
+      // Own hero photo of every type (client request 2026-11-10), no «фото готовится» plate.
+      const heroPhoto = page.getByTestId("processing-hero");
+      await expect(heroPhoto.locator("img")).toHaveCount(1);
+      await expect(heroPhoto.locator("img")).toHaveAttribute("alt", /\S/);
+      await expect(heroPhoto.locator(".ig-ph")).toHaveCount(0);
+      // «Где применяют»: photo cards, one photo per card.
+      const useCaseCards = page.getByTestId("processing-use-case");
+      await expect(useCaseCards.locator("img")).toHaveCount(await useCaseCards.count());
+
       // «Другие виды стекла»: three other types, never the page itself.
       const related = page.getByTestId("glass-related-card");
       await expect(related).toHaveCount(3);
@@ -258,7 +267,7 @@ test.describe("glass types", () => {
     await open(page, bySlug("matovoe").path);
     const mobile = isMobile(testInfo.project.name);
 
-    // Hero photo (temporary seed photo, replaceable in the admin), no placeholder.
+    // Hero photo (seed photo, replaceable in the admin), no placeholder.
     const hero = page.getByTestId("processing-hero");
     await expect(hero.locator("img")).toHaveCount(1);
     await expect(hero.locator(".ig-ph")).toHaveCount(0);
@@ -287,9 +296,10 @@ test.describe("glass types", () => {
       "/obrabotka-stekla/matirovanie/"
     );
 
-    // Use-cases: six numbered cards, the first three link to the related pages.
+    // Use-cases: six numbered photo cards, the first three link to the related pages.
     const useCases = page.getByTestId("processing-use-case");
     await expect(useCases).toHaveCount(6);
+    await expect(useCases.locator("img")).toHaveCount(6);
     await expect(useCases.first().getByRole("link")).toHaveAttribute(
       "href",
       "/steklyannye-peregorodki/"
@@ -371,6 +381,11 @@ test.describe("glass types", () => {
       "Торец обычного стекла, 12 мм",
       "Торец осветлённого стекла, 12 мм",
     ]);
+    // Real photos in both slots (no «фото готовится» placeholder), alts from the seed.
+    const edgePhotos = page.locator("[data-hero-photos] figure img");
+    await expect(edgePhotos).toHaveCount(2);
+    await expect(edgePhotos.first()).toHaveAttribute("alt", /Торец обычного/);
+    await expect(page.locator("[data-hero-photos] .ig-ph")).toHaveCount(0);
     if (!isMobile(testInfo.project.name)) {
       await expect(page.locator('[data-table-view="desktop"] td[data-positive]')).toHaveCount(4);
       await expect(page.locator('[data-table-view="desktop"] table')).toBeVisible();

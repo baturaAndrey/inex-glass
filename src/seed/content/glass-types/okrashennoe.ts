@@ -52,8 +52,12 @@ export const OKRASHENNOE: GlassTypeContent = {
       "Стекло, окрашенное керамической краской и закалённое: цвет по RAL, размеры до 3000 × 1600 мм. Чем отличается от лакобеля — на странице.",
   },
 
-  // 1. hero (teksty lead without `{условия}`: the terms are the hero ticks). No photo yet —
-  // the hero shows the «фото готовится» placeholder until one is chosen in the admin.
+  // 1. hero (teksty lead without `{условия}`: the terms are the hero ticks); own 16:9 photo
+  // (client request 2026-11-10).
+  heroImage: {
+    file: "hero/okrashennoe.webp",
+    alt: "Крашеное стекло шалфейного, графитового и белого цвета на стене и кухонном фартуке",
+  },
   intro:
     "Непрозрачное цветное стекло для мебели, облицовки стен и колонн, лифтовых холлов. Краска наносится на одну сторону и вжигается в стекло при закалке, поэтому цвет не отслаивается.",
 
@@ -126,27 +130,45 @@ export const OKRASHENNOE: GlassTypeContent = {
       items: [
         {
           title: "Мебельные фасады и столешницы",
+          image: {
+            file: "cards/okrashennoe-1.webp",
+            alt: "Мебельные фасады и столешница из крашеного стекла",
+          },
           text: "Кухни, шкафы-купе, торговая мебель",
           href: GLASS_TYPE_LINKS.mebel.url,
         },
         {
           title: "Облицовка стен и колонн",
+          image: {
+            file: "cards/okrashennoe-2.webp",
+            alt: "Облицовка стены и колонны крашеным стеклом",
+          },
           text: "Стены, колонны и ниши в общественных интерьерах",
         },
         {
           title: "Лифтовые холлы",
+          image: {
+            file: "cards/okrashennoe-3.webp",
+            alt: "Лифтовой холл с отделкой крашеным стеклом",
+          },
           text: "Холлы и порталы лифтов в жилых домах и бизнес-центрах",
         },
         {
           title: "Маркерные доски",
+          image: { file: "cards/okrashennoe-4.webp", alt: "Маркерная доска из крашеного стекла" },
           text: "Стеклянная доска для переговорных и учебных классов",
         },
         {
           title: "Кухонные фартуки",
+          image: { file: "cards/okrashennoe-5.webp", alt: "Кухонный фартук из крашеного стекла" },
           text: "Фартук за плитой — только из закалённого крашеного стекла",
         },
         {
           title: "Перегородки и декор",
+          image: {
+            file: "cards/okrashennoe-6.webp",
+            alt: "Перегородка и декор из крашеного стекла",
+          },
           text: "Глухие стеклянные перегородки и декоративные панели",
         },
       ],

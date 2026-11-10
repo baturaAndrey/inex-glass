@@ -36,6 +36,7 @@ export const PLENKI: ServiceSeed = {
   cardTitle: "Плёнки",
   keyLimit: "Матовые, тонирующие, защитные, цветные",
   image: { file: "plenki.webp", alt: "Наклейка плёнки на стекло ракелем" },
+  cardImage: { file: "hub-cards/plenki.webp", alt: "Нанесение плёнки на лист стекла в цехе" },
   seo: {
     h1: "Наклейка плёнки на стекло",
     title: "Матовая плёнка на стекло для офиса — в составе заказа | Inex Glass",

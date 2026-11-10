@@ -329,11 +329,11 @@ describe("seed zak-hub", () => {
     expect(kinds.items.map((item) => item.image)).toEqual([
       "media:zak-hub/prozrachnoe.webp",
       "media:zak-hub/osvetlennoe.webp",
-      "media:glass-types/matovoe.webp",
+      "media:glass-types/hero/matovoe.webp",
       "media:zak-hub/tonirovannoe.webp",
       "media:zak-hub/okrashennoe.webp",
       "media:zak-hub/riflenoe.webp",
-      "media:zak-hub/mollirovannoe.webp",
+      "media:zak-hub/gnutoe.webp",
     ]);
     const processing = data.layout.find((block) => block.anchorId === HUB_ANCHORS.processing) as {
       items: Array<{ image?: string }>;

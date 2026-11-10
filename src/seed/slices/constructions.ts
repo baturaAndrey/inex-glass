@@ -2,6 +2,7 @@ import type { QuizTypeId } from "@/lib/domain";
 import type { Construction } from "@/payload-types";
 import {
   CONSTRUCTIONS,
+  SHOWER_CONFIGS,
   type ConstructionSeed,
   type FaqSeed,
   type ImageSeed,
@@ -26,9 +27,14 @@ import type { RequiredDataFromCollectionSlug } from "payload";
  *
  * Photos of the hub (hero, construction cards) live in `../media/constructions/` and are
  * uploaded once (`../seed-media.ts`, found again by `sourceUrl`).
+ *
+ * The slice also publishes the five shower configurations of `/dushevye-peregorodki/`
+ * (`SHOWER_CONFIGS`, `shower-configs` by `slug`, same update rule) linked to that construction.
  */
 
 const MEDIA_GROUP = "constructions";
+/** Construction whose «Конфигурации» lists `SHOWER_CONFIGS`. */
+const SHOWER_CONFIGS_OWNER = "dushevye-peregorodki";
 
 type LayoutBlock = NonNullable<Construction["layout"]>[number];
 type ConstructionData = RequiredDataFromCollectionSlug<"constructions">;
@@ -195,6 +201,42 @@ export function constructionData(
   };
 }
 
+/** The «Конфигурации» cards of the showers page (`SHOWER_CONFIGS`). */
+async function seedShowerConfigs(ctx: SeedContext): Promise<void> {
+  const owner = SHOWER_CONFIGS_OWNER;
+  const found = await ctx.payload.find({
+    collection: "constructions",
+    where: { slug: { equals: owner } },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+  });
+  const construction = found.docs[0];
+  if (!construction) {
+    ctx.log(`shower-configs: нет конструкции ${owner}, конфигурации не записаны`);
+    return;
+  }
+  for (const [index, config] of SHOWER_CONFIGS.entries()) {
+    const where = { slug: { equals: config.slug } };
+    if (!(await mayOverwrite(ctx, "shower-configs", where, config.slug))) continue;
+    await upsertBySlug(
+      ctx,
+      "shower-configs",
+      {
+        name: config.name,
+        slug: config.slug,
+        construction: construction.id,
+        configType: config.configType,
+        image: await ensureSeedImage(ctx, { group: MEDIA_GROUP, ...config.image }),
+        // Before the imported inex.su catalog (orders from 10) if an editor publishes it.
+        order: index + 1,
+        _status: "published",
+      },
+      { overwrite: true }
+    );
+  }
+}
+
 export async function seed(ctx: SeedContext): Promise<void> {
   const editorConfig = await getEditorConfig(ctx.payload);
   const md: Md = (markdown) => markdownToLexical(markdown, editorConfig);
@@ -221,4 +263,5 @@ export async function seed(ctx: SeedContext): Promise<void> {
       overwrite: true,
     });
   }
+  await seedShowerConfigs(ctx);
 }

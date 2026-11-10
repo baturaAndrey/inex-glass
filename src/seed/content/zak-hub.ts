@@ -136,7 +136,8 @@ const KIND_CARDS: readonly HubCard[] = [
     title: "Гнутое",
     text: "До 1200 × 2000 мм; радиус от 1000 мм для 4–6 мм и от 1500 мм для 8–12 мм",
     url: "/zakalennoe-steklo/mollirovannoe/",
-    image: zakImage("mollirovannoe.webp", "Изогнутый лист закалённого стекла на полу цеха"),
+    // Bent across the whole plane, not radiused edges (client request 2026-11-10).
+    image: zakImage("gnutoe.webp", "Закалённое стекло, изогнутое по всей плоскости"),
   },
 ];
 

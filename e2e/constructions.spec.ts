@@ -384,9 +384,21 @@ test.describe("constructions", () => {
     await page.goto("/dushevye-peregorodki/");
     const section = page.locator("[data-section='shower-configs']");
     await expect(section.getByRole("heading", { name: "Конфигурации" })).toBeVisible();
-    const fallback = section.locator("[data-shower-fallback] li");
+    // The five seed configurations of teksty/12 as photo cards (client request 2026-11-10).
+    await expect(section.locator("[data-shower-fallback]")).toHaveCount(0);
     const cards = section.locator("article.ig-card");
-    expect((await fallback.count()) === 5 || (await cards.count()) > 0).toBe(true);
+    await expect(cards).toHaveCount(5);
+    await expect(cards.locator("h3")).toHaveText([
+      "Прямая с распашной дверью",
+      "угловая",
+      "трапециевидная",
+      "на штанге (walk-in)",
+      "с раздвижной дверью",
+    ]);
+    await expect(cards.locator("img")).toHaveCount(5);
+    for (const image of await cards.locator("img").all()) {
+      await expect(image).toHaveAttribute("alt", /душев/i);
+    }
     const callout = page.getByTestId("construction-warning");
     await expect(callout.getByRole("heading", { name: "Что важно знать" })).toBeVisible();
     await expect(callout.locator("ul > li")).toHaveCount(3);

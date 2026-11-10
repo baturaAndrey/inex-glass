@@ -6,7 +6,7 @@ import type { GlassTypeContent } from "./types";
  * there is no `2560_glass_osvetlennoe` artboard, the page reuses the reference section set).
  * Section → field mapping: `./README.md`.
  *
- * Every teksty/08 §4 fact is kept: the edge photo pair (`heroPhotoCaptions`) and the comparison
+ * Every teksty/08 §4 fact is kept: the edge photo pair (`heroPhotos`) and the comparison
  * table «Когда осветлённое стоит своих денег» with its four `positive` cells stay where the unit
  * and e2e tests look for them (`tables[]`). Facts from other Inex texts (teksty 08 «Крашеное» and
  * «Для мебели», 11, 12, 13; SSoT §44) are used as approved. Statements that are not Inex content
@@ -48,12 +48,31 @@ export const OSVETLENNOE: GlassTypeContent = {
   },
 
   // 1. hero: a short lead (the full explanation of teksty moved to «about»), no `{условия}` —
-  // the terms are the hero ticks. No `heroImage` yet: the hero shows the «фото готовится» plate.
+  // the terms are the hero ticks. Own 16:9 photo (client request 2026-11-10).
+  heroImage: {
+    file: "hero/osvetlennoe.webp",
+    alt: "Осветлённое стекло с бесцветным торцом рядом с обычным стеклом с зелёным торцом",
+  },
   intro:
     "В осветлённом стекле меньше железа, чем в обычном: оно почти бесцветное и на торце, и в толщине. Его выбирают для цельностеклянных перегородок, ограждений, витрин и светлого крашеного стекла. Поставляем в закалке по вашим чертежам.",
   // Captions of Osvetl.dc.html for «[Фото: торцы обычного и осветлённого стекла 12 мм рядом]»
   // (rendered as `heroPhotos` under the hero; checked by e2e).
-  heroPhotoCaptions: ["Торец обычного стекла, 12 мм", "Торец осветлённого стекла, 12 мм"],
+  heroPhotos: [
+    {
+      caption: "Торец обычного стекла, 12 мм",
+      image: {
+        file: "osvetlennoe/torec-obychnoe.webp",
+        alt: "Торец обычного закалённого стекла толщиной 12 мм с зелёным оттенком",
+      },
+    },
+    {
+      caption: "Торец осветлённого стекла, 12 мм",
+      image: {
+        file: "osvetlennoe/torec-osvetlennoe.webp",
+        alt: "Торец осветлённого закалённого стекла толщиной 12 мм, почти бесцветный",
+      },
+    },
+  ],
 
   // 2. specs
   specs: [
@@ -157,31 +176,52 @@ export const OSVETLENNOE: GlassTypeContent = {
       items: [
         {
           title: "Цельностеклянные перегородки",
+          image: {
+            file: "cards/osvetlennoe-1.webp",
+            alt: "Цельностеклянная перегородка из осветлённого стекла",
+          },
           text: "Торец на виду: в обычном толстом стекле он зеленит",
           href: GLASS_TYPE_LINKS.peregorodki.url,
         },
         {
           title: "Ограждения",
+          image: { file: "cards/osvetlennoe-2.webp", alt: "Ограждение из осветлённого стекла" },
           text: "Торец ограждения на виду, а в толстом обычном стекле он зеленит",
           href: "/steklyannye-ograzhdeniya/",
         },
         {
           title: "Витрины и магазины",
+          image: {
+            file: "cards/osvetlennoe-3.webp",
+            alt: "Витрина магазина из осветлённого стекла",
+          },
           text: "Товар за стеклом — в своём цвете, торцы не зеленят; 8, 10, 12 мм",
           href: "/osteklenie/vitrin-i-magazinov/",
         },
         {
           title: "Столешницы и мебель",
+          image: {
+            file: "cards/osvetlennoe-4.webp",
+            alt: "Столешница и мебель из осветлённого стекла",
+          },
           text: "Полированная кромка и прозрачный торец",
           href: GLASS_TYPE_LINKS.mebel.url,
         },
         {
           title: "Светлое крашеное стекло",
+          image: {
+            file: "cards/osvetlennoe-5.webp",
+            alt: "Светлое крашеное стекло на осветлённой основе",
+          },
           text: "Белые и светлые цвета RAL — на осветлённой основе, цвет совпадает с образцом",
           href: "/zakalennoe-steklo/okrashennoe/",
         },
         {
           title: "Интерьер и декор",
+          image: {
+            file: "cards/osvetlennoe-6.webp",
+            alt: "Декор интерьера из осветлённого стекла",
+          },
           text: "Аквариумы, кухонные фартуки, печать на стекле",
           href: "/obrabotka-stekla/pechat/",
         },

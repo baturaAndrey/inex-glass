@@ -35,6 +35,10 @@ export const KROMKA: ServiceSeed = {
     file: "kromka.webp",
     alt: "Скруглённый угол толстого стекла с полированной кромкой на фоне цеха",
   },
+  cardImage: {
+    file: "hub-cards/kromka.webp",
+    alt: "Кромка листа стекла у шлифовального станка в цехе",
+  },
   seo: {
     h1: "Обработка кромки стекла",
     title: "Обработка кромки стекла — шлифовка, еврокромка | Inex Glass",

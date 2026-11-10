@@ -46,8 +46,12 @@ export const TRIPLEKS: GlassTypeContent = {
       "Многослойное стекло по ГОСТ 30826-2014: закалённое до 3000 × 2000 мм, плёнка EVA, со вставками. Схему подберём под нагрузку.",
   },
 
-  // 1. hero (teksty lead without `{условия}`: the conditions are the hero checklist). No photo
-  // yet: the hero shows the `.ig-ph` placeholder until one is chosen in the admin.
+  // 1. hero (teksty lead without `{условия}`: the conditions are the hero checklist); own 16:9
+  // photo (client request 2026-11-10).
+  heroImage: {
+    file: "hero/tripleks.webp",
+    alt: "Торец триплекса: слои стекла и плёнка в зажиме ограждения",
+  },
   intro:
     "**Триплекс** — многослойное стекло: два стекла и больше, склеенных прочной плёнкой. При ударе стекло трескается, но осколки остаются на плёнке, а полотно — в проёме. Поэтому триплекс ставят там, где выпавшее стекло опасно: ограждения, козырьки, кровли, полы, витрины. Изготавливаем по ГОСТ 30826-2014.",
 
@@ -165,27 +169,39 @@ export const TRIPLEKS: GlassTypeContent = {
       items: [
         {
           title: "Ограждения лестниц и балконов",
+          image: {
+            file: "cards/tripleks-1.webp",
+            alt: "Ограждение лестницы и балкона из триплекса",
+          },
           text: "Схема 6+6; ограждения без стоек — 8+8",
         },
         {
           title: "Козырьки и кровли",
+          image: { file: "cards/tripleks-2.webp", alt: "Козырёк из триплекса" },
           text: "Только из закалённого триплекса: при ударе полотно остаётся в проёме",
         },
         {
           title: "Полы и ступени",
+          image: { file: "cards/tripleks-3.webp", alt: "Стеклянный пол и ступени из триплекса" },
           text: "Ступени, полы и подиумы — схемы от 10+10, только закалённый",
         },
         {
           title: "Перегородки и двери",
+          image: { file: "cards/tripleks-4.webp", alt: "Перегородка и дверь из триплекса" },
           text: "Схема 5+5: при ударе стекло не рассыпается",
           href: GLASS_TYPE_LINKS.peregorodki.url,
         },
         {
           title: "Витрины",
+          image: { file: "cards/tripleks-5.webp", alt: "Витрина из триплекса" },
           text: "Витрины магазинов: при ударе стекло трескается, но остаётся в проёме",
         },
         {
           title: "Фасады и панорамное остекление",
+          image: {
+            file: "cards/tripleks-6.webp",
+            alt: "Фасад с панорамным остеклением из триплекса",
+          },
           text: "Панорамное остекление — 6+6, фасады высотных зданий — 10+10",
         },
       ],

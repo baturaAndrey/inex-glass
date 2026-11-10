@@ -9,7 +9,7 @@ import type { ProcessingService } from "@/payload-types";
 
 /**
  * Photo cards of processing services (Paper mockups `2560_obrabotka-stekla` and
- * `2560_service_*`): the service photo (`heroImage`, or the card image), title, main limit
+ * `2560_service_*`): the card photo (`serviceCardMedia`), title, main limit
  * (`keyLimit`) and a round arrow button; the whole card links to the service page. 3 columns,
  * 2 ≤1100 px, 1 ≤599 px (the cards carry big text, so phones get one column, still square so
  * the text sits on the light bottom of the photo).
@@ -54,9 +54,20 @@ const CARD_PADDING = "p-[clamp(24px,3.34vw,64px)]";
 const text = (value: string | null | undefined, ctx: PlaceholderContext) =>
   value?.trim() ? replacePlaceholders(value.trim(), ctx) : "";
 
-/** The service photo, falling back to the card illustration. */
+/**
+ * Photo of a service card: the card's own photo (`card.image`, the square mockup photos of the
+ * hub, client request 2026-11-10), else the hero photo of the service page. A generated
+ * placeholder in `card.image` gives way to a real hero photo.
+ */
+export function serviceCardMedia(service: Pick<ServiceCardDoc, "card" | "heroImage">) {
+  const card = asMedia(service.card?.image);
+  const hero = asMedia(service.heroImage);
+  if (card && !card.isPlaceholder) return card;
+  return hero ?? card;
+}
+
 function photoOf(service: ServiceCardDoc): { src: string; alt: string } | null {
-  const media = asMedia(service.heroImage) ?? asMedia(service.card?.image);
+  const media = serviceCardMedia(service);
   const src = media ? mediaSrc(media) : null;
   // The title next to the photo names the card: the image itself is decorative here.
   return media && src ? { src, alt: "" } : null;

@@ -32,8 +32,12 @@ export const HOLES: ServiceSeed = {
   cardTitle: "Отверстия и вырезы",
   keyLimit: "Ø 4–130 мм; от кромки — не ближе двух толщин стекла",
   image: {
-    file: "otverstiya-i-vyrezy.webp",
-    alt: "Стекло с просверленными отверстиями и вырезом, рядом сверло",
+    file: "otverstiya-i-vyrezy-hero.webp",
+    alt: "Лист закалённого стекла с отверстиями, вырезом и точечным креплением",
+  },
+  cardImage: {
+    file: "hub-cards/otverstiya-i-vyrezy.webp",
+    alt: "Лист стекла с отверстием на столе в цехе",
   },
   seo: {
     h1: "Отверстия и вырезы в стекле",

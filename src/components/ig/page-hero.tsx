@@ -175,10 +175,10 @@ function P5Hero({
 }
 
 /**
- * The photo spans the full width on phones and the right 58% of the hero from 600 px; the hero
- * never grows past 1920 px, so neither does the photo (58% of 1920 ≈ 1114 px).
+ * The wide photo covers the whole hero (a 240 px strip above the text on phones); the hero never
+ * grows past 1920 px, so neither does the photo.
  */
-const HOME_MEDIA_SIZES = "(max-width: 599px) 100vw, (min-width: 1920px) 1114px, 58vw";
+const HOME_MEDIA_SIZES = "(min-width: 1920px) 1920px, 100vw";
 
 /**
  * Indent of the hero content under the H1 (`.ind`): the gutter on desktop, none ≤1100.
@@ -188,7 +188,9 @@ const HOME_MEDIA_SIZES = "(max-width: 599px) 100vw, (min-width: 1920px) 1114px, 
 const HOME_INDENT = "ml-(--ig-gutter) max-md:ml-0";
 
 /**
- * Home first screen (`.hero`): photo with a soft fade, caps H1, glass stats. The whole block,
+ * Home first screen (`.hero`, Paper `2560_home`): a wide photo behind the whole block — subject
+ * on the right, the calm left part under the light `.ig-hero-fade` that keeps the text AA — caps
+ * H1, glass stats. The whole block,
  * photo included, is bounded by the 1920 px frame (not full-bleed): wider screens show the page
  * background on both sides. The H1 starts at the gutter, the rest is indented (`HOME_INDENT`).
  * One `<img>` only (task 39): the former blurred backdrop copy of the photo duplicated the LCP
@@ -216,7 +218,7 @@ function HomeHero({
     >
       {media ? (
         <>
-          <div className="absolute top-0 right-0 h-full w-[58%] [mask-image:linear-gradient(90deg,transparent_0%,black_32%)] max-sm:relative max-sm:h-[240px] max-sm:w-full max-sm:[mask-image:none]">
+          <div className="absolute inset-0 max-sm:relative max-sm:h-[240px]">
             <Image
               src={media.src}
               alt={media.alt}
@@ -227,7 +229,8 @@ function HomeHero({
               fetchPriority="high"
               quality={60}
               sizes={HOME_MEDIA_SIZES}
-              className="object-cover"
+              // Phones show a 240 px strip: crop towards the products on the right.
+              className="object-cover max-sm:object-[75%_50%]"
             />
           </div>
           <div aria-hidden="true" className="ig-hero-fade absolute inset-0 max-sm:hidden" />

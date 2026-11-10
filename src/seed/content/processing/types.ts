@@ -137,8 +137,14 @@ export interface ServiceSeed {
   cardTitle: string;
   /** Main limit: the line under the card title (hub and «Другая обработка»). */
   keyLimit: string;
-  /** Hero photo (also the card photo). */
+  /** Hero photo of the service page. */
   image: ImageSeed;
+  /**
+   * Photo of the service card (`card.image`: hub «Что делаем», «Другая обработка», the processing
+   * strip of the thickness pages) — the original mockup photos, square (`hub-cards/<slug>.webp`).
+   * Without it the cards show the hero photo.
+   */
+  cardImage?: ImageSeed;
   seo: SeoSeed;
   /** Hero lead. */
   introMd: string;

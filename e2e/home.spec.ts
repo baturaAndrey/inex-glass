@@ -106,6 +106,11 @@ test.describe("home page", () => {
     );
     expect(visible).toBe(true);
     await expect(hero.getByRole("button", { name: "Отправить чертёж" })).toBeVisible();
+    // Wide seed photo of finished products (client request 2026-11-10), preloaded LCP image.
+    const heroImage = hero.locator("img");
+    await expect(heroImage).toHaveCount(1);
+    await expect(heroImage).toHaveAttribute("alt", /^Готовые изделия из стекла в цехе/);
+    await expect(heroImage).toHaveAttribute("fetchpriority", "high");
   });
 
   test("renders the sections in the prototype order", async ({ page }) => {

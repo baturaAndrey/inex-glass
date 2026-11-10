@@ -47,13 +47,8 @@ export const MATOVOE: GlassTypeContent = {
   // 1. hero
   intro:
     "Матовое стекло пропускает свет, но скрывает то, что за ним. Его ставят там, где нужна приватность без глухой стены: перегородки переговорных, двери, душевые, мебельные фасады. Изготавливаем в закалке по вашим чертежам.",
-  // The mockup's photo (the same picture as on «Матирование»), a separate media document so the
-  // client can replace it in the admin; flagged «Временное изображение».
-  heroImage: {
-    file: "matovoe.webp",
-    alt: "Стеклянная перегородка из матового стекла с прозрачными полосами",
-    temporary: true,
-  },
+  // Own 16:9 hero photo of the type (client request 2026-11-10).
+  heroImage: { file: "hero/matovoe.webp", alt: "Перегородка из матового стекла с дверью в офисе" },
 
   // 2. specs
   specs: [
@@ -130,29 +125,41 @@ export const MATOVOE: GlassTypeContent = {
       items: [
         {
           title: "Офисные перегородки и двери",
+          image: {
+            file: "cards/matovoe-1.webp",
+            alt: "Офисная перегородка с дверью из матового стекла",
+          },
           text: "Переговорные и кабинеты: свет проходит, а то, что за стеклом, не видно",
           href: GLASS_TYPE_LINKS.peregorodki.url,
         },
         {
           title: "Душевые перегородки",
+          image: { file: "cards/matovoe-2.webp", alt: "Душевая перегородка из матового стекла" },
           text: "Для гостиниц и спортивных объектов. Матовую сторону — наружу, не в зону воды",
           href: GLASS_TYPE_LINKS.dushevye.url,
         },
         {
           title: "Мебельные фасады",
+          image: { file: "cards/matovoe-3.webp", alt: "Мебельные фасады с матовым стеклом" },
           text: "Дверцы шкафов, витрин и купе — скрывают содержимое",
           href: GLASS_TYPE_LINKS.mebel.url,
         },
         {
           title: "Ограждения",
+          image: { file: "cards/matovoe-4.webp", alt: "Ограждение из матового стекла" },
           text: "Там, где нужна приватность: балконы, террасы, лестницы",
         },
         {
           title: "Интерьерные двери",
+          image: { file: "cards/matovoe-5.webp", alt: "Межкомнатная дверь из матового стекла" },
           text: "Цельностеклянные двери и вставки в дверные полотна",
         },
         {
           title: "Фасады и декор",
+          image: {
+            file: "cards/matovoe-6.webp",
+            alt: "Фасадные и декоративные панели из матового стекла",
+          },
           text: "Фасадное остекление, витражи, декоративные панели",
         },
       ],

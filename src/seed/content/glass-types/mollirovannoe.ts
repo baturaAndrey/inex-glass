@@ -51,8 +51,12 @@ export const MOLLIROVANNOE: GlassTypeContent = {
       "Гнутое закалённое стекло до 1200 × 2000 мм с радиусом от 1000 мм. Что указать в чертеже радиусного стекла — на странице.",
   },
 
-  // 1. hero (teksty lead without `{условия}`: the terms are the hero ticks). No photo yet — the
-  // hero shows the `.ig-ph` placeholder until one is chosen in the admin.
+  // 1. hero (teksty lead without `{условия}`: the terms are the hero ticks); own 16:9 photo
+  // (client request 2026-11-10).
+  heroImage: {
+    file: "hero/mollirovannoe.webp",
+    alt: "Гнутое закалённое стекло — ограждение галереи, изогнутое по всей плоскости",
+  },
   intro:
     "Радиусное стекло для ограждений, перегородок, остекления и торгового оборудования — гнутое и закалённое за один цикл.",
 
@@ -116,21 +120,31 @@ export const MOLLIROVANNOE: GlassTypeContent = {
       items: [
         {
           title: "Ограждения",
+          image: {
+            file: "cards/mollirovannoe-1.webp",
+            alt: "Изогнутое ограждение из гнутого стекла",
+          },
           text: "Радиусные ограждения лестниц, балконов и террас",
           href: "/steklyannye-ograzhdeniya/",
         },
         {
           title: "Перегородки",
+          image: { file: "cards/mollirovannoe-2.webp", alt: "Перегородка из гнутого стекла" },
           text: "Полукруглые перегородки в офисах, холлах и переговорных",
           href: GLASS_TYPE_LINKS.peregorodki.url,
         },
         {
           title: "Остекление",
+          image: { file: "cards/mollirovannoe-3.webp", alt: "Остекление из гнутого стекла" },
           text: "Эркеры, витражи и радиусные элементы фасадов",
           href: "/osteklenie/",
         },
         {
           title: "Торговое оборудование",
+          image: {
+            file: "cards/mollirovannoe-4.webp",
+            alt: "Торговое оборудование с гнутым стеклом",
+          },
           text: "Витрины, прилавки и стойки с гнутым стеклом",
           href: "/torgovye-vitriny/",
         },

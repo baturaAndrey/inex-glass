@@ -47,12 +47,16 @@ export const TONIROVANNOE: GlassTypeContent = {
       "Бронза, графит и серое стекло 4–19 мм в закалке. Оттенок зависит от толщины — согласуем образец до запуска партии.",
   },
 
-  // 1. hero: the teksty lead without `{условия}` (the terms are the hero ticks). No photo yet —
-  // the hero shows the «фото готовится» placeholder until one is chosen in the admin.
+  // 1. hero: the teksty lead without `{условия}` (the terms are the hero ticks); own 16:9 photo
+  // (client request 2026-11-10).
+  heroImage: {
+    file: "hero/tonirovannoe.webp",
+    alt: "Тонированное стекло серого и бронзового оттенка в перегородке и ограждении",
+  },
   intro:
     "Тонированное стекло окрашено в массе: цвет не нанесён сверху, а есть во всём объёме листа. Оно не стирается и не выгорает. Применяют его в перегородках, ограждениях, мебели и фасадах.",
   // The teksty note «[Фото: три образца на белом фоне и на просвет]» was a lone placeholder under
-  // the hero (`heroPhotoCaptions`); dropped in the new design — the samples photo goes to the hero
+  // the hero (`heroPhotos`); dropped in the new design — the samples photo goes to the hero
   // via the admin when it arrives (drafts doc, «Тонированное»).
 
   // 2. specs: Inex facts only (17-meta, teksty, SSoT limits)
@@ -153,20 +157,36 @@ export const TONIROVANNOE: GlassTypeContent = {
       items: [
         {
           title: "Перегородки и двери",
+          image: {
+            file: "cards/tonirovannoe-1.webp",
+            alt: "Перегородка и дверь из тонированного стекла",
+          },
           text: "Офисные перегородки и цельностеклянные двери: зонирование без глухой стены",
           href: GLASS_TYPE_LINKS.peregorodki.url,
         },
         {
           title: "Ограждения лестниц и балконов",
+          image: {
+            file: "cards/tonirovannoe-2.webp",
+            alt: "Ограждение лестницы из тонированного стекла",
+          },
           text: "Лестницы, балконы и террасы: цвет стекла в тон отделке",
         },
         {
           title: "Мебель и столешницы",
+          image: {
+            file: "cards/tonirovannoe-3.webp",
+            alt: "Столешница и мебель из тонированного стекла",
+          },
           text: "Фасады шкафов, витрины и столешницы в бронзе или графите",
           href: GLASS_TYPE_LINKS.mebel.url,
         },
         {
           title: "Фасадные и витринные стёкла",
+          image: {
+            file: "cards/tonirovannoe-4.webp",
+            alt: "Фасадное и витринное остекление тонированным стеклом",
+          },
           text: "Приглушают солнце и нагрев в помещении, скрывают интерьер от взгляда с улицы днём",
         },
       ],

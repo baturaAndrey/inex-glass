@@ -45,7 +45,10 @@ export const HOME_HERO = {
   ],
   quizLabel: "Рассчитать стоимость",
   drawingLabel: "Отправить чертёж",
-  imageAlt: "Пирамида с закалённым стеклом на складе",
+  /** Wide hero photo (`src/seed/media/home/`, 21:9): client request of 2026-11-10. */
+  image: { group: "home", file: "hero.webp" },
+  imageAlt:
+    "Готовые изделия из стекла в цехе: дверь в тонкой чёрной алюминиевой раме, перегородка, душевое ограждение, лестничное ограждение и раздвижная терраса",
 } as const;
 
 /**
@@ -246,7 +249,8 @@ export const HOME_STEPS = {
       text: "Обрешётка, фото при отгрузке, доставка транспортной компанией или самовывоз в Челябинске.",
     },
   ],
-  footnote: "Работаем с заказами от 50 м². Срочного изготовления нет. Монтаж — бригада-партнёр или шеф-монтаж.",
+  footnote:
+    "Работаем с заказами от 50 м². Срочного изготовления нет. Монтаж — бригада-партнёр или шеф-монтаж.",
   buttonLabel: "Отправить чертёж",
 } as const;
 
@@ -326,6 +330,8 @@ export const HOME_CLIENT_APPROVED_STRINGS: readonly string[] = [
   // Installation wording decided by the client on 2026-11-09, site-wide.
   HOME_STEPS.footnote,
   HOME_CONSTRUCTIONS.sub,
+  // Alt of the wide hero photo of 2026-11-10 (describes the photo, not page copy).
+  HOME_HERO.imageAlt,
 ];
 
 /** Strings taken from the prototype `Home.dc.html` (not present in teksty/01). */
@@ -333,7 +339,6 @@ export const HOME_PROTOTYPE_STRINGS: readonly string[] = [
   HOME_WHY.topicTitle,
   ...HOME_WHY.rows.map((row) => row.topic),
   HOME_PROCESSING.accent.title,
-  HOME_HERO.imageAlt,
 ];
 
 /** Form sources (lead `source` labels) of the page. */

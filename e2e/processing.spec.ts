@@ -219,6 +219,8 @@ test.describe("processing pages", () => {
     await expect(section.getByRole("heading", { level: 2 })).toHaveText("Что делаем");
     const cards = section.getByTestId("processing-card");
     await expect(cards).toHaveCount(6);
+    // Every card has its own photo (`card.image`, the square mockup photos), not the hero.
+    await expect(cards.locator("img")).toHaveCount(6);
     await expect(cards.nth(1)).toContainText("Отверстия и вырезы");
     await expect(cards.nth(1)).toContainText("Ø 4–130 мм; от кромки — не ближе двух толщин стекла");
 
@@ -242,6 +244,26 @@ test.describe("processing pages", () => {
 
     await cards.nth(1).click();
     await expect(page).toHaveURL(/\/obrabotka-stekla\/otverstiya-i-vyrezy\/$/);
+  });
+
+  test("hub card photo differs from the service hero (client request 2026-11-10)", async ({
+    page,
+  }) => {
+    /** Source file of a `next/image` (`/_next/image?url=<file>&w=…`). */
+    const fileOf = async (image: ReturnType<Page["locator"]>) => {
+      const src = (await image.getAttribute("src")) ?? "";
+      return new URL(src, "http://site").searchParams.get("url") ?? src;
+    };
+    await open(page, "/obrabotka-stekla/");
+    const card = page
+      .getByTestId("processing-operations")
+      .getByTestId("processing-card")
+      .filter({ hasText: "Фацет" });
+    const cardFile = await fileOf(card.locator("img"));
+    await open(page, "/obrabotka-stekla/facet/");
+    const heroFile = await fileOf(page.getByTestId("processing-hero").locator("img"));
+    expect(cardFile).not.toBe("");
+    expect(cardFile).not.toBe(heroFile);
   });
 
   test("service page: photo hero, plaque and the «Как указать» panel", async ({ page }) => {

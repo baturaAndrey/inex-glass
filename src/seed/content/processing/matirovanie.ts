@@ -41,6 +41,10 @@ export const MATIROVANIE: ServiceSeed = {
     file: "matirovanie.webp",
     alt: "Стекло с матовыми полосами и геометрическим узором на фоне цеха",
   },
+  cardImage: {
+    file: "hub-cards/matirovanie.webp",
+    alt: "Стеклянная перегородка с матовыми полосами в цехе",
+  },
   seo: {
     h1: "Пескоструйное матирование стекла",
     title: "Матирование стекла — пескоструй, логотипы, рисунки | Inex Glass",

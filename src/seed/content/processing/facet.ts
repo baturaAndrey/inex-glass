@@ -33,7 +33,8 @@ export const FACET: ServiceSeed = {
   breadcrumb: "Фацет",
   cardTitle: "Фацет",
   keyLimit: "На зеркалах и стекле, ширина 5–40 мм",
-  image: { file: "facet.webp", alt: "Угол зеркала с широким фацетом по краю в светлом интерьере" },
+  image: { file: "facet-hero.webp", alt: "Зеркало с широким фацетом по краю в холле гостиницы" },
+  cardImage: { file: "hub-cards/facet.webp", alt: "Угол зеркала с фацетом по краю в светлом цехе" },
   seo: {
     h1: "Фацет на зеркале",
     title: "Фацет на зеркале — что это, ширина 5–40 мм | Inex Glass",

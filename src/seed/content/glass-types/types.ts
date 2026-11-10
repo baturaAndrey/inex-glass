@@ -110,6 +110,11 @@ export interface UseCaseSeed {
   text?: string;
   /** Internal path: the whole card links there. */
   href?: string;
+  /**
+   * Background photo of the card (`cards/<slug>-<n>.webp`, 4:3). With photos the block renders
+   * as photo cards (like the processing service pages), without them as plain numbered cards.
+   */
+  image?: ImageSeed;
 }
 
 export interface CalloutItemContent {
@@ -173,8 +178,11 @@ export interface GlassTypeContent {
   intro: string;
   /** Hero photo. Without it the hero shows the `.ig-ph` placeholder until one is uploaded. */
   heroImage?: ImageSeed;
-  /** Captions of the photo placeholders of the hero («[Фото: …]» notes of teksty). */
-  heroPhotoCaptions?: string[];
+  /**
+   * Captioned photos under the hero («[Фото: …]» notes of teksty). Without `image` the slot
+   * shows the «фото готовится» placeholder with the caption.
+   */
+  heroPhotos?: { caption: string; image?: ImageSeed }[];
   /** Spec tiles under the hero; usually 4, the last one `accent`. */
   specs?: SpecSeed[];
   variantsHeading?: string;
