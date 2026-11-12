@@ -11,11 +11,13 @@ import type {
 import { FormSection } from "@/components/forms/form-section";
 import type { PlaceholderContext } from "@/lib/domain";
 import { HomeConstructionCards } from "./construction-cards";
+import { HomeDesign } from "./design";
 import { HomeGlassCards } from "./glass-cards";
 import { HomeHero } from "./hero";
 import { HomeObjectsStrip } from "./objects-strip";
 import { HomeOrderSteps } from "./order-steps";
 import { HomeProcessingTiles } from "./processing-tiles";
+import { HomeProduction } from "./production";
 import { HomeSegments } from "./segments";
 import { HomeUsefulCards } from "./useful-cards";
 import { HomeWhy } from "./why";
@@ -27,6 +29,11 @@ import { HomeWhy } from "./why";
  */
 const SECTION_KEYS = {
   why: { anchor: "why", type: "compare" },
+  design: { anchor: "design", type: "cta" },
+  designLevels: { anchor: "design-levels", type: "cards" },
+  production: { anchor: "production", type: "cta" },
+  productionStats: { anchor: "production-stats", type: "stats" },
+  productionPhotos: { anchor: "production-photos", type: "cards" },
   glass: { anchor: "glass", type: "cards" },
   processing: { anchor: "processing", type: "cards" },
   constructions: { anchor: "constructions", type: "cards" },
@@ -81,6 +88,11 @@ function locateSections(layout: LayoutBlock[]) {
   const sections = {
     hero: byType("hero", "hero"),
     why: byAnchor("why"),
+    design: byAnchor("design"),
+    designLevels: byAnchor("designLevels"),
+    production: byAnchor("production"),
+    productionStats: byAnchor("productionStats"),
+    productionPhotos: byAnchor("productionPhotos"),
     glass: byAnchor("glass"),
     processing: byAnchor("processing"),
     constructions: byAnchor("constructions"),
@@ -126,7 +138,7 @@ export interface HomePageProps {
 }
 
 /**
- * Home template (`/`): the 10 sections of `Home.dc.html` in a fixed order, each filled from the
+ * Home template (`/`): the sections of `Home.dc.html` (plus «Проектирование» and «Производство» of the Paper mockup `2560_home`, 2026-11-12) in a fixed order, each filled from the
  * matching block of the document. A missing block hides its section; unknown blocks render
  * through `RenderBlocks` before the final form.
  */
@@ -138,6 +150,18 @@ export async function HomePage({ layout, ctx, page }: HomePageProps) {
     <>
       {s.hero ? <HomeHero {...s.hero} ctx={ctx} page={page} /> : null}
       {s.why ? <HomeWhy {...s.why} ctx={ctx} page={page} /> : null}
+      {s.design ? (
+        <HomeDesign {...s.design} levels={s.designLevels?.block} ctx={ctx} page={page} />
+      ) : null}
+      {s.production ? (
+        <HomeProduction
+          {...s.production}
+          stats={s.productionStats?.block}
+          photos={s.productionPhotos?.block}
+          ctx={ctx}
+          page={page}
+        />
+      ) : null}
       {s.glass ? <HomeGlassCards {...s.glass} ctx={ctx} page={page} /> : null}
       {s.processing ? <HomeProcessingTiles {...s.processing} ctx={ctx} page={page} /> : null}
       {s.constructions ? (

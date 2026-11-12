@@ -43,6 +43,10 @@ export function toFormParams(value: unknown, fallbackSource?: string): FormParam
   return params;
 }
 
+/** Direction icons («arrow-right») follow the label of a link button; other icons lead it. */
+const isTrailingIcon = (name: string | null | undefined) =>
+  typeof name === "string" && name.toLowerCase().replace(/[^a-z0-9]/g, "") === "arrowright";
+
 export interface CtaButtonsProps {
   buttons: CtaButtonValue[] | null | undefined;
   ctx: PlaceholderContext;
@@ -127,7 +131,14 @@ function CtaButton({ button, ctx, page, onDark, size }: CtaButtonProps) {
       const target = link.newTab ? "_blank" : undefined;
       const rel = external || link.newTab ? "noopener noreferrer" : undefined;
       return (
-        <Button asChild size={size} variant={variant} leftIcon={<NamedIcon name={button.icon} />}>
+        <Button
+          asChild
+          size={size}
+          variant={variant}
+          {...(isTrailingIcon(button.icon)
+            ? { rightIcon: <NamedIcon name={button.icon} /> }
+            : { leftIcon: <NamedIcon name={button.icon} /> })}
+        >
           {external ? (
             <a href={link.href} target={target} rel={rel}>
               {label}

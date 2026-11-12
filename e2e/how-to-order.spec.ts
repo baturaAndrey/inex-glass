@@ -91,14 +91,6 @@ const PAGES: readonly PageCase[] = [
       "Как выбираем заводы, проверяем импортное стекло, согласуем спецификацию и фотографируем стекло при погрузке и отгрузке.",
     crumb: "Контроль качества",
   },
-  {
-    path: "/proektirovanie/",
-    h1: "Проектирование стеклянных конструкций",
-    title: "Проектирование стеклянных конструкций и узлов | Inex Glass",
-    description:
-      "Расчёт стекла под нагрузку, в том числе снеговую, узлы крепления и проектная документация для козырьков, ограждений, фасадов и перегородок.",
-    crumb: "Проектирование",
-  },
 ];
 
 const isMobile = (page: Page) => (page.viewportSize()?.width ?? 0) <= 599;
@@ -266,7 +258,7 @@ test.describe("subpage template", () => {
       const cards = page.getByTestId("subpage-links").locator("a");
       await expect(cards).toHaveCount(8);
       const current = cards.and(page.locator("[aria-current='page']"));
-      await expect(current).toHaveCount(item.path === "/proektirovanie/" ? 0 : 1);
+      await expect(current).toHaveCount(1);
     });
   }
 
@@ -380,17 +372,6 @@ test.describe("/kak-zakazat/priemka/", () => {
     await expect(page.locator("main a[download]")).toHaveCount(0);
     await expect(page.locator("main")).not.toContainText("Файл будет добавлен");
     await expect(page.locator("main")).not.toContainText("чек-лист приёмки");
-  });
-});
-
-test.describe("/proektirovanie/", () => {
-  test("«Отправить задачу на проектирование» opens a dialog", async ({ page }) => {
-    await page.goto("/proektirovanie/");
-    await page
-      .locator("main")
-      .getByRole("button", { name: "Отправить задачу на проектирование" })
-      .click();
-    await expect(page.getByRole("dialog")).toBeVisible();
   });
 });
 

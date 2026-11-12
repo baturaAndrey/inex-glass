@@ -26,6 +26,7 @@ import { seedGlobals } from "./globals";
 import { seedReferenceData, seedTemplateRecords } from "./minimal";
 import { seed as seedBlog } from "./slices/blog";
 import { seed as seedConstructions } from "./slices/constructions";
+import { seed as seedEngineering } from "./slices/engineering";
 import { seed as seedGlassTypes } from "./slices/glass-types";
 import { seed as seedGlazingMirrors } from "./slices/glazing-mirrors";
 import { seed as seedHome } from "./slices/home";
@@ -50,6 +51,7 @@ const SLICES: ReadonlyArray<readonly [string, SeedStep]> = [
   ["constructions", seedConstructions],
   ["glazing-mirrors", seedGlazingMirrors],
   ["how-to-order", seedHowToOrder],
+  ["engineering", seedEngineering],
   ["klientam-company", seedKlientamCompany],
   ["objects", seedObjects],
   ["blog", seedBlog],

@@ -124,6 +124,68 @@ export const HOME_WHY = {
 } as const;
 
 /**
+ * «Проектирование» (Paper mockup `2560_home`, frame `design`, 2026-11-12; not in teksty/01 —
+ * listed in `HOME_CLIENT_APPROVED_STRINGS`). `lead` + `checklist` become the rich text of a `cta`
+ * block; the level cards are a `cards` block (`bottom` → `priceHint`, `dark` → `tone: accent`).
+ */
+export const HOME_DESIGN = {
+  eyebrow: "Проектирование",
+  heading: "Сначала проект — потом стекло",
+  lead: "Закалённое стекло после изготовления не подрезать и не досверлить. Поэтому каждую конструкцию собираем в 3D-модели и проверяем узлы до запуска в производство.",
+  checklist: [
+    "3D-модель, узлы и примыкания",
+    "Расчёт стекла под нагрузку по СП и ГОСТ",
+    "Чертежи и спецификации по ЕСКД",
+    "Штатные инженеры: КОМПАС-3D, T-FLEX CAD, AutoCAD",
+  ],
+  moreLabel: "Подробнее о проектировании",
+  moreUrl: "/proektirovanie/",
+  taskLabel: "Отправить задачу",
+  levels: [
+    {
+      title: "Конструкторский проект",
+      text: "Для интерьеров, где проект не сдают в надзор: перегородки, душевые, ограждения, лестницы.",
+      bottom: "3D-модель · чертежи · узлы · спецификации",
+      dark: false,
+    },
+    {
+      title: "Проект с расчётами для объекта",
+      text: "Для объектов, которые сдают стройнадзору. Стекло рассчитано как несущий элемент: ветер, снег, сейсмика.",
+      bottom: "Расчёты в ЛИРА · подпись главного конструктора",
+      dark: true,
+    },
+  ],
+} as const;
+
+/**
+ * «Производство» (Paper mockup `2560_home`, frame `production`, 2026-11-12; not in teksty/01 —
+ * listed in `HOME_CLIENT_APPROVED_STRINGS`): a `cta` block (eyebrow, H2, lead, button), a
+ * `stats` block (figures) and a `cards` block (workshop photos, uploaded later).
+ */
+export const HOME_PRODUCTION = {
+  eyebrow: "Производство",
+  heading: "Делаем всё, кроме самого стекла",
+  lead: "Стекло изготавливает поставщик по нашему техзаданию. Каркасы, рамы, сборку со стеклом, контроль и упаковку делаем в своём цехе в Челябинске — на объект приезжает проверенный комплект.",
+  moreLabel: "Как устроено производство",
+  moreUrl: "/proizvodstvo/",
+  stats: [
+    { value: "800 м²", text: "цех в Челябинске, пять участков без пересечения потоков" },
+    { value: "0,1–0,2 мм", text: "точность реза профиля на измерительном рольганге" },
+    {
+      value: "3 металла",
+      text: "алюминиевые сплавы, нержавеющая сталь, сталь С245 — или по проекту",
+    },
+    { value: "ОТК", text: "каждое стекло на стенде перед упаковкой, фото при отгрузке" },
+  ],
+  photos: [
+    "Резка и фрезеровка профиля",
+    "Сварка каркасов и рам",
+    "Сборка со стеклом на мягких столах",
+    "Контроль и упаковка",
+  ],
+} as const;
+
+/**
  * «Закалённое стекло и триплекс под ваш размер». `priceHint` keeps the teksty wording with the
  * placeholder; the template replaces it with the price of the CMS price list (or hides it).
  * The price footnote under the grid is NOT stored here: teksty's «* Ориентировочная цена на
@@ -332,6 +394,20 @@ export const HOME_CLIENT_APPROVED_STRINGS: readonly string[] = [
   HOME_CONSTRUCTIONS.sub,
   // Alt of the wide hero photo of 2026-11-10 (describes the photo, not page copy).
   HOME_HERO.imageAlt,
+  // «Проектирование» and «Производство» of the Paper mockup (2026-11-12).
+  HOME_DESIGN.eyebrow,
+  HOME_DESIGN.heading,
+  HOME_DESIGN.lead,
+  ...HOME_DESIGN.checklist,
+  HOME_DESIGN.moreLabel,
+  HOME_DESIGN.taskLabel,
+  ...HOME_DESIGN.levels.flatMap((level) => [level.title, level.text, level.bottom]),
+  HOME_PRODUCTION.eyebrow,
+  HOME_PRODUCTION.heading,
+  HOME_PRODUCTION.lead,
+  HOME_PRODUCTION.moreLabel,
+  ...HOME_PRODUCTION.stats.flatMap((stat) => [stat.value, stat.text]),
+  ...HOME_PRODUCTION.photos,
 ];
 
 /** Strings taken from the prototype `Home.dc.html` (not present in teksty/01). */
@@ -345,5 +421,6 @@ export const HOME_PROTOTYPE_STRINGS: readonly string[] = [
 export const HOME_SOURCES = {
   hero: "home-hero",
   steps: "home-steps",
+  design: "home-design",
   form: "home-form",
 } as const;

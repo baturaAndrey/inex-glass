@@ -1,20 +1,24 @@
 import type {
   CardsBlock,
   CompareBlock,
+  CtaBlock,
   FormBlock,
   HeroBlock,
   ObjectsFeedBlock,
   Page,
+  StatsBlock,
   StepsBlock,
 } from "@/payload-types";
 import {
   HOME_CONSTRUCTIONS,
+  HOME_DESIGN,
   HOME_FORM,
   HOME_GLASS,
   HOME_HERO,
   HOME_OBJECTS,
   HOME_PATH,
   HOME_PROCESSING,
+  HOME_PRODUCTION,
   HOME_SEGMENTS,
   HOME_SEO,
   HOME_SLUG,
@@ -30,7 +34,7 @@ import { ensureSeedImage } from "../seed-media";
 import type { SeedContext } from "../context";
 
 /**
- * Seed slice «home» (task 22): the `pages` document with `isHome: true` and its 11 blocks.
+ * Seed slice «home» (task 22): the `pages` document with `isHome: true` and its 16 blocks.
  * The home template (`src/components/home/home-page.tsx`) finds the sections by `blockType`
  * (`hero`, `form`) or by `anchorId` (the rest), so the anchors below are part of the contract.
  *
@@ -43,6 +47,11 @@ import type { SeedContext } from "../context";
 /** Anchors of the home sections — read by the template. */
 export const HOME_ANCHORS = {
   why: "why",
+  design: "design",
+  designLevels: "design-levels",
+  production: "production",
+  productionStats: "production-stats",
+  productionPhotos: "production-photos",
   glass: "glass",
   processing: "processing",
   constructions: "constructions",
@@ -78,7 +87,7 @@ const card = (
   ...extra,
 });
 
-/** The 11 blocks of the home page, in display order. */
+/** The 16 blocks of the home page, in display order. */
 export async function buildHomeLayout(ctx: SeedContext): Promise<LayoutBlock[]> {
   const hero: HeroBlock = {
     blockType: "hero",
@@ -112,6 +121,87 @@ export async function buildHomeLayout(ctx: SeedContext): Promise<LayoutBlock[]> 
     rightTitle: HOME_WHY.rightTitle,
     rows: HOME_WHY.rows.map((row) => ({ ...row })),
     footLink: { ...customLink(HOME_WHY.footLink.url), label: HOME_WHY.footLink.label },
+  };
+
+  const designBody = [
+    HOME_DESIGN.lead,
+    HOME_DESIGN.checklist.map((item) => `- ${item}`).join("\n"),
+  ].join("\n\n");
+
+  const design: CtaBlock = {
+    blockType: "cta",
+    anchorId: HOME_ANCHORS.design,
+    background: "bg",
+    variant: "buttons",
+    tone: "light",
+    heading: HOME_DESIGN.eyebrow,
+    title: HOME_DESIGN.heading,
+    body: await markdown(ctx, designBody),
+    buttons: [
+      {
+        label: HOME_DESIGN.moreLabel,
+        kind: "link",
+        variant: "primary",
+        icon: "arrow-right",
+        link: customLink(HOME_DESIGN.moreUrl),
+      },
+      {
+        label: HOME_DESIGN.taskLabel,
+        kind: "form",
+        formKey: "drawing",
+        formParams: { label: HOME_DESIGN.taskLabel, source: HOME_SOURCES.design },
+        variant: "ghost",
+      },
+    ],
+  };
+
+  const designLevels: CardsBlock = {
+    blockType: "cards",
+    anchorId: HOME_ANCHORS.designLevels,
+    background: "bg",
+    layout: "g3",
+    items: HOME_DESIGN.levels.map((level) => ({
+      title: level.title,
+      text: level.text,
+      priceHint: level.bottom,
+      tone: level.dark ? "accent" : "default",
+    })),
+  };
+
+  const production: CtaBlock = {
+    blockType: "cta",
+    anchorId: HOME_ANCHORS.production,
+    background: "primaryDark",
+    variant: "buttons",
+    tone: "primaryDark",
+    heading: HOME_PRODUCTION.eyebrow,
+    title: HOME_PRODUCTION.heading,
+    body: await markdown(ctx, HOME_PRODUCTION.lead),
+    buttons: [
+      {
+        label: HOME_PRODUCTION.moreLabel,
+        kind: "link",
+        variant: "secondary",
+        icon: "arrow-right",
+        link: customLink(HOME_PRODUCTION.moreUrl),
+      },
+    ],
+  };
+
+  const productionStats: StatsBlock = {
+    blockType: "stats",
+    anchorId: HOME_ANCHORS.productionStats,
+    background: "primaryDark",
+    variant: "plain",
+    items: HOME_PRODUCTION.stats.map((stat) => ({ ...stat })),
+  };
+
+  const productionPhotos: CardsBlock = {
+    blockType: "cards",
+    anchorId: HOME_ANCHORS.productionPhotos,
+    background: "primaryDark",
+    layout: "g4",
+    items: HOME_PRODUCTION.photos.map((title) => ({ title })),
   };
 
   const glass: CardsBlock = {
@@ -212,6 +302,11 @@ export async function buildHomeLayout(ctx: SeedContext): Promise<LayoutBlock[]> 
   return [
     hero,
     why,
+    design,
+    designLevels,
+    production,
+    productionStats,
+    productionPhotos,
     glass,
     processing,
     constructions,

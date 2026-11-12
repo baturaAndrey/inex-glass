@@ -49,7 +49,7 @@
 
 ## PROJECT FACTS
 
-- The site is a B2B supplier of tempered glass, Inex Glass (inexglass.ru). We do NOT claim installation or own production
+- The site is a B2B supplier of tempered glass, Inex Glass (inexglass.ru). We do NOT make the glass itself (a supplier makes it to our spec) and do NOT install ourselves (installation = partner crew or supervised installation, "шеф-монтаж"). We DO design (working project) and manufacture finished constructions (frames, assembly with glass, QC, packing) in our own workshop — allowed since 12.11.2026, see `docs/inex/16-tz-razrabotka.md` §11
 - UI and content language is Russian. Code, identifiers and paths are English
 - Page copy is taken verbatim from `res/inex-glass-handoff/teksty/`; H1/title/description come from `docs/inex/17-meta.md`. Never invent missing copy: use the placeholder `[…]`
 - Reference values (prices, promo, terms, contacts) come only from CMS globals; never hardcode them

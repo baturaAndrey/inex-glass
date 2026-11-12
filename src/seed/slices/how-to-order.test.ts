@@ -22,7 +22,7 @@ import type {
  * Content of the «how-to-order» slice (task 28):
  * (a) every string is verbatim from teksty (body) or 17-meta (H1 / Title / Description);
  * (b) no stop-words (ТЗ §11), no editorial marks;
- * (c) 10 unique paths with a trailing slash.
+ * (c) 9 unique paths with a trailing slash.
  * The verbatim checks are skipped when the handoff folder (`res/`) is not checked out.
  */
 
@@ -160,10 +160,10 @@ describe("how-to-order content", () => {
     expect(allText).not.toMatch(/ждёт ответа|\[уточнить\]|heat\s*soak|стеклопакет/i);
   });
 
-  it("has 10 unique paths with a trailing slash", () => {
+  it("has 9 unique paths with a trailing slash", () => {
     const paths = HOW_TO_ORDER_PAGES.map((page) => page.path);
-    expect(paths).toHaveLength(10);
-    expect(new Set(paths).size).toBe(10);
+    expect(paths).toHaveLength(9);
+    expect(new Set(paths).size).toBe(9);
     for (const pagePath of paths) expect(pagePath).toMatch(/^\/[a-z0-9-/]+\/$/);
   });
 

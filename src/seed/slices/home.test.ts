@@ -5,11 +5,13 @@ import { EXPERIENCE_PHRASE, checkStopWords } from "@/lib/domain";
 import {
   HOME_CLIENT_APPROVED_STRINGS,
   HOME_CONSTRUCTIONS,
+  HOME_DESIGN,
   HOME_FORM,
   HOME_GLASS,
   HOME_HERO,
   HOME_OBJECTS,
   HOME_PROCESSING,
+  HOME_PRODUCTION,
   HOME_PROTOTYPE_STRINGS,
   HOME_SEGMENTS,
   HOME_SEO,
@@ -55,6 +57,19 @@ function contentStrings(): string[] {
     HOME_WHY.rightTitle,
     ...HOME_WHY.rows.flatMap((row) => [row.left, row.right]),
     HOME_WHY.footLink.label,
+    HOME_DESIGN.eyebrow,
+    HOME_DESIGN.heading,
+    HOME_DESIGN.lead,
+    ...HOME_DESIGN.checklist,
+    HOME_DESIGN.moreLabel,
+    HOME_DESIGN.taskLabel,
+    ...HOME_DESIGN.levels.flatMap((level) => [level.title, level.text, level.bottom]),
+    HOME_PRODUCTION.eyebrow,
+    HOME_PRODUCTION.heading,
+    HOME_PRODUCTION.lead,
+    HOME_PRODUCTION.moreLabel,
+    ...HOME_PRODUCTION.stats.flatMap((stat) => [stat.value, stat.text]),
+    ...HOME_PRODUCTION.photos,
     HOME_GLASS.heading,
     ...HOME_GLASS.items.flatMap((item) => [
       item.title,
@@ -88,6 +103,8 @@ function contentStrings(): string[] {
 function contentLinks(): string[] {
   return [
     HOME_WHY.footLink.url,
+    HOME_DESIGN.moreUrl,
+    HOME_PRODUCTION.moreUrl,
     ...HOME_GLASS.items.map((item) => item.url),
     ...HOME_PROCESSING.tiles.map((tile) => tile.url),
     HOME_PROCESSING.accent.url,
@@ -162,6 +179,10 @@ describe("home content", () => {
     expect(HOME_OBJECTS.fallback).toHaveLength(8);
     expect(HOME_HERO.stats).toHaveLength(3);
     expect(HOME_HERO.eyebrow).toHaveLength(3);
+    expect(HOME_DESIGN.checklist).toHaveLength(4);
+    expect(HOME_DESIGN.levels).toHaveLength(2);
+    expect(HOME_PRODUCTION.stats).toHaveLength(4);
+    expect(HOME_PRODUCTION.photos).toHaveLength(4);
   });
 
   it("starts the objects subtitle with the only allowed experience phrase", () => {

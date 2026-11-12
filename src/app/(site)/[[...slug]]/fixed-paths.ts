@@ -18,6 +18,8 @@ export const FIXED_PATHS = [
   "/kak-zakazat/",
   "/kak-zakazat/oplata/",
   "/kak-zakazat/trebovaniya-k-chertezham/",
+  "/proektirovanie/",
+  "/proizvodstvo/",
   "/zakalennoe-steklo/",
   "/obrabotka-stekla/",
   "/osteklenie/",

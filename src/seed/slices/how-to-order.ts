@@ -13,8 +13,8 @@ import type {
 import type { SeedContext } from "../context";
 
 /**
- * Seed slice «how-to-order» (task 28): the «Как заказать» hub, its eight child pages and
- * `/proektirovanie/` — 10 published `pages` documents. Content lives in
+ * Seed slice «how-to-order» (task 28): the «Как заказать» hub, its eight child pages — 9
+ * published `pages` documents (`/proektirovanie/` moved to the slice `engineering`, 2026-11-12). Content lives in
  * `src/seed/content/how-to-order.ts`; this file only maps it onto the block schema
  * (`src/payload/blocks/*`).
  *

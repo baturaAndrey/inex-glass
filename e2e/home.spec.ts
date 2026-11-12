@@ -15,6 +15,8 @@ const META = {
 
 const H2_ORDER = [
   "Почему через нас, а не напрямую с завода",
+  "Сначала проект — потом стекло",
+  "Делаем всё, кроме самого стекла",
   "Закалённое стекло и триплекс под ваш размер",
   "Вся обработка — до закалки",
   "Конструкции из стекла для объектов",
@@ -181,6 +183,29 @@ test.describe("home page", () => {
       return !path.endsWith("/") || path !== path.toLowerCase();
     });
     expect(bad).toEqual([]);
+  });
+
+  test("shows the design and production blocks with their links", async ({ page }) => {
+    await openHome(page);
+    const design = page.locator("#design");
+    await expect(design.locator("ul").first().locator("li")).toHaveCount(4);
+    await expect(design.getByRole("link", { name: "Подробнее о проектировании" })).toHaveAttribute(
+      "href",
+      "/proektirovanie/"
+    );
+    await expect(design.getByRole("heading", { level: 3 })).toHaveCount(2);
+    await design.getByRole("button", { name: "Отправить задачу" }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+
+    const production = page.locator("#production");
+    await expect(
+      production.getByRole("link", { name: "Как устроено производство" })
+    ).toHaveAttribute("href", "/proizvodstvo/");
+    await expect(production.locator("dl > div")).toHaveCount(4);
+    await expect(production.getByRole("heading", { level: 3 })).toHaveCount(4);
   });
 
   test("shows featured objects or the inactive fallback, and «Все объекты»", async ({ page }) => {

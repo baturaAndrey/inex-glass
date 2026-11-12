@@ -37,6 +37,7 @@ export const SEGMENT_LABELS: Readonly<Record<string, SegmentLabel>> = {
   "steklyannye-kozyrki": { label: "Стеклянные козырьки", hasPage: true },
   "torgovye-vitriny": { label: "Торговые витрины", hasPage: true },
   proektirovanie: { label: "Проектирование", hasPage: true },
+  proizvodstvo: { label: "Производство", hasPage: true },
   kontakty: { label: "Контакты", hasPage: true },
   "raschet-stoimosti": { label: "Расчёт стоимости", hasPage: true },
 };

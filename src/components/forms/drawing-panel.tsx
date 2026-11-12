@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { getConditions } from "@/lib/cms/globals";
 import { cn } from "@/lib/utils";
 import type { Condition } from "@/payload-types";
@@ -26,10 +27,15 @@ export interface DrawingPanelProps {
    */
   sub?: string | undefined;
   /**
-   * Form of the card: `full` (default) or `contacts` (`/kontakty/`: company, name, phone,
+   * Form of the card: `full` (default), `drawing` (no city / area: `/proektirovanie/`) or `contacts` (`/kontakty/`: company, name, phone,
    * e-mail, file, comment — teksty/06).
    */
-  formKey?: "full" | "contacts" | undefined;
+  formKey?: "full" | "contacts" | "drawing" | undefined;
+  /**
+   * Extra paragraph under the line, above a hairline (`/proektirovanie/`: «Проектирование —
+   * платная услуга …»).
+   */
+  note?: ReactNode;
   headingId: string;
   /** Lead params (`source`, `label` = CRM caption, …). */
   params: FormParams;
@@ -55,6 +61,7 @@ export async function DrawingPanel({
   heading,
   sub,
   formKey = "full",
+  note,
   headingId,
   params,
   anchorId,
@@ -82,6 +89,11 @@ export async function DrawingPanel({
           <p className="text-on-navy-2 m-0 text-[17px] leading-[1.55] max-sm:text-base">
             {subline}
           </p>
+        ) : null}
+        {note ? (
+          <div className="text-on-navy border-t border-white/15 pt-4 text-[17px] leading-[1.55] max-sm:text-base">
+            {note}
+          </div>
         ) : null}
       </div>
       <div className="bg-surface text-text rounded-xl p-8 max-sm:p-5">

@@ -479,7 +479,8 @@ const SERVICES_MENU: MegaMenu = {
     {
       title: "Проектирование и инструменты",
       links: [
-        megaLink("Проектирование узлов", "/proektirovanie/"),
+        megaLink("Проектирование", "/proektirovanie/"),
+        megaLink("Производство", "/proizvodstvo/"),
         megaLink("Калькулятор веса стекла", "/instrumenty/kalkulyator-vesa-stekla/"),
       ],
     },
@@ -562,6 +563,7 @@ async function seedNavigation(ctx: SeedContext): Promise<void> {
           links: [
             link("Обработка стекла", O),
             link("Проектирование", "/proektirovanie/"),
+            link("Производство", "/proizvodstvo/"),
             link("Как заказать", K),
             link("Требования к чертежам", `${K}trebovaniya-k-chertezham/`),
             link("Сроки", `${K}sroki/`),

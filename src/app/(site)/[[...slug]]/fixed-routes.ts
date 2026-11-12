@@ -12,6 +12,8 @@ import * as Team from "../_fixed/o-kompanii/sotrudniki/page";
 import * as ProcessingHub from "../_fixed/obrabotka-stekla/page";
 import * as GlazingHub from "../_fixed/osteklenie/page";
 import * as Home from "../_fixed/page";
+import * as Design from "../_fixed/proektirovanie/page";
+import * as Production from "../_fixed/proizvodstvo/page";
 import * as Constructions from "../_fixed/steklyannye-konstrukcii/page";
 import * as Canopies from "../_fixed/steklyannye-kozyrki/page";
 import * as Railings from "../_fixed/steklyannye-ograzhdeniya/page";
@@ -58,6 +60,8 @@ const FIXED_ROUTES = {
   "/kak-zakazat/": HowToOrder,
   "/kak-zakazat/oplata/": HowToOrderPayment,
   "/kak-zakazat/trebovaniya-k-chertezham/": DrawingRequirements,
+  "/proektirovanie/": Design,
+  "/proizvodstvo/": Production,
   "/zakalennoe-steklo/": TemperedHub,
   "/obrabotka-stekla/": ProcessingHub,
   "/osteklenie/": GlazingHub,

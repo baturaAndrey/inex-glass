@@ -169,6 +169,7 @@ export const URLS = {
   glazingLifts: "/osteklenie/liftovyh-shaht/",
   glazingVerandas: "/osteklenie/verand-terras-besedok/",
   design: "/proektirovanie/",
+  production: "/proizvodstvo/",
   howToOrder: "/kak-zakazat/",
   howToOrderDrawings: "/kak-zakazat/trebovaniya-k-chertezham/",
   howToOrderGost: "/kak-zakazat/dopuski-i-gost/",
@@ -282,7 +283,8 @@ const SERVICES_MENU: MegaMenuData = {
     {
       title: "Проектирование",
       links: [
-        megaLink("Проектирование узлов", URLS.design),
+        megaLink("Проектирование", URLS.design),
+        megaLink("Производство", URLS.production),
         megaLink("Калькулятор веса стекла", URLS.weightCalculator),
       ],
     },
@@ -372,6 +374,7 @@ export const DEFAULT_FOOTER_NAV: FooterNavData = {
       links: [
         link("Обработка стекла", URLS.processing),
         link("Проектирование", URLS.design),
+        link("Производство", URLS.production),
         link("Как заказать", URLS.howToOrder),
         link("Требования к чертежам", URLS.howToOrderDrawings),
         link("Допуски и ГОСТ", URLS.howToOrderGost),
