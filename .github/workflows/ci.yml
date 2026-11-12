@@ -38,6 +38,10 @@ jobs:
       SITE_URL: http://localhost:3100
       SITE_ENV: development
       JOBS_ENABLED: "false"
+      # Same dirs as `e2eServerEnv()` (e2e/helpers/env.ts): seed and attach-generated-media must
+      # write media where the e2e `next start` reads it, otherwise every image is a 500.
+      MEDIA_DIR: .data/e2e/media
+      UPLOADS_DIR: .data/e2e/lead-files
       # The app is built by the `pnpm build` step below; Playwright only runs `next start`.
       E2E_SKIP_BUILD: "1"
     steps:
@@ -75,7 +79,7 @@ jobs:
       # The package.json seed script ends with `--`, so bare flags reach the script.
       - run: pnpm seed --full || echo "seed not available"
       # Generated placeholder images (task 38): without them e2e/placeholder-media.spec.ts skips
-      # its page checks. Files go to the default MEDIA_DIR (./.data/media), which `next start`
+      # its page checks. Files go to MEDIA_DIR (job env, .data/e2e/media), which the e2e `next start`
       # serves. No site is running yet and the data cache is cleared before e2e, so revalidation
       # is skipped.
       - run: pnpm payload run scripts/attach-generated-media.ts -- --no-revalidate
