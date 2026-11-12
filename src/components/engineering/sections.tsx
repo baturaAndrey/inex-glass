@@ -90,7 +90,8 @@ export function FactsStrip({
   return (
     <dl
       className={cn(
-        "m-0 grid max-md:grid-cols-1",
+        // Gap under the hero photo (mockup: 40 px).
+        "m-0 mt-10 grid max-md:grid-cols-1 max-sm:mt-6",
         dark
           ? "bg-primary-dark text-on-navy grid-cols-3 rounded-xl px-12 py-10 max-lg:px-8 max-sm:rounded-lg max-sm:px-5 max-sm:py-6"
           : "bg-surface grid-cols-[1.4fr_1fr_1fr] rounded-lg py-8 max-sm:py-5"
