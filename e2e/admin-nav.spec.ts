@@ -117,7 +117,7 @@ test.describe("desktop 1366", () => {
     playwright,
     baseURL,
   }) => {
-    test.setTimeout(COUNTER_WAIT_MS + 60_000);
+    test.setTimeout(2 * COUNTER_WAIT_MS + 60_000);
     const api = await ensureAdmin(playwright, baseURL!);
     await signInBrowser(context, api, baseURL!);
 
@@ -148,9 +148,22 @@ test.describe("desktop 1366", () => {
     const shown = Number(match![1]);
     await expect(badge).toHaveText(String(shown));
     expect(shown).toBeGreaterThanOrEqual(1);
-    // Other specs add leads in parallel and the counter is cached: an upper bound only.
-    const after = await leadsWithStatus(api, statusId!);
-    expect(shown).toBeLessThanOrEqual(Math.max(after, before));
+    // Other specs add AND delete leads in parallel while the counter is cached for 60 s, so a
+    // single reading may be above or below the live count. Reload until the badge agrees with
+    // the live count (the cache expires within COUNTER_WAIT_MS).
+    await expect
+      .poll(
+        async () => {
+          await page.reload();
+          const current = await leadsWithStatus(api, statusId!);
+          const text =
+            (await badge.count()) > 0 ? ((await badge.getAttribute("aria-label")) ?? "") : "";
+          const value = Number(/^новых: (\d+)$/.exec(text)?.[1] ?? 0);
+          return value === current;
+        },
+        { timeout: COUNTER_WAIT_MS, intervals: [5_000] }
+      )
+      .toBe(true);
   });
 
   test("manager sees site and catalog, not jobs or the search index", async ({

@@ -121,6 +121,11 @@ test.describe("axe: WCAG 2.1 AA, no serious/critical", () => {
     await openPage(page, home);
     const banner = page.getByRole("region", { name: "Уведомление о cookie" });
     await expect(banner).toBeVisible();
+    // The banner fades in (`animate-in fade-in-0`): mid-animation axe sees a translucent
+    // button and reports a false color-contrast failure on slow runners (CI).
+    await banner.evaluate((element) =>
+      Promise.all(element.getAnimations({ subtree: true }).map((animation) => animation.finished))
+    );
     const blocking = await audit(page, testInfo, "cookie-banner", ".ig-cookie");
     expect(blocking, describeBlocking(blocking)).toEqual([]);
   });
@@ -148,7 +153,12 @@ test.describe("axe: WCAG 2.1 AA, no serious/critical", () => {
         status: 200,
         ctaInFirstScreen: true,
       });
-      await expect(page.getByRole("button", { name: /Фильтры/ })).toBeVisible();
+      // ≤1100: «Фильтры» button (drawer); ≥1101: the pill panel (objects.spec).
+      const filters =
+        (page.viewportSize()?.width ?? 0) <= 1100
+          ? page.getByRole("button", { name: /^Фильтры/ })
+          : page.locator("[data-objects-filters]");
+      await expect(filters).toBeVisible();
       const listing = await audit(page, testInfo, "objects-with-cards");
 
       await openPage(page, {
@@ -284,6 +294,9 @@ test.describe("keyboard and focus", () => {
     }
 
     const trigger = page.locator('header button[aria-haspopup="true"][aria-controls]').first();
+    // The walk above already passed the header: restart the Tab order from the skip link
+    // (the first focus stop) instead of tabbing through the whole page.
+    await page.getByRole("link", { name: "Перейти к содержимому" }).focus();
     await tabTo(page, trigger);
     await page.keyboard.press("Enter");
     await expect(trigger).toHaveAttribute("aria-expanded", "true");

@@ -1,6 +1,7 @@
 import os from "node:os";
 import path from "node:path";
 import { test } from "@playwright/test";
+import { E2E_BASE_URL } from "./env";
 import { MAILPIT_URL } from "./mailpit";
 import { VIEWPORTS } from "./viewports";
 import type { TestInfo } from "@playwright/test";
@@ -10,9 +11,11 @@ import type { TestInfo } from "@playwright/test";
  * the local production-like stand and a real staging; everything stand-specific comes from env:
  *
  * - `E2E_BASE_URL` — the stand (Playwright `baseURL`).
- * - `ACCEPTANCE_EXPECT_ENV` — `staging` | `production` | `development` (default `production`,
- *   the local stand): staging expects basic auth + noindex everywhere, production expects
- *   indexable public pages.
+ * - `ACCEPTANCE_EXPECT_ENV` — `staging` | `production` | `development`. Default: `development`
+ *   for the server Playwright starts itself (`e2eServerEnv()` runs it with `SITE_ENV=development`),
+ *   `production` for an external stand (`E2E_BASE_URL`, e.g. the local stand).
+ *   Staging expects basic auth + noindex everywhere, production expects indexable public pages;
+ *   staging and development serve a closed `robots.txt` (`Disallow: /`).
  * - `STAGING_BASIC_AUTH` — `user:pass` of the staging basic auth (`playwright.config.ts` turns it
  *   into `httpCredentials`).
  * - `MAILPIT_URL` — Mailpit HTTP API; without it mail checks are `[ЧЕЛОВЕК]` (see `./mailpit`).
@@ -24,7 +27,9 @@ export type ExpectEnv = "staging" | "production" | "development";
 const EXPECT_ENVS: readonly ExpectEnv[] = ["staging", "production", "development"];
 
 function readExpectEnv(): ExpectEnv {
-  const raw = (process.env.ACCEPTANCE_EXPECT_ENV ?? "production").trim().toLowerCase();
+  const raw = (process.env.ACCEPTANCE_EXPECT_ENV ?? (E2E_BASE_URL ? "production" : "development"))
+    .trim()
+    .toLowerCase();
   if ((EXPECT_ENVS as readonly string[]).includes(raw)) return raw as ExpectEnv;
   throw new Error(`ACCEPTANCE_EXPECT_ENV must be one of ${EXPECT_ENVS.join(" | ")} (got ${raw})`);
 }

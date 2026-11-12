@@ -182,12 +182,20 @@ test("7. prices: manager edit reaches the thickness page, hub and quiz; 45-day r
 
     const thickness = await html(request, PRICE_PAGE);
     expect(htmlTitle(thickness)).toContain(`от ${groupThousands(price)} ₽/м²`);
-    expect(visibleText(thickness)).toContain(`Ориентировочная цена на ${formatRu(today)}`);
+    // Paper redesign (04bd9e5): the spec table says «от N ₽/м² — ориентир на ДД.ММ.ГГГГ».
+    expect(visibleText(thickness)).toContain(`ориентир на ${formatRu(today)}`);
     const offers = aggregateOffers(thickness);
     expect(offers, "Product/AggregateOffer with a fresh price").toHaveLength(1);
     expect(offers[0]?.lowPrice).toBe(price);
 
-    expect(visibleText(await html(request, HUB))).toContain(`от ${groupThousands(price)}`);
+    // Hub price tiles (Paper redesign): caption «от, ₽/м²», the number without «от». Polled:
+    // a hub render started by a parallel spec just before the save may still land once.
+    await expect
+      .poll(async () => visibleText(await html(request, HUB)), {
+        timeout: 30_000,
+        intervals: [1_000, 2_000],
+      })
+      .toContain(`10 мм от, ₽/м² ${groupThousands(price)}`);
 
     const quiz = await quizStep3(page, testInfo, QUIZ_AREA);
     await expect(page.locator("[data-price-state]")).toHaveAttribute("data-price-state", "price");
@@ -255,7 +263,7 @@ test("8. promo: on → plate, «Акции», caption, quiz hint; ended / off �
       name: "Акции",
       exact: true,
     });
-    const caption = page.locator("[data-passport-promo]");
+    const caption = page.locator("[data-spec-promo]");
     if (shown) {
       await expect(plate.first()).toBeVisible();
       await expect(actions).toBeVisible();

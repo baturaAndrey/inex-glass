@@ -1,6 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { expect, request as playwrightRequest, test } from "@playwright/test";
-import { IS_STAGING, STAGING_CREDENTIALS, isHttps, onlyProject } from "../helpers/acceptance-env";
+import {
+  EXPECT_ENV,
+  IS_STAGING,
+  STAGING_CREDENTIALS,
+  isHttps,
+  onlyProject,
+} from "../helpers/acceptance-env";
 import { createStaffUser, deleteStaffUser } from "../helpers/admin";
 import { adminApi } from "../helpers/admin-api";
 import type { APIRequestContext, APIResponse } from "@playwright/test";
@@ -195,7 +201,8 @@ test.describe("acceptance: security", () => {
     const robots = await request.get("/robots.txt");
     expect(robots.status()).toBe(200);
     const text = await robots.text();
-    if (IS_STAGING) {
+    // Staging and development close the whole site (src/lib/seo/robots.ts).
+    if (EXPECT_ENV !== "production") {
       expect(text).toMatch(/^Disallow:\s*\/\s*$/m);
     } else {
       expect(text).toMatch(/^Disallow:\s*\/admin\/?\s*$/m);
