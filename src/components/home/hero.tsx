@@ -41,7 +41,9 @@ export async function HomeHero({ block, ctx, page }: BlockProps<"hero">) {
   const eyebrow = (block.eyebrow ?? []).map((item) => fill(item.text, ctx)).filter(Boolean);
   const stats = (block.stats ?? []).filter((stat) => hasText(stat.value));
   const image = asMedia(block.image);
-  const src = (image ? mediaSrc(image, "hero") : null) ?? HOME_HERO_FALLBACK_SRC;
+  // The original upload, not the 1600 px `hero` size: the photo spans up to 1920 px, so the
+  // optimizer must downscale every srcset width from the full-resolution file (no upscaling).
+  const src = (image ? mediaSrc(image) : null) ?? HOME_HERO_FALLBACK_SRC;
   const alt = fill(block.imageAlt, ctx) || image?.alt || "";
 
   return (

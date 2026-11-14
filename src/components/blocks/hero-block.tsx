@@ -117,7 +117,8 @@ export async function HeroBlock({ block, ctx, page }: BlockProps<"hero">) {
   const terms = block.showTerms === false ? null : await heroTerms(block.termsMode, ctx);
   const hasButtons = (block.buttons ?? []).some((button) => hasText(button.label));
   const homeImage = variant === "home" ? asMedia(block.image) : null;
-  const homeSrc = homeImage ? mediaSrc(homeImage, "hero") : null;
+  // Original upload (not the 1600 px `hero` size): the home photo spans up to 1920 px.
+  const homeSrc = homeImage ? mediaSrc(homeImage) : null;
   const stats = (block.stats ?? []).filter((stat) => hasText(stat.value));
 
   return (

@@ -273,6 +273,17 @@ jobs:
           SMOKE_BASIC_AUTH: ${{ secrets.STAGING_SMOKE_BASIC_AUTH }}
         run: node scripts/ops/smoke-prod.ts
 
+      # Encodes the home hero AVIF/WebP for every srcset width so the first visitor of the new
+      # release does not wait for it (docs/deploy.md «Кэш Next»). Best effort: never fails the job.
+      - name: Warm image cache (home hero)
+        if: env.DOKPLOY_STAGING_API_KEY != '' && env.SITE != ''
+        continue-on-error: true
+        timeout-minutes: 10
+        env:
+          WARM_BASIC_AUTH: ${{ secrets.STAGING_SMOKE_BASIC_AUTH }}
+          WARM_TIMEOUT_MS: "30000"
+        run: node scripts/ops/warm-images.ts || true
+
       # The prod gate (staging-gate) accepts a release only if THIS commit was deployed to staging,
       # answered health and passed the smoke suite. GitHub's automatic environment deployment
       # cannot serve as that proof: for workflow_run it records github.sha (the newest commit on
