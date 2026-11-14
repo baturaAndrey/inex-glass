@@ -41,14 +41,15 @@ export const HOME_HERO = {
   stats: [
     { value: "21 год", text: "опыт специалистов Inex" },
     { value: "1500+", text: "проектов по всей России" },
-    { value: "4–19 мм", text: "толщины закалённого стекла" },
+    // Client request of 2026-11-14 (replaces «4–19 мм / толщины закалённого стекла»).
+    { value: "800 м²", text: "своё производство" },
   ],
   quizLabel: "Рассчитать стоимость",
   drawingLabel: "Отправить чертёж",
-  /** Wide hero photo (`src/seed/media/home/`, 21:9): client request of 2026-11-10. */
+  /** Wide hero photo (`src/seed/media/home/`, 21:9): client photo of 2026-11-13. */
   image: { group: "home", file: "hero.webp" },
   imageAlt:
-    "Готовые изделия из стекла в цехе: дверь в тонкой чёрной алюминиевой раме, перегородка, душевое ограждение, лестничное ограждение и раздвижная терраса",
+    "Готовые стеклянные конструкции в цехе: двери в чёрной раме и упакованные стеклянные изделия на стойках для отгрузки",
 } as const;
 
 /**
@@ -392,8 +393,11 @@ export const HOME_CLIENT_APPROVED_STRINGS: readonly string[] = [
   // Installation wording decided by the client on 2026-11-09, site-wide.
   HOME_STEPS.footnote,
   HOME_CONSTRUCTIONS.sub,
-  // Alt of the wide hero photo of 2026-11-10 (describes the photo, not page copy).
+  // Alt of the wide hero photo (describes the photo, not page copy).
   HOME_HERO.imageAlt,
+  // Hero stat requested by the client on 2026-11-14.
+  HOME_HERO.stats[2].value,
+  HOME_HERO.stats[2].text,
   // «Проектирование» and «Производство» of the Paper mockup (2026-11-12).
   HOME_DESIGN.eyebrow,
   HOME_DESIGN.heading,
