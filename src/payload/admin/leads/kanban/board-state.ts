@@ -149,6 +149,9 @@ export function moveResultAnnouncement(
         `Заявка осталась в «${sourceName}»`;
 }
 
+/** A keyboard focus target on the board: a card (its handle or menu) or a column heading. */
+export type FocusTarget = { kind: "card"; cardId: string } | { kind: "column"; columnId: string };
+
 /**
  * Where the keyboard focus goes when `cardId` leaves its column for a place that may be hidden
  * (a collapsed refusal strip): the next card of the column, else the previous one, else the
@@ -157,7 +160,7 @@ export function moveResultAnnouncement(
 export function focusAfterLeaving(
   columns: readonly KanbanColumn[],
   cardId: string
-): { kind: "card"; cardId: string } | { kind: "column"; columnId: string } | null {
+): FocusTarget | null {
   const found = findCard(columns, cardId);
   if (!found) return null;
   const { cards } = found.column;

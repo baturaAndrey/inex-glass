@@ -11,6 +11,7 @@ import {
   uniquePhone,
 } from "./helpers/admin-api";
 import { E2E_BASE_URL, E2E_MAX_BOT_NAME, E2E_MAX_WEBHOOK_SECRET } from "./helpers/env";
+import { boardSearchMarker, keyboardDragReady } from "./helpers/kanban";
 import { clientIpHeaders, uniqueTestIp } from "./helpers/test-ip";
 import { VIEWPORTS } from "./helpers/viewports";
 import type { AdminApi, LeadInput } from "./helpers/admin-api";
@@ -36,7 +37,7 @@ import type { APIRequestContext, APIResponse, Page, TestInfo } from "@playwright
  * ignored in column assertions.
  */
 
-const RUN = `e2e-redesign-${Date.now().toString(36)}`;
+const RUN = boardSearchMarker("e2e-redesign");
 const NAV = 'nav[aria-label="Главное меню"]';
 const KANBAN = "/admin/collections/leads/kanban/";
 const BOARD_URL = `${KANBAN}?search=${encodeURIComponent(RUN)}`;
@@ -293,7 +294,7 @@ test.describe("flow (1366)", () => {
     // @dnd-kit keyboard sensor: focus the handle → Space → → → Space.
     await card.locator(".iga-kcard__handle").focus();
     await page.keyboard.press("Space");
-    await expect(page.locator('[id^="DndLiveRegion"]', { hasText: "Взята заявка" })).toHaveCount(1);
+    await keyboardDragReady(page, `Взята заявка «${leadMove.company}», колонка «Новая»`);
     await page.keyboard.press("ArrowRight");
     await expect(
       page.locator('[id^="DndLiveRegion"]', { hasText: "Над колонкой «В работе»" })

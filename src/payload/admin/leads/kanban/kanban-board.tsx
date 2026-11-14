@@ -1,6 +1,14 @@
 "use client";
 
-import { useCallback, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import type { CSSProperties, KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -33,6 +41,7 @@ import { KanbanColumn } from "./kanban-column";
 import { ContractDialog, RefuseDialog } from "./move-dialogs";
 import { RefuseStrip } from "./refuse-strip";
 import type { PatchResult } from "./api";
+import type { FocusTarget } from "./board-state";
 import type {
   KanbanBoardProps,
   KanbanCard as KanbanCardData,
@@ -153,20 +162,18 @@ type PendingDialog =
   | { kind: "refuse"; card: KanbanCardData; target: KanbanColumnData }
   | { kind: "contract"; card: KanbanCardData; target: KanbanColumnData };
 
-/** Moves the keyboard focus back to a card (after a dialog or a move). */
-function focusCard(cardId: string) {
-  requestAnimationFrame(() => {
-    const card = document.getElementById(cardDomId(cardId));
+/**
+ * Moves the keyboard focus to a card (its handle, or «Перенести в…» on phones) or to a column
+ * heading (a strip's summary: the place left when the column's last card goes).
+ */
+function applyFocus(target: FocusTarget) {
+  if (target.kind === "card") {
+    const card = document.getElementById(cardDomId(target.cardId));
     card?.querySelector<HTMLElement>(".iga-kcard__handle, .iga-kmenu__button")?.focus();
-  });
-}
-
-/** Focuses a column's heading (a strip's summary): the place left when its last card goes. */
-function focusColumn(columnId: string) {
-  requestAnimationFrame(() => {
-    const zone = document.querySelector(`[data-status-id="${CSS.escape(columnId)}"]`);
+  } else {
+    const zone = document.querySelector(`[data-status-id="${CSS.escape(target.columnId)}"]`);
     zone?.querySelector<HTMLElement>(".iga-kanban__col-title, .iga-kstrip__summary")?.focus();
-  });
+  }
 }
 
 export function KanbanBoard(props: KanbanBoardProps) {
@@ -192,6 +199,21 @@ export function KanbanBoard(props: KanbanBoardProps) {
   /** Server verdicts on moves for screen readers (dnd-kit only announces the drop itself). */
   const [liveMessage, setLiveMessage] = useState("");
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  /**
+   * Where the focus goes once the open dialog is gone. It cannot be moved right away: while the
+   * modal `<dialog>` is open the rest of the page is inert (`focus()` there is a no-op), and its
+   * `close()` on unmount (`useShowModal` cleanup) puts the focus back where it was before
+   * `showModal()`. The effect below runs after that cleanup (React runs a commit's passive
+   * cleanups before its passive effects), so this focus lands last.
+   */
+  const pendingFocus = useRef<FocusTarget | null>(null);
+
+  useEffect(() => {
+    if (dialog) return;
+    const target = pendingFocus.current;
+    pendingFocus.current = null;
+    if (target) applyFocus(target);
+  }, [dialog]);
 
   const setBusy = useCallback((cardId: string, busy: boolean) => {
     setBusyIds((current) => {
@@ -291,8 +313,9 @@ export function KanbanBoard(props: KanbanBoardProps) {
     [busyIds, currentUserId, currentUserName, router, setBusy]
   );
 
+  /** Closes the dialog and returns the focus to its card (Escape, «Отмена»). */
   const closeDialog = () => {
-    if (dialog) focusCard(dialog.card.id);
+    if (dialog) pendingFocus.current = { kind: "card", cardId: dialog.card.id };
     setDialog(null);
   };
 
@@ -312,13 +335,12 @@ export function KanbanBoard(props: KanbanBoardProps) {
       setBusy(card.id, false);
       if (result.ok) {
         setColumns((current) => moveCard(current, card, card.statusId, target.id));
+        pendingFocus.current = focusTo;
         setDialog(null);
         const sourceName = columnName(card.statusId);
         setLiveMessage(moveResultAnnouncement(result, card.title, target.name, sourceName));
         toast.success(`Статус: «${target.name}»`);
         router.refresh();
-        if (focusTo?.kind === "card") focusCard(focusTo.cardId);
-        else if (focusTo?.kind === "column") focusColumn(focusTo.columnId);
       }
       return result;
     },
@@ -517,8 +539,9 @@ export function KanbanBoard(props: KanbanBoardProps) {
           statusName={dialog.target.name}
           onConfirm={() => {
             const { card, target } = dialog;
+            // `commitMove` moves the card in this same render: the focus follows it.
+            pendingFocus.current = { kind: "card", cardId: card.id };
             setDialog(null);
-            focusCard(card.id);
             void commitMove(card, target, columnName(card.statusId), { status: target.id });
           }}
           onClose={closeDialog}

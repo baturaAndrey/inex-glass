@@ -8,6 +8,7 @@ import {
   signInBrowser,
   uniquePhone,
 } from "./helpers/admin-api";
+import { boardSearchMarker, keyboardDragReady } from "./helpers/kanban";
 import { VIEWPORTS } from "./helpers/viewports";
 import type { AdminApi } from "./helpers/admin-api";
 import type { Lead } from "../src/payload-types";
@@ -24,7 +25,7 @@ import type { APIRequestContext, Locator, Page } from "@playwright/test";
 
 test.describe.configure({ mode: "serial" });
 
-const RUN = `e2e-kanban-${Date.now().toString(36)}`;
+const RUN = boardSearchMarker("e2e-kanban");
 const KANBAN = "/admin/collections/leads/kanban/";
 const BOARD_URL = `${KANBAN}?search=${encodeURIComponent(RUN)}`;
 /** Name prefix of the temporary lead statuses of `e2e/helpers/orders-fixtures.ts`. */
@@ -194,7 +195,7 @@ test("drag with the keyboard (handle, Space, →, Space)", async ({ page, baseUR
 
   await card(page, leadB).locator(".iga-kcard__handle").focus();
   await page.keyboard.press("Space");
-  await announced("Взята заявка");
+  await keyboardDragReady(page, `Взята заявка «ИП ${RUN} Бета», колонка «Новая»`);
   await page.keyboard.press("ArrowRight");
   await announced("Над колонкой «В работе»");
   await page.keyboard.press("Space");
