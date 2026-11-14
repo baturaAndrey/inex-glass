@@ -498,11 +498,22 @@ export const HOME_USEFUL = {
       title: "Калькулятор веса стекла",
       text: "вес 1 м² и всей партии для 4–19 мм",
       url: "/instrumenty/kalkulyator-vesa-stekla/",
+      // Generated via kie.ai on 2026-11-14 (16:9, like the article covers of items 3–4).
+      image: homeImage(
+        "home",
+        "useful/kalkulyator-vesa.webp",
+        "Стопка листов закалённого стекла на платформенных весах, рядом планшет",
+      ),
     },
     {
       title: "Допуски по ГОСТ 30698-2014",
       text: "размеры, плоскостность, расстояния для отверстий",
       url: "/kak-zakazat/dopuski-i-gost/",
+      image: homeImage(
+        "home",
+        "useful/dopuski-gost.webp",
+        "Замер штангенциркулем кромки закалённого стекла у отверстия",
+      ),
     },
     {
       title: "Можно ли резать закалённое стекло",
@@ -574,6 +585,8 @@ export const HOME_CLIENT_APPROVED_STRINGS: readonly string[] = [
   // client request 2026-11-14.
   HOME_DESIGN.image.alt,
   ...HOME_PRODUCTION.photos.map((photo) => photo.image.alt),
+  HOME_USEFUL.items[0].image.alt,
+  HOME_USEFUL.items[1].image.alt,
 ];
 
 /** Strings taken from the prototype `Home.dc.html` (not present in teksty/01). */

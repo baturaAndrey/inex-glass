@@ -71,6 +71,8 @@ function contentStrings(): string[] {
     ...HOME_PRODUCTION.stats.flatMap((stat) => [stat.value, stat.text]),
     ...HOME_PRODUCTION.photos.flatMap((photo) => [photo.title, photo.image.alt]),
     HOME_DESIGN.image.alt,
+    HOME_USEFUL.items[0].image.alt,
+    HOME_USEFUL.items[1].image.alt,
     HOME_GLASS.heading,
     ...HOME_GLASS.items.flatMap((item) => [
       item.title,
