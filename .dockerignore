@@ -1,0 +1,63 @@
+# Build context for the Dockerfile. Keep it minimal: secrets, VCS, local data,
+# dev-only material and build artefacts must never reach the image.
+
+# VCS / editors / agents
+.git
+.gitignore
+.github
+.vscode
+.idea
+.claude
+.agents
+.mcp.json
+skills-lock.json
+
+# Dependencies and build output (rebuilt inside the image)
+node_modules
+**/node_modules
+.next
+out
+build
+coverage
+*.tsbuildinfo
+next-env.d.ts
+
+# Secrets and env files (env.example is not needed by the build either)
+.env
+.env.*
+env.example
+*.pem
+
+# Local data, test artefacts.
+# `e2e/` is deliberately NOT excluded: `next build` type-checks every `**/*.ts` (tsconfig
+# `include`), and playwright.config.ts, scripts/test-db.ts and the *.int.test.ts files import
+# `e2e/helpers`. Never exclude a directory holding .ts/.tsx files that tsconfig includes.
+.data
+playwright-report
+test-results
+.playwright-mcp
+
+# Docs, specs and source material (not used by the build)
+docs
+specs
+res
+*.md
+
+# Docker files themselves and dev-only compose assets
+Dockerfile
+.dockerignore
+docker-compose*.yml
+docker
+# Re-include only the public root CA for the runner image (see Dockerfile) and the directory
+# placeholder. The last matching rule wins, so these follow `docker` and `*.pem`.
+!docker/certs/russian_trusted_root_ca.pem
+!docker/certs/.gitkeep
+
+# Misc
+.DS_Store
+npm-debug.log*
+.pnpm-debug.log*
+nul
+
+# Local generated assets (scripts/gen-images.ts cache, ~57 MB of PNGs)
+scripts/.cache

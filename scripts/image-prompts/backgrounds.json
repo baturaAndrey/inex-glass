@@ -1,0 +1,128 @@
+[
+  {
+    "id": "hero-home",
+    "group": "backgrounds",
+    "kind": "background",
+    "aspect": "16:9",
+    "subject": "Clean bright warehouse interior with large sheets of tempered glass standing upright on steel A-frame racks, glass edges glowing with a subtle green-teal tint, cold daylight from high windows, polished concrete floor, racks placed on the right two thirds of the frame.",
+    "alt": "Стеллажи с листами закалённого стекла на складе",
+    "target": { "kind": "template", "slug": "home", "field": "heroImage" }
+  },
+  {
+    "id": "hero-zak-hub",
+    "group": "backgrounds",
+    "kind": "background",
+    "aspect": "16:9",
+    "subject": "Neat stack of clear tempered glass sheets lying flat, seen from a low three-quarter angle so the layered greenish edges are clearly visible, even soft overhead light, stack placed on the right side of the frame.",
+    "alt": "Стопка закалённого стекла с видимым торцом",
+    "target": { "kind": "template", "slug": "zak-hub", "field": "heroImage" }
+  },
+  {
+    "id": "hero-thickness",
+    "group": "backgrounds",
+    "kind": "background",
+    "aspect": "16:9",
+    "subject": "Extreme close-up of the polished edge of a thick 19 mm clear glass panel, the edge glowing with a green-teal highlight, smooth light-grey blurred background, glass edge positioned on the right side.",
+    "alt": "Торец толстого стекла крупным планом",
+    "target": { "kind": "template", "slug": "thickness", "field": "heroImage" }
+  },
+  {
+    "id": "hero-glass-type",
+    "group": "backgrounds",
+    "kind": "background",
+    "aspect": "16:9",
+    "subject": "Abstract arrangement of several overlapping glass panels with different textures: clear, frosted satin, vertically fluted and lightly tinted grey, standing in a row with soft light passing through them, placed on the right side of the frame.",
+    "alt": "Фон: стеклянные панели разной фактуры",
+    "target": { "kind": "template", "slug": "glass-type", "field": "heroImage" }
+  },
+  {
+    "id": "hero-processing",
+    "group": "backgrounds",
+    "kind": "background",
+    "aspect": "16:9",
+    "subject": "Macro photograph of a clear glass panel with a perfectly polished flat edge and a round drilled hole with a smooth chamfered rim, crisp reflections, cool light, details on the right side of the frame.",
+    "alt": "Полированная кромка и отверстие в стекле",
+    "target": { "kind": "template", "slug": "processing", "field": "heroImage" }
+  },
+  {
+    "id": "hero-construction",
+    "group": "backgrounds",
+    "kind": "background",
+    "aspect": "16:9",
+    "subject": "Empty bright modern multi-level atrium of a public building with frameless glass balustrades on the galleries, white walls and floors, daylight from a glass roof, glass railings on the right side, no stairs visible, no people.",
+    "alt": "Атриум со стеклянными ограждениями галерей",
+    "target": { "kind": "template", "slug": "construction", "field": "heroImage" }
+  },
+  {
+    "id": "hero-service",
+    "group": "backgrounds",
+    "kind": "background",
+    "aspect": "16:9",
+    "subject": "Abstract still life: a sheet of clear glass lying on a white drafting table, thin soft light lines and geometric reflections crossing its surface, blank white paper underneath with no writing, minimal and calm, objects on the right side.",
+    "alt": "Фон: стекло на светлом чертёжном столе",
+    "target": { "kind": "template", "slug": "service", "field": "heroImage" }
+  },
+  {
+    "id": "hero-article",
+    "group": "backgrounds",
+    "kind": "background",
+    "aspect": "16:9",
+    "subject": "Soft abstract background of light reflections and gentle refractions on a large clear glass surface, pale grey-white tones with a faint teal glint along one edge on the right side.",
+    "alt": "Фон: отражения света на стекле",
+    "target": { "kind": "template", "slug": "article", "field": "heroImage" }
+  },
+  {
+    "id": "hero-objects",
+    "group": "backgrounds",
+    "kind": "background",
+    "aspect": "16:9",
+    "subject": "Modern shopping centre facade made of large glass panels with a structural glazing grid, reflecting a pale blue sky, shot from a low angle on an overcast day, facade occupying the right two thirds, no signage, no people.",
+    "alt": "Стеклянный фасад торгового центра",
+    "target": { "kind": "template", "slug": "objects", "field": "heroImage" }
+  },
+  {
+    "id": "bg-section-light",
+    "group": "backgrounds",
+    "kind": "background",
+    "aspect": "16:9",
+    "subject": "Very subtle abstract texture: delicate soft light glints and caustics on a matte frosted glass surface, almost white, low contrast, suitable as a quiet section background.",
+    "alt": "Фон: светлые блики на матовом стекле",
+    "target": { "kind": "section", "slug": "light", "field": "backgroundKey" }
+  },
+  {
+    "id": "bg-section-dark-teal",
+    "group": "backgrounds",
+    "kind": "background",
+    "aspect": "16:9",
+    "subject": "Dark moody abstract background in deep dark blue-green with soft out-of-focus reflections of stacked glass panels and thin teal light streaks on the right, the overall image dark and low key despite the light style.",
+    "alt": "Фон: тёмные сине-зелёные отражения стекла",
+    "target": { "kind": "section", "slug": "dark-teal", "field": "backgroundKey" }
+  },
+  {
+    "id": "bg-snow-calc",
+    "group": "backgrounds",
+    "kind": "background",
+    "aspect": "16:9",
+    "subject": "Frameless glass canopy above a building entrance at winter dusk, a thin layer of snow on the glass, deep slate-navy evening sky, cool lights under the canopy, canopy on the right side, dark low-key overall image, no people, no signs.",
+    "alt": "Стеклянный козырёк со снегом в сумерках",
+    "target": { "kind": "section", "slug": "snow-calc", "field": "backgroundKey" }
+  },
+  {
+    "id": "bg-forms",
+    "group": "backgrounds",
+    "kind": "background",
+    "aspect": "16:9",
+    "subject": "Light airy abstract background: overlapping translucent glass planes at soft angles with very faint teal edges, mostly white and pale grey, calm and uncluttered.",
+    "alt": "Фон: светлые полупрозрачные стеклянные плоскости",
+    "target": { "kind": "section", "slug": "forms", "field": "backgroundKey" }
+  },
+  {
+    "id": "bg-404",
+    "group": "backgrounds",
+    "kind": "background",
+    "aspect": "16:9",
+    "subject": "Light abstract composition of thin diverging lines of glass edges and light rays radiating from the right side, white and pale grey with faint teal highlights, minimal and calm.",
+    "alt": "Фон: расходящиеся линии стеклянных граней",
+    "target": { "kind": "template", "slug": "not-found", "field": "heroImage" }
+  }
+]

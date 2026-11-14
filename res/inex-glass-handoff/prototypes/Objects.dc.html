@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Inex Glass — объекты</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../design-system/colors_and_type.css">
+<link rel="stylesheet" href="../design-system/components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F6B60}a:hover{color:#16403D}
+.wrap{max-width:1920px;margin:0 auto;padding:0 70px;box-sizing:border-box}
+.top{background:#ECEEEC;font:400 13px/1.4 'Rubik',sans-serif}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:8px 24px;padding-top:8px;padding-bottom:8px}
+.top a,.top button{color:#1C1F22;text-decoration:none;display:inline-flex;align-items:center;gap:4px;background:none;border:0;padding:0;font:inherit;cursor:pointer}
+.top a:hover,.top button:hover{color:#1F6B60}
+.top svg{width:14px;height:14px}
+.top__l,.top__r{display:flex;gap:20px;flex-wrap:wrap}
+.mainrow{background:#fff}
+.mainrow .wrap{display:flex;align-items:center;gap:16px;padding-top:14px;padding-bottom:14px}
+.logo{display:flex;flex:none}
+.logo img{height:44px;width:auto}
+.pills{display:flex;gap:8px;flex:none}
+.pill{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:999px;border:1.5px solid #1C1F22;background:#fff;font:500 15px/1 'Rubik',sans-serif;color:#1C1F22;cursor:pointer;transition:border-color 200ms,color 200ms}
+.pill:hover{border-color:#2B8C7E;color:#1F6B60}
+.pill svg{width:18px;height:18px}
+.nav{display:flex;gap:20px;font:500 15px/1 'Rubik',sans-serif;flex:none}
+.nav a{color:#1C1F22;text-decoration:none}
+.nav a:hover{color:#1F6B60}
+.search{flex:1 1 200px;min-width:0;position:relative;display:flex}
+.search input{height:44px;border-radius:999px;padding-left:44px}
+.search svg{position:absolute;left:16px;top:13px;width:18px;height:18px;color:#5B636B}
+.cta-full{height:44px;padding:0 22px;font-size:15px;flex:none}
+.cta-icon,.burger,.m-icons{display:none}
+.tel{display:flex;flex-direction:column;gap:2px;flex:none}
+.tel__h{font:400 12px/1.3 'Rubik',sans-serif;color:#5B636B;display:flex;align-items:center;gap:6px}
+.tel__dot{width:7px;height:7px;border-radius:50%;background:#2B8A3E}
+.tel__n{font:600 16px/1.3 'Rubik',sans-serif;color:#1C1F22;text-decoration:none}
+.ico{width:44px;height:44px;flex:none}
+.sec{background:#fff;border-top:1px solid #E6E8E6;box-shadow:0 1px 0 #E6E8E6}
+.sec .wrap{display:flex;justify-content:space-between;gap:8px 20px;padding-top:12px;padding-bottom:12px;font:400 14px/1.4 'Rubik',sans-serif}
+.sec a{color:#1C1F22;text-decoration:none}
+.sec a:hover{color:#1F6B60}
+.sec .more{display:none}
+
+.hero{position:relative;background:#EEF2F0;overflow:hidden}
+.hero__bg{position:absolute;inset:-40px;width:calc(100% + 80px);height:calc(100% + 80px);object-fit:cover;object-position:right center;filter:blur(28px) saturate(1.05);display:block}
+.hero__img{position:absolute;top:0;right:0;width:58%;height:100%;object-fit:cover;display:block;-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 32%);mask-image:linear-gradient(90deg,transparent 0%,#000 32%)}
+.hero__fade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(240,244,242,.9) 0%,rgba(240,244,242,.78) 38%,rgba(240,244,242,.35) 52%,rgba(240,244,242,0) 64%)}
+.hero__in{position:relative;max-width:1920px;margin:0 auto;padding:72px 70px 80px;box-sizing:border-box;min-height:760px;display:flex;align-items:center}
+.hero__col{max-width:960px;display:flex;flex-direction:column;gap:24px}
+.ind{margin-left:70px}
+.eyebrow{display:flex;flex-wrap:wrap;gap:4px 10px;font:500 14px/1.4 'Rubik',sans-serif;color:#3E464D}
+.eyebrow i{font-style:normal;color:#2B8C7E}
+.lead{font:400 20px/1.5 'Rubik',sans-serif;color:#2A2F34;margin-top:0;margin-bottom:0;max-width:640px;text-wrap:pretty}
+.stats{max-width:760px}
+.stats .ig-stat{font-size:48px;white-space:nowrap}
+.stats .ig-stat-tile__text{font:400 14px/1.4 'Rubik',sans-serif}
+.terms{display:flex;flex-wrap:wrap;gap:6px 20px;font:500 12px/1.4 'Rubik',sans-serif;color:#1C1F22}
+.terms svg{width:14px;height:14px}
+.terms span{display:flex;align-items:center;gap:8px}
+.terms svg{width:16px;height:16px;color:#1F6B60;flex:none}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.m-sticky{display:none}
+
+@media (max-width:1365px){
+  .sec .hide-s{display:none}
+  .sec .more{display:inline-flex}
+  .tel{display:none}
+}
+@media (max-width:1365px){
+  .wrap{padding:0 40px}
+  .hero__in{padding-left:40px;padding-right:40px}
+  .ind{margin-left:40px}
+}
+@media (max-width:1100px){
+  .wrap{padding:0 24px}
+  .hero__in{padding-left:24px;padding-right:24px}
+  .ind{margin-left:0}
+  .top__r,.pills,.nav,.search,.sec,.cta-full{display:none}
+  .cta-icon,.burger{display:inline-flex}
+  .mainrow .wrap{justify-content:space-between}
+  .hero__fade{background:linear-gradient(90deg,#EEF2F0 0%,#EEF2F0 55%,rgba(238,242,240,.75) 80%,rgba(238,242,240,.35) 100%)}
+}
+@media (max-width:599px){
+  .top,.cta-icon,.myc{display:none}
+  .wrap{padding:0 16px}
+  .mainrow .wrap{padding-top:10px;padding-bottom:10px;gap:4px}
+  .logo img{height:32px}
+  .m-icons{display:flex;gap:2px;margin-left:auto}
+  .burger{margin-left:0}
+  .hero__img{position:static;width:100%;height:240px;-webkit-mask-image:none;mask-image:none}
+  .hero__fade,.hero__bg,.d-br{display:none}
+  .hero__in{padding:24px 16px 32px;min-height:0}
+  .hero__col{gap:16px}
+  .eyebrow{font-size:13px}
+  .ig-h1--caps{text-transform:none;letter-spacing:0}
+  .lead{font-size:17px}
+  .stats{grid-template-columns:1fr;background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none;border:1px solid #E6E8E6}
+  .stats .ig-stat-tile{padding:16px 18px;flex-direction:row;align-items:center;gap:16px}
+  .stats .ig-stat-tile + .ig-stat-tile{border-left:0;border-top:1px solid #E6E8E6}
+  .stats .ig-stat{font-size:28px;flex:none;width:118px}
+  .terms{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;font-size:12px}
+  .btns{flex-direction:column}
+  .btns .ig-btn{width:100%}
+  .m-sticky{display:block;position:sticky;bottom:0;z-index:5}
+}
+/* ---- Блок 2 ---- */
+.why{position:relative;overflow:hidden;background:radial-gradient(55% 70% at 62% 38%,rgba(232,242,239,.95) 0%,rgba(232,242,239,0) 70%),radial-gradient(40% 60% at 12% 85%,rgba(210,230,225,.7) 0%,rgba(210,230,225,0) 70%),linear-gradient(135deg,#5A968E 0%,#A9CBC5 42%,#C9DEDA 58%,#6FA39B 100%)}
+.why__in{max-width:1920px;margin:0 auto;padding:96px 70px;box-sizing:border-box;display:flex;flex-direction:column;gap:40px}
+.why__head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px 64px}
+.why__h{font:700 40px/1.15 'Rubik',sans-serif;color:#16403D;margin:0;max-width:760px;text-wrap:balance}
+.why__sub{font:400 18px/1.5 'Rubik',sans-serif;color:#1F2A2E;margin:0;max-width:560px}
+.card{background:rgba(255,255,255,.94);border-radius:24px;box-shadow:0 12px 40px rgba(22,64,61,.14);padding:12px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.row{display:grid;grid-template-columns:220px minmax(0,1fr) minmax(0,1.12fr);column-gap:8px}
+.row + .row .c{border-top:1px solid rgba(28,31,34,.06)}
+.hd .c{padding:18px 24px;font:600 16px/1.3 'Rubik',sans-serif;display:flex;align-items:center;gap:10px}
+.hd .c--self{background:#FCF6EA;color:#8A5A00;border-radius:16px 16px 0 0}
+.hd .c--inex{background:#EAF3F1;color:#16403D;border-radius:16px 16px 0 0}
+.c{padding:18px 24px;display:flex;align-items:flex-start;gap:12px;font:400 16px/1.45 'Rubik',sans-serif}
+.c--topic{font:600 15px/1.4 'Rubik',sans-serif;color:#16403D;padding-left:16px}
+.c--self{background:#FCF6EA;color:#3A3F44}
+.c--inex{background:#EAF3F1;color:#1C1F22;font-weight:500}
+.row.last .c--self,.row.last .c--inex{border-radius:0 0 16px 16px}
+.ic{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;margin-top:1px}
+.ic svg{width:13px;height:13px}
+.ic--x{background:#F2D59C;color:#8A5A00}
+.ic--ok{background:#2B8C7E;color:#fff}
+.lbl{display:none}
+.foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:16px 32px}
+.foot__t{font:500 16px/1.4 'Rubik',sans-serif;color:#16403D}
+.foot__b{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.lnk{color:#16403D;font-weight:600}
+@media (max-width:1100px){
+  .why__in{padding:72px 24px}
+  .row{grid-template-columns:160px minmax(0,1fr) minmax(0,1.12fr)}
+}
+@media (max-width:760px){
+  .why__in{padding:48px 16px;gap:24px}
+  .why__h{font-size:28px;line-height:1.2}
+  .why__sub{font-size:16px}
+  .card{padding:0;background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;display:flex;flex-direction:column;gap:12px}
+  .hd{display:none}
+  .row{grid-template-columns:1fr;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(22,64,61,.12)}
+  .row + .row .c{border-top:0}
+  .c{padding:14px 16px;font-size:15px}
+  .c--topic{padding:14px 16px 10px;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+  .row.last .c--self,.row.last .c--inex{border-radius:0}
+  .lbl{display:block;font:500 11px/1.3 'Rubik',sans-serif;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+  .c--self .lbl{color:#8A5A00}
+  .c--inex .lbl{color:#1F6B60}
+  .foot{flex-direction:column;align-items:stretch}
+  .foot__b .ig-btn{width:100%}
+}
+
+@media (max-width:1365px) and (min-width:1101px){.why__in{padding-left:40px;padding-right:40px}}
+
+/* ---- Блоки главной 3–10 ---- */
+.blk{padding:96px 0}
+.blk--bg{background:#F4F5F3}
+.blk--sf{background:#FFFFFF}
+.blk__head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px 48px;margin-bottom:40px}
+.blk__h{font:700 40px/1.15 'Rubik',sans-serif;margin:0;color:#1C1F22;max-width:900px;text-wrap:balance}
+.blk__sub{font:400 18px/1.5 'Rubik',sans-serif;color:#5B636B;margin:0;max-width:620px;text-wrap:pretty}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.ph-wide{aspect-ratio:16/10}
+.note{display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;background:#EEF4FA;color:#2C5B86;font:500 15px/1.3 'Rubik',sans-serif}
+.note svg{width:18px;height:18px;flex:none}
+
+.proc{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:48px;align-items:start}
+.proc__l{display:flex;flex-direction:column;gap:20px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.tile{display:flex;flex-direction:column;justify-content:space-between;gap:28px;min-height:132px;padding:22px 22px 20px;border-radius:16px;background:#F4F5F3;color:#1C1F22;text-decoration:none;font:600 18px/1.3 'Rubik',sans-serif;transition:background-color 200ms cubic-bezier(.4,0,.2,1),transform 200ms cubic-bezier(.4,0,.2,1)}
+.tile:hover{background:#EAF3F1;color:#16403D;transform:translateY(-2px)}
+.tile svg{width:22px;height:22px;color:#1F6B60;align-self:flex-end}
+.tile--accent{background:#16403D;color:#fff}
+.tile--accent svg{color:#fff}
+.tile--accent:hover{background:#1F6B60;color:#fff}
+
+.seg{display:flex;flex-direction:column;gap:20px;padding:28px;border-radius:16px;background:#F4F5F3;color:#1C1F22;text-decoration:none;min-height:220px;transition:background-color 200ms,transform 200ms,box-shadow 200ms}
+.seg:hover{background:#fff;box-shadow:0 8px 24px rgba(28,31,34,.12);transform:translateY(-2px);color:#1C1F22}
+.seg__ic{width:56px;height:56px;border-radius:14px;background:#EAF3F1;color:#1F6B60;display:grid;place-items:center}
+.seg__ic svg{width:28px;height:28px}
+.seg__t{font:600 20px/1.3 'Rubik',sans-serif;margin:0}
+.seg__more{margin-top:auto;display:inline-flex;align-items:center;gap:6px;font:500 15px/1.3 'Rubik',sans-serif;color:#1F6B60}
+.seg__more svg{width:18px;height:18px}
+
+.stepsbox{background:#fff;border-radius:24px;padding:36px;box-shadow:0 2px 8px rgba(28,31,34,.06);display:flex;flex-direction:column;gap:32px}
+.stepsfoot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 32px;padding-top:28px;border-top:1px solid #E6E8E6}
+.stepsfoot .ig-terms{padding:0;border:0;background:none}
+
+.form{display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:64px;align-items:start}
+.form__l{display:flex;flex-direction:column;gap:24px;position:sticky;top:24px}
+.form__list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;font:500 16px/1.4 'Rubik',sans-serif}
+.form__list li{display:flex;gap:12px;align-items:flex-start}
+.form__list svg{width:20px;height:20px;color:#2B8C7E;flex:none;margin-top:1px}
+.form__card{background:#fff;border-radius:24px;padding:40px;box-shadow:0 2px 8px rgba(28,31,34,.06);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.span2{grid-column:1 / -1}
+.form__send{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px}
+
+.ftr{background:#324B64;color:#C9D3DD}
+.ftr a{color:#C9D3DD;text-decoration:none}
+.ftr a:hover{color:#fff;text-decoration:underline}
+.ftr h3{margin:0 0 4px;font:600 16px/1.3 'Rubik',sans-serif;color:#fff}
+.ftr__in{padding-top:56px;padding-bottom:32px;display:flex;flex-direction:column;gap:40px}
+.ftr__cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:32px;font:400 14px/1.5 'Rubik',sans-serif}
+.ftr__col{display:flex;flex-direction:column;gap:10px}
+.ftr__bot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px;padding-top:24px;border-top:1px solid rgba(255,255,255,.14);font:400 13px/1.4 'Rubik',sans-serif}
+
+@media (max-width:1365px){
+  .g4,.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .proc{grid-template-columns:1fr;gap:32px}
+  .ig-steps{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:28px}
+  .ig-step:nth-child(3) .ig-step__line{display:none}
+}
+@media (max-width:1100px){
+  .blk{padding:72px 0}
+  .g4,.g3,.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .form{grid-template-columns:1fr;gap:32px}
+  .form__l{position:static}
+  .ftr__cols{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:599px){
+  .blk{padding:48px 0}
+  .blk__head{margin-bottom:24px}
+  .blk__h{font-size:28px;line-height:1.2}
+  .blk__sub{font-size:16px}
+  .g4,.g3{grid-template-columns:1fr;gap:16px}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .tile{min-height:112px;padding:16px;font-size:15px;gap:16px}
+  .seg{min-height:0;padding:20px;flex-direction:row;align-items:center;gap:16px}
+  .seg__ic{width:48px;height:48px;flex:none}
+  .seg__t{font-size:17px}
+  .seg__more{display:none}
+  .stepsbox{padding:20px;gap:24px}
+  .ig-steps{grid-template-columns:1fr;row-gap:20px}
+  .ig-step{flex-direction:row;flex-wrap:wrap;column-gap:14px;row-gap:2px}
+  .ig-step__line{display:none}
+  .ig-step__num{width:36px;height:36px;font-size:15px}
+  .ig-step__title{flex:1;align-self:center}
+  .ig-step__text{flex-basis:100%;padding-left:50px}
+  .stepsfoot{flex-direction:column;align-items:stretch}
+  .stepsfoot .ig-btn{width:100%}
+  .form__card{grid-template-columns:1fr;padding:20px;gap:16px}
+  .form__send .ig-btn{width:100%}
+  .ftr__cols{grid-template-columns:1fr}
+  .ftr__in{padding-bottom:104px}
+}
+.seg__d{margin:0;font:400 15px/1.5 'Rubik',sans-serif;color:#5B636B}
+.ig-steps .ig-step__text{font-size:14px;line-height:1.5}
+@media (max-width:599px){
+  .seg{flex-direction:column;align-items:flex-start;gap:12px}
+  .seg__d{font-size:14px}
+}
+/* ---- page ---- */
+.ob-top{padding:40px 0 48px}
+.ob-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 48px;margin-top:24px}
+.ob-list{position:relative;padding-top:40px}
+.ob-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+.ob-count{font:600 18px/1.3 'Rubik',sans-serif}
+.ob-bar__r{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.ob-sort{display:flex;align-items:center;gap:10px}
+.ob-sort__l{font:400 14px/1.3 'Rubik',sans-serif;color:#5B636B}
+.ob-sort .ig-select{width:220px;height:48px}
+.ob-badge{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:#2B8C7E;color:#fff;font:600 12px/1 'Rubik',sans-serif}
+.ob-active{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:24px}
+.ob-chip{background:#EAF3F1;border-color:#CFE3DF;color:#16403D}
+.ob-reset{font-size:14px;margin-left:8px}
+.ob-empty{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:40px;border-radius:16px;background:#fff}
+.ob-more{display:flex;justify-content:center;margin-top:40px}
+.ob-overlay{position:absolute;inset:0;background:rgba(28,31,34,.32);z-index:20}
+.ob-drawer{position:absolute;top:0;right:0;bottom:0;width:420px;max-width:100%;z-index:21;background:#fff;box-shadow:0 24px 64px rgba(28,31,34,.2);padding:28px;box-sizing:border-box;display:flex;flex-direction:column;gap:24px;overflow-y:auto}
+.ob-drawer__head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ob-group{border:0;margin:0;padding:0 0 20px;border-bottom:1px solid #E6E8E6;display:flex;flex-direction:column;gap:12px}
+.ob-group legend{padding:0;margin-bottom:12px}
+.ob-opt{font-size:15px;color:#1C1F22}
+.ob-drawer__foot{display:flex;gap:12px;margin-top:auto;position:sticky;bottom:0;background:#fff;padding-top:16px}
+.ob-drawer__foot .ig-btn--primary{flex:1}
+@media (max-width:599px){
+  .ob-top{padding:24px 0 32px}
+  .ob-sort .ig-select{width:100%}
+  .ob-sort{flex:1}
+  .ob-sort__l{display:none}
+  .ob-bar__r{width:100%}
+  .ob-drawer{width:100%;padding:20px 16px}
+}
+
+</style>
+</helmet>
+<div style="width: 100%; background: #F4F5F3; font-family: 'Rubik', system-ui, sans-serif; color: #1C1F22">
+  <header>
+    <div class="top">
+      <div class="wrap">
+        <div class="top__l"><button type="button">Компания<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><button type="button">Связаться с нами<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button></div>
+        <a href="#" class="ig-badge ig-badge--promo" style="text-transform: none; letter-spacing: 0; font-size: 13px; color: #16403D">−5% на закалённое стекло при заказе от 100 м²</a>
+        <nav class="top__r" aria-label="Для кого"><a href="#">Застройщикам</a><a href="#">Подрядчикам</a><a href="#">Дизайнерам и архитекторам</a><a href="#">Производителям мебели</a></nav>
+      </div>
+    </div>
+    <div class="mainrow">
+      <div class="wrap">
+        <a class="logo" href="#"><img src="../design-system/assets/inex-glass-logo-dark.svg" alt="Inex Glass — на главную"></a>
+        <div class="pills">
+          <button class="pill" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>Услуги</button>
+          <button class="pill" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>Каталог</button>
+        </div>
+        <nav class="nav" aria-label="Основное"><a href="#">Акции</a><a href="#">Блог</a></nav>
+        <label class="search"><span style="position: absolute; left: -9999px">Поиск по сайту</span><input class="ig-input" placeholder="Введите запрос"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></label>
+        <a class="ig-btn ig-btn--primary cta-full" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>Рассчитать стоимость</a>
+        <div class="tel"><span class="tel__h"><span class="tel__dot" aria-hidden="true"></span>Звоните Пн–Пт 9–18</span><a class="tel__n" href="tel:+73512470557">+7 (351) 247-05-57</a><a class="ig-link ig-link--dashed" href="#" style="font-size: 12px">Заказать звонок</a></div>
+        <a class="ig-btn ig-btn--primary ig-btn--icon cta-icon" href="#" aria-label="Рассчитать стоимость" style="width: 44px; height: 44px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg></a>
+        <a class="ig-btn ig-btn--ghost ig-btn--icon ico myc" href="#" aria-label="Мой расчёт"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M12 11h4"></path><path d="M12 16h4"></path><path d="M8 11h.01"></path><path d="M8 16h.01"></path></svg></a>
+        <div class="m-icons">
+          <button class="ig-btn ig-btn--ghost ig-btn--icon ico" type="button" aria-label="Поиск"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></button>
+          <a class="ig-btn ig-btn--ghost ig-btn--icon ico" href="tel:+73512470557" aria-label="Позвонить +7 (351) 247-05-57"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.910a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></a>
+        </div>
+        <button class="ig-btn ig-btn--ghost ig-btn--icon ico burger" type="button" aria-label="Меню"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button>
+      </div>
+    </div>
+    <nav class="sec" aria-label="Разделы">
+      <div class="wrap">
+        <a href="#">Закалённое стекло</a><a href="#">Триплекс</a><a href="#">Обработка стекла</a><a href="#">Стеклянные перегородки</a><a href="#">Ограждения</a><a href="#" class="hide-s">Козырьки</a><a href="#" class="hide-s">Остекление зданий</a><a href="#" class="hide-s">Стекло для мебели</a><a href="#" class="hide-s">Зеркала</a><a href="#" class="more">Ещё ▾</a>
+      </div>
+    </nav>
+  </header>
+  <main>
+  <section class="blk blk--sf ob-top" aria-labelledby="ob-h">
+    <div class="wrap">
+      <nav class="ig-crumbs" aria-label="Хлебные крошки"><a href="#">Главная</a><span class="ig-crumbs__sep">/</span><span aria-current="page">Объекты</span></nav>
+      <div class="ob-head">
+        <h1 class="ig-h1" id="ob-h">Объекты</h1>
+        <p class="blk__sub">За 21 год специалисты Inex выполнили более 1500 проектов по всей России.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="blk blk--bg ob-list" aria-label="Список объектов">
+    <div class="wrap">
+      <div class="ob-bar">
+        <span class="ob-count">{{countLabel}}</span>
+        <div class="ob-bar__r">
+          <label class="ob-sort"><span class="ob-sort__l">Сортировка</span><select class="ig-select" value="{{sort}}" onChange="{{setSort}}"><option value="new">Сначала новые</option><option value="az">По алфавиту</option><option value="city">По городу</option></select></label>
+          <button class="ig-btn ig-btn--secondary" type="button" aria-expanded="{{open}}" onClick="{{toggle}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"></line><line x1="10" x2="3" y1="4" y2="4"></line><line x1="21" x2="12" y1="12" y2="12"></line><line x1="8" x2="3" y1="12" y2="12"></line><line x1="21" x2="16" y1="20" y2="20"></line><line x1="12" x2="3" y1="20" y2="20"></line><line x1="14" x2="14" y1="2" y2="6"></line><line x1="8" x2="8" y1="10" y2="14"></line><line x1="16" x2="16" y1="18" y2="22"></line></svg>Фильтры<sc-if value="{{hasActive}}" hint-placeholder-val="{{ true }}"><span class="ob-badge">{{activeCount}}</span></sc-if></button>
+        </div>
+      </div>
+
+      <sc-if value="{{hasActive}}" hint-placeholder-val="{{ true }}">
+        <div class="ob-active">
+          <sc-for list="{{active}}" as="f" hint-placeholder-count="2">
+            <button class="ig-chip ob-chip" type="button" onClick="{{f.remove}}" aria-label="Убрать фильтр {{f.label}}">{{f.label}}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+          </sc-for>
+          <button class="ig-link ob-reset" type="button" onClick="{{clearAll}}">Сбросить всё</button>
+        </div>
+      </sc-if>
+
+      <div class="g4">
+        <sc-for list="{{cards}}" as="o" hint-placeholder-count="8">
+          <a class="ig-card" href="ObjectPage.dc.html"><div class="ig-ph"><span>фото объекта</span></div><div class="ig-card__body"><h2 class="ig-card__title">{{o.n}}</h2><sc-if value="{{o.meta}}" hint-placeholder-val="{{ true }}"><p class="ig-card__sub">{{o.meta}}</p></sc-if><div class="ig-chips" style="margin-top: 6px"><span class="ig-chip ig-chip--static">[изделие]</span><span class="ig-chip ig-chip--static">[стекло]</span></div></div></a>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+        <div class="ob-empty"><p class="ig-h5">Нет объектов по выбранным фильтрам</p><button class="ig-btn ig-btn--secondary ig-btn--s" type="button" onClick="{{clearAll}}">Сбросить фильтры</button></div>
+      </sc-if>
+
+      <sc-if value="{{hasMore}}" hint-placeholder-val="{{ true }}">
+        <div class="ob-more"><button class="ig-btn ig-btn--secondary" type="button" onClick="{{more}}">Показать ещё</button></div>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{open}}" hint-placeholder-val="{{ true }}">
+      <div class="ob-overlay" onClick="{{toggle}}" aria-hidden="true"></div>
+      <aside class="ob-drawer" aria-label="Фильтры">
+        <div class="ob-drawer__head">
+          <span class="ig-h4">Фильтры</span>
+          <button class="ig-btn ig-btn--ghost ig-btn--icon" type="button" aria-label="Закрыть фильтры" onClick="{{toggle}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+        </div>
+        <sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+          <fieldset class="ob-group">
+            <legend class="ig-label">{{g.title}}</legend>
+            <sc-for list="{{g.items}}" as="i" hint-placeholder-count="5">
+              <label class="ig-check ob-opt"><input type="checkbox" checked="{{i.on}}" onChange="{{i.toggle}}"><span>{{i.label}}</span></label>
+            </sc-for>
+          </fieldset>
+        </sc-for>
+        <div class="ob-drawer__foot">
+          <button class="ig-btn ig-btn--ghost" type="button" onClick="{{clearAll}}">Сбросить</button>
+          <button class="ig-btn ig-btn--primary" type="button" onClick="{{toggle}}">Показать {{countLabel}}</button>
+        </div>
+      </aside>
+    </sc-if>
+  </section>
+  </main>
+
+  <footer class="ftr">
+    <div class="wrap ftr__in">
+      <img src="../design-system/assets/inex-glass-logo-light.svg" alt="Inex Glass" style="height: 44px; width: auto; align-self: flex-start">
+      <div class="ftr__cols">
+        <div class="ftr__col"><h3>Каталог</h3><a href="#">Закалённое стекло</a><a href="#">Триплекс</a><a href="#">Стеклянные перегородки</a><a href="#">Ограждения и перила</a><a href="#">Козырьки</a><a href="#">Остекление зданий</a><a href="#">Зеркала</a></div>
+        <div class="ftr__col"><h3>Услуги</h3><a href="#">Обработка стекла</a><a href="#">Проектирование</a><a href="#">Как заказать</a><a href="#">Требования к чертежам</a><a href="#">Калькулятор веса стекла</a></div>
+        <div class="ftr__col"><h3>Компания</h3><a href="#">О компании</a><a href="#">Объекты</a><a href="#">Контакты</a><a href="#">Реквизиты</a></div>
+        <div class="ftr__col" style="gap: 14px"><h3>Контакты</h3>
+          <a href="tel:+73512470557" style="font: 600 18px/1.3 'Rubik', sans-serif; color: #fff">+7 (351) 247-05-57</a>
+          <a href="mailto:sale@inex.su">sale@inex.su</a>
+          <span><span style="color: #fff">Челябинск — офис</span><br>ул. Артиллерийская, 124А · +7 951 489-04-09</span>
+          <span><span style="color: #fff">Челябинск — склад и самовывоз</span><br>Свердловский тракт, 7В · пн–пт, 9:00–18:00</span>
+          <span><span style="color: #fff">Екатеринбург — офис</span><br>ул. Данилы Зверева, 17б · +7 982 329-11-08</span>
+        </div>
+      </div>
+      <a href="#" style="align-self: flex-start; color: #fff; font: 500 15px/1.4 'Rubik', sans-serif">Двери, лестницы и другие конструкции Inex — на inex.su</a>
+      <div class="ftr__bot"><div style="display: flex; flex-wrap: wrap; gap: 8px 24px"><a href="#">Политика обработки персональных данных</a><a href="#">Согласие на обработку персональных данных</a></div><span>© 2026 ИП Копылов А. М.</span></div>
+    </div>
+  </footer>
+
+  <div class="m-sticky ig-sticky-cta"><a class="ig-btn ig-btn--primary ig-btn--block" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>Рассчитать стоимость</a></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":2600}}'>
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { open: true, sort: 'new', limit: 8, sel: { product: [], type: ['ТЦ', 'арена'], city: [] } };
+  }
+  renderVals() {
+    const s = this.state;
+    const all = [
+      { n: 'ТРК «Родник»', city: '', type: 'ТЦ' },
+      { n: 'ТРК «Урал»', city: '', type: 'ТЦ' },
+      { n: '«Трактор» арена', city: '', type: 'арена' },
+      { n: 'Концертный зал (Омск)', city: 'Омск', type: 'концертный зал' },
+      { n: 'Главное управление «Сургутнефтегаз»', city: 'Сургут', type: 'офис' },
+      { n: 'Сбербанк (Ишим)', city: 'Ишим', type: 'банк' },
+      { n: '«Аркаим Плаза»', city: '', type: '' },
+      { n: 'Угорская шахматная академия', city: '', type: '' },
+      { n: 'ТРЦ «Алмаз»', city: 'Челябинск', type: 'ТЦ' },
+      { n: 'Аэропорт Челябинск', city: 'Челябинск', type: 'аэропорт' },
+      { n: '«РМК-Арена»', city: 'Челябинск', type: 'арена' }
+    ];
+    const groupsDef = [
+      { key: 'product', title: 'Изделие', items: ['Перегородки', 'Ограждения', 'Козырьки', 'Фасады', 'Душевые'] },
+      { key: 'type', title: 'Тип объекта', items: ['ТЦ', 'банк', 'офис', 'арена', 'аэропорт', 'концертный зал', 'коттедж'] },
+      { key: 'city', title: 'Город', items: ['Челябинск', 'Омск', 'Сургут', 'Ишим'] }
+    ];
+    const cap = (t) => t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
+    const setSel = (key, list) => this.setState({ sel: Object.assign({}, s.sel, { [key]: list }), limit: 8 });
+    const toggleOpt = (key, v) => {
+      const cur = s.sel[key];
+      setSel(key, cur.indexOf(v) >= 0 ? cur.filter((x) => x !== v) : cur.concat([v]));
+    };
+    // Изделие пока не фильтрует: в карточках объектов ещё нет данных по изделиям.
+    let list = all.filter((o) =>
+      (s.sel.type.length === 0 || s.sel.type.indexOf(o.type) >= 0) &&
+      (s.sel.city.length === 0 || s.sel.city.indexOf(o.city) >= 0));
+    if (s.sort === 'az') list = list.slice().sort((a, b) => a.n.replace(/[«»"]/g, '').localeCompare(b.n.replace(/[«»"]/g, ''), 'ru'));
+    if (s.sort === 'city') list = list.slice().sort((a, b) => (a.city || 'я').localeCompare(b.city || 'я', 'ru'));
+    const n = list.length;
+    const m10 = n % 10, m100 = n % 100;
+    const word = (m10 === 1 && m100 !== 11) ? 'объект' : (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) ? 'объекта' : 'объектов';
+    const active = [];
+    groupsDef.forEach((g) => s.sel[g.key].forEach((v) => active.push({ label: cap(v), remove: () => toggleOpt(g.key, v) })));
+    return {
+      open: s.open,
+      toggle: () => this.setState({ open: !s.open }),
+      sort: s.sort,
+      setSort: (e) => this.setState({ sort: e.target.value }),
+      countLabel: n + ' ' + word,
+      cards: list.slice(0, s.limit).map((o) => ({ n: o.n, meta: [o.city, cap(o.type)].filter(Boolean).join(' · ') })),
+      empty: n === 0,
+      hasMore: n > s.limit,
+      more: () => this.setState({ limit: s.limit + 8 }),
+      active,
+      hasActive: active.length > 0,
+      activeCount: active.length,
+      clearAll: () => this.setState({ sel: { product: [], type: [], city: [] }, limit: 8 }),
+      groups: groupsDef.map((g) => ({
+        title: g.title,
+        items: g.items.map((v) => ({ label: cap(v), on: s.sel[g.key].indexOf(v) >= 0, toggle: () => toggleOpt(g.key, v) }))
+      }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<svg width="880" height="470" viewBox="0 0 880 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="pechat-title pechat-desc" font-family="Rubik, system-ui, sans-serif">
+  <!--
+    Source of the print format diagram (Paper mockup 2560_service_pechat, frame «diagram»): the
+    silkscreen field 1100 × 700 mm drawn to scale inside the UV / photo print sheet 2000 × 3180 mm.
+    The site shows the raster `pechat.webp` next to this file (export 2x from Paper, Rubik baked
+    in): the media collection does not accept SVG uploads (stored XSS). After editing this file,
+    re-export the WebP under a NEW file name (seed media are keyed by file name) and update the
+    service seed.
+    Colours = tokens: #16403D primary-dark, #1F6B60 primary-pressed, #2B8C7E primary,
+    #EAF3F1 primary-light, #CFE3DF line-teal, #5B636B text-2.
+  -->
+  <title id="pechat-title">Максимальный формат, в масштабе</title>
+  <desc id="pechat-desc">Поле шелкографии 1100 × 700 мм в масштабе внутри листа УФ-печати и фотопечати 2000 × 3180 мм.</desc>
+  <rect x="40" y="20" width="636" height="400" rx="4" fill="#EAF3F1" stroke="#2B8C7E" stroke-width="2" />
+  <rect x="72" y="52" width="220" height="140" rx="2" fill="#CFE3DF" stroke="#16403D" stroke-width="2" />
+  <text x="182" y="120" text-anchor="middle" font-size="20" font-weight="700" fill="#16403D">1100 × 700 мм</text>
+  <text x="182" y="146" text-anchor="middle" font-size="16" fill="#1F6B60">шелкография</text>
+  <text x="652" y="374" text-anchor="end" font-size="24" font-weight="700" fill="#16403D">2000 × 3180 мм</text>
+  <text x="652" y="402" text-anchor="end" font-size="16" fill="#1F6B60">УФ-печать и фотопечать</text>
+  <line x1="40" y1="444" x2="676" y2="444" stroke="#5B636B" stroke-width="1.5" />
+  <line x1="40" y1="436" x2="40" y2="452" stroke="#5B636B" stroke-width="1.5" />
+  <line x1="676" y1="436" x2="676" y2="452" stroke="#5B636B" stroke-width="1.5" />
+  <text x="358" y="466" text-anchor="middle" font-size="16" fill="#5B636B">3180 мм</text>
+  <line x1="700" y1="20" x2="700" y2="420" stroke="#5B636B" stroke-width="1.5" />
+  <line x1="692" y1="20" x2="708" y2="20" stroke="#5B636B" stroke-width="1.5" />
+  <line x1="692" y1="420" x2="708" y2="420" stroke="#5B636B" stroke-width="1.5" />
+  <text x="716" y="226" font-size="16" fill="#5B636B">2000 мм</text>
+</svg>

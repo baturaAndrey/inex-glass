@@ -1,0 +1,37 @@
+<svg width="880" height="380" viewBox="0 0 880 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="bent-title bent-desc" font-family="Rubik, system-ui, sans-serif">
+  <!--
+    Source of the bent glass geometry diagram («Гнутое», about section; no Paper mockup yet,
+    drawn by the convention of src/seed/content/processing/README.md, «Схемы»). The site shows
+    the raster `mollirovannoe.webp` next to this file (export 2x, Rubik baked in): the media
+    collection does not accept SVG uploads (stored XSS). After editing this file, re-export the
+    WebP under a NEW file name (seed media are keyed by file name) and update the glass-type seed.
+    Geometry: top view of a cylindrical bend, centre of the arc below the frame at (440, 580),
+    inner radius 500, outer 512 (glass thickness), chord 500, sagitta 67.
+    Colours = tokens: #16403D primary-dark, #1F6B60 primary-pressed, #2B8C7E primary,
+    #DCEBE8 teal-wash, #5B636B text-2.
+  -->
+  <title id="bent-title">Схема геометрии гнутого стекла, вид сверху</title>
+  <desc id="bent-desc">Изогнутый по дуге лист стекла, вид сверху. Геометрию задают радиусом R и длиной дуги или центральным углом, либо хордой и стрелой прогиба. Радиус указывают по внутренней или наружной стороне стекла. Высота листа — прямая сторона, перпендикулярно схеме.</desc>
+  <!-- arc length guide -->
+  <path d="M170 112.4 A540 540 0 0 1 710 112.4" fill="none" stroke="#1F6B60" stroke-width="2" stroke-dasharray="6 4" />
+  <text x="440" y="28" text-anchor="middle" font-size="18" font-weight="600" fill="#16403D">длина дуги</text>
+  <!-- glass -->
+  <path d="M190 147 A500 500 0 0 1 690 147 L696 136.6 A512 512 0 0 0 184 136.6 Z" fill="#DCEBE8" stroke="#2B8C7E" stroke-width="2" stroke-linejoin="round" />
+  <text x="176" y="156" text-anchor="end" font-size="16" fill="#5B636B">наружная сторона</text>
+  <text x="708" y="170" font-size="16" fill="#5B636B">внутренняя сторона</text>
+  <!-- chord -->
+  <line x1="190" y1="147" x2="690" y2="147" stroke="#1F6B60" stroke-width="2" stroke-dasharray="6 4" />
+  <text x="560" y="174" text-anchor="middle" font-size="18" font-weight="600" fill="#16403D">хорда</text>
+  <!-- sagitta -->
+  <line x1="440" y1="82" x2="440" y2="147" stroke="#1F6B60" stroke-width="2" />
+  <line x1="432" y1="82" x2="448" y2="82" stroke="#1F6B60" stroke-width="2" />
+  <line x1="432" y1="147" x2="448" y2="147" stroke="#1F6B60" stroke-width="2" />
+  <text x="452" y="124" font-size="18" font-weight="600" fill="#16403D">стрела прогиба</text>
+  <!-- radii towards the centre of the arc (below the frame) -->
+  <line x1="190" y1="147" x2="290" y2="320" stroke="#1F6B60" stroke-width="2" stroke-dasharray="6 4" />
+  <line x1="690" y1="147" x2="590" y2="320" stroke="#1F6B60" stroke-width="2" stroke-dasharray="6 4" />
+  <text x="224" y="262" text-anchor="end" font-size="20" font-weight="600" fill="#16403D">R</text>
+  <path d="M280 302.9 A320 320 0 0 1 600 302.9" fill="none" stroke="#1F6B60" stroke-width="2" />
+  <text x="440" y="292" text-anchor="middle" font-size="16" fill="#5B636B">центральный угол</text>
+  <text x="440" y="366" text-anchor="middle" font-size="16" fill="#5B636B">R — по внутренней или наружной стороне; высота листа — прямая сторона</text>
+</svg>

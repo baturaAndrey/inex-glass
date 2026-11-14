@@ -25,6 +25,9 @@
 # misc
 .DS_Store
 *.pem
+# Public root CA for the Docker image (Russian Trusted Root CA, platform-api2.max.ru): not a
+# secret. Only this exact file is re-included; any other *.pem stays ignored.
+!/docker/certs/russian_trusted_root_ca.pem
 
 # debug
 npm-debug.log*
@@ -34,6 +37,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.test.example
 
 # vercel
 .vercel
@@ -45,4 +49,34 @@ next-env.d.ts
 # uploads
 public/uploads
 
+# stray Windows "nul" device-name files
 nul
+
+# local data (Postgres volumes are in Docker; uploads/media in dev)
+/.data
+
+# playwright
+/test-results
+/playwright-report
+/blob-report
+/playwright/.cache
+/e2e/.auth
+# screenshot baselines: only -linux ones are committed (see playwright.config.ts)
+/e2e/**/*-snapshots/*-win32.*
+/e2e/**/*-snapshots/*-darwin.*
+
+# payload
+/src/payload-generated-schema.ts
+
+# inex.su import (task 37): Firecrawl cache and downloaded photos
+/scripts/.cache/
+/scripts/.import-tmp/
+
+# performance audit (task 39): Lighthouse reports and JS budget results
+/scripts/perf/out/
+
+# audits (task 40)
+/scripts/audit/out/
+
+# final acceptance (task 42): run-staging.sh logs and screenshots
+/scripts/acceptance/out/

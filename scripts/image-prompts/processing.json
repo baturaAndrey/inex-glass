@@ -1,0 +1,100 @@
+[
+  {
+    "id": "p-obrabotka-hub",
+    "group": "processing",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Still life of several small clear glass samples arranged neatly: one with a polished edge, one with a drilled hole, one with a bevelled facet and one with a frosted surface.",
+    "alt": "Образцы обработки стекла: кромка, отверстие, фацет, матирование",
+    "target": {
+      "kind": "doc",
+      "collection": "pages",
+      "slug": "obrabotka-stekla",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "p-kromka",
+    "group": "processing",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Macro close-up of a perfectly polished flat edge of a clear tempered glass panel with small arrises, glossy edge surface with a green-teal glow.",
+    "alt": "Полированная кромка стекла крупным планом",
+    "target": {
+      "kind": "doc",
+      "collection": "processing-services",
+      "slug": "kromka",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "p-otverstiya-i-vyrezy",
+    "group": "processing",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Macro close-up of a round drilled hole in a clear glass panel with a smooth seamed chamfered rim, and a neat rectangular cut-out near the corner.",
+    "alt": "Отверстие и вырез в стекле",
+    "target": {
+      "kind": "doc",
+      "collection": "processing-services",
+      "slug": "otverstiya-i-vyrezy",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "p-facet",
+    "group": "processing",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Macro close-up of the corner of a mirror with a wide polished bevelled facet edge, light refracting through the bevel and creating soft rainbow-free highlights.",
+    "alt": "Фацет на зеркале крупным планом",
+    "target": {
+      "kind": "doc",
+      "collection": "processing-services",
+      "slug": "facet",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "p-matirovanie",
+    "group": "processing",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Upright clear glass panel decorated with a sandblasted frosted pattern of simple abstract parallel horizontal stripes of varying width, no letters, no logos.",
+    "alt": "Пескоструйное матирование стекла: полосы",
+    "target": {
+      "kind": "doc",
+      "collection": "processing-services",
+      "slug": "matirovanie",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "p-plenki",
+    "group": "processing",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Clear glass office partition panel with a horizontal band of matte frosted privacy film across its middle, clear glass above and below, bright minimal background.",
+    "alt": "Матовая плёнка на стекле — полоса приватности",
+    "target": {
+      "kind": "doc",
+      "collection": "processing-services",
+      "slug": "plenki",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "p-pechat",
+    "group": "processing",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Upright glass panel with ceramic frit printing: an abstract gradient dot pattern from dense at the bottom to sparse at the top, in light grey, no text.",
+    "alt": "Керамическая печать на стекле: точечный растр",
+    "target": {
+      "kind": "doc",
+      "collection": "processing-services",
+      "slug": "pechat",
+      "field": "card.image"
+    }
+  }
+]

@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Inex Glass — страница заказа</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../design-system/colors_and_type.css">
+<link rel="stylesheet" href="../design-system/components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F6B60}a:hover{color:#16403D}
+.wrap{max-width:1920px;margin:0 auto;padding:0 70px;box-sizing:border-box}
+.top{background:#ECEEEC;font:400 13px/1.4 'Rubik',sans-serif}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:8px 24px;padding-top:8px;padding-bottom:8px}
+.top a,.top button{color:#1C1F22;text-decoration:none;display:inline-flex;align-items:center;gap:4px;background:none;border:0;padding:0;font:inherit;cursor:pointer}
+.top a:hover,.top button:hover{color:#1F6B60}
+.top svg{width:14px;height:14px}
+.top__l,.top__r{display:flex;gap:20px;flex-wrap:wrap}
+.mainrow{background:#fff}
+.mainrow .wrap{display:flex;align-items:center;gap:16px;padding-top:14px;padding-bottom:14px}
+.logo{display:flex;flex:none}
+.logo img{height:44px;width:auto}
+.pills{display:flex;gap:8px;flex:none}
+.pill{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:999px;border:1.5px solid #1C1F22;background:#fff;font:500 15px/1 'Rubik',sans-serif;color:#1C1F22;cursor:pointer;transition:border-color 200ms,color 200ms}
+.pill:hover{border-color:#2B8C7E;color:#1F6B60}
+.pill svg{width:18px;height:18px}
+.nav{display:flex;gap:20px;font:500 15px/1 'Rubik',sans-serif;flex:none}
+.nav a{color:#1C1F22;text-decoration:none}
+.nav a:hover{color:#1F6B60}
+.search{flex:1 1 200px;min-width:0;position:relative;display:flex}
+.search input{height:44px;border-radius:999px;padding-left:44px}
+.search svg{position:absolute;left:16px;top:13px;width:18px;height:18px;color:#5B636B}
+.cta-full{height:44px;padding:0 22px;font-size:15px;flex:none}
+.cta-icon,.burger,.m-icons{display:none}
+.tel{display:flex;flex-direction:column;gap:2px;flex:none}
+.tel__h{font:400 12px/1.3 'Rubik',sans-serif;color:#5B636B;display:flex;align-items:center;gap:6px}
+.tel__dot{width:7px;height:7px;border-radius:50%;background:#2B8A3E}
+.tel__n{font:600 16px/1.3 'Rubik',sans-serif;color:#1C1F22;text-decoration:none}
+.ico{width:44px;height:44px;flex:none}
+.sec{background:#fff;border-top:1px solid #E6E8E6;box-shadow:0 1px 0 #E6E8E6}
+.sec .wrap{display:flex;justify-content:space-between;gap:8px 20px;padding-top:12px;padding-bottom:12px;font:400 14px/1.4 'Rubik',sans-serif}
+.sec a{color:#1C1F22;text-decoration:none}
+.sec a:hover{color:#1F6B60}
+.sec .more{display:none}
+
+.hero{position:relative;background:#EEF2F0;overflow:hidden}
+.hero__bg{position:absolute;inset:-40px;width:calc(100% + 80px);height:calc(100% + 80px);object-fit:cover;object-position:right center;filter:blur(28px) saturate(1.05);display:block}
+.hero__img{position:absolute;top:0;right:0;width:58%;height:100%;object-fit:cover;display:block;-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 32%);mask-image:linear-gradient(90deg,transparent 0%,#000 32%)}
+.hero__fade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(240,244,242,.9) 0%,rgba(240,244,242,.78) 38%,rgba(240,244,242,.35) 52%,rgba(240,244,242,0) 64%)}
+.hero__in{position:relative;max-width:1920px;margin:0 auto;padding:72px 70px 80px;box-sizing:border-box;min-height:760px;display:flex;align-items:center}
+.hero__col{max-width:960px;display:flex;flex-direction:column;gap:24px}
+.ind{margin-left:70px}
+.eyebrow{display:flex;flex-wrap:wrap;gap:4px 10px;font:500 14px/1.4 'Rubik',sans-serif;color:#3E464D}
+.eyebrow i{font-style:normal;color:#2B8C7E}
+.lead{font:400 20px/1.5 'Rubik',sans-serif;color:#2A2F34;margin-top:0;margin-bottom:0;max-width:640px;text-wrap:pretty}
+.stats{max-width:760px}
+.stats .ig-stat{font-size:48px;white-space:nowrap}
+.stats .ig-stat-tile__text{font:400 14px/1.4 'Rubik',sans-serif}
+.terms{display:flex;flex-wrap:wrap;gap:6px 20px;font:500 12px/1.4 'Rubik',sans-serif;color:#1C1F22}
+.terms svg{width:14px;height:14px}
+.terms span{display:flex;align-items:center;gap:8px}
+.terms svg{width:16px;height:16px;color:#1F6B60;flex:none}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.m-sticky{display:none}
+
+@media (max-width:1365px){
+  .sec .hide-s{display:none}
+  .sec .more{display:inline-flex}
+  .tel{display:none}
+}
+@media (max-width:1365px){
+  .wrap{padding:0 40px}
+  .hero__in{padding-left:40px;padding-right:40px}
+  .ind{margin-left:40px}
+}
+@media (max-width:1100px){
+  .wrap{padding:0 24px}
+  .hero__in{padding-left:24px;padding-right:24px}
+  .ind{margin-left:0}
+  .top__r,.pills,.nav,.search,.sec,.cta-full{display:none}
+  .cta-icon,.burger{display:inline-flex}
+  .mainrow .wrap{justify-content:space-between}
+  .hero__fade{background:linear-gradient(90deg,#EEF2F0 0%,#EEF2F0 55%,rgba(238,242,240,.75) 80%,rgba(238,242,240,.35) 100%)}
+}
+@media (max-width:599px){
+  .top,.cta-icon,.myc{display:none}
+  .wrap{padding:0 16px}
+  .mainrow .wrap{padding-top:10px;padding-bottom:10px;gap:4px}
+  .logo img{height:32px}
+  .m-icons{display:flex;gap:2px;margin-left:auto}
+  .burger{margin-left:0}
+  .hero__img{position:static;width:100%;height:240px;-webkit-mask-image:none;mask-image:none}
+  .hero__fade,.hero__bg,.d-br{display:none}
+  .hero__in{padding:24px 16px 32px;min-height:0}
+  .hero__col{gap:16px}
+  .eyebrow{font-size:13px}
+  .ig-h1--caps{text-transform:none;letter-spacing:0}
+  .lead{font-size:17px}
+  .stats{grid-template-columns:1fr;background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none;border:1px solid #E6E8E6}
+  .stats .ig-stat-tile{padding:16px 18px;flex-direction:row;align-items:center;gap:16px}
+  .stats .ig-stat-tile + .ig-stat-tile{border-left:0;border-top:1px solid #E6E8E6}
+  .stats .ig-stat{font-size:28px;flex:none;width:118px}
+  .terms{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;font-size:12px}
+  .btns{flex-direction:column}
+  .btns .ig-btn{width:100%}
+  .m-sticky{display:block;position:sticky;bottom:0;z-index:5}
+}
+/* ---- Блок 2 ---- */
+.why{position:relative;overflow:hidden;background:radial-gradient(55% 70% at 62% 38%,rgba(232,242,239,.95) 0%,rgba(232,242,239,0) 70%),radial-gradient(40% 60% at 12% 85%,rgba(210,230,225,.7) 0%,rgba(210,230,225,0) 70%),linear-gradient(135deg,#5A968E 0%,#A9CBC5 42%,#C9DEDA 58%,#6FA39B 100%)}
+.why__in{max-width:1920px;margin:0 auto;padding:96px 70px;box-sizing:border-box;display:flex;flex-direction:column;gap:40px}
+.why__head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px 64px}
+.why__h{font:700 40px/1.15 'Rubik',sans-serif;color:#16403D;margin:0;max-width:760px;text-wrap:balance}
+.why__sub{font:400 18px/1.5 'Rubik',sans-serif;color:#1F2A2E;margin:0;max-width:560px}
+.card{background:rgba(255,255,255,.94);border-radius:24px;box-shadow:0 12px 40px rgba(22,64,61,.14);padding:12px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.row{display:grid;grid-template-columns:220px minmax(0,1fr) minmax(0,1.12fr);column-gap:8px}
+.row + .row .c{border-top:1px solid rgba(28,31,34,.06)}
+.hd .c{padding:18px 24px;font:600 16px/1.3 'Rubik',sans-serif;display:flex;align-items:center;gap:10px}
+.hd .c--self{background:#FCF6EA;color:#8A5A00;border-radius:16px 16px 0 0}
+.hd .c--inex{background:#EAF3F1;color:#16403D;border-radius:16px 16px 0 0}
+.c{padding:18px 24px;display:flex;align-items:flex-start;gap:12px;font:400 16px/1.45 'Rubik',sans-serif}
+.c--topic{font:600 15px/1.4 'Rubik',sans-serif;color:#16403D;padding-left:16px}
+.c--self{background:#FCF6EA;color:#3A3F44}
+.c--inex{background:#EAF3F1;color:#1C1F22;font-weight:500}
+.row.last .c--self,.row.last .c--inex{border-radius:0 0 16px 16px}
+.ic{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;margin-top:1px}
+.ic svg{width:13px;height:13px}
+.ic--x{background:#F2D59C;color:#8A5A00}
+.ic--ok{background:#2B8C7E;color:#fff}
+.lbl{display:none}
+.foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:16px 32px}
+.foot__t{font:500 16px/1.4 'Rubik',sans-serif;color:#16403D}
+.foot__b{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.lnk{color:#16403D;font-weight:600}
+@media (max-width:1100px){
+  .why__in{padding:72px 24px}
+  .row{grid-template-columns:160px minmax(0,1fr) minmax(0,1.12fr)}
+}
+@media (max-width:760px){
+  .why__in{padding:48px 16px;gap:24px}
+  .why__h{font-size:28px;line-height:1.2}
+  .why__sub{font-size:16px}
+  .card{padding:0;background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;display:flex;flex-direction:column;gap:12px}
+  .hd{display:none}
+  .row{grid-template-columns:1fr;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(22,64,61,.12)}
+  .row + .row .c{border-top:0}
+  .c{padding:14px 16px;font-size:15px}
+  .c--topic{padding:14px 16px 10px;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+  .row.last .c--self,.row.last .c--inex{border-radius:0}
+  .lbl{display:block;font:500 11px/1.3 'Rubik',sans-serif;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+  .c--self .lbl{color:#8A5A00}
+  .c--inex .lbl{color:#1F6B60}
+  .foot{flex-direction:column;align-items:stretch}
+  .foot__b .ig-btn{width:100%}
+}
+
+@media (max-width:1365px) and (min-width:1101px){.why__in{padding-left:40px;padding-right:40px}}
+
+/* ---- Блоки главной 3–10 ---- */
+.blk{padding:96px 0}
+.blk--bg{background:#F4F5F3}
+.blk--sf{background:#FFFFFF}
+.blk__head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px 48px;margin-bottom:40px}
+.blk__h{font:700 40px/1.15 'Rubik',sans-serif;margin:0;color:#1C1F22;max-width:900px;text-wrap:balance}
+.blk__sub{font:400 18px/1.5 'Rubik',sans-serif;color:#5B636B;margin:0;max-width:620px;text-wrap:pretty}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.ph-wide{aspect-ratio:16/10}
+.note{display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;background:#EEF4FA;color:#2C5B86;font:500 15px/1.3 'Rubik',sans-serif}
+.note svg{width:18px;height:18px;flex:none}
+
+.proc{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:48px;align-items:start}
+.proc__l{display:flex;flex-direction:column;gap:20px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.tile{display:flex;flex-direction:column;justify-content:space-between;gap:28px;min-height:132px;padding:22px 22px 20px;border-radius:16px;background:#F4F5F3;color:#1C1F22;text-decoration:none;font:600 18px/1.3 'Rubik',sans-serif;transition:background-color 200ms cubic-bezier(.4,0,.2,1),transform 200ms cubic-bezier(.4,0,.2,1)}
+.tile:hover{background:#EAF3F1;color:#16403D;transform:translateY(-2px)}
+.tile svg{width:22px;height:22px;color:#1F6B60;align-self:flex-end}
+.tile--accent{background:#16403D;color:#fff}
+.tile--accent svg{color:#fff}
+.tile--accent:hover{background:#1F6B60;color:#fff}
+
+.seg{display:flex;flex-direction:column;gap:20px;padding:28px;border-radius:16px;background:#F4F5F3;color:#1C1F22;text-decoration:none;min-height:220px;transition:background-color 200ms,transform 200ms,box-shadow 200ms}
+.seg:hover{background:#fff;box-shadow:0 8px 24px rgba(28,31,34,.12);transform:translateY(-2px);color:#1C1F22}
+.seg__ic{width:56px;height:56px;border-radius:14px;background:#EAF3F1;color:#1F6B60;display:grid;place-items:center}
+.seg__ic svg{width:28px;height:28px}
+.seg__t{font:600 20px/1.3 'Rubik',sans-serif;margin:0}
+.seg__more{margin-top:auto;display:inline-flex;align-items:center;gap:6px;font:500 15px/1.3 'Rubik',sans-serif;color:#1F6B60}
+.seg__more svg{width:18px;height:18px}
+
+.stepsbox{background:#fff;border-radius:24px;padding:36px;box-shadow:0 2px 8px rgba(28,31,34,.06);display:flex;flex-direction:column;gap:32px}
+.stepsfoot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 32px;padding-top:28px;border-top:1px solid #E6E8E6}
+.stepsfoot .ig-terms{padding:0;border:0;background:none}
+
+.form{display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:64px;align-items:start}
+.form__l{display:flex;flex-direction:column;gap:24px;position:sticky;top:24px}
+.form__list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;font:500 16px/1.4 'Rubik',sans-serif}
+.form__list li{display:flex;gap:12px;align-items:flex-start}
+.form__list svg{width:20px;height:20px;color:#2B8C7E;flex:none;margin-top:1px}
+.form__card{background:#fff;border-radius:24px;padding:40px;box-shadow:0 2px 8px rgba(28,31,34,.06);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.span2{grid-column:1 / -1}
+.form__send{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px}
+
+.ftr{background:#324B64;color:#C9D3DD}
+.ftr a{color:#C9D3DD;text-decoration:none}
+.ftr a:hover{color:#fff;text-decoration:underline}
+.ftr h3{margin:0 0 4px;font:600 16px/1.3 'Rubik',sans-serif;color:#fff}
+.ftr__in{padding-top:56px;padding-bottom:32px;display:flex;flex-direction:column;gap:40px}
+.ftr__cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:32px;font:400 14px/1.5 'Rubik',sans-serif}
+.ftr__col{display:flex;flex-direction:column;gap:10px}
+.ftr__bot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px;padding-top:24px;border-top:1px solid rgba(255,255,255,.14);font:400 13px/1.4 'Rubik',sans-serif}
+
+@media (max-width:1365px){
+  .g4,.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .proc{grid-template-columns:1fr;gap:32px}
+  .ig-steps{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:28px}
+  .ig-step:nth-child(3) .ig-step__line{display:none}
+}
+@media (max-width:1100px){
+  .blk{padding:72px 0}
+  .g4,.g3,.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .form{grid-template-columns:1fr;gap:32px}
+  .form__l{position:static}
+  .ftr__cols{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:599px){
+  .blk{padding:48px 0}
+  .blk__head{margin-bottom:24px}
+  .blk__h{font-size:28px;line-height:1.2}
+  .blk__sub{font-size:16px}
+  .g4,.g3{grid-template-columns:1fr;gap:16px}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .tile{min-height:112px;padding:16px;font-size:15px;gap:16px}
+  .seg{min-height:0;padding:20px;flex-direction:row;align-items:center;gap:16px}
+  .seg__ic{width:48px;height:48px;flex:none}
+  .seg__t{font-size:17px}
+  .seg__more{display:none}
+  .stepsbox{padding:20px;gap:24px}
+  .ig-steps{grid-template-columns:1fr;row-gap:20px}
+  .ig-step{flex-direction:row;flex-wrap:wrap;column-gap:14px;row-gap:2px}
+  .ig-step__line{display:none}
+  .ig-step__num{width:36px;height:36px;font-size:15px}
+  .ig-step__title{flex:1;align-self:center}
+  .ig-step__text{flex-basis:100%;padding-left:50px}
+  .stepsfoot{flex-direction:column;align-items:stretch}
+  .stepsfoot .ig-btn{width:100%}
+  .form__card{grid-template-columns:1fr;padding:20px;gap:16px}
+  .form__send .ig-btn{width:100%}
+  .ftr__cols{grid-template-columns:1fr}
+  .ftr__in{padding-bottom:104px}
+}
+.seg__d{margin:0;font:400 15px/1.5 'Rubik',sans-serif;color:#5B636B}
+.ig-steps .ig-step__text{font-size:14px;line-height:1.5}
+@media (max-width:599px){
+  .seg{flex-direction:column;align-items:flex-start;gap:12px}
+  .seg__d{font-size:14px}
+}
+
+/* ---- Страница заказа (od-) ---- */
+.od-root{background:#F4F5F3;font-family:'Rubik',system-ui,sans-serif;color:#1C1F22;position:relative;min-height:100%}
+.od-head{background:#fff;box-shadow:0 1px 0 #E6E8E6}
+.od-head .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:14px;padding-bottom:14px}
+.od-head img{height:44px;width:auto;display:block}
+.od-head__r{display:flex;align-items:center;gap:24px}
+.od-tel{font:600 16px/1.3 'Rubik',sans-serif;color:#1C1F22;text-decoration:none}
+.od-demo{background:#16403D;color:#fff}
+.od-demo .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding-top:10px;padding-bottom:10px;font:500 13px/1 'Rubik',sans-serif}
+.od-seg{display:inline-flex;gap:4px;padding:3px;border-radius:999px;background:rgba(255,255,255,.12)}
+.od-seg button{height:32px;padding:0 14px;border-radius:999px;border:0;background:transparent;color:#fff;font:500 13px/1 'Rubik',sans-serif;cursor:pointer}
+.od-seg button.is-on{background:#fff;color:#16403D}
+.od-main{padding-top:48px;padding-bottom:80px;display:flex;flex-direction:column;gap:32px}
+.od-title{display:flex;flex-direction:column;gap:8px}
+.od-title h1{margin:0;font:700 40px/1.15 'Rubik',sans-serif}
+.od-title p{margin:0;font:400 18px/1.5 'Rubik',sans-serif;color:#5B636B}
+.od-grid{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.od-col{flex:999 1 640px;min-width:0;display:flex;flex-direction:column;gap:24px}
+.od-side{flex:1 1 320px;max-width:420px;display:flex;flex-direction:column;gap:24px}
+.od-card{background:#fff;border-radius:24px;padding:28px 32px;box-shadow:0 2px 8px rgba(28,31,34,.06);display:flex;flex-direction:column;gap:20px}
+.od-card h2{margin:0;font:600 20px/1.3 'Rubik',sans-serif}
+.od-gal{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.od-thumb{padding:0;border:0;border-radius:12px;overflow:hidden;cursor:pointer;background:none;display:block;transition:transform 200ms,box-shadow 200ms}
+.od-thumb:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(28,31,34,.12)}
+.od-thumb .ig-ph{aspect-ratio:4/3}
+.od-empty{display:flex;align-items:center;gap:14px;padding:24px;border-radius:16px;border:1.5px dashed #D9DCDE;color:#5B636B;font:400 15px/1.45 'Rubik',sans-serif}
+.od-empty svg{width:28px;height:28px;flex:none;color:#9AA1A8}
+.od-kv{display:grid;grid-template-columns:200px minmax(0,1fr);gap:12px 24px;margin:0;font:400 16px/1.45 'Rubik',sans-serif}
+.od-kv dt{color:#5B636B}
+.od-kv dd{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;font-weight:500}
+.od-docs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column}
+.od-docs li{display:flex;align-items:center;gap:16px;padding:14px 0;border-top:1px solid #E6E8E6}
+.od-docs li:first-child{border-top:0;padding-top:0}
+.od-docs__ic{width:44px;height:44px;border-radius:10px;background:#EAF3F1;color:#1F6B60;display:grid;place-items:center;flex:none}
+.od-docs__ic svg{width:22px;height:22px}
+.od-docs__n{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font:500 15px/1.4 'Rubik',sans-serif}
+.od-docs__n span{font:400 13px/1.3 'Rubik',sans-serif;color:#5B636B}
+.od-mgr{display:flex;align-items:center;gap:16px}
+.od-mgr__ph{width:72px;height:72px;border-radius:50%;flex:none;background:linear-gradient(135deg,#E3ECE9,#CFDDD9);display:grid;place-items:center;color:#6A7C78;font:500 10px/1.2 'Rubik',sans-serif;text-transform:uppercase;letter-spacing:.06em;text-align:center}
+.od-mgr__c{display:flex;flex-direction:column;gap:12px;font:400 16px/1.4 'Rubik',sans-serif}
+.od-mgr__c a{text-decoration:none;font-weight:500}
+.od-exp{max-width:720px;margin:64px auto;text-align:left}
+.od-foot{background:#324B64;color:#C9D3DD;font:400 14px/1.5 'Rubik',sans-serif}
+.od-foot .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 32px;padding-top:28px;padding-bottom:28px}
+.od-foot a{color:#fff;text-decoration:none}
+.od-lb{position:absolute;inset:0;z-index:20;background:rgba(28,31,34,.85);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:96px 24px 24px;gap:16px}
+.od-lb__img{width:100%;max-width:1100px;aspect-ratio:4/3;max-height:720px;border-radius:16px}
+.od-lb__bar{width:100%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;gap:16px;color:#fff;font:400 15px/1.4 'Rubik',sans-serif}
+.od-lb__btn{width:48px;height:48px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;display:grid;place-items:center;cursor:pointer}
+.od-lb__btn:hover{background:rgba(255,255,255,.26)}
+.od-lb__btn svg{width:22px;height:22px}
+@media (max-width:1365px){.od-gal{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:599px){
+  .od-head img{height:32px}
+  .od-tel,.od-cta-full{display:none}
+  .od-main{padding-top:24px;padding-bottom:48px;gap:20px}
+  .od-title h1{font-size:28px}
+  .od-title p{font-size:16px}
+  .od-card{padding:20px 16px;border-radius:16px}
+  .od-side{max-width:none}
+  .od-gal{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .od-kv{grid-template-columns:1fr;gap:4px}
+  .od-kv dd{margin-bottom:10px}
+  .od-tl{grid-template-columns:1fr}
+  .od-tl .ig-tl__step{flex-direction:row;gap:14px;padding:0 0 22px}
+  .od-tl .ig-tl__bar{top:32px;left:15px;right:auto;bottom:0;width:2px;height:auto}
+  .od-lb{padding-top:64px}
+}
+@media (min-width:600px){.od-cta-icon{display:none}}
+</style>
+</helmet>
+<div class="od-root">
+  <header class="od-head">
+    <div class="wrap">
+      <a href="#" style="display: flex"><img src="../design-system/assets/inex-glass-logo-dark.svg" alt="Inex Glass — на главную"></a>
+      <div class="od-head__r">
+        <a class="od-tel" href="tel:+73512470557">+7 (351) 247-05-57</a>
+        <a class="ig-btn ig-btn--primary od-cta-full" href="#" style="height: 44px; padding: 0 22px; font-size: 15px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>Рассчитать стоимость</a>
+        <a class="ig-btn ig-btn--ghost ig-btn--icon od-cta-icon" href="tel:+73512470557" aria-label="Позвонить +7 (351) 247-05-57" style="width: 44px; height: 44px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></a>
+        <a class="ig-btn ig-btn--primary ig-btn--icon od-cta-icon" href="#" aria-label="Рассчитать стоимость" style="width: 44px; height: 44px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="od-demo">
+    <div class="wrap"><span>Демо — состояние страницы:</span><div class="od-seg" role="group" aria-label="Состояние страницы"><sc-for list="{{views}}" as="v" hint-placeholder-count="3"><button type="button" class="{{v.cls}}" aria-pressed="{{v.on}}" onClick="{{v.go}}">{{v.label}}</button></sc-for></div></div>
+  </div>
+
+  <sc-if value="{{expired}}" hint-placeholder-val="{{ false }}">
+    <main class="wrap">
+      <div class="od-exp od-card">
+        <span class="ig-callout__icon" aria-hidden="true" style="background: #F2D59C; color: #8A5A00"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
+        <h1 style="margin: 0; font: 700 32px/1.2 'Rubik', sans-serif">Ссылка больше не действует — свяжитесь с менеджером</h1>
+        <div class="od-mgr__c"><a href="tel:+73512470557" style="font: 600 22px/1.3 'Rubik', sans-serif; color: #16403D">+7 (351) 247-05-57</a><a href="mailto:sale@inex.su">sale@inex.su</a><span class="ig-small ig-muted">Пн–пт, 9:00–18:00</span></div>
+      </div>
+    </main>
+  </sc-if>
+
+  <sc-if value="{{active}}" hint-placeholder-val="{{ true }}">
+    <main class="wrap od-main">
+      <div class="od-title">
+        <span class="ig-label">inexglass.ru/zakaz/2026-0147</span>
+        <h1>Заказ № 2026-0147</h1>
+        <p>[Название компании] · Закалённое стекло 10 мм, 86 м², 42 позиции</p>
+      </div>
+
+      <div class="od-card">
+        <h2>Статус</h2>
+        <div class="ig-tl od-tl">
+          <sc-for list="{{tl}}" as="t" hint-placeholder-count="5">
+            <div class="{{t.cls}}">
+              <sc-if value="{{t.bar}}" hint-placeholder-val="{{ true }}"><span class="ig-tl__bar" aria-hidden="true"></span></sc-if>
+              <span class="ig-tl__dot"><sc-if value="{{t.done}}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></sc-if><sc-if value="{{t.cur}}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg></sc-if></span>
+              <span style="display: flex; flex-direction: column; gap: 4px"><span class="ig-tl__title">{{t.title}}</span><span class="ig-tl__date">{{t.date}}</span></span>
+            </div>
+          </sc-for>
+        </div>
+        <div class="ig-callout ig-callout--info" style="padding: 18px 20px">
+          <span class="ig-callout__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg></span>
+          <div><p class="ig-callout__title" style="font-size: 16px; margin-bottom: 4px">Комментарий менеджера</p><p class="ig-body" style="margin: 0">Срок изготовления перенесён на 14.11 — завод заменил оборудование на линии закалки. Отгрузка 15.11.</p></div>
+        </div>
+      </div>
+
+      <div class="od-grid">
+        <div class="od-col">
+          <div class="od-card">
+            <h2>Фото упаковки</h2>
+            <sc-if value="{{shipped}}" hint-placeholder-val="{{ true }}">
+              <div class="od-gal"><sc-for list="{{photos}}" as="p" hint-placeholder-count="4"><button type="button" class="od-thumb" aria-label="{{p.aria}}" onClick="{{p.open}}"><span class="ig-ph"><span>{{p.label}}</span></span></button></sc-for></div>
+              <span class="ig-small ig-muted">Фото при отгрузке, 15.11.2026</span>
+            </sc-if>
+            <sc-if value="{{inProd}}" hint-placeholder-val="{{ false }}">
+              <div class="od-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>Фото появятся при отгрузке</div>
+            </sc-if>
+          </div>
+
+          <sc-if value="{{shipped}}" hint-placeholder-val="{{ true }}">
+            <div class="od-card">
+              <h2>Отгрузка</h2>
+              <dl class="od-kv">
+                <dt>Дата отгрузки</dt><dd>15.11.2026</dd>
+                <dt>Транспортная компания</dt><dd>[Название ТК]</dd>
+                <dt>Номер накладной</dt><dd><span style="font-variant-numeric: tabular-nums">[номер накладной]</span><button class="ig-btn ig-btn--secondary ig-btn--s" type="button" onClick="{{copy}}">{{copyLabel}}</button></dd>
+                <dt>Отслеживание</dt><dd><a class="ig-link ig-link--arrow" href="#">Открыть на сайте ТК<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a></dd>
+              </dl>
+            </div>
+          </sc-if>
+
+          <div class="od-card">
+            <h2>Документы</h2>
+            <ul class="od-docs">
+              <sc-for list="{{docs}}" as="d" hint-placeholder-count="3">
+                <li><span class="od-docs__ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg></span><span class="od-docs__n">{{d.n}}<span>{{d.m}}</span></span><a class="ig-btn ig-btn--ghost ig-btn--s" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Скачать</a></li>
+              </sc-for>
+            </ul>
+          </div>
+        </div>
+
+        <aside class="od-side">
+          <div class="od-card">
+            <h2>Ваш менеджер</h2>
+            <div class="od-mgr"><span class="od-mgr__ph" aria-hidden="true">фото</span><div style="display: flex; flex-direction: column; gap: 2px"><span style="font: 600 18px/1.3 'Rubik', sans-serif">[Имя менеджера]</span><span class="ig-small ig-muted">Менеджер по заказам</span></div></div>
+            <div class="od-mgr__c"><a href="tel:+73512470557" style="color: #1C1F22">+7 (351) 247-05-57</a><a href="mailto:sale@inex.su">sale@inex.su</a></div>
+            <a class="ig-btn ig-btn--secondary ig-btn--block" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>Написать в мессенджер</a>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </sc-if>
+
+  <footer class="od-foot">
+    <div class="wrap"><span>Inex Glass · <a href="tel:+73512470557">+7 (351) 247-05-57</a> · <a href="mailto:sale@inex.su">sale@inex.su</a></span><span>Челябинск, ул. Артиллерийская, 124А · Екатеринбург, ул. Данилы Зверева, 17б</span></div>
+  </footer>
+
+  <sc-if value="{{lbOpen}}" hint-placeholder-val="{{ false }}">
+    <div class="od-lb" role="dialog" aria-modal="true" aria-label="Фото упаковки">
+      <div class="od-lb__bar"><span>{{lbLabel}} · Фото при отгрузке, 15.11.2026</span><button type="button" class="od-lb__btn" aria-label="Закрыть" onClick="{{lbClose}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div>
+      <div class="ig-ph od-lb__img"><span>{{lbLabel}}</span></div>
+      <div class="od-lb__bar" style="justify-content: center"><button type="button" class="od-lb__btn" aria-label="Предыдущее фото" onClick="{{lbPrev}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></button><span>{{lbCount}}</span><button type="button" class="od-lb__btn" aria-label="Следующее фото" onClick="{{lbNext}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button></div>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":1700}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { view: 'ship', copied: false, lb: -1 }; }
+  renderVals() {
+    const s = this.state;
+    const ship = s.view === 'ship';
+    const steps = [
+      ['Спецификация согласована', '28.10.2026'],
+      ['В производстве', '30.10.2026'],
+      ['Упаковано', ship ? '14.11.2026' : '—'],
+      ['Отгружено', ship ? '15.11.2026' : 'план 15.11'],
+      ['Получено', '—']
+    ];
+    const cur = ship ? 3 : 1;
+    const tl = steps.map((t, i) => ({
+      title: t[0], date: t[1], bar: i < steps.length - 1,
+      done: i < cur, cur: i === cur,
+      cls: 'ig-tl__step' + (i < cur ? ' is-done' : i === cur ? ' is-current' : '')
+    }));
+    const n = 6;
+    const photos = Array.from({ length: n }, (_, i) => ({ label: 'фото упаковки ' + (i + 1), aria: 'Открыть фото упаковки ' + (i + 1), open: () => this.setState({ lb: i }) }));
+    return {
+      views: [['prod', 'В производстве'], ['ship', 'Отгружено'], ['expired', 'Ссылка истекла']].map((v) => ({ label: v[1], on: s.view === v[0], cls: s.view === v[0] ? 'is-on' : '', go: () => this.setState({ view: v[0], lb: -1, copied: false }) })),
+      expired: s.view === 'expired',
+      active: s.view !== 'expired',
+      shipped: ship,
+      inProd: s.view === 'prod',
+      tl: tl,
+      photos: photos,
+      copy: () => this.setState({ copied: true }),
+      copyLabel: s.copied ? 'Скопировано' : 'Скопировать',
+      docs: [
+        { n: 'Спецификация', m: 'PDF' },
+        { n: 'Паспорт качества', m: 'PDF' },
+        { n: 'Сертификаты соответствия', m: 'PDF' }
+      ],
+      lbOpen: s.lb >= 0 && ship,
+      lbLabel: 'Фото упаковки ' + (s.lb + 1),
+      lbCount: (s.lb + 1) + ' из ' + n,
+      lbClose: () => this.setState({ lb: -1 }),
+      lbPrev: () => this.setState({ lb: (s.lb + n - 1) % n }),
+      lbNext: () => this.setState({ lb: (s.lb + 1) % n })
+    };
+  }
+}
+</script>
+</body>
+</html>

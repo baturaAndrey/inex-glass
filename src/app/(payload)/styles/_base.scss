@@ -1,0 +1,584 @@
+// Inex Glass admin theme: Payload variables, `--iga-*` variables and the shared `.iga-*` classes.
+// Owner: task-02 (wave 1); other tasks only use these classes and write their own in their partials.
+// Colours come only from `--ig-*` tokens (src/styles/ig-vars.css, loaded by the admin layout).
+// Values of the `.iga-*` classes follow the approved mockup (res/admin-mockup/*.dc.html).
+
+@use "sass:list";
+
+// Payload scale steps, 0 … 1000 by 50 (node_modules/@payloadcms/ui/dist/scss/colors.scss).
+$steps:
+  0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950,
+  1000;
+
+// Each scale maps ranges of steps to one token: (from, to, token) — inclusive bounds.
+$elevation-scale: (
+  (0, 0, --ig-surface),
+  (50, 50, --ig-bg),
+  (100, 100, --ig-well),
+  (150, 150, --ig-hairline),
+  (200, 200, --ig-line),
+  (250, 250, --ig-gray-2),
+  (300, 300, --ig-gray-1),
+  (350, 450, --ig-text-muted),
+  (500, 600, --ig-text-2),
+  (650, 700, --ig-ink-2),
+  (750, 750, --ig-ink-3),
+  (800, 1000, --ig-text)
+);
+
+$success-scale: (
+  (50, 100, --ig-primary-light),
+  (150, 250, --ig-line-teal),
+  (300, 450, --ig-primary),
+  (500, 600, --ig-btn-primary-bg),
+  (650, 750, --ig-primary-pressed),
+  (800, 950, --ig-primary-dark)
+);
+
+$error-scale: ((50, 100, --ig-danger-bg), (150, 300, --ig-danger), (350, 950, --ig-danger-text));
+
+$warning-scale: (
+  (50, 100, --ig-warning-bg),
+  (150, 300, --ig-warning),
+  (350, 950, --ig-warning-text)
+);
+
+// Emits `--theme-<name>-<step>: var(<token>)` for every step covered by the scale.
+@mixin theme-scale($name, $scale) {
+  @each $range in $scale {
+    $from: list.nth($range, 1);
+    $to: list.nth($range, 2);
+    $token: list.nth($range, 3);
+    @each $step in $steps {
+      @if $step >= $from and $step <= $to {
+        --theme-#{$name}-#{$step}: var(#{$token});
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Payload variables. Payload declares them on `:root` inside `@layer payload-default`;
+// this file is unlayered, so the same selector wins regardless of specificity.
+// ---------------------------------------------------------------------------------------------
+
+:root {
+  @include theme-scale(elevation, $elevation-scale);
+  @include theme-scale(success, $success-scale);
+  @include theme-scale(error, $error-scale);
+  @include theme-scale(warning, $warning-scale);
+
+  --theme-bg: var(--ig-bg);
+  --theme-input-bg: var(--ig-surface);
+  --theme-text: var(--ig-text);
+  --font-body: var(--ig-font);
+  --style-radius-s: var(--ig-r-sm);
+  --style-radius-m: var(--ig-r-md);
+  --style-radius-l: var(--ig-r-lg);
+  --accessibility-outline: 2px solid var(--ig-primary);
+
+  // Light only (DESIGN.md): native controls and scrollbars stay light.
+  color-scheme: light;
+
+  // Admin redesign variables. Task 03 writes the menu styles in `_nav.scss`; here only values.
+  // Semi-transparent white / `--ig-text` shades of the mockup, no new colours.
+  --iga-nav-bg: var(--ig-navy);
+  --iga-nav-text: var(--ig-on-navy);
+  --iga-nav-text-2: var(--ig-on-navy-2);
+  --iga-nav-active-bg: var(--ig-btn-primary-bg);
+  --iga-nav-hover-bg: rgb(255 255 255 / 0.08);
+  --iga-nav-divider: rgb(255 255 255 / 0.12);
+  --iga-shadow-xs: 0 1px 2px rgb(28 31 34 / 0.05); // mockup cards (rgb of --ig-text)
+  --iga-ease: var(--ig-ease);
+}
+
+::selection {
+  background: var(--ig-primary-light);
+  color: var(--ig-text);
+}
+
+// Payload buttons: the default primary is black (`--theme-elevation-800`). Override through
+// Payload's own variables. An unlayered rule also beats Payload's nested `.btn--disabled`, so the
+// disabled state is repeated explicitly.
+.btn--style-primary {
+  --color: var(--ig-on-navy);
+  --bg-color: var(--ig-btn-primary-bg);
+  --hover-bg: var(--ig-btn-primary-bg-hover);
+  --hover-color: var(--ig-on-navy);
+
+  &.btn--disabled {
+    --bg-color: var(--ig-well);
+    --color: var(--ig-text-muted);
+    --hover-bg: var(--ig-well);
+    --hover-color: var(--ig-text-muted);
+  }
+}
+
+.btn--style-secondary {
+  --color: var(--ig-primary-pressed);
+  --btn-border: 1px solid var(--ig-primary);
+  --hover-color: var(--ig-primary-pressed);
+  --hover-btn-border: 1px solid var(--ig-primary-pressed);
+
+  &.btn--disabled {
+    --color: var(--ig-text-muted);
+    --btn-border: 1px solid var(--ig-line);
+    --hover-btn-border: 1px solid var(--ig-line);
+    --hover-color: var(--ig-text-muted);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Graphics (src/payload/admin/graphics): the SVG keeps its aspect ratio.
+// ---------------------------------------------------------------------------------------------
+
+.iga-logo {
+  height: 44px; // DESIGN.md: header logo is at least 44 px high
+  width: auto;
+}
+
+.iga-icon {
+  height: 22px;
+  width: auto;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Shared classes (contract «Каркас (task-02)» in specs/admin-redesign/README.md).
+// ---------------------------------------------------------------------------------------------
+
+.iga-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 22px;
+  background: var(--ig-surface);
+  border: 1px solid var(--ig-hairline);
+  border-radius: var(--ig-r-lg);
+  box-shadow: var(--iga-shadow-xs);
+
+  > h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+
+.iga-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: var(--ig-r-pill);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background var(--ig-dur-fast) var(--iga-ease),
+    border-color var(--ig-dur-fast) var(--iga-ease),
+    color var(--ig-dur-fast) var(--iga-ease),
+    transform var(--ig-dur-fast) var(--iga-ease);
+
+  svg {
+    width: 16px;
+    height: 16px;
+    flex: none;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &--primary {
+    background: var(--ig-btn-primary-bg);
+    color: var(--ig-on-navy);
+
+    &:hover {
+      background: var(--ig-btn-primary-bg-hover);
+    }
+  }
+
+  &--secondary {
+    background: var(--ig-surface);
+    color: var(--ig-primary-pressed);
+    border-color: var(--ig-primary);
+
+    &:hover {
+      background: var(--ig-primary-light);
+    }
+  }
+
+  &--ghost {
+    background: var(--ig-surface);
+    color: var(--ig-text);
+    border-color: var(--ig-line);
+
+    &:hover {
+      background: var(--ig-bg);
+    }
+  }
+
+  &--danger {
+    height: 32px;
+    padding: 0 4px;
+    background: transparent;
+    color: var(--ig-danger-text);
+    border: 0;
+  }
+
+  &--sm {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  // Last among the button rules so it beats every variant and its hover.
+  &:disabled,
+  &[aria-disabled="true"] {
+    background: var(--ig-well);
+    color: var(--ig-text-muted);
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.iga-badge {
+  // Any status colour can be passed inline: `style={{ "--iga-badge-color": color }}`.
+  --iga-badge-color: var(--ig-text-2);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: var(--ig-r-sm);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--iga-badge-color);
+  background: color-mix(in srgb, var(--iga-badge-color) 12%, var(--ig-surface));
+
+  &--new {
+    background: var(--ig-info-bg);
+    color: var(--ig-info-text);
+  }
+
+  &--work {
+    background: var(--ig-warning-bg);
+    color: var(--ig-warning-text);
+  }
+
+  &--kp {
+    background: var(--ig-primary-light);
+    color: var(--ig-primary-dark);
+  }
+
+  &--ok {
+    background: var(--ig-success-bg);
+    color: var(--ig-success-text);
+  }
+
+  &--no {
+    background: var(--ig-danger-bg);
+    color: var(--ig-danger-text);
+  }
+}
+
+.iga-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--ig-r-sm);
+  font-size: 12px;
+  white-space: nowrap;
+  background: var(--ig-well);
+  color: var(--ig-text-2);
+}
+
+.iga-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--ig-line);
+  border-radius: var(--ig-r-pill);
+  background: var(--ig-surface);
+  color: var(--ig-text);
+  font: inherit;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--ig-dur-fast) var(--iga-ease),
+    border-color var(--ig-dur-fast) var(--iga-ease),
+    color var(--ig-dur-fast) var(--iga-ease);
+
+  &:hover {
+    border-color: var(--ig-primary);
+  }
+
+  &[aria-pressed="true"] {
+    background: var(--ig-primary-light);
+    border-color: var(--ig-primary);
+    color: var(--ig-primary-dark);
+    font-weight: 500;
+  }
+
+  b {
+    font-weight: 600;
+    color: var(--ig-text-2);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.iga-seg {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--ig-r-pill);
+  background: var(--ig-well);
+
+  > button,
+  > a {
+    padding: 6px 14px;
+    border: 0;
+    border-radius: var(--ig-r-pill);
+    background: transparent;
+    color: var(--ig-text-2);
+    font: inherit;
+    font-size: 13px;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background var(--ig-dur-fast) var(--iga-ease),
+      color var(--ig-dur-fast) var(--iga-ease);
+  }
+
+  > [aria-pressed="true"],
+  > [aria-current="page"],
+  > [aria-selected="true"] {
+    background: var(--ig-surface);
+    color: var(--ig-text);
+    font-weight: 500;
+    box-shadow: var(--iga-shadow-xs);
+  }
+}
+
+// `.iga-select` shares the input look; only the native arrow and cursor differ.
+.iga-input,
+.iga-select {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--ig-line);
+  border-radius: var(--ig-r-md);
+  background: var(--ig-surface);
+  color: var(--ig-text);
+  font: inherit;
+  font-size: 14px;
+  transition:
+    border-color var(--ig-dur-fast) var(--iga-ease),
+    box-shadow var(--ig-dur-fast) var(--iga-ease);
+
+  &::placeholder {
+    color: var(--ig-text-muted);
+  }
+
+  &:focus {
+    border-color: var(--ig-primary);
+    box-shadow: var(--ig-focus-ring);
+    outline: none;
+  }
+
+  &[aria-invalid="true"] {
+    border-color: var(--ig-danger-text);
+  }
+}
+
+textarea.iga-input {
+  height: auto;
+  min-height: 84px;
+  padding: 10px 12px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.iga-select {
+  appearance: auto;
+  cursor: pointer;
+}
+
+.iga-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__label {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ig-text-2);
+  }
+
+  &__hint {
+    font-size: 12px;
+    color: var(--ig-text-2);
+  }
+
+  &__error {
+    font-size: 12px;
+    color: var(--ig-danger-text);
+  }
+}
+
+.iga-dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px 24px;
+  margin: 0;
+
+  dt {
+    margin-bottom: 3px;
+    font-size: 13px;
+    color: var(--ig-text-2);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+.iga-bar {
+  height: 8px;
+  border-radius: var(--ig-r-pill);
+  background: var(--ig-well);
+  overflow: hidden;
+
+  // Width is set inline: `style={{ width: "42%" }}`.
+  > span {
+    display: block;
+    height: 100%;
+    border-radius: var(--ig-r-pill);
+    background: var(--ig-primary);
+  }
+}
+
+.iga-page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 32px;
+  background: var(--ig-surface);
+  border-bottom: 1px solid var(--ig-hairline);
+
+  &__eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ig-text-2);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 12px;
+    margin-left: auto;
+  }
+}
+
+.iga-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  &__sub {
+    font-size: 13px;
+    color: var(--ig-text-2);
+  }
+
+  &__action {
+    margin-left: auto;
+  }
+}
+
+.iga-avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--ig-primary-light);
+  color: var(--ig-primary-dark);
+  font-size: 13px;
+  font-weight: 600;
+
+  &--sm {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Shared rules: focus, touch targets, reduced motion.
+// ---------------------------------------------------------------------------------------------
+
+.iga-btn,
+.iga-chip,
+.iga-seg > * {
+  &:focus-visible {
+    outline: 2px solid var(--ig-primary);
+    outline-offset: 2px;
+  }
+}
+
+// DESIGN.md: touch targets on phones are at least 44 px.
+@media (max-width: 599px) {
+  .iga-btn,
+  .iga-chip,
+  .iga-input,
+  .iga-select {
+    min-height: 44px;
+  }
+
+  .iga-page-head {
+    padding: 12px 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  // Every element whose class list contains an `iga-` class (first or not).
+  [class^="iga-"],
+  [class*=" iga-"] {
+    transition: none;
+  }
+
+  .iga-btn:active {
+    transform: none;
+  }
+}

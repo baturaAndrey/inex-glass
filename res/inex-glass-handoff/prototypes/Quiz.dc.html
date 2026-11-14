@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Inex Glass — загрузка, квиз, FAQ</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../design-system/colors_and_type.css">
+<link rel="stylesheet" href="../design-system/components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F6B60}a:hover{color:#16403D}
+.pn{background:#fff;border-radius:24px;padding:28px;box-shadow:0 2px 8px rgba(28,31,34,.06);display:flex;flex-direction:column;gap:20px}
+.mono{font:400 12px/1.4 ui-monospace,Menlo,monospace;color:#5B636B}
+.st{display:flex;flex-direction:column;gap:10px}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1500px; box-sizing: border-box; padding: 64px; background: #F4F5F3; font-family: 'Rubik', system-ui, sans-serif; color: #1C1F22; display: flex; flex-direction: column; gap: 28px">
+  <div style="display: flex; flex-direction: column; gap: 12px">
+    <span class="ig-label">Дизайн-система Inex Glass · 05</span>
+    <h1 class="ig-h2">Загрузка файла, радио-карточки, FAQ</h1>
+  </div>
+
+  <div class="pn">
+    <span class="ig-h6">Загрузка чертежа — DWG, DXF, PDF, до 50 МБ</span>
+    <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; align-items: start">
+      <div class="st"><span class="mono">пусто</span>
+        <div class="ig-upload"><span class="ig-upload__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg></span><span class="ig-upload__title">Перетащите чертёж или <a href="#">выберите файл</a></span><span>DWG, DXF, PDF · до 50 МБ</span></div>
+      </div>
+      <div class="st"><span class="mono">перетаскивание</span>
+        <div class="ig-upload is-drag"><span class="ig-upload__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg></span><span class="ig-upload__title" style="color: #16403D">Отпустите файл</span><span style="color: #1F6B60">Загрузим и проверим формат</span></div>
+      </div>
+      <div class="st"><span class="mono">загружено</span>
+        <div class="ig-file"><span class="ig-file__ext">DWG</span><div style="display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1"><span class="ig-file__name">peregorodki_3etazh_v2.dwg</span><span class="ig-file__meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>4,2 МБ · загружено</span></div><button class="ig-btn ig-btn--ghost ig-btn--icon" type="button" aria-label="Удалить файл" style="width: 40px; height: 40px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg></button></div>
+        <a class="ig-link" href="#" style="font-size: 14px">Добавить ещё файл</a>
+      </div>
+      <div class="st"><span class="mono">ошибка формата</span>
+        <div class="ig-upload is-error"><span class="ig-upload__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg></span><span class="ig-upload__title" style="color: #B23B3B">Формат .jpg не принимаем</span><span style="color: #1C1F22">Загрузите DWG, DXF или PDF</span><a href="#" style="font-size: 14px">Выбрать другой файл</a></div>
+      </div>
+      <div class="st"><span class="mono">ошибка размера</span>
+        <div class="ig-upload is-error"><span class="ig-upload__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg></span><span class="ig-upload__title" style="color: #B23B3B">Файл 64 МБ — больше 50 МБ</span><span style="color: #1C1F22">Сожмите архивом или пришлите на e-mail</span><a href="#" style="font-size: 14px">Выбрать другой файл</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pn">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 24px">
+      <span class="ig-h6">Радио-карточки квиза и прогресс</span>
+      <span class="ig-small ig-muted">Шаг 1 из 7</span>
+    </div>
+    <div style="height: 6px; border-radius: 999px; background: #ECEEEC; overflow: hidden" role="progressbar" aria-valuemin="1" aria-valuemax="7" aria-valuenow="1" aria-label="Прогресс квиза"><div style="width: 14.3%; height: 100%; background: #2B8C7E; border-radius: 999px"></div></div>
+    <span class="ig-h4">Что нужно рассчитать?</span>
+    <div role="radiogroup" aria-label="Тип изделия" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+      <sc-for list="{{types}}" as="t" hint-placeholder-count="4">
+        <button type="button" role="radio" aria-checked="{{t.on}}" class="{{t.cls}}" onClick="{{t.pick}}">
+          <span class="ig-radio-card__mark" aria-hidden="true"></span>
+          <span class="ig-radio-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"></rect><path d="m8 8 3-3"></path><path d="m8 13 7-7"></path></svg></span>
+          <span style="display: flex; flex-direction: column; gap: 4px"><span class="ig-radio-card__title">{{t.title}}</span><span class="ig-radio-card__sub">{{t.sub}}</span></span>
+        </button>
+      </sc-for>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px">
+      <button class="ig-btn ig-btn--ghost" type="button">Назад</button>
+      <button class="ig-btn ig-btn--primary" type="button">Далее<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></button>
+    </div>
+  </div>
+
+  <div class="pn">
+    <span class="ig-h6">Аккордеон FAQ</span>
+    <div class="ig-acc">
+      <sc-for list="{{faq}}" as="f" hint-placeholder-count="4">
+        <div class="{{f.cls}}">
+          <button class="ig-acc__btn" type="button" aria-expanded="{{f.open}}" onClick="{{f.toggle}}">{{f.q}}<span class="ig-acc__sign" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></span></button>
+          <sc-if value="{{f.open}}" hint-placeholder-val="{{ false }}"><div class="ig-acc__panel">{{f.a}}</div></sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { type: 'glass', open: 0 }; }
+  renderVals() {
+    const s = this.state;
+    const types = [
+      { id: 'glass', title: 'Закалённое стекло', sub: '4–19 мм, по вашим размерам' },
+      { id: 'triplex', title: 'Триплекс', sub: 'Закалённый, плёнка 0,38–1,52 мм' },
+      { id: 'construct', title: 'Стеклянная конструкция', sub: 'Перегородки, ограждения, козырьки' },
+      { id: 'furniture', title: 'Стекло для мебели', sub: 'Серии для производства' }
+    ];
+    const faq = [
+      { q: 'Можно ли резать закалённое стекло после закалки?', a: 'Нет. Раскрой, отверстия, вырезы и обработка кромки выполняются до закалки. Поэтому мы проверяем чертёж до размещения заказа.' },
+      { q: 'Какой минимальный заказ?', a: 'Работаем с заказами от 50 м².' },
+      { q: 'Сколько занимает изготовление?', a: 'От 10 рабочих дней с даты договора. Коммерческое предложение — в среднем за 2–3 рабочих дня.' },
+      { q: 'Какие документы будут на партию?', a: 'Паспорт на каждую партию, стекло по ГОСТ 30698.' }
+    ];
+    return {
+      types: types.map((t) => ({ ...t, on: t.id === s.type, cls: 'ig-radio-card' + (t.id === s.type ? ' is-selected' : ''), pick: () => this.setState({ type: t.id }) })),
+      faq: faq.map((f, i) => ({ ...f, open: s.open === i, cls: 'ig-acc__item' + (s.open === i ? ' is-open' : ''), toggle: () => this.setState({ open: s.open === i ? -1 : i }) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

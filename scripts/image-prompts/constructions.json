@@ -1,0 +1,100 @@
+[
+  {
+    "id": "c-konstrukcii-hub",
+    "group": "constructions",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Bright minimal modern interior combining several frameless glass structures: an all-glass office partition and a glass balustrade on a mezzanine, white walls, daylight, no stairs.",
+    "alt": "Стеклянные конструкции в современном интерьере",
+    "target": {
+      "kind": "doc",
+      "collection": "pages",
+      "slug": "steklyannye-konstrukcii",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "c-peregorodki",
+    "group": "constructions",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Frameless all-glass partition wall in an empty bright modern office, clear tempered glass panels with slim aluminium top and bottom profiles, white desks in the background, no people.",
+    "alt": "Цельностеклянная перегородка в офисе",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "steklyannye-peregorodki",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "c-ograzhdeniya",
+    "group": "constructions",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Frameless glass balustrade on the edge of an interior gallery, clear tempered glass panels held in a continuous aluminium base profile, light wooden floor, bright minimal interior.",
+    "alt": "Стеклянное ограждение на профиле",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "steklyannye-ograzhdeniya",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "c-kozyrki",
+    "group": "constructions",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Frameless laminated glass canopy above a minimal building entrance, held by stainless steel tension rods to a light grey facade wall, daylight, no signs.",
+    "alt": "Стеклянный козырёк над входом",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "steklyannye-kozyrki",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "c-dushevye",
+    "group": "constructions",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Frameless clear glass shower enclosure in a bright minimal hotel bathroom with light grey large-format tiles, chrome fittings, empty and tidy, no people, no towels with prints.",
+    "alt": "Душевая перегородка из стекла в ванной комнате",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "dushevye-peregorodki",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "c-torgovye-vitriny",
+    "group": "constructions",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Empty frameless glass display case with glass shelves in a bright minimal retail interior, clean light, no products, no brands, no signs.",
+    "alt": "Стеклянная торговая витрина",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "torgovye-vitriny",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "c-furnitura",
+    "group": "constructions",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Macro product shot of brushed stainless steel glass hardware: a four-arm spider fitting holding the corners of glass panels and an aluminium clamping profile with a glass edge inserted.",
+    "alt": "Фурнитура для стекла: спайдер и зажимной профиль",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "furnitura",
+      "field": "card.image"
+    }
+  }
+]

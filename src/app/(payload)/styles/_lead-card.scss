@@ -1,0 +1,544 @@
+// Lead card — «Сводка» tab `/admin/collections/leads/<id>/summary/`. Owner: task-08 (wave 3).
+// Values follow the approved mockup res/admin-mockup/Lead.dc.html (`.top`, `.page`, `.col-main`,
+// `.col-side`, `.qa`, `.file`, `.ext`, `<details class="card">`).
+// Colours: `--ig-*` tokens only. Shared `.iga-*` classes come from `_base.scss`.
+// Classes: `.iga-lead*`, `.iga-lead-file*`, `.iga-lead-processing*`, `.iga-lead-dialog*`,
+// `.iga-lead-erase*`.
+
+$phone: 599px;
+$tablet: 1100px;
+
+@mixin focus-ring {
+  outline: 2px solid var(--ig-primary);
+  outline-offset: 2px;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Page
+// ---------------------------------------------------------------------------------------------
+
+.iga-lead {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  padding: 24px 0 56px;
+  color: var(--ig-text);
+  font-size: 14px;
+
+  a:not(.iga-btn, .iga-lead-file) {
+    color: var(--ig-primary-pressed);
+
+    &:hover {
+      color: var(--ig-primary-dark);
+    }
+  }
+
+  :is(a, button, summary):focus-visible {
+    @include focus-ring;
+  }
+
+  &__num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__note {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--ig-text-2);
+  }
+
+  &__empty {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ig-text-2);
+  }
+
+  &__error {
+    margin: 0;
+    font-size: 12px;
+    color: var(--ig-danger-text);
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--ig-text-2);
+  }
+
+  &__line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 14px;
+  }
+
+  // ---- Head (mockup `.top`) ----
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__title {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    margin-right: auto;
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 6px;
+    font-size: 13px;
+    text-decoration: none;
+  }
+
+  &__badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__meta {
+    margin: 0;
+    font-size: 13px;
+    color: var(--ig-text-2);
+    overflow-wrap: anywhere;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  // ---- Columns (mockup `.page`) ----
+
+  &__cols {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  &__main {
+    display: flex;
+    flex: 999 1 520px;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  &__side {
+    display: flex;
+    flex: 1 1 320px;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .iga-dl dd {
+    overflow-wrap: anywhere;
+  }
+
+  // ---- «Что нужно клиенту» ----
+
+  &__request-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+
+    h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+
+  &__estimate {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 8px;
+    margin: 0;
+  }
+
+  &__price {
+    font-size: 20px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  &__qa {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    font-size: 14px;
+  }
+
+  &__qa-row {
+    display: grid;
+    grid-template-columns: minmax(140px, 220px) 1fr;
+    gap: 16px;
+
+    dt {
+      color: var(--ig-text-2);
+    }
+
+    dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+  }
+
+  &__summary {
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  &__comment {
+    padding: 12px 14px;
+    border-radius: var(--ig-r-md);
+    background: var(--ig-bg);
+    font-size: 14px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+
+    .iga-lead__note {
+      display: block;
+      margin-bottom: 4px;
+      white-space: normal;
+    }
+  }
+
+  &__kp {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  // ---- «Файлы» ----
+
+  &__files {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap: 10px;
+  }
+
+  // ---- «Откуда пришёл клиент» (folded) ----
+
+  &__source {
+    summary {
+      display: flex;
+      align-items: center;
+      min-height: 24px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: var(--ig-r-sm);
+      // `display: flex` drops the native disclosure triangle, so the fold had no visible
+      // affordance: draw the same chevron as the kanban «Отказ» strip (`.iga-kstrip__summary`).
+      gap: 10px;
+      list-style: none;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+
+      &::before {
+        content: "";
+        flex: none;
+        width: 6px;
+        height: 6px;
+        border-right: 2px solid var(--ig-text-2);
+        border-bottom: 2px solid var(--ig-text-2);
+        transform: rotate(-45deg);
+        transition: transform var(--ig-dur-fast) var(--iga-ease);
+      }
+    }
+
+    details[open] > summary {
+      margin-bottom: 20px;
+
+      &::before {
+        transform: rotate(45deg);
+      }
+    }
+  }
+
+  // ---- Side column ----
+
+  &__repeats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 10px;
+    }
+  }
+
+  &__consent {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  // Text-style danger button (mockup `.btn-d`): aligned with the card content.
+  &__erase {
+    align-self: flex-start;
+    padding-inline: 4px;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// File tile (mockup `.file`, `.ext`)
+// ---------------------------------------------------------------------------------------------
+
+.iga-lead-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--ig-hairline);
+  border-radius: var(--ig-r-md);
+  color: var(--ig-text);
+  text-decoration: none;
+  transition: border-color var(--ig-dur-fast) var(--iga-ease);
+
+  &:hover {
+    border-color: var(--ig-primary);
+    color: var(--ig-text);
+  }
+
+  &__ext {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--ig-primary-light);
+    color: var(--ig-primary-dark);
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__name {
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// «Обработка» panel
+// ---------------------------------------------------------------------------------------------
+
+.iga-lead-processing {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  .is-error {
+    border-color: var(--ig-danger-text);
+  }
+
+  // «Назначить себя»: a text link look (mockup), still a button.
+  &__self {
+    align-self: flex-start;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ig-primary-pressed);
+    font: inherit;
+    font-size: 13px;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--ig-primary-dark);
+    }
+
+    &:disabled {
+      color: var(--ig-text-muted);
+      cursor: not-allowed;
+    }
+  }
+
+  &__flags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  &__save {
+    width: 100%;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Dialogs: «Перевести в «Договор»?» (native <dialog>) and the erasure (Payload modal)
+// ---------------------------------------------------------------------------------------------
+
+.iga-lead-dialog {
+  width: min(480px, calc(100vw - 32px));
+  padding: 24px;
+  border: 1px solid var(--ig-hairline);
+  border-radius: var(--ig-r-lg);
+  background: var(--ig-surface);
+  color: var(--ig-text);
+  box-shadow: var(--ig-shadow-modal);
+
+  &::backdrop {
+    background: rgb(28 31 34 / 0.45); // rgb of --ig-text
+  }
+
+  &__title {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  &__text {
+    margin: 0 0 20px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ig-text-2);
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+
+.iga-lead-erase {
+  width: min(520px, calc(100vw - 32px));
+  margin: 15vh auto 0;
+  color: var(--ig-text);
+
+  &__title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  &__text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+
+  &__submit {
+    height: 40px;
+    padding: 0 12px;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Responsive
+// ---------------------------------------------------------------------------------------------
+
+// Tablet and below: one column, the side column after the main one.
+@media (max-width: $tablet) {
+  .iga-lead {
+    &__main,
+    &__side {
+      flex-basis: 100%;
+    }
+  }
+}
+
+@media (max-width: $phone) {
+  .iga-lead {
+    padding-top: 16px;
+
+    &__actions {
+      flex: 1 1 100%;
+      flex-wrap: nowrap;
+
+      > .iga-btn {
+        flex: 1 1 50%;
+        min-width: 0;
+      }
+    }
+
+    &__qa-row {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+
+    &__source summary {
+      min-height: 44px;
+    }
+  }
+
+  // Touch targets ≥ 44 px (DESIGN.md §11).
+  .iga-lead-processing__self {
+    min-height: 44px;
+  }
+
+  .iga-lead-dialog__actions > .iga-btn,
+  .iga-lead-erase__actions > .iga-btn {
+    flex: 1 1 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iga-lead-file,
+  .iga-lead__source summary::before {
+    transition: none;
+  }
+}

@@ -1,0 +1,1119 @@
+// Edit form of a document (task 07, wave 2): the common Payload edit view of every collection and
+// global (pages, articles, objects, catalogue, globals) in the theme of `res/admin-mockup/
+// PageEdit.dc.html`, plus the SEO counters, the search snippet and «Изменена / Кем».
+//
+// Selectors start from the edit view (`.doc-header`, `.collection-edit`, `.global-edit`), never
+// from lists, modals or the login screen. Only this partial styles the shared edit-view selectors
+// (`.collection-edit`, `.document-fields`, `.doc-controls`, `.doc-tabs`, `.blocks-field`,
+// `.rich-text-lexical`); task-12 adds screen-specific rules only. Colours: `--ig-*` tokens only.
+//
+// Payload's own breakpoints differ from the site's: it stacks the sidebar under the main column
+// at ≤ 1024 px (`mid-break`); our gutters follow DESIGN.md (32 / 24 / 16 px of the mockup).
+
+$edit: ".collection-edit, .global-edit";
+$phone: 599px;
+$tablet: 1100px;
+
+// Payload layout variables of the edit view: gutters of the mockup (`.top`, `.page`).
+.doc-header,
+#{$edit} {
+  --gutter-h: 32px;
+
+  @media (max-width: $tablet) {
+    --gutter-h: 24px;
+  }
+
+  @media (max-width: $phone) {
+    --gutter-h: 16px;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// 1. Document header: title + document tabs (`.doc-header`), then status, meta and the save
+//    buttons (`.doc-controls`). Both are one white strip, as `.top` of the mockup.
+// ---------------------------------------------------------------------------------------------
+
+.doc-header {
+  padding-top: 14px;
+  padding-bottom: 10px;
+  background: var(--ig-surface);
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 16px;
+    min-width: 0;
+  }
+
+  &__title {
+    flex: 1 1 240px;
+    min-width: 0;
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+}
+
+%iga-doc-tab-active {
+  background: var(--ig-surface);
+  color: var(--ig-text);
+  font-weight: 500;
+  box-shadow: var(--iga-shadow-xs);
+}
+
+// Document tabs («Редактировать», «Версии», «API»): a pill segment like `.seg` of the mockup.
+.doc-tabs {
+  max-width: 100%;
+
+  &__tabs-container {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  &__tabs {
+    display: inline-flex;
+    gap: 4px;
+    margin: 0;
+    padding: 4px;
+    border-radius: var(--ig-r-pill);
+    background: var(--ig-well);
+    list-style: none;
+  }
+
+  .doc-tab {
+    --bg-color: transparent;
+    --hover-bg: var(--ig-surface);
+    --color: var(--ig-text-2);
+    --hover-color: var(--ig-text);
+
+    margin: 0;
+    padding: 6px 14px;
+    border: 0;
+    border-radius: var(--ig-r-pill);
+    background: transparent;
+    color: var(--ig-text-2);
+    font-size: 13px;
+    line-height: 1.4;
+    box-shadow: none;
+    transition:
+      background var(--ig-dur-fast) var(--iga-ease),
+      color var(--ig-dur-fast) var(--iga-ease);
+
+    &:hover {
+      color: var(--ig-text);
+    }
+
+    &::after {
+      display: none;
+    }
+
+    // With `trailingSlash: true` Payload builds the tab hrefs with a double slash and marks no
+    // tab active; `DocTabsCurrent` (src/payload/admin/doc-tabs-current.tsx) sets
+    // `aria-current="page"` on the current one. Until it runs (before hydration) the first tab
+    // («Редактировать», the default route) stands in.
+    &.doc-tab--active,
+    &[aria-current="page"] {
+      @extend %iga-doc-tab-active;
+    }
+
+    @at-root .doc-tabs__tabs:not(:has(.doc-tab--active, .doc-tab[aria-current="page"]))
+        > .doc-tab:first-child {
+      @extend %iga-doc-tab-active;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--ig-primary);
+      outline-offset: 2px;
+    }
+  }
+
+  .pill-version-count {
+    margin-left: 6px;
+    padding: 0 6px;
+    border-radius: var(--ig-r-pill);
+    background: var(--ig-primary-light);
+    color: var(--ig-primary-dark);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+#{$edit} {
+  .doc-controls {
+    // Payload paints a blurred translucent strip; the mockup header is plain white.
+    backdrop-filter: none;
+    background: var(--ig-surface);
+    border-bottom: 1px solid var(--ig-hairline);
+
+    &__divider {
+      display: none;
+    }
+
+    &__wrapper {
+      gap: 12px 16px;
+      min-height: 64px;
+      height: auto;
+    }
+
+    &__content {
+      min-width: 0;
+      padding: 12px 0;
+    }
+
+    &__meta {
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 18px;
+    }
+
+    &__list-item {
+      gap: 4px;
+      min-width: 0;
+      font-size: 13px;
+    }
+
+    &__label {
+      color: var(--ig-text-2);
+    }
+
+    &__value {
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: var(--ig-text);
+    }
+
+    &__controls {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    // «…» menu: a ghost icon button.
+    &__dots {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--ig-line);
+      border-radius: var(--ig-r-pill);
+      background: var(--ig-surface);
+      color: var(--ig-text);
+
+      &:hover {
+        border-color: var(--ig-line);
+        background: var(--ig-bg);
+      }
+    }
+
+    .popup--active .doc-controls__dots {
+      border-color: var(--ig-line);
+      background: var(--ig-bg);
+    }
+  }
+
+  // One-row header above Payload's `mid-break` (≤ 1024 px stacks the strip itself): the
+  // controls shrank with the meta, so at 1366 the two save buttons stacked, «⋮» drifted away
+  // and the dates took two lines. The buttons keep their width; the meta gives way instead and
+  // truncates with an ellipsis (Payload's `.doc-controls__value` already has `text-overflow`).
+  // Below 1025 px the existing wrapping (and the phone layout of section 8) stays as it was.
+  @media (min-width: 1025px) {
+    .doc-controls {
+      &__content {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      &__meta {
+        flex-wrap: nowrap;
+        min-width: 0;
+      }
+
+      &__list-item {
+        flex: 0 1 auto;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      // The status badge never truncates.
+      &__status {
+        flex: none;
+        overflow: visible;
+      }
+
+      &__controls-wrapper {
+        flex: none;
+      }
+
+      &__controls {
+        flex-wrap: nowrap;
+      }
+    }
+  }
+
+  // Document status («Опубликовано» / «Изменено» / «Черновик») as a badge.
+  .status {
+    &__value-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    &__label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    &__value {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: var(--ig-r-sm);
+      background: var(--ig-success-bg);
+      color: var(--ig-success-text);
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+  }
+
+  // Save / publish buttons: pills of 40 px (`.btn-p` / `.btn-s` of the mockup).
+  .doc-controls__controls .btn {
+    height: 40px;
+    margin: 0;
+    padding: 0 18px;
+    border-radius: var(--ig-r-pill);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 38px;
+    transition:
+      background var(--ig-dur-fast) var(--iga-ease),
+      border-color var(--ig-dur-fast) var(--iga-ease),
+      color var(--ig-dur-fast) var(--iga-ease);
+
+    &:active:not(.btn--disabled) {
+      transform: scale(0.98);
+    }
+
+    .btn__content {
+      line-height: inherit;
+    }
+  }
+
+  .doc-controls__controls .btn--style-secondary:not(.btn--disabled) {
+    --bg-color: var(--ig-surface);
+    --hover-bg: var(--ig-primary-light);
+  }
+}
+
+// «Изменено» — a draft newer than the published version: warning colours (`.s-work`).
+.doc-controls__status:has(.status__action) .status__value {
+  background: var(--ig-warning-bg);
+  color: var(--ig-warning-text);
+}
+
+// ---------------------------------------------------------------------------------------------
+// 2. Two columns: the main column and the sidebar on the page background, fields in white cards.
+// ---------------------------------------------------------------------------------------------
+
+#{$edit} {
+  background: var(--ig-bg);
+
+  .document-fields {
+    --main-border: none;
+    --main-field-margin: 0;
+    --sidebar-gutter-h-left: 0px;
+
+    background: var(--ig-bg);
+
+    &__edit {
+      padding-top: 24px;
+      padding-bottom: 56px;
+    }
+
+    // The main column keeps the gap to the sidebar (`.page { gap: 20px }`).
+    &--has-sidebar .document-fields__edit {
+      padding-right: 20px;
+    }
+
+    &__sidebar-wrap {
+      min-width: 320px;
+    }
+
+    &__sidebar-fields {
+      padding-top: 24px;
+      padding-bottom: 56px;
+    }
+
+    // Sidebar fields in one white card (the «Публикация» card of the mockup).
+    &__sidebar-fields > .render-fields:not(:empty) {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 20px 22px;
+      background: var(--ig-surface);
+      border: 1px solid var(--ig-hairline);
+      border-radius: var(--ig-r-lg);
+      box-shadow: var(--ig-shadow-card);
+
+      > .field-type {
+        margin: 0;
+      }
+    }
+  }
+
+  // Payload stacks the sidebar under the main column (≤ 1024 px): full-width card.
+  @media (max-width: 1024px) {
+    .document-fields {
+      &--has-sidebar .document-fields__edit {
+        padding-right: var(--gutter-h);
+      }
+
+      &__sidebar-wrap {
+        min-width: 0;
+      }
+
+      &__sidebar-fields {
+        padding: 0 var(--gutter-h) 48px;
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// 3. Field tabs («Содержимое», «SEO», «Настройки»): a pill segment and the tab content in a card.
+// ---------------------------------------------------------------------------------------------
+
+#{$edit} {
+  .tabs-field {
+    margin: 24px 0 0;
+
+    &__tabs-wrap {
+      margin-bottom: 14px;
+      overflow-x: auto;
+    }
+
+    &__tabs {
+      display: inline-flex;
+      gap: 4px;
+      min-width: 0;
+      padding: 4px;
+      border: 0;
+      border-radius: var(--ig-r-pill);
+      background: var(--ig-well);
+
+      &::before,
+      &::after {
+        display: none;
+      }
+    }
+
+    &__tab-button {
+      margin: 0;
+      padding: 7px 16px;
+      border-radius: var(--ig-r-pill);
+      color: var(--ig-text-2);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.4;
+      opacity: 1;
+      transition:
+        background var(--ig-dur-fast) var(--iga-ease),
+        color var(--ig-dur-fast) var(--iga-ease);
+
+      &::after {
+        display: none;
+      }
+
+      &:hover {
+        color: var(--ig-text);
+        opacity: 1;
+      }
+
+      &--active {
+        background: var(--ig-surface);
+        color: var(--ig-text);
+        font-weight: 500;
+        box-shadow: var(--iga-shadow-xs);
+      }
+
+      &--has-error {
+        color: var(--ig-danger-text);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--ig-primary);
+        outline-offset: 2px;
+      }
+    }
+
+    &__content-wrap {
+      padding: 20px 22px;
+      background: var(--ig-surface);
+      border: 1px solid var(--ig-hairline);
+      border-radius: var(--ig-r-lg);
+      box-shadow: var(--ig-shadow-card);
+    }
+
+    // Nested tabs (inside a block or a collapsible) stay flat.
+    &--within-collapsible {
+      margin: 0;
+
+      .tabs-field__content-wrap {
+        padding: 14px 0 0;
+        border: 0;
+        box-shadow: none;
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// 4. Fields: labels, inputs, selects, textareas, descriptions (`.fld` / `.inp` of the mockup).
+// ---------------------------------------------------------------------------------------------
+
+#{$edit} {
+  .field-label {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ig-text-2);
+  }
+
+  .field-description {
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--ig-text-2);
+  }
+
+  .field-type__wrap > input,
+  .field-type.textarea textarea,
+  .date-time-picker input,
+  .rs__control {
+    min-height: 42px;
+    border: 1px solid var(--ig-line);
+    border-radius: var(--ig-r-md);
+    background: var(--ig-surface);
+    color: var(--ig-text);
+    font-size: 14px;
+    box-shadow: none;
+    transition:
+      border-color var(--ig-dur-fast) var(--iga-ease),
+      box-shadow var(--ig-dur-fast) var(--iga-ease);
+
+    &:hover {
+      border-color: var(--ig-gray-2);
+    }
+  }
+
+  .field-type__wrap > input,
+  .date-time-picker input {
+    height: 42px;
+  }
+
+  .field-type.textarea textarea {
+    line-height: 1.5;
+  }
+
+  .field-type__wrap > input:focus,
+  .field-type.textarea textarea:focus,
+  .date-time-picker input:focus,
+  .rs__control--is-focused {
+    border-color: var(--ig-primary);
+    box-shadow: var(--ig-focus-ring);
+    outline: none;
+  }
+
+  .read-only .field-type__wrap > input,
+  .field-type__wrap > input:read-only {
+    background: var(--ig-bg);
+    color: var(--ig-text-2);
+  }
+
+  .field-type.error .field-type__wrap > input,
+  .field-type.error textarea {
+    border-color: var(--ig-danger-text);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// 5. Blocks: each row is a `.blk` card; the open block is outlined in the brand colour.
+// ---------------------------------------------------------------------------------------------
+
+#{$edit} {
+  .blocks-field {
+    gap: 12px;
+
+    &__header h3,
+    &__header h3 .field-label {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ig-text);
+    }
+
+    &__header-action {
+      color: var(--ig-primary-pressed);
+      font-size: 13px;
+    }
+
+    &__rows {
+      gap: 10px;
+    }
+
+    &__block-header {
+      align-items: center;
+      gap: 10px;
+    }
+
+    &__block-number {
+      color: var(--ig-text-2);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    // Block type: the `.bi` colours of the mockup as a text badge (blocks have no icons).
+    &__block-pill.pill {
+      padding: 4px 10px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--ig-primary-light);
+      color: var(--ig-primary-dark);
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.3;
+    }
+
+    // «Добавить блок»: a dashed full-width button.
+    &__drawer-toggler {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      align-self: stretch;
+      width: 100%;
+      min-height: 44px;
+      border: 1px dashed var(--ig-gray-2);
+      border-radius: 12px;
+      background: transparent;
+      cursor: pointer;
+      transition:
+        background var(--ig-dur-fast) var(--iga-ease),
+        border-color var(--ig-dur-fast) var(--iga-ease);
+
+      &:hover {
+        border-color: var(--ig-primary);
+        background: var(--ig-primary-light);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--ig-primary);
+        outline-offset: 2px;
+      }
+
+      .btn,
+      .btn:hover {
+        color: var(--ig-primary-pressed);
+        font-size: 14px;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .array-field__title,
+  .array-field__title .field-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ig-text);
+  }
+
+  // Array «add row» buttons (FAQ, lists) get the same dashed look.
+  .array-field__add-row {
+    --color: var(--ig-primary-pressed);
+    --hover-color: var(--ig-primary-pressed);
+
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+    margin: 0;
+    border: 1px dashed var(--ig-gray-2);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--ig-primary-pressed);
+    font-weight: 500;
+
+    &:hover {
+      border-color: var(--ig-primary);
+      background: var(--ig-primary-light);
+    }
+  }
+
+  // Rows of blocks and arrays (collapsibles).
+  .collapsible {
+    border-radius: 12px;
+
+    &--style-default {
+      border: 1px solid var(--ig-hairline);
+      background: var(--ig-surface);
+      transition:
+        border-color var(--ig-dur-fast) var(--iga-ease),
+        box-shadow var(--ig-dur-fast) var(--iga-ease);
+
+      &:hover {
+        border-color: var(--ig-gray-2);
+      }
+
+      // Open row: brand outline + soft ring (as the open «Текст» block of the mockup).
+      &:not(.collapsible--collapsed) {
+        border-color: var(--ig-primary);
+        box-shadow: var(--ig-focus-ring);
+      }
+    }
+
+    &__toggle-wrap {
+      min-height: 56px;
+      padding: 8px 10px 8px 14px;
+      background: var(--ig-surface);
+      border-radius: 12px 12px 0 0;
+
+      &:not(.toggle-disabled):hover {
+        background: var(--ig-surface);
+      }
+    }
+
+    &--collapsed > .collapsible__toggle-wrap {
+      border-radius: 12px;
+    }
+
+    &:not(.collapsible--collapsed) > .collapsible__toggle-wrap {
+      border-bottom: 1px solid var(--ig-hairline);
+    }
+
+    &__toggle {
+      border-radius: 12px 12px 0 0;
+
+      &:focus-visible {
+        outline: 2px solid var(--ig-primary);
+        outline-offset: -2px;
+      }
+    }
+
+    &__drag {
+      color: var(--ig-text-muted);
+      opacity: 1;
+      cursor: grab;
+
+      &:active {
+        cursor: grabbing;
+      }
+    }
+
+    &__actions,
+    &__indicator {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      color: var(--ig-text-2);
+      transition: background var(--ig-dur-fast) var(--iga-ease);
+    }
+
+    &__actions:hover {
+      background: var(--ig-bg);
+      color: var(--ig-text);
+    }
+
+    &__content {
+      background: var(--ig-surface);
+      border-radius: 0 0 12px 12px;
+      padding: 16px;
+    }
+
+    .section-title__input {
+      color: var(--ig-text-2);
+      font-size: 13px;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// 6. Lexical: the editor in an input-like frame; only the floating selection toolbar exists.
+// ---------------------------------------------------------------------------------------------
+
+#{$edit} {
+  .rich-text-lexical .editor-container {
+    padding: 0 14px 4px;
+    border: 1px solid var(--ig-line);
+    border-radius: var(--ig-r-md);
+    background: var(--ig-surface);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    letter-spacing: normal;
+    transition:
+      border-color var(--ig-dur-fast) var(--iga-ease),
+      box-shadow var(--ig-dur-fast) var(--iga-ease);
+
+    &:hover {
+      border-color: var(--ig-gray-2);
+    }
+
+    &:focus-within {
+      border-color: var(--ig-primary);
+      box-shadow: var(--ig-focus-ring);
+    }
+  }
+}
+
+// The floating toolbar lives in a portal-like layer of the editor: not scoped to the form.
+.inline-toolbar-popup {
+  padding: 4px;
+  border: 1px solid var(--ig-hairline);
+  border-radius: var(--ig-r-md);
+  background: var(--ig-surface);
+  box-shadow: var(--ig-shadow-dropdown);
+
+  .divider {
+    height: 20px;
+    background-color: var(--ig-line);
+  }
+}
+
+.toolbar-popup__button,
+.toolbar-popup__dropdown {
+  height: 32px;
+  border-radius: var(--ig-r-sm);
+  color: var(--ig-text);
+
+  &:hover:not(:disabled, .disabled) {
+    background: var(--ig-bg);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ig-primary);
+    outline-offset: 1px;
+  }
+}
+
+.toolbar-popup__button {
+  width: 32px;
+
+  &.active,
+  &.active:hover {
+    background: var(--ig-primary-light);
+    color: var(--ig-primary-dark);
+  }
+}
+
+.toolbar-popup__dropdown-items {
+  padding: 4px;
+  border: 1px solid var(--ig-hairline);
+  border-radius: var(--ig-r-md);
+  background: var(--ig-surface);
+  box-shadow: var(--ig-shadow-dropdown);
+
+  .toolbar-popup__dropdown-item {
+    border-radius: var(--ig-r-sm);
+
+    &:hover,
+    &.active {
+      background: var(--ig-primary-light);
+      color: var(--ig-primary-dark);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// 7. SEO widgets: the length counter, the search snippet, «Изменена / Кем».
+// ---------------------------------------------------------------------------------------------
+
+// The counter sits in the label row, right-aligned above the input (`.fld label` of the mockup).
+#{$edit} {
+  .field-type:has(> .field-type__wrap .iga-seo-counter) {
+    > .field-label {
+      padding-right: 96px;
+    }
+
+    // Positioned against `.field-type__wrap` (relative in Payload): just above the input, on
+    // the line of the label.
+    .iga-seo-counter {
+      position: absolute;
+      right: 0;
+      bottom: 100%;
+      margin-bottom: 4px;
+    }
+  }
+}
+
+.iga-seo-counter {
+  display: block;
+  font-size: 12px;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+  color: var(--ig-text-2);
+  white-space: nowrap;
+
+  &[data-state="ok"] {
+    color: var(--ig-success-text);
+  }
+
+  &[data-state="over"] {
+    color: var(--ig-warning-text);
+  }
+}
+
+.iga-snippet {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 4px 0;
+  padding: 12px 14px;
+  border-radius: var(--ig-r-md);
+  background: var(--ig-bg);
+  overflow-wrap: anywhere;
+
+  &__caption {
+    font-size: 12px;
+    color: var(--ig-text-2);
+  }
+
+  &__url {
+    font-size: 12px;
+    color: var(--ig-success-text);
+  }
+
+  &__title {
+    font-size: 16px;
+    line-height: 1.3;
+    color: var(--ig-info-text);
+  }
+
+  &__note {
+    font-size: 12px;
+    color: var(--ig-text-2);
+  }
+
+  &__description {
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ig-ink-2);
+
+    &--empty {
+      color: var(--ig-text-2);
+    }
+  }
+
+  &__flags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin-top: 4px;
+  }
+}
+
+// Rows of the «Публикация» card: label on the left, value on the right.
+.iga-updated-by {
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--ig-hairline);
+    font-size: 14px;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+
+    dt {
+      color: var(--ig-text-2);
+    }
+
+    dd {
+      margin: 0;
+      min-width: 0;
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__date {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// 8. Phones (≤ 599): no horizontal scroll, wrapping header, 44 px touch targets.
+// ---------------------------------------------------------------------------------------------
+
+@media (max-width: $phone) {
+  .doc-header {
+    padding-top: 12px;
+    padding-bottom: 8px;
+
+    &__title {
+      flex-basis: 100%;
+      font-size: 20px;
+    }
+  }
+
+  .doc-tabs .doc-tab {
+    min-height: 36px;
+    padding: 6px 12px;
+  }
+
+  #{$edit} {
+    .doc-controls {
+      // Payload sticks this strip with a negative top equal to the meta height; with a wrapping
+      // meta row that height varies, so the strip simply scrolls with the page on phones.
+      // `relative`, not `static`: Payload's `blur-bg-light` paints absolutely positioned
+      // ::before / ::after (inset 0, backdrop-filter: blur) that must stay inside the strip —
+      // with `static` they escape to an ancestor and blur the document title and tabs above.
+      // `top: 0` cancels Payload's negative sticky offset, which would shift a relative strip
+      // up over the tabs.
+      position: relative;
+      top: 0;
+
+      &__content {
+        padding: 10px var(--gutter-h) 6px;
+        overflow: visible;
+      }
+
+      &__meta {
+        width: 100%;
+
+        &::after {
+          display: none;
+        }
+      }
+
+      &__list-item {
+        flex-wrap: wrap;
+        font-size: 12px;
+      }
+
+      &__controls-wrapper {
+        align-items: flex-start;
+        height: auto;
+        padding: 8px var(--gutter-h) 12px;
+        border-top: 0;
+        background: var(--ig-surface);
+      }
+
+      // Long Russian labels do not fit side by side at 375 px: full-width buttons in a column,
+      // the «…» menu next to them.
+      &__controls {
+        flex: 1 1 auto;
+        flex-direction: column;
+        align-items: stretch;
+        min-width: 0;
+        padding: 0;
+        overflow: visible;
+
+        &::after {
+          display: none;
+        }
+
+        .form-submit {
+          width: 100%;
+          min-width: 0;
+        }
+
+        .btn {
+          width: 100%;
+          height: 44px;
+          padding: 0 12px;
+          line-height: 42px;
+        }
+
+        .btn__label {
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      &__dots {
+        width: 44px;
+        height: 44px;
+      }
+    }
+
+    .document-fields__edit {
+      padding-top: 16px;
+      padding-bottom: 32px;
+    }
+
+    .tabs-field__content-wrap,
+    .document-fields__sidebar-fields > .render-fields:not(:empty) {
+      padding: 16px;
+    }
+
+    .tabs-field__tab-button {
+      min-height: 40px;
+    }
+
+    .field-type__wrap > input,
+    .date-time-picker input,
+    .rs__control {
+      min-height: 44px;
+    }
+
+    .collapsible__actions,
+    .collapsible__indicator {
+      width: 40px;
+      height: 40px;
+    }
+
+    // Counter: a plain line under the field.
+    .field-type:has(> .field-type__wrap .iga-seo-counter) > .field-label {
+      padding-right: 0;
+    }
+
+    .field-type:has(> .field-type__wrap .iga-seo-counter) .iga-seo-counter {
+      position: static;
+      margin-top: 6px;
+    }
+  }
+
+  // The account/breadcrumb bar above the edit view must not widen the page.
+  .template-default__wrap:has(#{$edit}) .app-header {
+    max-width: 100vw;
+
+    .step-nav {
+      min-width: 0;
+      overflow: hidden;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// 9. Reduced motion: no transitions, no press scale.
+// ---------------------------------------------------------------------------------------------
+
+@media (prefers-reduced-motion: reduce) {
+  .doc-tabs .doc-tab,
+  .tabs-field__tab-button,
+  .collapsible--style-default,
+  .collapsible__actions,
+  .collapsible__indicator,
+  .blocks-field__drawer-toggler,
+  .rich-text-lexical .editor-container {
+    transition: none;
+  }
+
+  #{$edit} {
+    .field-type__wrap > input,
+    .field-type.textarea textarea,
+    .rs__control,
+    .doc-controls__controls .btn {
+      transition: none;
+    }
+
+    .doc-controls__controls .btn:active {
+      transform: none;
+    }
+  }
+}

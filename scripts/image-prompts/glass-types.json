@@ -1,0 +1,114 @@
+[
+  {
+    "id": "gt-matovoe",
+    "group": "glass-types",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "A single upright rectangular panel of acid-etched frosted satin glass: the whole surface is evenly matte, milky white and translucent (not transparent), diffusing the light behind it, with a faint greenish polished edge.",
+    "alt": "Матовое закалённое стекло",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "matovoe",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "gt-okrashennoe",
+    "group": "glass-types",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Three upright back-painted glass panels standing slightly overlapping, in muted colours: soft sage green, warm light grey and muted navy, glossy surfaces with soft reflections.",
+    "alt": "Крашеное закалённое стекло разных цветов",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "okrashennoe",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "gt-osvetlennoe",
+    "group": "glass-types",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Two thick glass panels side by side seen edge-on: on the left an ultra-clear low-iron panel with a perfectly colourless edge, on the right a standard float glass panel with a noticeably green edge.",
+    "alt": "Осветлённое стекло рядом с обычным: сравнение торцов",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "osvetlennoe",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "gt-tonirovannoe",
+    "group": "glass-types",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Three upright tinted glass panels slightly overlapping: bronze, graphite and neutral grey tint, translucent with soft light passing through and coloured shadows on the floor.",
+    "alt": "Тонированное стекло: бронза, графит, серое",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "tonirovannoe",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "gt-dlya-mebeli",
+    "group": "glass-types",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Minimal modern low cabinet with a clear tempered glass tabletop and a frosted glass front panel, polished glass edges, empty surfaces, bright minimal interior.",
+    "alt": "Закалённое стекло в мебели: столешница и фасад",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "dlya-mebeli",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "gt-riflenoe",
+    "group": "glass-types",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "A single upright panel of fluted reeded glass with fine vertical ribs, light refracting through the ribs and softly distorting the background.",
+    "alt": "Рифлёное стекло с вертикальными рёбрами",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "riflenoe",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "gt-mollirovannoe",
+    "group": "glass-types",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "A single curved bent tempered glass panel standing upright, forming a smooth gentle arc, clear with soft reflections along the curve and a green-teal edge.",
+    "alt": "Моллированное изогнутое закалённое стекло",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "mollirovannoe",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "gt-tripleks",
+    "group": "glass-types",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Macro close-up of the edge of laminated safety glass showing two glass layers bonded with a thin clear interlayer film between them, polished edge with a green-teal tint.",
+    "alt": "Торец триплекса с видимыми слоями",
+    "target": {
+      "kind": "doc",
+      "collection": "glass-types",
+      "slug": "tripleks",
+      "field": "card.image"
+    }
+  }
+]

@@ -1,0 +1,340 @@
+/* Inex Glass — компоненты. Требует ig-tokens.css.
+   Источник: res/inex-glass-handoff/design-system/components.css (+ правки контраста:
+   заливки «белый текст на бирюзовом» → --ig-btn-primary-bg #267D70; рамки и фокус остаются
+   на брендовом --ig-primary; захардкоженные HEX заменены токенами; prefers-reduced-motion).
+   Подключается из src/app/(site)/globals.css в слой `components`, поэтому утилиты Tailwind
+   (слой utilities) всегда перебивают эти классы. Ни один класс .ig-* не удалять (задачи 12, 13). */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ---------- Кнопки ---------- */
+.ig-btn {
+  position: relative; overflow: hidden; isolation: isolate;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  height: 48px; padding: 0 28px; border-radius: var(--ig-r-pill);
+  border: 1.5px solid transparent; background: transparent; color: var(--ig-text);
+  font: 500 16px/1 var(--ig-font); text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: background-color var(--ig-dur-base) var(--ig-ease), border-color var(--ig-dur-base) var(--ig-ease),
+              color var(--ig-dur-base) var(--ig-ease), box-shadow var(--ig-dur-base) var(--ig-ease),
+              transform var(--ig-dur-fast) var(--ig-ease);
+}
+.ig-btn svg { width: 20px; height: 20px; flex: none; }
+.ig-btn:active { transform: scale(.98); }
+/* Чёткое кольцо фокуса (WCAG 2.4.11/1.4.11): outline со смещением 2 px, поэтому между ним
+   и заливкой кнопки виден фон страницы; цвет ≥3:1 к фону. Работает и в forced-colors. */
+.ig-btn:focus-visible { outline: 2px solid var(--ig-focus-outline); outline-offset: 2px; box-shadow: none; }
+.ig-btn[disabled], .ig-btn.is-disabled, .ig-btn[aria-disabled="true"] { cursor: not-allowed; transform: none; }
+
+.ig-btn--l { height: 56px; padding: 0 32px; font-size: 17px; }
+.ig-btn--m { height: 48px; padding: 0 28px; }
+.ig-btn--s { height: 40px; padding: 0 20px; font-size: 14px; gap: 8px; }
+.ig-btn--s svg { width: 18px; height: 18px; }
+.ig-btn--icon { width: 48px; padding: 0; }
+.ig-btn--block { width: 100%; }
+
+.ig-btn--primary { background: var(--ig-btn-primary-bg); color: #fff; }
+.ig-btn--primary:hover { background: var(--ig-btn-primary-bg-hover); color: #fff; }
+.ig-btn--primary:active, .ig-btn--primary.is-pressed { background: var(--ig-primary-pressed); }
+.ig-btn--primary[disabled], .ig-btn--primary.is-disabled, .ig-btn--primary[aria-disabled="true"] { background: var(--ig-line); color: var(--ig-text-2); }
+
+/* Световой блик: наклонная 45° размытая полоса 64 px, один проход на hover */
+.ig-btn--primary::after {
+  content: ""; position: absolute; z-index: -1; top: -30%; bottom: -30%; left: -96px; width: 64px;
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.38), rgba(255,255,255,0));
+  transform: skewX(-45deg); filter: blur(4px); pointer-events: none;
+  transition: left 0s;
+}
+.ig-btn--primary:hover::after, .ig-btn--primary.is-hover::after { left: calc(100% + 96px); transition: left 640ms var(--ig-ease); }
+.ig-btn--primary.is-hover { background: var(--ig-btn-primary-bg-hover); }
+.ig-btn--primary[disabled]::after, .ig-btn--primary.is-disabled::after, .ig-btn--primary[aria-disabled="true"]::after { display: none; }
+
+.ig-btn--secondary { border-color: var(--ig-primary); color: var(--ig-primary-pressed); background: var(--ig-surface); }
+.ig-btn--secondary:hover, .ig-btn--secondary.is-hover { background: var(--ig-primary-light); color: var(--ig-primary-dark); }
+.ig-btn--secondary:active { background: var(--ig-teal-wash); }
+.ig-btn--secondary[disabled], .ig-btn--secondary.is-disabled, .ig-btn--secondary[aria-disabled="true"] { border-color: var(--ig-line); color: var(--ig-text-muted); background: var(--ig-surface); }
+
+.ig-btn--ghost { color: var(--ig-text); }
+.ig-btn--ghost:hover, .ig-btn--ghost.is-hover { background: var(--ig-well); }
+.ig-btn--ghost:active { background: var(--ig-line); }
+
+.ig-btn--on-dark { border-color: rgba(255,255,255,.6); color: #fff; }
+.ig-btn--on-dark:hover { background: rgba(255,255,255,.1); color: #fff; }
+.ig-btn--on-dark:focus-visible { outline-color: var(--ig-focus-outline-on-dark); }
+
+.ig-link {
+  display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; cursor: pointer;
+  color: var(--ig-primary-pressed); font: 500 16px/1.4 var(--ig-font);
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px;
+}
+.ig-link:hover { color: var(--ig-primary-dark); }
+.ig-link svg { width: 18px; height: 18px; transition: transform var(--ig-dur-base) var(--ig-ease); }
+.ig-link:hover svg { transform: translateX(3px); }
+.ig-link--arrow { text-decoration: none; }
+.ig-link--dashed { text-decoration-style: dashed; color: var(--ig-text-2); font-weight: 400; font-size: 13px; }
+
+/* ---------- Поля ---------- */
+.ig-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ig-field__label { font: 500 14px/1.4 var(--ig-font); color: var(--ig-text); }
+.ig-field__label .ig-req { color: var(--ig-danger-text); }
+.ig-field__opt { font-weight: 400; color: var(--ig-text-2); }
+.ig-field__hint { font: var(--ig-small); color: var(--ig-text-2); }
+.ig-field__error { font: var(--ig-small); color: var(--ig-danger-text); display: flex; gap: 6px; align-items: flex-start; }
+.ig-field__error svg { width: 16px; height: 16px; flex: none; margin-top: 2px; }
+
+.ig-input, .ig-select, .ig-textarea {
+  width: 100%; height: 48px; padding: 0 16px; border: 1px solid var(--ig-line); border-radius: var(--ig-r-md);
+  background: var(--ig-surface); color: var(--ig-text); font: var(--ig-body);
+  transition: border-color var(--ig-dur-fast) var(--ig-ease), box-shadow var(--ig-dur-fast) var(--ig-ease);
+}
+.ig-input::placeholder, .ig-textarea::placeholder { color: var(--ig-text-muted); }
+.ig-input:hover, .ig-select:hover, .ig-textarea:hover { border-color: var(--ig-gray-2); }
+.ig-input:focus, .ig-select:focus, .ig-textarea:focus, .is-focus { outline: none; border-color: var(--ig-primary); box-shadow: var(--ig-focus-ring); }
+.ig-input.is-error, .ig-textarea.is-error, .ig-select.is-error { border-color: var(--ig-danger-text); background: var(--ig-danger-bg); }
+.ig-input[disabled] { background: var(--ig-well); color: var(--ig-text-muted); }
+.ig-textarea { height: auto; min-height: 112px; padding: 12px 16px; resize: vertical; }
+.ig-select {
+  appearance: none; padding-right: 44px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%235B636B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+
+/* ---------- Загрузка файла ---------- */
+.ig-upload {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center;
+  min-height: 168px; padding: 24px; border: 1.5px dashed var(--ig-gray-2); border-radius: var(--ig-r-lg);
+  background: var(--ig-surface); color: var(--ig-text-2); font: var(--ig-small);
+  transition: background-color var(--ig-dur-base) var(--ig-ease), border-color var(--ig-dur-base) var(--ig-ease);
+}
+.ig-upload__icon { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--ig-well); color: var(--ig-primary-pressed); }
+.ig-upload__icon svg { width: 22px; height: 22px; }
+.ig-upload__title { font: 500 16px/1.4 var(--ig-font); color: var(--ig-text); }
+.ig-upload:hover { border-color: var(--ig-primary); }
+.ig-upload.is-drag { border-color: var(--ig-primary); border-style: solid; background: var(--ig-primary-light); }
+.ig-upload.is-drag .ig-upload__icon { background: var(--ig-btn-primary-bg); color: #fff; }
+.ig-upload.is-error { border-color: var(--ig-danger-text); background: var(--ig-danger-bg); }
+.ig-upload.is-error .ig-upload__icon { background: var(--ig-surface); color: var(--ig-danger-text); }
+.ig-file {
+  display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--ig-line);
+  border-radius: var(--ig-r-md); background: var(--ig-surface);
+}
+.ig-file__ext { flex: none; width: 44px; height: 44px; border-radius: 8px; display: grid; place-items: center; background: var(--ig-primary-light); color: var(--ig-primary-dark); font: 700 11px/1 var(--ig-font); letter-spacing: .04em; }
+.ig-file__name { font: 500 15px/1.35 var(--ig-font); color: var(--ig-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ig-file__meta { font: var(--ig-small); color: var(--ig-success-text); display: flex; align-items: center; gap: 6px; }
+.ig-file__meta svg { width: 16px; height: 16px; }
+
+/* ---------- Чекбокс / радио-карточки ---------- */
+.ig-check { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; font: var(--ig-small); color: var(--ig-text-2); }
+.ig-check input { appearance: none; flex: none; width: 22px; height: 22px; margin: 0; border: 1.5px solid var(--ig-gray-1); border-radius: 6px; background: var(--ig-surface); cursor: pointer; display: grid; place-items: center; transition: background-color var(--ig-dur-fast) var(--ig-ease), border-color var(--ig-dur-fast) var(--ig-ease); }
+.ig-check input:checked { background-color: var(--ig-btn-primary-bg); border-color: var(--ig-primary); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; }
+.ig-check input:focus-visible { outline: none; box-shadow: var(--ig-focus-ring); }
+.ig-check.is-error input { border-color: var(--ig-danger-text); }
+
+.ig-radio-card {
+  position: relative; display: flex; flex-direction: column; gap: 12px; padding: 20px; min-height: 132px;
+  border: 1.5px solid var(--ig-line); border-radius: var(--ig-r-lg); background: var(--ig-surface);
+  text-align: left; font: inherit; color: var(--ig-text); cursor: pointer;
+  transition: border-color var(--ig-dur-base) var(--ig-ease), background-color var(--ig-dur-base) var(--ig-ease), box-shadow var(--ig-dur-base) var(--ig-ease), transform var(--ig-dur-base) var(--ig-ease);
+}
+.ig-radio-card:hover { border-color: var(--ig-gray-1); box-shadow: var(--ig-shadow-card); }
+.ig-radio-card:focus-visible { outline: none; box-shadow: var(--ig-focus-ring); border-color: var(--ig-primary); }
+.ig-radio-card__icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--ig-well); color: var(--ig-primary-pressed); }
+.ig-radio-card__icon svg { width: 24px; height: 24px; }
+.ig-radio-card__title { font: 600 16px/1.35 var(--ig-font); }
+.ig-radio-card__sub { font: var(--ig-small); color: var(--ig-text-2); }
+.ig-radio-card__mark { position: absolute; top: 16px; right: 16px; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--ig-gray-1); background: var(--ig-surface); }
+.ig-radio-card.is-selected { border-color: var(--ig-primary); background: var(--ig-primary-light); }
+.ig-radio-card.is-selected .ig-radio-card__icon { background: var(--ig-surface); }
+.ig-radio-card.is-selected .ig-radio-card__mark { border: 6px solid var(--ig-btn-primary-bg); }
+
+/* ---------- Чипсы, бейдж, крошки ---------- */
+.ig-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ig-chip {
+  display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px;
+  border: 1px solid var(--ig-line); border-radius: var(--ig-r-sm); background: var(--ig-surface);
+  font: 500 14px/1 var(--ig-font); color: var(--ig-text); cursor: pointer; text-decoration: none;
+  transition: border-color var(--ig-dur-fast) var(--ig-ease), background-color var(--ig-dur-fast) var(--ig-ease), color var(--ig-dur-fast) var(--ig-ease);
+}
+.ig-chip:hover { border-color: var(--ig-primary); color: var(--ig-primary-pressed); }
+.ig-chip.is-active { background: var(--ig-btn-primary-bg); border-color: var(--ig-primary); color: #fff; }
+.ig-chip--static { cursor: default; height: 28px; padding: 0 10px; font-size: 13px; background: var(--ig-well); border-color: transparent; color: var(--ig-text-2); }
+.ig-chip--static:hover { border-color: transparent; color: var(--ig-text-2); }
+.ig-chip svg { width: 14px; height: 14px; }
+
+.ig-badge { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: var(--ig-r-sm); font: 500 12px/1 var(--ig-font); letter-spacing: .04em; text-transform: uppercase; }
+.ig-badge--promo { background: var(--ig-primary-light); color: var(--ig-primary-dark); }
+.ig-badge--success { background: var(--ig-success-bg); color: var(--ig-success-text); }
+.ig-badge--info { background: var(--ig-info-bg); color: var(--ig-info-text); }
+
+.ig-crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font: var(--ig-small); color: var(--ig-text-2); }
+.ig-crumbs a { color: var(--ig-text-2); text-decoration: none; }
+.ig-crumbs a:hover { color: var(--ig-primary-pressed); text-decoration: underline; }
+.ig-crumbs__sep { color: var(--ig-text-muted); }
+.ig-crumbs [aria-current] { color: var(--ig-text); }
+
+/* ---------- Аккордеон FAQ ---------- */
+.ig-acc { border-top: 1px solid var(--ig-line); }
+.ig-acc__item { border-bottom: 1px solid var(--ig-line); }
+.ig-acc__btn { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 22px 0; border: 0; background: none; font: 600 18px/1.4 var(--ig-font); color: var(--ig-text); text-align: left; cursor: pointer; }
+.ig-acc__btn:hover { color: var(--ig-primary-pressed); }
+.ig-acc__btn:focus-visible { outline: none; box-shadow: var(--ig-focus-ring); border-radius: 6px; }
+.ig-acc__sign { flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--ig-well); display: grid; place-items: center; transition: transform var(--ig-dur-base) var(--ig-ease), background-color var(--ig-dur-base) var(--ig-ease); }
+.ig-acc__sign svg { width: 18px; height: 18px; }
+.ig-acc__item.is-open .ig-acc__sign { transform: rotate(45deg); background: var(--ig-primary-light); color: var(--ig-primary-dark); }
+.ig-acc__panel { padding: 0 56px 24px 0; font: var(--ig-body); color: var(--ig-text-2); }
+
+/* ---------- Таблица фактов ---------- */
+.ig-table-wrap { overflow-x: auto; border-radius: var(--ig-r-lg); border: 1px solid var(--ig-line); background: var(--ig-surface); }
+.ig-table { width: 100%; border-collapse: collapse; font: var(--ig-body); }
+.ig-table th { text-align: left; padding: 14px 20px; font: 500 13px/1.3 var(--ig-font); color: var(--ig-text-2); background: var(--ig-surface); border-bottom: 1px solid var(--ig-line); }
+.ig-table td { padding: 16px 20px; border-bottom: 1px solid var(--ig-hairline); vertical-align: top; }
+.ig-table tbody tr:nth-child(even) td { background: var(--ig-well); }
+.ig-table tbody tr:last-child td { border-bottom: 0; }
+.ig-table .ig-num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ig-table tr.is-link { cursor: pointer; }
+.ig-table tr.is-link:hover td { background: var(--ig-primary-light); }
+/* Мобильная версия — карточки */
+.ig-mcard { background: var(--ig-surface); border: 1px solid var(--ig-line); border-radius: var(--ig-r-lg); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.ig-mcard__row { display: flex; justify-content: space-between; gap: 12px; font: var(--ig-small); }
+.ig-mcard__row dt { color: var(--ig-text-2); }
+.ig-mcard__row dd { margin: 0; text-align: right; font-weight: 500; }
+
+/* ---------- Сравнение «сами / через Inex Glass» ---------- */
+.ig-compare { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border-radius: var(--ig-r-xl); overflow: hidden; background: var(--ig-surface); box-shadow: var(--ig-shadow-card); }
+.ig-compare__head { padding: 20px 28px; font: 600 18px/1.35 var(--ig-font); display: flex; align-items: center; gap: 10px; }
+.ig-compare__head--self { background: var(--ig-warning-bg); color: var(--ig-warning-text); justify-content: flex-end; text-align: right; border-bottom: 1px solid var(--ig-warning); }
+.ig-compare__head--inex { background: var(--ig-primary-light); color: var(--ig-primary-dark); border-bottom: 1px solid var(--ig-line-teal); }
+.ig-compare__cell { padding: 18px 28px; font: var(--ig-body); color: var(--ig-text); border-bottom: 1px solid var(--ig-hairline); }
+.ig-compare__cell--self { background: var(--ig-warning-bg); text-align: right; border-right: 1px solid var(--ig-warning); }
+.ig-compare__cell--inex { background: var(--ig-primary-light); }
+.ig-pair { display: flex; flex-direction: column; border-radius: var(--ig-r-lg); overflow: hidden; border: 1px solid var(--ig-line); }
+.ig-pair__self { padding: 14px 16px; background: var(--ig-warning-bg); font: var(--ig-small); }
+.ig-pair__inex { padding: 14px 16px; background: var(--ig-primary-light); font: 500 14px/1.45 var(--ig-font); }
+.ig-pair__lbl { display: block; font: 500 11px/1.3 var(--ig-font); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
+.ig-pair__self .ig-pair__lbl { color: var(--ig-warning-text); }
+.ig-pair__inex .ig-pair__lbl { color: var(--ig-primary-pressed); }
+
+/* ---------- Полоса условий ---------- */
+.ig-terms { display: flex; flex-wrap: wrap; gap: 8px 32px; align-items: center; padding: 16px 24px; border-radius: var(--ig-r-lg); background: var(--ig-surface); border: 1px solid var(--ig-line); font: 500 14px/1.4 var(--ig-font); color: var(--ig-text); }
+.ig-terms__item { display: flex; align-items: center; gap: 10px; }
+.ig-terms__item svg { width: 18px; height: 18px; color: var(--ig-primary); flex: none; }
+.ig-terms--plain { background: none; border: 0; padding: 0; }
+
+/* ---------- Callout ---------- */
+.ig-callout { display: flex; gap: 16px; padding: 24px; border-radius: var(--ig-r-lg); background: var(--ig-warning-bg); border: 1px solid var(--ig-warning); }
+.ig-callout__icon { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--ig-warning); color: var(--ig-warning-text); display: grid; place-items: center; }
+.ig-callout__icon svg { width: 20px; height: 20px; }
+.ig-callout__title { font: 600 18px/1.35 var(--ig-font); margin: 0 0 8px; color: var(--ig-text); }
+.ig-callout ul, .ig-callout ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.ig-callout--info { background: var(--ig-info-bg); border-color: var(--ig-info); }
+.ig-callout--info .ig-callout__icon { background: var(--ig-info); color: var(--ig-info-text); }
+
+/* ---------- Карточки ---------- */
+.ig-card { background: var(--ig-surface); border-radius: var(--ig-r-lg); box-shadow: var(--ig-shadow-card); overflow: hidden; color: var(--ig-text); text-decoration: none; display: flex; flex-direction: column; transition: transform var(--ig-dur-base) var(--ig-ease), box-shadow var(--ig-dur-base) var(--ig-ease); }
+a.ig-card:hover, .ig-card.is-hover { transform: translateY(-2px); box-shadow: var(--ig-shadow-card-hover); color: var(--ig-text); }
+a.ig-card:focus-visible { outline: none; box-shadow: var(--ig-focus-ring), var(--ig-shadow-card); }
+
+.ig-ph { position: relative; aspect-ratio: 4 / 3; background: linear-gradient(135deg, #E3ECE9 0%, #CFDDD9 55%, #E8EEEC 100%); display: grid; place-items: center; color: #6A7C78; font: 500 12px/1 var(--ig-font); letter-spacing: .06em; text-transform: uppercase; }
+.ig-ph::before { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,.55) 46%, transparent 54%); }
+.ig-ph span { position: relative; }
+.ig-ph--16x9 { aspect-ratio: 16 / 9; }
+
+.ig-card__body { padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.ig-card__title { font: 600 20px/1.3 var(--ig-font); margin: 0; }
+.ig-card__sub { font: var(--ig-small); color: var(--ig-text-2); margin: 0; }
+.ig-card__foot { margin-top: auto; padding-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ig-card__arrow { width: 40px; height: 40px; border-radius: 50%; background: var(--ig-well); display: grid; place-items: center; color: var(--ig-text); transition: background-color var(--ig-dur-base) var(--ig-ease), color var(--ig-dur-base) var(--ig-ease); flex: none; }
+.ig-card__arrow svg { width: 18px; height: 18px; }
+a.ig-card:hover .ig-card__arrow, .ig-card.is-hover .ig-card__arrow { background: var(--ig-btn-primary-bg); color: #fff; }
+
+.ig-thick { padding: 24px; gap: 16px; }
+.ig-thick__mm { font: 700 48px/1 var(--ig-font); letter-spacing: -.01em; }
+.ig-thick__mm small { font-size: 20px; font-weight: 500; margin-left: 4px; color: var(--ig-text-2); }
+.ig-thick__note { font: 400 12px/1.4 var(--ig-font); color: var(--ig-text-2); }
+.ig-thick__specs { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 12px 0 0; border-top: 1px solid var(--ig-hairline); font: var(--ig-small); }
+.ig-thick__specs div { display: flex; justify-content: space-between; gap: 12px; }
+.ig-thick__specs dt { color: var(--ig-text-2); }
+.ig-thick__specs dd { margin: 0; font-weight: 500; }
+
+/* ---------- Шаги процесса ---------- */
+.ig-steps { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; counter-reset: step; }
+.ig-step { position: relative; display: flex; flex-direction: column; gap: 10px; padding-top: 4px; }
+.ig-step__num { width: 44px; height: 44px; border-radius: 50%; background: var(--ig-primary-light); color: var(--ig-primary-dark); display: grid; place-items: center; font: 700 18px/1 var(--ig-font); position: relative; z-index: 1; }
+.ig-step__line { position: absolute; top: 26px; left: 52px; right: -8px; height: 2px; background: repeating-linear-gradient(90deg, var(--ig-line) 0 6px, transparent 6px 12px); }
+.ig-step__title { font: 600 16px/1.35 var(--ig-font); margin: 0; }
+.ig-step__text { font: var(--ig-small); color: var(--ig-text-2); margin: 0; }
+
+/* ---------- Статистика ---------- */
+.ig-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-radius: var(--ig-r-xl); background: var(--ig-surface); box-shadow: var(--ig-shadow-card); }
+.ig-stat-tile { padding: 28px; display: flex; flex-direction: column; gap: 10px; }
+.ig-stat-tile + .ig-stat-tile { border-left: 1px solid var(--ig-hairline); }
+.ig-stat-tile__text { font: var(--ig-small); color: var(--ig-text-2); margin: 0; }
+/* Frosted glass — только в hero */
+.ig-stats--glass { background: rgba(255,255,255,.62); -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 8px 32px rgba(22,64,61,.12); }
+.ig-stats--glass .ig-stat-tile + .ig-stat-tile { border-left-color: rgba(28,31,34,.08); }
+.ig-stats--glass .ig-stat-tile__text { color: var(--ig-ink-2); }
+
+/* ---------- Cookie, sticky CTA ---------- */
+.ig-cookie { display: flex; align-items: center; gap: 24px; padding: 20px 24px; border-radius: var(--ig-r-lg); background: var(--ig-surface); box-shadow: var(--ig-shadow-modal); font: var(--ig-small); color: var(--ig-text); }
+.ig-cookie p { margin: 0; flex: 1; }
+.ig-cookie__actions { display: flex; gap: 8px; flex-wrap: wrap; flex: none; }
+.ig-sticky-cta { padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.96); border-top: 1px solid var(--ig-line); box-shadow: 0 -4px 16px rgba(28,31,34,.08); }
+
+/* ---------- Таймлайн заказа ---------- */
+.ig-tl { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.ig-tl__step { position: relative; display: flex; flex-direction: column; gap: 8px; padding-right: 16px; }
+.ig-tl__dot { position: relative; z-index: 1; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--ig-surface); border: 2px solid var(--ig-line); color: var(--ig-text-muted); }
+.ig-tl__dot svg { width: 16px; height: 16px; }
+.ig-tl__bar { position: absolute; top: 15px; left: 32px; right: 0; height: 2px; background: var(--ig-line); }
+.ig-tl__title { font: 600 15px/1.35 var(--ig-font); color: var(--ig-text-muted); }
+.ig-tl__date { font: var(--ig-small); color: var(--ig-text-muted); }
+.ig-tl__step.is-done .ig-tl__dot { background: var(--ig-primary-light); border-color: var(--ig-primary-light); color: var(--ig-primary-pressed); }
+.ig-tl__step.is-done .ig-tl__bar { background: var(--ig-primary); }
+.ig-tl__step.is-done .ig-tl__title { color: var(--ig-text); }
+.ig-tl__step.is-done .ig-tl__date { color: var(--ig-text-2); }
+.ig-tl__step.is-current .ig-tl__dot { background: var(--ig-btn-primary-bg); border-color: var(--ig-primary); color: #fff; box-shadow: 0 0 0 6px rgba(43,140,126,.15); }
+.ig-tl__step.is-current .ig-tl__title { color: var(--ig-primary-pressed); }
+.ig-tl__step.is-current .ig-tl__date { color: var(--ig-text-2); }
+.ig-tl--v { grid-template-columns: 1fr; gap: 0; }
+.ig-tl--v .ig-tl__step { flex-direction: row; gap: 14px; padding: 0 0 22px; }
+.ig-tl--v .ig-tl__bar { top: 32px; left: 15px; right: auto; bottom: 0; width: 2px; height: auto; }
+
+/* ---------- Логотип (временный) ---------- */
+.ig-logo { display: inline-flex; align-items: baseline; gap: 8px; text-decoration: none; color: var(--ig-text); font: 700 24px/1 var(--ig-font); letter-spacing: .02em; }
+.ig-logo__x { display: inline-block; width: 18px; height: 18px; vertical-align: -1px; }
+.ig-logo__glass { font-weight: 400; letter-spacing: .14em; font-size: 15px; color: var(--ig-text-2); }
+.ig-logo--light { color: var(--ig-on-navy); }
+.ig-logo--light .ig-logo__glass { color: var(--ig-on-navy-2); }
+
+/* ---------- Движение: уважаем prefers-reduced-motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .ig-btn--primary::after { display: none; }
+  .ig-btn:active { transform: none; }
+  a.ig-card:hover, .ig-card.is-hover { transform: none; }
+  .ig-link:hover svg { transform: none; }
+}
+
+/* ---------- Кнопка в состоянии загрузки (React-обёртка Button loading) ---------- */
+/* Загрузка = aria-disabled + aria-busy (не native disabled, чтобы кнопка не теряла фокус).
+   Внешний вид остаётся «активным», а не серым disabled — идёт отправка, а не запрет. */
+.ig-btn[aria-busy="true"] { cursor: progress; }
+.ig-btn--primary[aria-busy="true"][aria-disabled="true"] { background: var(--ig-btn-primary-bg); color: #fff; }
+.ig-btn--secondary[aria-busy="true"][aria-disabled="true"] { border-color: var(--ig-primary); color: var(--ig-primary-pressed); background: var(--ig-surface); }
+
+/* ---------- Hero главной: вуаль над фото под текстом (PageHero variant="home") ---------- */
+/* Desktop: полупрозрачный tint-green слева → прозрачный к 64 %; ≤1100 — плотнее, текст во всю ширину. */
+.ig-hero-fade {
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--ig-tint-green) 90%, transparent) 0%,
+    color-mix(in srgb, var(--ig-tint-green) 78%, transparent) 38%,
+    color-mix(in srgb, var(--ig-tint-green) 35%, transparent) 52%,
+    transparent 64%);
+}
+@media (max-width: 1100px) {
+  .ig-hero-fade {
+    background: linear-gradient(90deg,
+      var(--ig-tint-green) 0%,
+      var(--ig-tint-green) 55%,
+      color-mix(in srgb, var(--ig-tint-green) 75%, transparent) 80%,
+      color-mix(in srgb, var(--ig-tint-green) 35%, transparent) 100%);
+  }
+}

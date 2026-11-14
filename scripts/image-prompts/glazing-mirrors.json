@@ -1,0 +1,128 @@
+[
+  {
+    "id": "g-osteklenie-hub",
+    "group": "glazing-mirrors",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Corner of a modern building with large frameless glazing panels reflecting a pale sky, clean structural glass joints, cool daylight.",
+    "alt": "Остекление современного здания",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "osteklenie",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "g-fasadov",
+    "group": "glazing-mirrors",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Structural glazing facade of an office building seen from below, flush glass panels with thin silicone joints and no visible frames, reflecting soft clouds, no signage.",
+    "alt": "Структурное остекление фасада",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "fasadov",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "g-spajdernoe",
+    "group": "glazing-mirrors",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Macro view of a stainless steel spider fitting with point bolts holding four corners of tempered glass facade panels, crisp reflections, cool light.",
+    "alt": "Спайдерное крепление стеклянного фасада",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "spajdernoe",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "g-vitrin-i-magazinov",
+    "group": "glazing-mirrors",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Frameless glass shopfront of a small empty retail space, floor-to-ceiling clear glass with a glass entrance area, bright interior visible through it, no signs, no brands, no products.",
+    "alt": "Витринное остекление магазина",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "vitrin-i-magazinov",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "g-liftovyh-shaht",
+    "group": "glazing-mirrors",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Transparent glass-enclosed elevator shaft in a bright modern atrium, clear tempered glass panels on a slim steel frame, glass cabin visible inside, no people, no stairs.",
+    "alt": "Прозрачная лифтовая шахта из стекла",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "liftovyh-shaht",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "g-verand-terras-besedok",
+    "group": "glazing-mirrors",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Frameless sliding glass glazing of a light wooden veranda of a country house, clear glass panels, green garden softly blurred outside, empty wooden deck, daylight.",
+    "alt": "Безрамное остекление веранды",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "verand-terras-besedok",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "m-zerkala",
+    "group": "glazing-mirrors",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Large frameless made-to-measure wall mirror with polished edges in a bright minimal interior, reflecting a soft light-grey room, no people, nothing personal reflected.",
+    "alt": "Зеркало по размеру в интерьере",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "zerkala",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "m-dlya-zalov",
+    "group": "glazing-mirrors",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Empty bright dance or fitness studio with a continuous floor-to-ceiling mirror wall made of large frameless mirror panels, light wooden floor, no equipment, no people.",
+    "alt": "Зеркальная стена в пустом зале",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "dlya-zalov",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "m-dlya-salonov",
+    "group": "glazing-mirrors",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Rectangular wall mirror with a wide bevelled facet edge in a bright minimal beauty salon interior, no backlight, no lamps around the mirror, empty chair, no people.",
+    "alt": "Зеркало с фацетом в интерьере салона",
+    "target": {
+      "kind": "doc",
+      "collection": "constructions",
+      "slug": "dlya-salonov",
+      "field": "card.image"
+    }
+  }
+]

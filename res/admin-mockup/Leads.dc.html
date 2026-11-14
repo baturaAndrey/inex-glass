@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Заявки — канбан</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&amp;display=swap">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F4F5F3;font-family:'Rubik',system-ui,sans-serif;color:#1C1F22;font-size:14px}
+a{color:#1F6B60}a:hover{color:#16403D}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #2B8C7E;outline-offset:2px}
+.app{display:flex;flex-wrap:wrap;min-height:100vh;align-items:stretch}
+.sb{flex:1 1 248px;background:#324B64;color:#FFFFFF;display:flex;flex-direction:column;gap:12px;padding:20px 14px}
+.sb-brand{display:flex;align-items:center;gap:12px;padding:4px 8px 18px;border-bottom:1px solid rgba(255,255,255,.12)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.sb-g{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#C9D3DD;padding:14px 10px 6px}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:#FFFFFF;text-decoration:none;font-size:14px;min-height:40px}
+.nav a:hover{background:rgba(255,255,255,.08);color:#FFFFFF}
+.nav a.on{background:#267D70;font-weight:500}
+.nav svg{width:18px;height:18px;flex:none;opacity:.9}
+.cnt{margin-left:auto;min-width:22px;padding:2px 7px;border-radius:999px;background:#FFFFFF;color:#324B64;font-size:12px;font-weight:600;text-align:center;font-variant-numeric:tabular-nums}
+.cnt.soft{background:rgba(255,255,255,.16);color:#FFFFFF}
+.sb-user{margin-top:auto;display:flex;align-items:center;gap:10px;padding:14px 8px 4px;border-top:1px solid rgba(255,255,255,.12)}
+.av{width:34px;height:34px;border-radius:999px;background:#EAF3F1;color:#16403D;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex:none}
+.av.sm{width:28px;height:28px;font-size:11px}
+.main{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
+.top{background:#FFFFFF;border-bottom:1px solid #E6E8E6;padding:14px 32px;display:flex;flex-wrap:wrap;align-items:center;gap:16px}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#5B636B;font-weight:500}
+.ttl{font-size:22px;font-weight:700;margin:2px 0 0;line-height:1.2}
+.search{display:flex;align-items:center;gap:8px;border:1px solid #D9DCDE;border-radius:999px;padding:0 14px;height:40px;background:#F4F5F3;flex:0 1 320px;min-width:200px;color:#5B636B}
+.search input{border:0;background:transparent;font:inherit;font-size:14px;outline:none;width:100%;color:#1C1F22}
+.search svg{width:16px;height:16px;flex:none}
+.page{padding:24px 32px 56px;display:flex;flex-direction:column;gap:20px}
+.card{background:#FFFFFF;border:1px solid #E6E8E6;border-radius:16px;padding:20px;box-shadow:0 1px 2px rgba(28,31,34,.05)}
+.mut{color:#5B636B}
+.num{font-variant-numeric:tabular-nums}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 18px;border-radius:999px;font:inherit;font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;border:1px solid transparent;white-space:nowrap}
+.btn svg{width:16px;height:16px}
+.btn-p{background:#267D70;color:#FFFFFF}.btn-p:hover{background:#1F6B60;color:#FFFFFF}
+.btn-g{background:#FFFFFF;color:#1C1F22;border-color:#D9DCDE}.btn-g:hover{background:#F4F5F3;color:#1C1F22}
+.bdg{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:500;white-space:nowrap}
+.s-new{background:#EEF4FA;color:#2C5B86}.s-work{background:#FCF6EA;color:#8A5A00}.s-kp{background:#EAF3F1;color:#16403D}.s-ok{background:#EEF8F0;color:#237A35}.s-no{background:#FCEFEF;color:#B23B3B}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;font-size:12px;background:#ECEEEC;color:#5B636B;white-space:nowrap}
+.seg{display:inline-flex;gap:4px;padding:4px;border-radius:999px;background:#ECEEEC}
+.seg button{border:0;background:transparent;font:inherit;font-size:13px;padding:6px 14px;border-radius:999px;color:#5B636B;cursor:pointer}
+.seg button.on{background:#FFFFFF;color:#1C1F22;font-weight:500;box-shadow:0 1px 2px rgba(28,31,34,.08)}
+.chip{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:999px;border:1px solid #D9DCDE;background:#FFFFFF;font:inherit;font-size:13px;color:#1C1F22;cursor:pointer}
+.chip:hover{border-color:#2B8C7E}
+.chip.on{background:#EAF3F1;border-color:#2B8C7E;color:#16403D;font-weight:500}
+.chip b{font-weight:600;color:#5B636B;font-variant-numeric:tabular-nums}
+.sel{height:36px;border:1px solid #D9DCDE;border-radius:10px;padding:0 10px;font:inherit;font-size:13px;background:#FFFFFF;color:#1C1F22}
+.stat{display:flex;flex-direction:column;gap:4px;padding:16px 18px}
+.stat-v{font-size:28px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.board{display:grid;grid-template-columns:repeat(4,minmax(270px,1fr));gap:14px;align-items:start}
+.col{background:#ECEEEC;border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.col-h{display:flex;align-items:center;gap:8px;padding:6px 6px 2px;font-size:14px;font-weight:600}
+.dot{width:8px;height:8px;border-radius:999px;flex:none}
+.lc{background:#FFFFFF;border:1px solid #E6E8E6;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:9px;cursor:grab;transition:border-color .12s,box-shadow .2s}
+.lc:hover{border-color:#2B8C7E;box-shadow:0 6px 18px rgba(28,31,34,.07)}
+.lc-t{font-size:15px;font-weight:600;color:#1C1F22;text-decoration:none;line-height:1.3}
+.lc-t:hover{color:#1F6B60;text-decoration:underline}
+.lc-f{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid #E6E8E6;padding-top:10px}
+.mini{height:28px;padding:0 10px;border-radius:999px;border:1px solid #2B8C7E;background:#FFFFFF;color:#1F6B60;font:inherit;font-size:12px;font-weight:500;cursor:pointer}
+.mini:hover{background:#EAF3F1}
+.more{border:1px dashed #BFC4C8;background:transparent;border-radius:10px;height:36px;font:inherit;font-size:13px;color:#5B636B;cursor:pointer}
+</style>
+</helmet>
+<div class="app">
+
+<aside class="sb" aria-label="Главное меню">
+<div class="sb-brand">
+<img src="/_blob/7fe0d1b7dc096c3d902aceee83ccb72a" alt="Inex Glass" style="height: 36px; width: auto">
+<span style="font-size: 12px; color: #C9D3DD; line-height: 1.3">панель<br>управления</span>
+</div>
+<nav class="nav">
+<div class="sb-g">Работа</div>
+<a href="Main.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>Дашборд</a>
+<a href="Leads.dc.html" class="on" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>Заявки<span class="cnt" aria-label="новых: 5">5</span></a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg>Заказы<span class="cnt soft" aria-label="в работе: 12">12</span></a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg>Отчёты</a>
+<div class="sb-g">Сайт</div>
+<a href="PageEdit.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>Страницы</a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>Статьи</a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path></svg>Объекты</a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>Медиатека</a>
+<div class="sb-g">Каталог и цены</div>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 10 5-10 5L2 7z"></path><path d="m2 17 10 5 10-5"></path><path d="m2 12 10 5 10-5"></path></svg>Каталог</a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.580a2.426 2.426 0 0 0 0-3.42z"></path><circle cx="7.5" cy="7.5" r=".5"></circle></svg>Цены и акция</a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>Условия и контакты</a>
+<div class="sb-g">Система</div>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>Пользователи</a>
+<a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>Настройки</a>
+</nav>
+<div class="sb-user">
+<span class="av">СМ</span>
+<div style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 14px; font-weight: 500">Сергей Морозов</span><span style="font-size: 12px; color: #C9D3DD">Менеджер</span></div>
+</div>
+</aside>
+
+<main class="main">
+<header class="top">
+<div style="display: flex; flex-direction: column; margin-right: auto">
+<span class="eyebrow">Работа</span>
+<h1 class="ttl">Заявки</h1>
+</div>
+<label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg><input type="search" placeholder="Компания, имя, телефон, ИНН" aria-label="Поиск по заявкам"></label>
+<button type="button" class="btn btn-g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>Экспорт</button>
+</header>
+
+<div class="page">
+
+<section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px" aria-label="Сводка">
+<div class="card stat"><span class="mut" style="font-size: 13px">Новые сегодня</span><span class="stat-v" style="color: #2C5B86">5</span><span class="mut" style="font-size: 12px">3 без ответственного</span></div>
+<div class="card stat"><span class="mut" style="font-size: 13px">В работе</span><span class="stat-v">12</span><span class="mut" style="font-size: 12px">у вас — 7</span></div>
+<div class="card stat"><span class="mut" style="font-size: 13px">Ждут ответа на КП</span><span class="stat-v">8</span><span class="mut" style="font-size: 12px">дольше 5 дней — 2</span></div>
+<div class="card stat"><span class="mut" style="font-size: 13px">Договоры за месяц</span><span class="stat-v" style="color: #237A35">6</span><span class="mut" style="font-size: 12px">890 м² в заказах</span></div>
+</section>
+
+<section style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px" aria-label="Фильтры">
+<div class="seg" role="group" aria-label="Вид"><button type="button" class="on" aria-pressed="true">Канбан</button><button type="button">Таблица</button></div>
+<span style="width: 1px; height: 24px; background: #D9DCDE"></span>
+<button type="button" class="chip on" aria-pressed="true">Все</button>
+<button type="button" class="chip">Мои <b>7</b></button>
+<button type="button" class="chip">Без ответственного <b>3</b></button>
+<button type="button" class="chip">Повторные <b>1</b></button>
+<button type="button" class="chip">С флагами <b>4</b></button>
+<div style="display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap">
+<select class="sel" aria-label="Источник"><option>Все источники</option><option>Квиз</option><option>Отправить чертёж</option><option>Заказать звонок</option><option>Заказать образец</option></select>
+<select class="sel" aria-label="Период"><option>За 30 дней</option><option>Сегодня</option><option>7 дней</option></select>
+</div>
+</section>
+
+<div style="overflow-x: auto; padding-bottom: 4px">
+<div class="board">
+
+<section class="col" aria-label="Новая">
+<div class="col-h"><span class="dot" style="background: #2C5B86"></span>Новая<span class="mut num" style="margin-left: auto; font-weight: 400; font-size: 13px">5</span></div>
+<article class="lc">
+<div style="display: flex; justify-content: space-between; gap: 8px; align-items: flex-start"><a href="Lead.dc.html" class="lc-t">ООО «СтройФасад»</a><span class="mut num" style="font-size: 12px; white-space: nowrap" title="22.10.2026 10:48">12 мин</span></div>
+<div class="mut" style="font-size: 13px">Андрей · <a href="tel:+79123456789" class="num">+7 912 345-67-89</a></div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span class="tag">Фасады</span><span class="tag num">120 м²</span><span class="tag">Квиз</span><span class="bdg s-no">Срочно</span></div>
+<div class="lc-f"><span class="num" style="font-weight: 600">от&nbsp;168&nbsp;000&nbsp;₽</span><button type="button" class="mini">Взять себе</button></div>
+</article>
+<article class="lc">
+<div style="display: flex; justify-content: space-between; gap: 8px; align-items: flex-start"><a href="Lead.dc.html" class="lc-t">ИП Соколова</a><span class="mut num" style="font-size: 12px; white-space: nowrap">40 мин</span></div>
+<div class="mut" style="font-size: 13px">Марина · <a href="tel:+79221112233" class="num">+7 922 111-22-33</a></div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span class="tag">Перегородки</span><span class="tag num">58 м²</span><span class="tag">Чертёж · 2 DWG</span></div>
+<div class="lc-f"><span class="mut" style="font-size: 13px">расчёт по чертежу</span><button type="button" class="mini">Взять себе</button></div>
+</article>
+<article class="lc">
+<div style="display: flex; justify-content: space-between; gap: 8px; align-items: flex-start"><a href="Lead.dc.html" class="lc-t">«Мебель-Профи»</a><span class="mut num" style="font-size: 12px; white-space: nowrap">1 ч</span></div>
+<div class="mut" style="font-size: 13px">Олег · <a href="tel:+73512000000" class="num">+7 351 200-00-00</a></div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span class="tag">Закалённое стекло</span><span class="tag num">12 м²</span><span class="tag">Образец</span><span class="bdg s-work">Малый объём</span><span class="bdg s-work">Повтор</span></div>
+<div class="lc-f"><span class="mut" style="font-size: 13px">—</span><span class="av sm" title="Сергей Морозов">СМ</span></div>
+</article>
+<article class="lc">
+<div style="display: flex; justify-content: space-between; gap: 8px; align-items: flex-start"><a href="Lead.dc.html" class="lc-t">ГК «Северный квартал»</a><span class="mut num" style="font-size: 12px; white-space: nowrap; color: #B23B3B">2 ч 15 мин</span></div>
+<div class="mut" style="font-size: 13px">Ирина · <a href="tel:+79000000000" class="num">+7 900 000-00-00</a></div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span class="tag">Ограждения</span><span class="tag num">96 м²</span><span class="tag">Звонок</span><span class="bdg s-work">Без файла</span></div>
+<div class="lc-f"><span class="mut" style="font-size: 13px">перезвонить</span><button type="button" class="mini">Взять себе</button></div>
+</article>
+<button type="button" class="more">Ещё 1</button>
+</section>
+
+<section class="col" aria-label="В работе">
+<div class="col-h"><span class="dot" style="background: #8A5A00"></span>В работе<span class="mut num" style="margin-left: auto; font-weight: 400; font-size: 13px">12</span></div>
+<article class="lc">
+<div style="display: flex; justify-content: space-between; gap: 8px; align-items: flex-start"><a href="Lead.dc.html" class="lc-t">«ДизайнЛаб»</a><span class="mut num" style="font-size: 12px; white-space: nowrap">вчера</span></div>
+<div class="mut" style="font-size: 13px">Анастасия · дизайнер</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span class="tag">Душевые</span><span class="tag num">64 м²</span><span class="tag">Квиз</span></div>
+<div class="lc-f"><span class="num" style="font-weight: 600">от&nbsp;96&nbsp;000&nbsp;₽</span><span class="av sm" title="Ольга Кузнецова">ОК</span></div>
+</article>
+<article class="lc">
+<div style="display: flex; justify-content: space-between; gap: 8px; align-items: flex-start"><a href="Lead.dc.html" class="lc-t">ООО «Альфа-Монтаж»</a><span class="mut num" style="font-size: 12px; white-space: nowrap">2 дня</span></div>
+<div class="mut" style="font-size: 13px">Дмитрий · подрядчик</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span class="tag">Козырьки</span><span class="tag num">75 м²</span><span class="tag">Чертёж · PDF</span><span class="bdg s-work">Нужны документы</span></div>
+<div class="lc-f"><span class="mut" style="font-size: 13px">2 комментария</span><span class="av sm" title="Сергей Морозов">СМ</span></div>
+</article>
+<article class="lc">
+<div style="display: flex; justify-content: space-between; gap: 8px; align-items: flex-start"><a href="Lead.dc.html" class="lc-t">«Технострой»</a><span class="mut num" style="font-size: 12px; white-space: nowrap">3 дня</span></div>
+<div class="mut" style="font-size: 13px">Павел · застройщик</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span class="tag">Триплекс</span><span class="tag num">140 м²</span><span class="tag">Под нагрузку</span></div>
+<div class="lc-f"><span class="num" style="font-weight: 600">от&nbsp;392&nbsp;000&nbsp;₽</span><span class="av sm" title="Ольга Кузнецова">ОК</span></div>
+</article>
+<button type="button" class="more">Ещё 9</button>
+</section>
+
+<section class="col" aria-label="КП отправлено">
+<div class="col-h"><span class="dot" style="background: #16403D"></span>КП отправлено<span class="mut num" style="margin-left: auto; font-weight: 400; font-size: 13px">8</span></div>
+<article class="lc">
+<div style="display: flex; justify-content: space-between; gap: 8px; align-items: flex-start"><a href="Lead.dc.html" class="lc-t">ГК «Уралстрой»</a><span class="mut num" style="font-size: 12px; white-space: nowrap; color: #8A5A00">6 дней</span></div>
+<div class="mut" style="font-size: 13px">Ирина · генподрядчик</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span class="tag">Ограждения</span><span class="tag num">210 м²</span><span class="tag">Звонок</span></div>
+<div class="lc-f"><span class="num" style="font-weight: 600">КП 412&nbsp;000&nbsp;₽</span><span class="av sm" title="Сергей Морозов">СМ</span></div>
+</article>
+<article class="lc">
+<div style="display: flex; justify-content: space-between; gap: 8px; align-items: flex-start"><a href="Lead.dc.html" class="lc-t">«Витрина-Сервис»</a><span class="mut num" style="font-size: 12px; white-space: nowrap">2 дня</span></div>
+<div class="mut" style="font-size: 13px">Виктор · производитель</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span class="tag">Витрины</span><span class="tag num">52 м²</span><span class="tag">Контакты</span></div>
+<div class="lc-f"><span class="num" style="font-weight: 600">КП 118&nbsp;000&nbsp;₽</span><span class="av sm" title="Ольга Кузнецова">ОК</span></div>
+</article>
+<button type="button" class="more">Ещё 6</button>
+</section>
+
+<section class="col" aria-label="Договор">
+<div class="col-h"><span class="dot" style="background: #237A35"></span>Договор<span class="mut num" style="margin-left: auto; font-weight: 400; font-size: 13px">6 за месяц</span></div>
+<article class="lc">
+<div style="display: flex; justify-content: space-between; gap: 8px; align-items: flex-start"><a href="Lead.dc.html" class="lc-t">ООО «ГлассДом»</a><span class="mut num" style="font-size: 12px; white-space: nowrap">20.10</span></div>
+<div class="mut" style="font-size: 13px">Елена · подрядчик</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span class="tag">Перегородки</span><span class="tag num">180 м²</span></div>
+<div class="lc-f"><a href="#" style="font-size: 13px; font-weight: 500">Заказ 2026-0142 →</a><span class="av sm" title="Сергей Морозов">СМ</span></div>
+</article>
+<article class="lc">
+<div style="display: flex; justify-content: space-between; gap: 8px; align-items: flex-start"><a href="Lead.dc.html" class="lc-t">«Мастер Интерьер»</a><span class="mut num" style="font-size: 12px; white-space: nowrap">17.10</span></div>
+<div class="mut" style="font-size: 13px">Роман · мебель</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span class="tag">Для мебели</span><span class="tag num">70 м²</span></div>
+<div class="lc-f"><a href="#" style="font-size: 13px; font-weight: 500">Заказ 2026-0139 →</a><span class="av sm" title="Ольга Кузнецова">ОК</span></div>
+</article>
+<button type="button" class="more">Ещё 4</button>
+</section>
+
+</div>
+</div>
+
+<details class="card" style="padding: 14px 18px">
+<summary style="cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 10px"><span class="dot" style="background: #B23B3B"></span>Отказ <span class="mut num" style="font-weight: 400">9 за месяц · перетащите карточку сюда, чтобы закрыть заявку с причиной</span></summary>
+<div class="mut" style="padding-top: 12px; font-size: 13px">Дорого: 4 · Выбрали другого поставщика: 2 · Нужен монтаж: 2 · Не дозвонились: 1</div>
+</details>
+
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1180}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

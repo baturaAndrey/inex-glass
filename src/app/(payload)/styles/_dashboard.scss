@@ -1,0 +1,587 @@
+// Admin dashboard (`/admin/`, src/payload/admin/views/dashboard.tsx). Owner: task-04.
+// Values follow the approved mockup res/admin-mockup/Main.dc.html; colours only from `--ig-*`.
+// Status colours arrive as CSS variables (`--iga-badge-color`, `--iga-bar-color`), never inline.
+
+.iga-dash-page {
+  min-width: 0;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Page head: search + «На сайт» (mockup `.top`, `.search`)
+// ---------------------------------------------------------------------------------------------
+
+.iga-dash-head {
+  &__actions {
+    flex: 1 1 auto;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .iga-page-head__eyebrow {
+    display: block;
+  }
+
+  .iga-page-head__title {
+    margin-top: 2px;
+  }
+}
+
+.iga-dash-search {
+  display: flex;
+  flex: 0 1 320px;
+  align-items: center;
+  gap: 8px;
+  min-width: 200px;
+  height: 40px;
+  margin: 0;
+  padding: 0 14px;
+  border: 1px solid var(--ig-line);
+  border-radius: var(--ig-r-pill);
+  background: var(--ig-bg);
+  color: var(--ig-text-2);
+  transition:
+    border-color var(--ig-dur-fast) var(--ig-ease),
+    box-shadow var(--ig-dur-fast) var(--ig-ease);
+
+  &:focus-within {
+    border-color: var(--ig-primary);
+    box-shadow: var(--ig-focus-ring);
+  }
+
+  svg {
+    flex: none;
+    width: 16px;
+    height: 16px;
+  }
+
+  input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: var(--ig-text);
+    font: inherit;
+    font-size: 14px;
+
+    &::placeholder {
+      color: var(--ig-text-muted);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Layout
+// ---------------------------------------------------------------------------------------------
+
+.iga-dash {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 28px 32px 56px;
+  color: var(--ig-text);
+  font-size: 14px;
+
+  a:not(.iga-btn, .iga-att) {
+    color: var(--ig-primary-pressed);
+
+    &:hover {
+      color: var(--ig-primary-dark);
+    }
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--ig-primary);
+    outline-offset: 2px;
+  }
+
+  &__sec {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  &__muted {
+    color: var(--ig-text-2);
+  }
+
+  &__empty,
+  &__error,
+  &__warning {
+    margin: 0;
+    font-size: 13px;
+    color: var(--ig-text-2);
+  }
+
+  &__error {
+    color: var(--ig-danger-text);
+  }
+
+  &__warning {
+    padding: 8px 12px;
+    border-radius: var(--ig-r-md);
+    background: var(--ig-warning-bg);
+    color: var(--ig-warning-text);
+  }
+
+  .iga-section-head__sub {
+    font-size: 13px;
+  }
+
+  .iga-section-head__action {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  // The segment keeps its own colours (beats the generic link colour above).
+  .iga-seg > a {
+    white-space: nowrap;
+    color: var(--ig-text-2);
+    text-decoration: none;
+
+    &[aria-current="page"],
+    &:hover {
+      color: var(--ig-text);
+    }
+  }
+}
+
+// Visually hidden, read by screen readers (deltas «рост на 18 % к предыдущему периоду»).
+.iga-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// ---------------------------------------------------------------------------------------------
+// «Требует внимания» (mockup `.att`)
+// ---------------------------------------------------------------------------------------------
+
+.iga-att-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.iga-att {
+  --iga-att-tone: var(--ig-text-2);
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 116px;
+  padding: 16px;
+  border: 1px solid var(--ig-hairline);
+  border-radius: var(--ig-r-lg);
+  background: var(--ig-surface);
+  color: var(--ig-text);
+  text-decoration: none;
+  transition:
+    transform var(--ig-dur-base) var(--ig-ease),
+    box-shadow var(--ig-dur-base) var(--ig-ease);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--ig-shadow-card-hover);
+    color: var(--ig-text);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ig-primary);
+    outline-offset: 2px;
+  }
+
+  &__top {
+    display: flex;
+    align-items: center;
+  }
+
+  &__icon {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    color: var(--iga-att-tone);
+  }
+
+  &__value {
+    margin-left: auto;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--iga-att-tone);
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__label {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  &__sub {
+    font-size: 12px;
+    color: var(--ig-text-2);
+  }
+
+  &--danger {
+    --iga-att-tone: var(--ig-danger-text);
+
+    border-color: var(--ig-danger);
+  }
+
+  &--warning {
+    --iga-att-tone: var(--ig-warning-text);
+
+    border-color: var(--ig-warning);
+  }
+
+  &--info {
+    --iga-att-tone: var(--ig-info-text);
+
+    border-color: var(--ig-info);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// «Пульс» (mockup `.kpi`)
+// ---------------------------------------------------------------------------------------------
+
+.iga-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.iga-dash .iga-card {
+  gap: 16px;
+  padding: 20px;
+  box-shadow: var(--ig-shadow-card);
+}
+
+.iga-dash .iga-kpi {
+  gap: 6px;
+  min-height: 168px;
+}
+
+.iga-kpi {
+  &__label {
+    font-size: 13px;
+    color: var(--ig-text-2);
+  }
+
+  &__value {
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__unit {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ig-text-2);
+  }
+
+  &__delta {
+    font-size: 12px;
+  }
+
+  &__muted {
+    color: var(--ig-text-2);
+  }
+
+  &__change {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+
+    &--up {
+      color: var(--ig-success-text);
+    }
+
+    &--down {
+      color: var(--ig-danger-text);
+    }
+
+    &--flat {
+      color: var(--ig-text-2);
+    }
+  }
+}
+
+.iga-spark {
+  --iga-spark-color: var(--ig-primary);
+
+  display: block;
+  width: 100%;
+  height: 40px;
+  margin-top: auto;
+
+  &--danger {
+    --iga-spark-color: var(--ig-danger-text);
+  }
+
+  &__area {
+    fill: var(--iga-spark-color);
+    fill-opacity: 0.1;
+    stroke: none;
+  }
+
+  &__line {
+    fill: none;
+    stroke: var(--iga-spark-color);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Cards of the middle row: funnel, sources, orders
+// ---------------------------------------------------------------------------------------------
+
+.iga-dash-card {
+  min-width: 0;
+
+  &__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    a {
+      flex: none;
+      font-size: 13px;
+    }
+  }
+}
+
+.iga-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+  }
+
+  &__num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .iga-bar > span {
+    background: var(--iga-bar-color, var(--ig-primary));
+  }
+}
+
+.iga-funnel-refused {
+  padding-top: 12px;
+  border-top: 1px solid var(--ig-hairline);
+  color: var(--ig-text-2);
+
+  summary {
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--ig-primary);
+      outline-offset: 2px;
+    }
+  }
+
+  &__reasons {
+    margin: 8px 0 0;
+    font-size: 12px;
+  }
+}
+
+.iga-order-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.iga-order-tile {
+  padding: 12px;
+  border-radius: var(--ig-r-md);
+  background: var(--ig-bg);
+
+  &__num {
+    font-size: 24px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__label {
+    font-size: 12px;
+    color: var(--ig-text-2);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// «Последние заявки»
+// ---------------------------------------------------------------------------------------------
+
+.iga-dash .iga-latest {
+  gap: 0;
+  padding: 0;
+
+  .iga-dash-card__head {
+    padding: 18px 20px 6px;
+  }
+}
+
+.iga-latest {
+  &__pad {
+    padding: 12px 20px 20px;
+  }
+
+  &__scroll {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+
+    th {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--ig-hairline);
+      text-align: left;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ig-text-2);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--ig-hairline);
+      white-space: nowrap;
+      transition: background var(--ig-dur-fast) var(--ig-ease);
+    }
+
+    th:first-child,
+    td:first-child {
+      padding-left: 20px;
+    }
+
+    th:last-child,
+    td:last-child {
+      padding-right: 20px;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    tbody tr:hover td {
+      background: var(--ig-bg);
+    }
+  }
+
+  &__num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__company {
+    font-weight: 500;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Breakpoints (DESIGN.md §6) and reduced motion
+// ---------------------------------------------------------------------------------------------
+
+@media (max-width: 1100px) {
+  .iga-dash {
+    padding: 24px 24px 48px;
+  }
+
+  .iga-dash-head {
+    padding-inline: 24px;
+  }
+}
+
+@media (max-width: 599px) {
+  .iga-dash {
+    gap: 28px;
+    padding: 16px 16px 40px;
+  }
+
+  .iga-dash-head {
+    padding-inline: 16px;
+  }
+
+  .iga-dash-head__actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .iga-dash-search {
+    flex: 1 1 100%;
+    min-width: 0;
+    height: 44px;
+  }
+
+  // One column of cards on phones: 300 px minimum would overflow 343 px of content.
+  .iga-dash__row,
+  .iga-kpi-grid,
+  .iga-att-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .iga-dash .iga-seg > a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iga-att {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}

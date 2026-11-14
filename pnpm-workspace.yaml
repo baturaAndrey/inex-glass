@@ -1,5 +1,11 @@
 allowBuilds:
-  esbuild: set this to true or false
-  msw: set this to true or false
-  sharp: set this to true or false
-  unrs-resolver: set this to true or false
+  # sass's optional file watcher: prebuilt binaries, its node-gyp fallback is not needed.
+  "@parcel/watcher": false
+  esbuild: true
+  msw: false
+  sharp: true
+  unrs-resolver: true
+
+overrides:
+  "@types/react": 19.2.5
+  "@types/react-dom": 19.2.3

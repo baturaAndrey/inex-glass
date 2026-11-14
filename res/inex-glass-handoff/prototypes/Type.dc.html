@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Inex Glass — типографика</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../design-system/colors_and_type.css">
+<link rel="stylesheet" href="../design-system/components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F6B60}a:hover{color:#16403D}
+.tr{display:grid;grid-template-columns:150px minmax(0,1fr) 120px;gap:24px;align-items:baseline;padding:18px 0;border-bottom:1px solid #E6E8E6}
+.tr__n{font:500 13px/1.3 'Rubik',sans-serif;color:#5B636B}
+.tr__m{font:400 12px/1.4 ui-monospace,Menlo,monospace;color:#5B636B;text-align:right}
+.mr{display:flex;flex-direction:column;gap:6px;padding:14px 0;border-bottom:1px solid #E6E8E6}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1240px; box-sizing: border-box; padding: 64px; background: #F4F5F3; font-family: 'Rubik', system-ui, sans-serif; color: #1C1F22; display: flex; flex-direction: column; gap: 40px">
+  <div style="display: flex; flex-direction: column; gap: 12px">
+    <span class="ig-label">Дизайн-система Inex Glass · 02</span>
+    <h1 class="ig-h2">Типографика — Rubik</h1>
+    <p class="ig-body ig-muted" style="max-width: 760px">Один шрифт, 300–700. Шкала заголовков 54/40/32: H1 и H2 различимы с первого взгляда. КАПС — только H1 первого экрана главной и метки до трёх слов.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: minmax(0, 1fr) 375px; gap: 48px; align-items: start">
+    <div style="background: #fff; border-radius: 24px; padding: 8px 40px 24px; box-shadow: 0 2px 8px rgba(28,31,34,.06)">
+      <div class="tr"><span class="tr__n">H1 caps · 700</span><span class="ig-h1 ig-h1--caps">Закалённое стекло</span><span class="tr__m">54 / 1.1</span></div>
+      <div class="tr"><span class="tr__n">H1 · 700</span><span class="ig-h1">Стекло 10 мм на заказ</span><span class="tr__m">54 / 1.1</span></div>
+      <div class="tr"><span class="tr__n">H2 · 700</span><span class="ig-h2">Почему через нас, а не с завода</span><span class="tr__m">40 / 1.15</span></div>
+      <div class="tr"><span class="tr__n">H3 · 700</span><span class="ig-h3">Что входит в цену</span><span class="tr__m">32 / 1.2</span></div>
+      <div class="tr"><span class="tr__n">H4 · 600</span><span class="ig-h4">Обработка кромки</span><span class="tr__m">24 / 1.3</span></div>
+      <div class="tr"><span class="tr__n">H5 · H6 · 600</span><span style="display: flex; gap: 24px; align-items: baseline"><span class="ig-h5">Допуски по ГОСТ</span><span class="ig-h6">Сроки и упаковка</span></span><span class="tr__m">18 · 16 / 1.4</span></div>
+      <div class="tr"><span class="tr__n">Body · 400</span><span class="ig-body" style="max-width: 640px">Проверяем чертёж, размещаем заказ на заводах-партнёрах, контролируем упаковку и отправляем на объект. Монтаж выполняет ваша бригада.</span><span class="tr__m">16 / 1.5</span></div>
+      <div class="tr"><span class="tr__n">Small · 400</span><span class="ig-small ig-muted">Ориентировочная цена на 01.11.2026. Точная стоимость — в КП.</span><span class="tr__m">14 / 1.45</span></div>
+      <div class="tr"><span class="tr__n">Micro · label · 500</span><span style="display: flex; gap: 24px; align-items: baseline"><span class="ig-micro">Фото при отгрузке, 15.11.2026</span><span class="ig-label">ГОСТ 30698</span></span><span class="tr__m">12 / 1.4</span></div>
+      <div class="tr"><span class="tr__n">Цена · 700</span><span style="display: flex; gap: 32px; align-items: baseline"><span class="ig-price-l">от 1 400 ₽/м²</span><span class="ig-price-m">от 700 ₽/м²</span><span class="ig-price-s">≈ 120 400 ₽</span></span><span class="tr__m">30 · 22 · 16</span></div>
+      <div class="tr" style="border-bottom: 0"><span class="tr__n">Статистика · 700</span><span style="display: flex; gap: 48px; align-items: baseline"><span class="ig-stat">21 год</span><span class="ig-stat">1500+</span><span class="ig-stat">4–19 мм</span></span><span class="tr__m">48 / 1</span></div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <span class="ig-label">Телефон ≤ 599 px</span>
+      <div style="background: #fff; border-radius: 24px; padding: 8px 16px 16px; box-shadow: 0 2px 8px rgba(28,31,34,.06)">
+        <div class="mr"><span class="tr__n">H1 · 32 / 1.15</span><span style="font: 700 32px/1.15 'Rubik', sans-serif">Стекло 10 мм на заказ</span></div>
+        <div class="mr"><span class="tr__n">H2 · 28 / 1.2</span><span style="font: 700 28px/1.2 'Rubik', sans-serif">Почему через нас</span></div>
+        <div class="mr"><span class="tr__n">H3 · 22 / 1.25</span><span style="font: 700 22px/1.25 'Rubik', sans-serif">Что входит в цену</span></div>
+        <div class="mr"><span class="tr__n">H4 · 20 / 1.3</span><span style="font: 600 20px/1.3 'Rubik', sans-serif">Обработка кромки</span></div>
+        <div class="mr"><span class="tr__n">Body · 16 / 1.5</span><span class="ig-body">Заказы от 50 м², срок от 10 рабочих дней.</span></div>
+        <div class="mr"><span class="tr__n">Цена · 24 · 20 · 16</span><span style="display: flex; gap: 16px; align-items: baseline"><span style="font: 700 24px/1.1 'Rubik', sans-serif">от 1 400 ₽/м²</span><span style="font: 700 16px/1.3 'Rubik', sans-serif">≈ 120 400 ₽</span></span></div>
+        <div class="mr" style="border-bottom: 0"><span class="tr__n">Статистика · 36 / 1</span><span style="font: 700 36px/1 'Rubik', sans-serif">1500+</span></div>
+      </div>
+      <div style="background: #ECEEEC; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
+        <span class="ig-h6">Правила набора</span>
+        <span class="ig-small">«3000 × 2000 мм» — знак ×, не x</span>
+        <span class="ig-small">«1 400 ₽» — неразрывный пробел в разрядах</span>
+        <span class="ig-small">«от 10 рабочих дней», «10 мм»</span>
+        <span class="ig-small">Кнопка — глагол: «Отправить чертёж»</span>
+        <span class="ig-small">Цифры в таблицах — tabular-nums</span>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Inex Glass — квиз «Расчёт стоимости»</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../design-system/colors_and_type.css">
+<link rel="stylesheet" href="../design-system/components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F6B60}a:hover{color:#16403D}
+.wrap{max-width:1920px;margin:0 auto;padding:0 70px;box-sizing:border-box}
+.top{background:#ECEEEC;font:400 13px/1.4 'Rubik',sans-serif}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:8px 24px;padding-top:8px;padding-bottom:8px}
+.top a,.top button{color:#1C1F22;text-decoration:none;display:inline-flex;align-items:center;gap:4px;background:none;border:0;padding:0;font:inherit;cursor:pointer}
+.top a:hover,.top button:hover{color:#1F6B60}
+.top svg{width:14px;height:14px}
+.top__l,.top__r{display:flex;gap:20px;flex-wrap:wrap}
+.mainrow{background:#fff}
+.mainrow .wrap{display:flex;align-items:center;gap:16px;padding-top:14px;padding-bottom:14px}
+.logo{display:flex;flex:none}
+.logo img{height:44px;width:auto}
+.pills{display:flex;gap:8px;flex:none}
+.pill{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:999px;border:1.5px solid #1C1F22;background:#fff;font:500 15px/1 'Rubik',sans-serif;color:#1C1F22;cursor:pointer;transition:border-color 200ms,color 200ms}
+.pill:hover{border-color:#2B8C7E;color:#1F6B60}
+.pill svg{width:18px;height:18px}
+.nav{display:flex;gap:20px;font:500 15px/1 'Rubik',sans-serif;flex:none}
+.nav a{color:#1C1F22;text-decoration:none}
+.nav a:hover{color:#1F6B60}
+.search{flex:1 1 200px;min-width:0;position:relative;display:flex}
+.search input{height:44px;border-radius:999px;padding-left:44px}
+.search svg{position:absolute;left:16px;top:13px;width:18px;height:18px;color:#5B636B}
+.cta-full{height:44px;padding:0 22px;font-size:15px;flex:none}
+.cta-icon,.burger,.m-icons{display:none}
+.tel{display:flex;flex-direction:column;gap:2px;flex:none}
+.tel__h{font:400 12px/1.3 'Rubik',sans-serif;color:#5B636B;display:flex;align-items:center;gap:6px}
+.tel__dot{width:7px;height:7px;border-radius:50%;background:#2B8A3E}
+.tel__n{font:600 16px/1.3 'Rubik',sans-serif;color:#1C1F22;text-decoration:none}
+.ico{width:44px;height:44px;flex:none}
+.sec{background:#fff;border-top:1px solid #E6E8E6;box-shadow:0 1px 0 #E6E8E6}
+.sec .wrap{display:flex;justify-content:space-between;gap:8px 20px;padding-top:12px;padding-bottom:12px;font:400 14px/1.4 'Rubik',sans-serif}
+.sec a{color:#1C1F22;text-decoration:none}
+.sec a:hover{color:#1F6B60}
+.sec .more{display:none}
+
+.hero{position:relative;background:#EEF2F0;overflow:hidden}
+.hero__bg{position:absolute;inset:-40px;width:calc(100% + 80px);height:calc(100% + 80px);object-fit:cover;object-position:right center;filter:blur(28px) saturate(1.05);display:block}
+.hero__img{position:absolute;top:0;right:0;width:58%;height:100%;object-fit:cover;display:block;-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 32%);mask-image:linear-gradient(90deg,transparent 0%,#000 32%)}
+.hero__fade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(240,244,242,.9) 0%,rgba(240,244,242,.78) 38%,rgba(240,244,242,.35) 52%,rgba(240,244,242,0) 64%)}
+.hero__in{position:relative;max-width:1920px;margin:0 auto;padding:72px 70px 80px;box-sizing:border-box;min-height:760px;display:flex;align-items:center}
+.hero__col{max-width:960px;display:flex;flex-direction:column;gap:24px}
+.ind{margin-left:70px}
+.eyebrow{display:flex;flex-wrap:wrap;gap:4px 10px;font:500 14px/1.4 'Rubik',sans-serif;color:#3E464D}
+.eyebrow i{font-style:normal;color:#2B8C7E}
+.lead{font:400 20px/1.5 'Rubik',sans-serif;color:#2A2F34;margin-top:0;margin-bottom:0;max-width:640px;text-wrap:pretty}
+.stats{max-width:760px}
+.stats .ig-stat{font-size:48px;white-space:nowrap}
+.stats .ig-stat-tile__text{font:400 14px/1.4 'Rubik',sans-serif}
+.terms{display:flex;flex-wrap:wrap;gap:6px 20px;font:500 12px/1.4 'Rubik',sans-serif;color:#1C1F22}
+.terms svg{width:14px;height:14px}
+.terms span{display:flex;align-items:center;gap:8px}
+.terms svg{width:16px;height:16px;color:#1F6B60;flex:none}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.m-sticky{display:none}
+
+@media (max-width:1365px){
+  .sec .hide-s{display:none}
+  .sec .more{display:inline-flex}
+  .tel{display:none}
+}
+@media (max-width:1365px){
+  .wrap{padding:0 40px}
+  .hero__in{padding-left:40px;padding-right:40px}
+  .ind{margin-left:40px}
+}
+@media (max-width:1100px){
+  .wrap{padding:0 24px}
+  .hero__in{padding-left:24px;padding-right:24px}
+  .ind{margin-left:0}
+  .top__r,.pills,.nav,.search,.sec,.cta-full{display:none}
+  .cta-icon,.burger{display:inline-flex}
+  .mainrow .wrap{justify-content:space-between}
+  .hero__fade{background:linear-gradient(90deg,#EEF2F0 0%,#EEF2F0 55%,rgba(238,242,240,.75) 80%,rgba(238,242,240,.35) 100%)}
+}
+@media (max-width:599px){
+  .top,.cta-icon,.myc{display:none}
+  .wrap{padding:0 16px}
+  .mainrow .wrap{padding-top:10px;padding-bottom:10px;gap:4px}
+  .logo img{height:32px}
+  .m-icons{display:flex;gap:2px;margin-left:auto}
+  .burger{margin-left:0}
+  .hero__img{position:static;width:100%;height:240px;-webkit-mask-image:none;mask-image:none}
+  .hero__fade,.hero__bg,.d-br{display:none}
+  .hero__in{padding:24px 16px 32px;min-height:0}
+  .hero__col{gap:16px}
+  .eyebrow{font-size:13px}
+  .ig-h1--caps{text-transform:none;letter-spacing:0}
+  .lead{font-size:17px}
+  .stats{grid-template-columns:1fr;background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none;border:1px solid #E6E8E6}
+  .stats .ig-stat-tile{padding:16px 18px;flex-direction:row;align-items:center;gap:16px}
+  .stats .ig-stat-tile + .ig-stat-tile{border-left:0;border-top:1px solid #E6E8E6}
+  .stats .ig-stat{font-size:28px;flex:none;width:118px}
+  .terms{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;font-size:12px}
+  .btns{flex-direction:column}
+  .btns .ig-btn{width:100%}
+  .m-sticky{display:block;position:sticky;bottom:0;z-index:5}
+}
+/* ---- Блок 2 ---- */
+.why{position:relative;overflow:hidden;background:radial-gradient(55% 70% at 62% 38%,rgba(232,242,239,.95) 0%,rgba(232,242,239,0) 70%),radial-gradient(40% 60% at 12% 85%,rgba(210,230,225,.7) 0%,rgba(210,230,225,0) 70%),linear-gradient(135deg,#5A968E 0%,#A9CBC5 42%,#C9DEDA 58%,#6FA39B 100%)}
+.why__in{max-width:1920px;margin:0 auto;padding:96px 70px;box-sizing:border-box;display:flex;flex-direction:column;gap:40px}
+.why__head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px 64px}
+.why__h{font:700 40px/1.15 'Rubik',sans-serif;color:#16403D;margin:0;max-width:760px;text-wrap:balance}
+.why__sub{font:400 18px/1.5 'Rubik',sans-serif;color:#1F2A2E;margin:0;max-width:560px}
+.card{background:rgba(255,255,255,.94);border-radius:24px;box-shadow:0 12px 40px rgba(22,64,61,.14);padding:12px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.row{display:grid;grid-template-columns:220px minmax(0,1fr) minmax(0,1.12fr);column-gap:8px}
+.row + .row .c{border-top:1px solid rgba(28,31,34,.06)}
+.hd .c{padding:18px 24px;font:600 16px/1.3 'Rubik',sans-serif;display:flex;align-items:center;gap:10px}
+.hd .c--self{background:#FCF6EA;color:#8A5A00;border-radius:16px 16px 0 0}
+.hd .c--inex{background:#EAF3F1;color:#16403D;border-radius:16px 16px 0 0}
+.c{padding:18px 24px;display:flex;align-items:flex-start;gap:12px;font:400 16px/1.45 'Rubik',sans-serif}
+.c--topic{font:600 15px/1.4 'Rubik',sans-serif;color:#16403D;padding-left:16px}
+.c--self{background:#FCF6EA;color:#3A3F44}
+.c--inex{background:#EAF3F1;color:#1C1F22;font-weight:500}
+.row.last .c--self,.row.last .c--inex{border-radius:0 0 16px 16px}
+.ic{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;margin-top:1px}
+.ic svg{width:13px;height:13px}
+.ic--x{background:#F2D59C;color:#8A5A00}
+.ic--ok{background:#2B8C7E;color:#fff}
+.lbl{display:none}
+.foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:16px 32px}
+.foot__t{font:500 16px/1.4 'Rubik',sans-serif;color:#16403D}
+.foot__b{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.lnk{color:#16403D;font-weight:600}
+@media (max-width:1100px){
+  .why__in{padding:72px 24px}
+  .row{grid-template-columns:160px minmax(0,1fr) minmax(0,1.12fr)}
+}
+@media (max-width:760px){
+  .why__in{padding:48px 16px;gap:24px}
+  .why__h{font-size:28px;line-height:1.2}
+  .why__sub{font-size:16px}
+  .card{padding:0;background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;display:flex;flex-direction:column;gap:12px}
+  .hd{display:none}
+  .row{grid-template-columns:1fr;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(22,64,61,.12)}
+  .row + .row .c{border-top:0}
+  .c{padding:14px 16px;font-size:15px}
+  .c--topic{padding:14px 16px 10px;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+  .row.last .c--self,.row.last .c--inex{border-radius:0}
+  .lbl{display:block;font:500 11px/1.3 'Rubik',sans-serif;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+  .c--self .lbl{color:#8A5A00}
+  .c--inex .lbl{color:#1F6B60}
+  .foot{flex-direction:column;align-items:stretch}
+  .foot__b .ig-btn{width:100%}
+}
+
+@media (max-width:1365px) and (min-width:1101px){.why__in{padding-left:40px;padding-right:40px}}
+
+/* ---- Блоки главной 3–10 ---- */
+.blk{padding:96px 0}
+.blk--bg{background:#F4F5F3}
+.blk--sf{background:#FFFFFF}
+.blk__head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px 48px;margin-bottom:40px}
+.blk__h{font:700 40px/1.15 'Rubik',sans-serif;margin:0;color:#1C1F22;max-width:900px;text-wrap:balance}
+.blk__sub{font:400 18px/1.5 'Rubik',sans-serif;color:#5B636B;margin:0;max-width:620px;text-wrap:pretty}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.ph-wide{aspect-ratio:16/10}
+.note{display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;background:#EEF4FA;color:#2C5B86;font:500 15px/1.3 'Rubik',sans-serif}
+.note svg{width:18px;height:18px;flex:none}
+
+.proc{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:48px;align-items:start}
+.proc__l{display:flex;flex-direction:column;gap:20px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.tile{display:flex;flex-direction:column;justify-content:space-between;gap:28px;min-height:132px;padding:22px 22px 20px;border-radius:16px;background:#F4F5F3;color:#1C1F22;text-decoration:none;font:600 18px/1.3 'Rubik',sans-serif;transition:background-color 200ms cubic-bezier(.4,0,.2,1),transform 200ms cubic-bezier(.4,0,.2,1)}
+.tile:hover{background:#EAF3F1;color:#16403D;transform:translateY(-2px)}
+.tile svg{width:22px;height:22px;color:#1F6B60;align-self:flex-end}
+.tile--accent{background:#16403D;color:#fff}
+.tile--accent svg{color:#fff}
+.tile--accent:hover{background:#1F6B60;color:#fff}
+
+.seg{display:flex;flex-direction:column;gap:20px;padding:28px;border-radius:16px;background:#F4F5F3;color:#1C1F22;text-decoration:none;min-height:220px;transition:background-color 200ms,transform 200ms,box-shadow 200ms}
+.seg:hover{background:#fff;box-shadow:0 8px 24px rgba(28,31,34,.12);transform:translateY(-2px);color:#1C1F22}
+.seg__ic{width:56px;height:56px;border-radius:14px;background:#EAF3F1;color:#1F6B60;display:grid;place-items:center}
+.seg__ic svg{width:28px;height:28px}
+.seg__t{font:600 20px/1.3 'Rubik',sans-serif;margin:0}
+.seg__more{margin-top:auto;display:inline-flex;align-items:center;gap:6px;font:500 15px/1.3 'Rubik',sans-serif;color:#1F6B60}
+.seg__more svg{width:18px;height:18px}
+
+.stepsbox{background:#fff;border-radius:24px;padding:36px;box-shadow:0 2px 8px rgba(28,31,34,.06);display:flex;flex-direction:column;gap:32px}
+.stepsfoot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 32px;padding-top:28px;border-top:1px solid #E6E8E6}
+.stepsfoot .ig-terms{padding:0;border:0;background:none}
+
+.form{display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:64px;align-items:start}
+.form__l{display:flex;flex-direction:column;gap:24px;position:sticky;top:24px}
+.form__list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;font:500 16px/1.4 'Rubik',sans-serif}
+.form__list li{display:flex;gap:12px;align-items:flex-start}
+.form__list svg{width:20px;height:20px;color:#2B8C7E;flex:none;margin-top:1px}
+.form__card{background:#fff;border-radius:24px;padding:40px;box-shadow:0 2px 8px rgba(28,31,34,.06);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.span2{grid-column:1 / -1}
+.form__send{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px}
+
+.ftr{background:#324B64;color:#C9D3DD}
+.ftr a{color:#C9D3DD;text-decoration:none}
+.ftr a:hover{color:#fff;text-decoration:underline}
+.ftr h3{margin:0 0 4px;font:600 16px/1.3 'Rubik',sans-serif;color:#fff}
+.ftr__in{padding-top:56px;padding-bottom:32px;display:flex;flex-direction:column;gap:40px}
+.ftr__cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:32px;font:400 14px/1.5 'Rubik',sans-serif}
+.ftr__col{display:flex;flex-direction:column;gap:10px}
+.ftr__bot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px;padding-top:24px;border-top:1px solid rgba(255,255,255,.14);font:400 13px/1.4 'Rubik',sans-serif}
+
+@media (max-width:1365px){
+  .g4,.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .proc{grid-template-columns:1fr;gap:32px}
+  .ig-steps{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:28px}
+  .ig-step:nth-child(3) .ig-step__line{display:none}
+}
+@media (max-width:1100px){
+  .blk{padding:72px 0}
+  .g4,.g3,.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .form{grid-template-columns:1fr;gap:32px}
+  .form__l{position:static}
+  .ftr__cols{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:599px){
+  .blk{padding:48px 0}
+  .blk__head{margin-bottom:24px}
+  .blk__h{font-size:28px;line-height:1.2}
+  .blk__sub{font-size:16px}
+  .g4,.g3{grid-template-columns:1fr;gap:16px}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .tile{min-height:112px;padding:16px;font-size:15px;gap:16px}
+  .seg{min-height:0;padding:20px;flex-direction:row;align-items:center;gap:16px}
+  .seg__ic{width:48px;height:48px;flex:none}
+  .seg__t{font-size:17px}
+  .seg__more{display:none}
+  .stepsbox{padding:20px;gap:24px}
+  .ig-steps{grid-template-columns:1fr;row-gap:20px}
+  .ig-step{flex-direction:row;flex-wrap:wrap;column-gap:14px;row-gap:2px}
+  .ig-step__line{display:none}
+  .ig-step__num{width:36px;height:36px;font-size:15px}
+  .ig-step__title{flex:1;align-self:center}
+  .ig-step__text{flex-basis:100%;padding-left:50px}
+  .stepsfoot{flex-direction:column;align-items:stretch}
+  .stepsfoot .ig-btn{width:100%}
+  .form__card{grid-template-columns:1fr;padding:20px;gap:16px}
+  .form__send .ig-btn{width:100%}
+  .ftr__cols{grid-template-columns:1fr}
+  .ftr__in{padding-bottom:104px}
+}
+.seg__d{margin:0;font:400 15px/1.5 'Rubik',sans-serif;color:#5B636B}
+.ig-steps .ig-step__text{font-size:14px;line-height:1.5}
+@media (max-width:599px){
+  .seg{flex-direction:column;align-items:flex-start;gap:12px}
+  .seg__d{font-size:14px}
+}
+
+/* ---- Квиз (qz-) ---- */
+.qz-root{position:relative;min-height:1200px;background:#F4F5F3;font-family:'Rubik',system-ui,sans-serif;color:#1C1F22;overflow:hidden}
+.qz-bg{position:absolute;inset:0;filter:blur(3px);opacity:.9;pointer-events:none}
+.qz-bg__top{height:36px;background:#ECEEEC}
+.qz-bg__main{height:72px;background:#fff;display:flex;align-items:center;gap:24px;padding:0 70px}
+.qz-bg__main img{height:44px;width:auto}
+.qz-bg__bar{height:14px;border-radius:7px;background:#ECEEEC}
+.qz-bg__hero{position:relative;height:760px;background:#EEF2F0;overflow:hidden}
+.qz-bg__hero img{position:absolute;right:0;top:0;width:58%;height:100%;object-fit:cover}
+.qz-bg__lines{position:absolute;left:140px;top:120px;display:flex;flex-direction:column;gap:20px}
+.qz-bg__lines span{display:block;height:44px;border-radius:8px;background:#C9D3D0}
+.qz-overlay{position:absolute;inset:0;background:rgba(28,31,34,.55)}
+.qz-demo{position:absolute;z-index:3;top:16px;left:16px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.95);box-shadow:0 8px 24px rgba(28,31,34,.18);font:500 12px/1 'Rubik',sans-serif;max-width:calc(100% - 32px);box-sizing:border-box}
+.qz-demo__l{color:#5B636B;text-transform:uppercase;letter-spacing:.06em;margin-right:4px}
+.qz-demo button{height:28px;min-width:28px;padding:0 9px;border-radius:6px;border:1px solid #D9DCDE;background:#fff;font:500 12px/1 'Rubik',sans-serif;color:#1C1F22;cursor:pointer}
+.qz-demo button.is-on{background:#16403D;border-color:#16403D;color:#fff}
+.qz-wrap{position:relative;z-index:2;display:flex;justify-content:center;padding:88px 24px 64px}
+.qz-modal{width:100%;max-width:880px;background:#fff;border-radius:24px;box-shadow:0 24px 64px rgba(28,31,34,.2);display:flex;flex-direction:column;overflow:hidden}
+.qz-head{padding:28px 32px 20px;display:flex;flex-direction:column;gap:14px;border-bottom:1px solid #E6E8E6}
+.qz-head__row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.qz-title{margin:0;font:700 28px/1.2 'Rubik',sans-serif}
+.qz-meta{margin:6px 0 0;font:400 14px/1.45 'Rubik',sans-serif;color:#5B636B}
+.qz-close{flex:none;width:44px;height:44px;border-radius:50%;border:0;background:#F4F5F3;display:grid;place-items:center;cursor:pointer;color:#1C1F22}
+.qz-close:hover{background:#ECEEEC}
+.qz-close svg{width:20px;height:20px}
+.qz-prefill{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px;border-radius:6px;background:#EAF3F1;color:#16403D;font:500 13px/1 'Rubik',sans-serif}
+.qz-prefill svg{width:14px;height:14px}
+.qz-prog{display:flex;align-items:center;gap:14px}
+.qz-prog__bar{flex:1;height:6px;border-radius:999px;background:#ECEEEC;overflow:hidden}
+.qz-prog__fill{height:100%;border-radius:999px;background:#2B8C7E;transition:width 320ms cubic-bezier(.4,0,.2,1)}
+.qz-prog__t{flex:none;font:500 13px/1 'Rubik',sans-serif;color:#5B636B}
+.qz-body{padding:28px 32px 8px;display:flex;flex-direction:column;gap:24px;min-height:420px}
+.qz-q{margin:0;font:600 22px/1.3 'Rubik',sans-serif}
+.qz-sub{margin:0 0 -8px;font:600 16px/1.35 'Rubik',sans-serif}
+.qz-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.qz-grid--5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.qz-grid .ig-radio-card{min-height:0;padding:16px;gap:10px}
+.qz-grid .ig-radio-card__icon{width:40px;height:40px}
+.qz-grid .ig-radio-card__mark{top:12px;right:12px;width:20px;height:20px}
+.qz-grid .ig-radio-card.is-selected .ig-radio-card__mark{border-width:6px}
+.qz-hint{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:10px;font:400 14px/1.45 'Rubik',sans-serif}
+.qz-hint svg{width:18px;height:18px;flex:none;margin-top:1px}
+.qz-hint--info{background:#EEF4FA;color:#2C5B86}
+.qz-hint--warn{background:#FCF6EA;color:#8A5A00}
+.qz-hint--promo{background:#EAF3F1;color:#16403D}
+.qz-est{padding:16px 18px;border-radius:14px;background:#F4F5F3;display:flex;flex-direction:column;gap:4px}
+.qz-est__n{font:700 24px/1.2 'Rubik',sans-serif}
+.qz-est__t{font:400 13px/1.45 'Rubik',sans-serif;color:#5B636B}
+.qz-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.qz-fields--3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.qz-span2{grid-column:1 / -1}
+.qz-size{display:flex;align-items:center;gap:10px}
+.qz-size span{color:#5B636B}
+.qz-group{display:flex;flex-direction:column;gap:10px}
+.qz-glabel{font:500 14px/1.4 'Rubik',sans-serif;color:#1C1F22}
+.qz-filedemo{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font:400 12px/1 'Rubik',sans-serif;color:#5B636B}
+.qz-filedemo button{height:26px;padding:0 8px;border-radius:6px;border:1px dashed #AEB4BA;background:#fff;font:400 12px/1 'Rubik',sans-serif;color:#5B636B;cursor:pointer}
+.qz-filedemo button.is-on{border-style:solid;border-color:#2B8C7E;color:#1F6B60}
+.qz-foot{padding:20px 32px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid #E6E8E6;margin-top:20px}
+.qz-btn-off{background:#D9DCDE !important;color:#5B636B !important}
+.qz-btn-off::after{display:none}
+.qz-done{padding:48px 40px 40px;display:flex;flex-direction:column;gap:24px;align-items:flex-start}
+.qz-done__ic{width:64px;height:64px;border-radius:50%;background:#EAF3F1;color:#1F6B60;display:grid;place-items:center}
+.qz-done__ic svg{width:32px;height:32px}
+.qz-next{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:14px;counter-reset:n}
+.qz-next li{display:flex;gap:14px;align-items:flex-start;font:400 16px/1.45 'Rubik',sans-serif}
+.qz-next b{flex:none;width:32px;height:32px;border-radius:50%;background:#EAF3F1;color:#16403D;display:grid;place-items:center;font:700 14px/1 'Rubik',sans-serif}
+.qz-wait{display:flex;flex-direction:column;gap:8px;padding:18px 20px;border-radius:14px;background:#F4F5F3;width:100%;box-sizing:border-box}
+@media (max-width:599px){
+  .qz-root{min-height:0}
+  .qz-bg,.qz-overlay{display:none}
+  .qz-demo{position:relative;top:0;left:0;margin:8px;max-width:none}
+  .qz-wrap{padding:0}
+  .qz-modal{max-width:none;border-radius:0;box-shadow:none;min-height:100vh}
+  .qz-head{padding:16px 16px 14px}
+  .qz-title{font-size:22px}
+  .qz-body{padding:20px 16px 8px;min-height:0}
+  .qz-q{font-size:19px}
+  .qz-grid,.qz-grid--5{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .qz-grid .ig-radio-card{padding:12px}
+  .qz-grid .ig-radio-card__icon{display:none}
+  .qz-grid .ig-radio-card__title{font-size:14px;padding-right:22px}
+  .qz-fields,.qz-fields--3{grid-template-columns:1fr}
+  .qz-foot{position:sticky;bottom:0;background:#fff;padding:12px 16px;margin-top:12px}
+  .qz-foot .ig-btn{flex:1}
+  .qz-done{padding:32px 16px}
+}
+</style>
+</helmet>
+<div class="qz-root">
+  <div class="qz-bg" aria-hidden="true">
+    <div class="qz-bg__top"></div>
+    <div class="qz-bg__main"><img src="../design-system/assets/inex-glass-logo-dark.svg" alt=""><span class="qz-bg__bar" style="width: 220px"></span><span class="qz-bg__bar" style="width: 120px"></span><span class="qz-bg__bar" style="flex: 1"></span><span class="qz-bg__bar" style="width: 200px; background: #2B8C7E"></span></div>
+    <div class="qz-bg__hero"><img src="../design-system/assets/hero-glass-temp.jpg" alt=""><div class="qz-bg__lines"><span style="width: 640px"></span><span style="width: 720px"></span><span style="width: 520px"></span><span style="width: 560px; height: 110px; background: #E1E8E6"></span></div></div>
+  </div>
+  <div class="qz-overlay" aria-hidden="true"></div>
+
+  <div class="qz-demo" role="toolbar" aria-label="Демо-переключатели">
+    <span class="qz-demo__l">Демо:</span>
+    <sc-for list="{{demoSteps}}" as="d" hint-placeholder-count="8"><button type="button" class="{{d.cls}}" onClick="{{d.go}}">{{d.label}}</button></sc-for>
+    <button type="button" class="{{prefillCls}}" onClick="{{togglePrefill}}">Старт с карточки 10 мм</button>
+  </div>
+
+  <div class="qz-wrap">
+    <div class="qz-modal" role="dialog" aria-modal="true" aria-labelledby="qz-t">
+      <div class="qz-head">
+        <div class="qz-head__row">
+          <div><h1 class="qz-title" id="qz-t">Рассчитаем стоимость вашего заказа</h1><p class="qz-meta">7 вопросов · около 3 минут · КП в среднем за 2–3 рабочих дня</p></div>
+          <button class="qz-close" type="button" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+        </div>
+        <sc-if value="{{showPrefill}}" hint-placeholder-val="{{ true }}"><span class="qz-prefill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Из карточки: Закалённое стекло, 10 мм</span></sc-if>
+        <sc-if value="{{notDone}}" hint-placeholder-val="{{ true }}">
+          <div class="qz-prog"><div class="qz-prog__bar" role="progressbar" aria-valuemin="1" aria-valuemax="7" aria-valuenow="{{step}}" aria-label="Прогресс"><div class="qz-prog__fill" style="width: {{progress}}"></div></div><span class="qz-prog__t">Шаг {{step}} из 7</span></div>
+        </sc-if>
+      </div>
+
+      <!-- Шаг 1 -->
+      <sc-if value="{{s1}}" hint-placeholder-val="{{ true }}">
+        <div class="qz-body">
+          <h2 class="qz-q">Что нужно рассчитать?</h2>
+          <div class="qz-grid" role="radiogroup" aria-label="Что нужно рассчитать">
+            <sc-for list="{{types}}" as="o" hint-placeholder-count="11"><button type="button" role="radio" aria-checked="{{o.on}}" class="{{o.cls}}" onClick="{{o.pick}}"><span class="ig-radio-card__mark" aria-hidden="true"></span><span class="ig-radio-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"></rect><path d="m8 8 3-3"></path><path d="m8 13 7-7"></path></svg></span><span class="ig-radio-card__title">{{o.label}}</span></button></sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- Шаг 2 -->
+      <sc-if value="{{s2}}" hint-placeholder-val="{{ false }}">
+        <div class="qz-body">
+          <h2 class="qz-q">Какое стекло?</h2>
+          <p class="qz-sub">Толщина</p>
+          <div class="qz-grid qz-grid--5" role="radiogroup" aria-label="Толщина">
+            <sc-for list="{{thicks}}" as="o" hint-placeholder-count="9"><button type="button" role="radio" aria-checked="{{o.on}}" class="{{o.cls}}" onClick="{{o.pick}}"><span class="ig-radio-card__mark" aria-hidden="true"></span><span class="ig-radio-card__title">{{o.label}}</span><span class="ig-radio-card__sub">{{o.sub}}</span></button></sc-for>
+          </div>
+          <sc-if value="{{isLoad}}" hint-placeholder-val="{{ false }}"><label class="ig-field"><span class="ig-field__label">Опишите конструкцию: размер стекла, как крепится, где стоит</span><textarea class="ig-textarea" value="{{load}}" onChange="{{setLoad}}"></textarea></label></sc-if>
+          <p class="qz-sub">Вид</p>
+          <div class="ig-chips"><sc-for list="{{vids}}" as="c" hint-placeholder-count="7"><button type="button" class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div>
+          <sc-if value="{{isPainted}}" hint-placeholder-val="{{ false }}">
+            <div class="qz-group"><div class="qz-hint qz-hint--info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>Крашеное стекло — толщина 4–15 мм, размер до 3000 × 1600 мм</div><label class="ig-field" style="max-width: 320px"><span class="ig-field__label">Цвет RAL</span><input class="ig-input" placeholder="Например, RAL 9003" value="{{ral}}" onChange="{{setRal}}"></label></div>
+          </sc-if>
+          <sc-if value="{{isTinted}}" hint-placeholder-val="{{ false }}">
+            <div class="qz-group"><span class="qz-glabel">Оттенок</span><div class="ig-chips"><sc-for list="{{tints}}" as="c" hint-placeholder-count="3"><button type="button" class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div></div>
+          </sc-if>
+          <sc-if value="{{isBent}}" hint-placeholder-val="{{ false }}">
+            <div class="qz-group"><label class="ig-field" style="max-width: 320px"><span class="ig-field__label">Радиус гиба, мм</span><input class="ig-input" inputmode="numeric" value="{{radius}}" onChange="{{setRadius}}"></label><div class="qz-hint qz-hint--info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>Гнутое — до 1200 × 2000 мм; радиус от 1000 мм для 4–6 мм и от 1500 мм для 8–12 мм</div></div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- Шаг 3 -->
+      <sc-if value="{{s3}}" hint-placeholder-val="{{ false }}">
+        <div class="qz-body">
+          <h2 class="qz-q">Объём и размеры</h2>
+          <p class="qz-sub">Сколько позиций и какая общая площадь?</p>
+          <div class="qz-fields">
+            <label class="ig-field"><span class="ig-field__label">Позиций</span><input class="ig-input" inputmode="numeric" value="{{positions}}" onChange="{{setPositions}}"></label>
+            <label class="ig-field"><span class="ig-field__label">Площадь, м²</span><input class="ig-input" inputmode="numeric" value="{{area}}" onChange="{{setArea}}"></label>
+          </div>
+          <div class="qz-group">
+            <span class="qz-glabel">Самое большое стекло</span>
+            <div class="qz-size"><label style="flex: 1"><span style="position: absolute; left: -9999px">Ширина, мм</span><input class="ig-input" inputmode="numeric" placeholder="ширина" value="{{maxW}}" onChange="{{setMaxW}}"></label><span>×</span><label style="flex: 1"><span style="position: absolute; left: -9999px">Высота, мм</span><input class="ig-input" inputmode="numeric" placeholder="высота" value="{{maxH}}" onChange="{{setMaxH}}"></label><span>мм</span></div>
+          </div>
+          <sc-if value="{{areaLow}}" hint-placeholder-val="{{ false }}"><div class="qz-hint qz-hint--warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>Мы работаем с заказами от 50 м². Если это часть большого проекта — оставьте контакты, объединим позиции в один заказ.</div></sc-if>
+          <sc-if value="{{areaPromo}}" hint-placeholder-val="{{ false }}"><div class="qz-hint qz-hint--promo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>−5% на закалённое стекло при заказе от 100 м²</div></sc-if>
+          <sc-if value="{{sizeOdd}}" hint-placeholder-val="{{ false }}"><div class="qz-hint qz-hint--info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>Нестандартный размер — менеджер уточнит возможность изготовления.</div></sc-if>
+          <sc-if value="{{showEst}}" hint-placeholder-val="{{ true }}"><div class="qz-est"><span class="qz-est__n">Ориентировочно от {{est}} ₽</span><span class="qz-est__t">за стекло без обработки и доставки. Цены на 01.11.2026. Точная стоимость — в КП.</span></div></sc-if>
+        </div>
+      </sc-if>
+
+      <!-- Шаг 4 -->
+      <sc-if value="{{s4}}" hint-placeholder-val="{{ false }}">
+        <div class="qz-body">
+          <h2 class="qz-q">Обработка</h2>
+          <div class="qz-group"><span class="qz-glabel">Кромка</span><div class="ig-chips"><sc-for list="{{edges}}" as="c" hint-placeholder-count="5"><button type="button" class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div></div>
+          <div class="qz-group"><span class="qz-glabel">Отверстия</span><div class="ig-chips"><sc-for list="{{holes}}" as="c" hint-placeholder-count="2"><button type="button" class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div>
+            <sc-if value="{{hasHoles}}" hint-placeholder-val="{{ false }}">
+              <div class="qz-fields"><label class="ig-field"><span class="ig-field__label">Количество</span><input class="ig-input" inputmode="numeric" value="{{holeCount}}" onChange="{{setHoleCount}}"></label><label class="ig-field"><span class="ig-field__label">Диаметры, мм</span><input class="ig-input" placeholder="Например, 12, 16" value="{{holeDiam}}" onChange="{{setHoleDiam}}"></label></div>
+              <div class="qz-hint qz-hint--info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>{{holeHint}}</div>
+              <sc-if value="{{diamOut}}" hint-placeholder-val="{{ false }}"><div class="qz-hint qz-hint--warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>До 220 мм — при сверлении с одной стороны. Уточним по чертежу</div></sc-if>
+            </sc-if>
+          </div>
+          <div class="qz-fields">
+            <div class="qz-group"><span class="qz-glabel">Обработать кромку отверстий изнутри (для металлического крепежа)</span><div class="ig-chips"><sc-for list="{{inner}}" as="c" hint-placeholder-count="2"><button type="button" class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div></div>
+            <div class="qz-group"><span class="qz-glabel">Вырезы, пазы, фрезерование</span><div class="ig-chips"><sc-for list="{{cuts}}" as="c" hint-placeholder-count="2"><button type="button" class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div></div>
+          </div>
+          <div class="qz-group"><span class="qz-glabel">Декор</span><div class="ig-chips"><sc-for list="{{decor}}" as="c" hint-placeholder-count="3"><button type="button" class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div></div>
+          <div class="qz-group"><span class="qz-glabel">Клеймо</span><div class="ig-chips"><sc-for list="{{stamps}}" as="c" hint-placeholder-count="3"><button type="button" class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div></div>
+        </div>
+      </sc-if>
+
+      <!-- Шаг 5 -->
+      <sc-if value="{{s5}}" hint-placeholder-val="{{ false }}">
+        <div class="qz-body">
+          <h2 class="qz-q">Чертёж</h2>
+          <p class="qz-sub" style="margin: 0">Прикрепите файл — DWG, DXF, PDF или фото эскиза, до 50 МБ.</p>
+          <sc-if value="{{fEmpty}}" hint-placeholder-val="{{ true }}"><div class="ig-upload"><span class="ig-upload__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg></span><span class="ig-upload__title">Перетащите чертёж или <button type="button" class="ig-link" onClick="{{fileUpload}}">выберите файл</button></span><span>DWG, DXF, PDF, JPG или PNG · до 50 МБ</span></div></sc-if>
+          <sc-if value="{{fDrag}}" hint-placeholder-val="{{ false }}"><div class="ig-upload is-drag"><span class="ig-upload__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg></span><span class="ig-upload__title" style="color: #16403D">Отпустите файл</span></div></sc-if>
+          <sc-if value="{{fDone}}" hint-placeholder-val="{{ false }}"><div class="ig-file"><span class="ig-file__ext">DWG</span><div style="display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1"><span class="ig-file__name">peregorodki_3etazh_v2.dwg</span><span class="ig-file__meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>4,2 МБ · загружено</span></div><button class="ig-btn ig-btn--ghost ig-btn--s" type="button" onClick="{{fileClear}}">удалить</button></div></sc-if>
+          <sc-if value="{{fFmt}}" hint-placeholder-val="{{ false }}"><div class="ig-upload is-error"><span class="ig-upload__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg></span><span class="ig-upload__title" style="color: #B23B3B">Подойдут DWG, DXF, PDF, JPG или PNG</span><button type="button" class="ig-link" onClick="{{fileClear}}">Выбрать другой файл</button></div></sc-if>
+          <sc-if value="{{fSize}}" hint-placeholder-val="{{ false }}"><div class="ig-upload is-error"><span class="ig-upload__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg></span><span class="ig-upload__title" style="color: #B23B3B">Файл больше 50 МБ. Сожмите его или пришлите ссылку в комментарии</span><button type="button" class="ig-link" onClick="{{fileClear}}">Выбрать другой файл</button></div></sc-if>
+          <div class="qz-filedemo"><span>Состояние зоны:</span><sc-for list="{{fileStates}}" as="f" hint-placeholder-count="5"><button type="button" class="{{f.cls}}" onClick="{{f.go}}">{{f.label}}</button></sc-for></div>
+          <div class="qz-hint qz-hint--info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>Для простых прямоугольных стёкол подойдёт PDF или эскиз. Сложную форму — контуром в DWG или DXF 1:1.</div>
+          <button type="button" class="ig-link" style="align-self: flex-start" onClick="{{next}}">Нет чертежа? Продолжите — менеджер уточнит размеры</button>
+        </div>
+      </sc-if>
+
+      <!-- Шаг 6 -->
+      <sc-if value="{{s6}}" hint-placeholder-val="{{ false }}">
+        <div class="qz-body">
+          <h2 class="qz-q">Сроки и доставка</h2>
+          <label class="ig-field" style="max-width: 320px"><span class="ig-field__label">К какой дате нужно стекло?</span><input class="ig-input" placeholder="дд.мм.гггг" value="{{date}}" onChange="{{setDate}}"></label>
+          <sc-if value="{{dateEarly}}" hint-placeholder-val="{{ false }}"><div class="qz-hint qz-hint--warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>Срочного изготовления нет. Ближайший срок — от 10 рабочих дней с даты договора, для триплекса — от 14.</div></sc-if>
+          <div class="qz-group"><span class="qz-glabel">Город доставки</span><div class="ig-chips"><sc-for list="{{cities}}" as="c" hint-placeholder-count="15"><button type="button" class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div></div>
+          <div class="qz-group"><span class="qz-glabel">Требования к упаковке</span><div class="ig-chips"><sc-for list="{{packs}}" as="c" hint-placeholder-count="4"><button type="button" class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div>
+            <sc-if value="{{packText}}" hint-placeholder-val="{{ false }}"><label class="ig-field"><span class="ig-field__label">Требования перевозчика</span><textarea class="ig-textarea" style="min-height: 80px"></textarea></label></sc-if>
+          </div>
+          <div class="qz-group"><span class="qz-glabel">Нужен пакет документов (паспорт, сертификат, протоколы)</span><div class="ig-chips"><sc-for list="{{docs}}" as="c" hint-placeholder-count="2"><button type="button" class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div></div>
+        </div>
+      </sc-if>
+
+      <!-- Шаг 7 -->
+      <sc-if value="{{s7}}" hint-placeholder-val="{{ false }}">
+        <div class="qz-body">
+          <h2 class="qz-q">Контакты</h2>
+          <div class="qz-fields">
+            <label class="ig-field"><span class="ig-field__label">Компания <span class="ig-req">*</span></span><input class="{{companyCls}}" value="{{company}}" onChange="{{setCompany}}"><sc-if value="{{errCompany}}" hint-placeholder-val="{{ false }}"><span class="ig-field__error">Заполните поле, чтобы мы могли связаться с вами</span></sc-if></label>
+            <label class="ig-field"><span class="ig-field__label">ИНН <span class="ig-field__opt">— необязательно</span></span><input class="ig-input" inputmode="numeric" value="{{inn}}" onChange="{{setInn}}"></label>
+            <label class="ig-field"><span class="ig-field__label">Имя <span class="ig-req">*</span></span><input class="{{nameCls}}" value="{{name}}" onChange="{{setName}}"><sc-if value="{{errName}}" hint-placeholder-val="{{ false }}"><span class="ig-field__error">Заполните поле, чтобы мы могли связаться с вами</span></sc-if></label>
+            <label class="ig-field"><span class="ig-field__label">Телефон <span class="ig-req">*</span></span><input class="{{phoneCls}}" type="tel" placeholder="+7 (___) ___-__-__" value="{{phone}}" onChange="{{setPhone}}"><sc-if value="{{errPhone}}" hint-placeholder-val="{{ false }}"><span class="ig-field__error">Заполните поле, чтобы мы могли связаться с вами</span></sc-if></label>
+            <label class="ig-field qz-span2"><span class="ig-field__label">E-mail</span><input class="ig-input" type="email" value="{{email}}" onChange="{{setEmail}}"></label>
+          </div>
+          <div class="qz-group"><span class="qz-glabel">Кто вы</span><div class="ig-chips"><sc-for list="{{whos}}" as="c" hint-placeholder-count="5"><button type="button" class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div></div>
+          <label class="{{consentCls}}"><input type="checkbox" checked="{{consent}}" onChange="{{toggleConsent}}"><span>Даю <a href="#">согласие на обработку персональных данных</a> и ознакомлен с <a href="#">политикой обработки персональных данных</a></span></label>
+          <sc-if value="{{consentErr}}" hint-placeholder-val="{{ false }}"><span class="ig-field__error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>Чтобы отправить заявку, отметьте согласие на обработку персональных данных</span></sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{notDone}}" hint-placeholder-val="{{ true }}">
+        <div class="qz-foot">
+          <button class="ig-btn ig-btn--ghost" type="button" onClick="{{back}}" disabled="{{isFirst}}">Назад</button>
+          <sc-if value="{{notLast}}" hint-placeholder-val="{{ true }}"><button class="ig-btn ig-btn--primary" type="button" onClick="{{next}}">Далее<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></button></sc-if>
+          <sc-if value="{{isLast}}" hint-placeholder-val="{{ false }}"><button class="{{submitCls}}" type="button" aria-disabled="{{noConsent}}" onClick="{{submit}}">Получить КП</button></sc-if>
+        </div>
+      </sc-if>
+
+      <!-- Готово -->
+      <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+        <div class="qz-done">
+          <span class="qz-done__ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></span>
+          <h2 class="qz-title">Спасибо, заявка принята</h2>
+          <p class="ig-body" style="max-width: 640px">Менеджер проверит данные и пришлёт КП — в среднем за 2–3 рабочих дня, для больших объёмов дольше. Связь — звонком и по e-mail.</p>
+          <span class="ig-h6">Что будет дальше</span>
+          <ol class="qz-next">
+            <li><b>1</b><span>Проверим размеры, отверстия и ограничения и пришлём спецификацию на согласование.</span></li>
+            <li><b>2</b><span>Пришлём КП с ценой, сроком и доставкой — в среднем за 2–3 рабочих дня.</span></li>
+            <li><b>3</b><span>Подпишем договор — цена в нём фиксируется, срок считается от его даты.</span></li>
+          </ol>
+          <div class="qz-wait">
+            <span class="ig-h6">Пока ждёте:</span>
+            <span class="ig-body"><a href="#">Требования к чертежам</a> — если файл ещё не готов</span>
+            <span class="ig-body"><a href="#">Сроки изготовления</a> — как спланировать заказ</span>
+            <span class="ig-body"><a href="#">Как мы работаем</a></span>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":1200}}'>
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = this.initial(true);
+  }
+  initial(prefilled) {
+    return {
+      step: 1, prefilled: prefilled,
+      type: prefilled ? 'Закалённое стекло' : '', thick: prefilled ? '10' : '', vid: prefilled ? 'Прозрачное' : '',
+      load: '', ral: '', tint: '', radius: '',
+      positions: prefilled ? '42' : '', area: prefilled ? '86' : '', maxW: prefilled ? '3000' : '', maxH: prefilled ? '1200' : '',
+      edge: '', holes: 'нет', holeCount: '', holeDiam: '', inner: '', cuts: '', decor: [], stamp: '',
+      file: 'empty', date: '', city: '', packs: [], docs: '',
+      company: '', inn: '', name: '', phone: '', email: '', who: '', consent: false, consentErr: false, tried: false
+    };
+  }
+  renderVals() {
+    const s = this.state;
+    const set = (k) => (e) => this.setState({ [k]: e && e.target ? e.target.value : e });
+    const pick = (k, v) => () => this.setState({ [k]: v });
+    const tog = (k, v) => () => { const a = s[k].slice(); const i = a.indexOf(v); if (i < 0) a.push(v); else a.splice(i, 1); this.setState({ [k]: a }); };
+    const chips = (list, k, multi) => list.map((v) => { const on = multi ? s[k].indexOf(v) >= 0 : s[k] === v; return { label: v, on: on, cls: 'ig-chip' + (on ? ' is-active' : ''), pick: multi ? tog(k, v) : pick(k, v) }; });
+    const cards = (list, k) => list.map((o) => { const v = o.v || o; const on = s[k] === v; return { label: o.l || v, sub: o.sub || '', on: on, cls: 'ig-radio-card' + (on ? ' is-selected' : ''), pick: pick(k, v) }; });
+
+    const types = ['Закалённое стекло', 'Триплекс', 'Перегородки', 'Ограждения', 'Душевые перегородки', 'Козырьки', 'Стеклянный фасад', 'Торговые витрины', 'Остекление веранд и террас', 'Зеркала', 'Другое'];
+    const thickList = ['4', '5', '6', '8', '10', '12', '15', '19'].map((n) => ({ v: n, l: n + ' мм', sub: (Number(n) * 2.5).toString().replace('.', ',') + ' кг/м²' }));
+    thickList.push({ v: 'load', l: 'Подберите под нагрузку', sub: 'опишите конструкцию' });
+    const edges = ['шлифованная', 'полированная', '«трапеция»', '«еврокромка»'].concat(s.type === 'Зеркала' ? ['фацет 30 мм', 'фацет 50 мм'] : []).concat(['не знаю — подскажите']);
+
+    const area = parseFloat(String(s.area).replace(',', '.')) || 0;
+    const prices = { '4': 700, '10': 1400 };
+    const price = prices[s.thick];
+    const fmt = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    const w = parseFloat(s.maxW) || 0, h = parseFloat(s.maxH) || 0;
+    const lo = Math.min(w, h), hi = Math.max(w, h);
+    const sizeOdd = w > 0 && h > 0 && (lo < 150 || hi < 300 || hi > 3000 || lo > 2000);
+    const N = Number(s.thick) || 0;
+    const diams = String(s.holeDiam).split(/[^0-9.,]+/).map((x) => parseFloat(x.replace(',', '.'))).filter((x) => !isNaN(x));
+    const diamOut = diams.some((d) => d < 4 || d > 130);
+
+    let dateEarly = false;
+    const m = String(s.date).match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+    if (m) {
+      const d = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
+      const today = new Date(2026, 9, 19);
+      const days = (d - today) / 86400000;
+      dateEarly = days < (s.type === 'Триплекс' ? 20 : 14);
+    }
+
+    const step = s.step;
+    const done = step === 8;
+    const fs = s.file;
+    const stepNames = ['1', '2', '3', '4', '5', '6', '7', 'Готово'];
+    const errC = s.tried && !s.company.trim(), errN = s.tried && !s.name.trim(), errP = s.tried && !s.phone.trim();
+    const inCls = (e) => 'ig-input' + (e ? ' is-error' : '');
+
+    return {
+      step: step, done: done, notDone: !done,
+      progress: Math.round(step / 7 * 100) + '%',
+      s1: step === 1, s2: step === 2, s3: step === 3, s4: step === 4, s5: step === 5, s6: step === 6, s7: step === 7,
+      isFirst: step === 1, isLast: step === 7, notLast: step < 7,
+      showPrefill: s.prefilled && !done,
+      prefillCls: s.prefilled ? 'is-on' : '',
+      togglePrefill: () => this.setState(this.initial(!s.prefilled)),
+      demoSteps: stepNames.map((l, i) => ({ label: l, cls: step === i + 1 ? 'is-on' : '', go: () => this.setState({ step: i + 1 }) })),
+      next: () => this.setState({ step: Math.min(7, step + 1) }),
+      back: () => this.setState({ step: Math.max(1, step - 1) }),
+
+      types: cards(types, 'type'),
+      thicks: cards(thickList, 'thick'),
+      isLoad: s.thick === 'load', load: s.load, setLoad: set('load'),
+      vids: chips(['Прозрачное', 'Осветлённое', 'Матовое', 'Тонированное', 'Крашеное по RAL', 'Рифлёное', 'Гнутое'], 'vid'),
+      isPainted: s.vid === 'Крашеное по RAL', ral: s.ral, setRal: set('ral'),
+      isTinted: s.vid === 'Тонированное', tints: chips(['бронза', 'графит', 'серое'], 'tint'),
+      isBent: s.vid === 'Гнутое', radius: s.radius, setRadius: set('radius'),
+
+      positions: s.positions, setPositions: set('positions'),
+      area: s.area, setArea: set('area'),
+      maxW: s.maxW, setMaxW: set('maxW'), maxH: s.maxH, setMaxH: set('maxH'),
+      areaLow: area > 0 && area < 50,
+      areaPromo: area >= 100,
+      sizeOdd: sizeOdd,
+      showEst: !!price && area > 0,
+      est: price ? fmt(area * price) : '',
+
+      edges: chips(edges, 'edge'),
+      holes: chips(['нет', 'есть'], 'holes'),
+      hasHoles: s.holes === 'есть',
+      holeCount: s.holeCount, setHoleCount: set('holeCount'),
+      holeDiam: s.holeDiam, setHoleDiam: set('holeDiam'),
+      holeHint: N ? 'Для стекла ' + N + ' мм отверстие — не ближе ' + (2 * N) + ' мм к кромке и ' + (6 * N) + ' мм к углу (ГОСТ 30698-2014)' : 'Отверстие — не ближе двух толщин стекла к кромке и шести толщин к углу (ГОСТ 30698-2014)',
+      diamOut: diamOut,
+      inner: chips(['да', 'нет'], 'inner'),
+      cuts: chips(['да', 'нет'], 'cuts'),
+      decor: chips(['матирование', 'печать (до 1100 × 700 мм)', 'плёнка'], 'decor', true),
+      stamps: chips(['в стандартном месте', 'укажу место', 'без клейма'], 'stamp'),
+
+      fEmpty: fs === 'empty', fDrag: fs === 'drag', fDone: fs === 'done', fFmt: fs === 'fmt', fSize: fs === 'size',
+      fileUpload: () => this.setState({ file: 'done' }),
+      fileClear: () => this.setState({ file: 'empty' }),
+      fileStates: [['empty', 'пусто'], ['drag', 'перетаскивание'], ['done', 'загружено'], ['fmt', 'ошибка формата'], ['size', 'ошибка размера']].map((f) => ({ label: f[1], cls: fs === f[0] ? 'is-on' : '', go: () => this.setState({ file: f[0] }) })),
+
+      date: s.date, setDate: set('date'), dateEarly: dateEarly,
+      cities: chips(['Челябинск', 'Екатеринбург', 'Тюмень', 'Омск', 'Новосибирск', 'Кемерово', 'Красноярск', 'Уфа', 'Пермь', 'Самара', 'Казань', 'Сыктывкар', 'Волгоград', 'Другой', 'Самовывоз (Челябинск)'], 'city'),
+      packs: chips(['плёнка', 'картон', 'ящик под кран или погрузчик', 'требования перевозчика'], 'packs', true),
+      packText: s.packs.indexOf('требования перевозчика') >= 0,
+      docs: chips(['да', 'нет'], 'docs'),
+
+      company: s.company, setCompany: set('company'), companyCls: inCls(errC), errCompany: errC,
+      inn: s.inn, setInn: set('inn'),
+      name: s.name, setName: set('name'), nameCls: inCls(errN), errName: errN,
+      phone: s.phone, setPhone: set('phone'), phoneCls: inCls(errP), errPhone: errP,
+      email: s.email, setEmail: set('email'),
+      whos: chips(['подрядчик', 'производитель мебели или изделий', 'застройщик или генподрядчик', 'дизайнер или архитектор', 'другое'], 'who'),
+      consent: s.consent,
+      noConsent: !s.consent,
+      consentErr: s.consentErr && !s.consent,
+      consentCls: 'ig-check' + (s.consentErr && !s.consent ? ' is-error' : ''),
+      toggleConsent: () => this.setState({ consent: !s.consent }),
+      submitCls: 'ig-btn ig-btn--primary ig-btn--l' + (s.consent ? '' : ' qz-btn-off'),
+      submit: () => {
+        if (!s.consent) { this.setState({ consentErr: true }); return; }
+        if (!s.company.trim() || !s.name.trim() || !s.phone.trim()) { this.setState({ tried: true }); return; }
+        this.setState({ step: 8 });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

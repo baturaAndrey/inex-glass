@@ -1,0 +1,109 @@
+[
+  {
+    "id": "h-zakalennoe-steklo",
+    "group": "hubs-articles",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Several clear tempered glass panels of different thicknesses standing upright in a neat row, polished edges glowing green-teal, crisp reflections.",
+    "alt": "Закалённое стекло разной толщины",
+    "target": {
+      "kind": "doc",
+      "collection": "pages",
+      "slug": "zakalennoe-steklo",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "h-kak-zakazat",
+    "group": "hubs-articles",
+    "kind": "card-illustration",
+    "aspect": "4:3",
+    "subject": "Abstract scheme of light on glass: three clear glass panels in a staggered sequence with a soft beam of light passing through them from left to right, suggesting steps of a process, no text.",
+    "alt": "Абстрактная схема: свет проходит через стеклянные панели",
+    "target": { "kind": "doc", "collection": "pages", "slug": "kak-zakazat", "field": "card.image" }
+  },
+  {
+    "id": "a-mozhno-li-rezat",
+    "group": "hubs-articles",
+    "kind": "card-illustration",
+    "aspect": "16:9",
+    "subject": "A sheet of tempered glass lying on a light grey workshop cutting table next to a glass cutter tool, the scene calm and clean, no hands, no people.",
+    "alt": "Закалённое стекло и стеклорез на столе",
+    "target": {
+      "kind": "doc",
+      "collection": "articles",
+      "slug": "mozhno-li-rezat-zakalennoe-steklo",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "a-chem-otlichaetsya",
+    "group": "hubs-articles",
+    "kind": "card-illustration",
+    "aspect": "16:9",
+    "subject": "Side-by-side comparison still life: on the left a broken annealed glass pane with sharp large shards, on the right a broken tempered glass panel crumbled into small blunt cube-like fragments.",
+    "alt": "Сравнение осколков обычного и закалённого стекла",
+    "target": {
+      "kind": "doc",
+      "collection": "articles",
+      "slug": "chem-otlichaetsya-zakalennoe-steklo-ot-obychnogo",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "a-kak-vybrat-tolshchinu",
+    "group": "hubs-articles",
+    "kind": "card-illustration",
+    "aspect": "16:9",
+    "subject": "Row of plain unmarked clear glass samples of increasing thickness, from thin to very thick, lying flat and fanned out so their green-teal edges are visible side by side; the glass surfaces are completely blank, without engraving, labels or numbers.",
+    "alt": "Образцы стекла разной толщины",
+    "target": {
+      "kind": "doc",
+      "collection": "articles",
+      "slug": "kak-vybrat-tolshchinu-stekla",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "a-kak-snyat-razmery",
+    "group": "hubs-articles",
+    "kind": "card-illustration",
+    "aspect": "16:9",
+    "subject": "An empty bright wall opening ready for a glass partition, a plain unmarked aluminium straight-edge ruler and a spirit level leaning in the opening, clean minimal interior, no hands, no people, no scale markings, no numbers.",
+    "alt": "Проём под стекло и рулетка для замера",
+    "target": {
+      "kind": "doc",
+      "collection": "articles",
+      "slug": "kak-snyat-razmery-dlya-stekla",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "a-tripleks-ili-zakalennoe",
+    "group": "hubs-articles",
+    "kind": "card-illustration",
+    "aspect": "16:9",
+    "subject": "Two glass balustrade panels side by side on a bright gallery: on the left laminated glass with a visible layered edge, on the right a single tempered glass panel, both in a base profile.",
+    "alt": "Триплекс и закалённое стекло в ограждении",
+    "target": {
+      "kind": "doc",
+      "collection": "articles",
+      "slug": "tripleks-ili-zakalennoe-dlya-ograzhdenij",
+      "field": "card.image"
+    }
+  },
+  {
+    "id": "a-markirovka",
+    "group": "hubs-articles",
+    "kind": "card-illustration",
+    "aspect": "16:9",
+    "subject": "Close-up of the lower corner of a clear tempered glass panel catching the light, with a small blank smooth corner area, crisp edge, abstract and calm, absolutely no stamp, no marking, no text.",
+    "alt": "Угол закалённого стекла крупным планом",
+    "target": {
+      "kind": "doc",
+      "collection": "articles",
+      "slug": "markirovka-zakalennogo-stekla",
+      "field": "card.image"
+    }
+  }
+]

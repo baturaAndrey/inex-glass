@@ -1,0 +1,123 @@
+/* Inex Glass — токены цвета, типографики, пространства, формы, движения.
+   Шрифт: Rubik (Google Fonts) 300/400/500/600/700 — подключается отдельно:
+   https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap */
+
+:root {
+  /* Бренд */
+  --ig-primary: #2B8C7E;
+  --ig-primary-hover: #267D70;
+  --ig-primary-pressed: #1F6B60;   /* + цвет текстовых ссылок */
+  --ig-primary-dark: #16403D;
+  --ig-primary-light: #EAF3F1;
+  --ig-navy: #324B64;              /* подвал, тёмные блоки */
+  --ig-on-navy: #FFFFFF;
+  --ig-on-navy-2: #C9D3DD;
+  /* Только логотип (буква X) — в интерфейсе не использовать */
+  --ig-logo-orange: #EF7F1A;
+  --ig-logo-blue: #0081AF;
+
+  /* Нейтральные — тёплые, «лист чертежа» */
+  --ig-bg: #F4F5F3;
+  --ig-surface: #FFFFFF;
+  --ig-well: #ECEEEC;
+  --ig-line: #D9DCDE;
+  --ig-hairline: #E6E8E6;
+  --ig-text: #1C1F22;
+  --ig-text-2: #5B636B;
+  --ig-text-muted: #9AA1A8;        /* только плейсхолдеры и disabled */
+
+  /* Семантика: tone — рамки, точки, иконки; bg — заливка больших плашек; text — текст */
+  --ig-success: #A8DAB4; --ig-success-bg: #EEF8F0; --ig-success-text: #2B8A3E;
+  --ig-warning: #F2D59C; --ig-warning-bg: #FCF6EA; --ig-warning-text: #8A5A00;
+  --ig-danger:  #EAADAD; --ig-danger-bg:  #FCEFEF; --ig-danger-text:  #B23B3B;
+  --ig-info:    #AECAE6; --ig-info-bg:    #EEF4FA; --ig-info-text:    #2C5B86;
+
+  /* Фокус */
+  --ig-focus-ring: 0 0 0 3px rgba(43, 140, 126, .2);
+
+  /* Шрифт */
+  --ig-font: 'Rubik', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Spacing, база 4 */
+  --ig-sp-1: 4px;  --ig-sp-2: 8px;  --ig-sp-3: 12px; --ig-sp-4: 16px;
+  --ig-sp-5: 20px; --ig-sp-6: 24px; --ig-sp-8: 32px; --ig-sp-10: 40px;
+  --ig-sp-12: 48px; --ig-sp-16: 64px; --ig-sp-20: 80px; --ig-sp-30: 120px;
+
+  /* Radius */
+  --ig-r-sm: 6px;    /* чипсы, бейджи */
+  --ig-r-md: 10px;   /* инпуты */
+  --ig-r-lg: 16px;   /* карточки, модалки */
+  --ig-r-xl: 24px;   /* hero, крупные плашки */
+  --ig-r-pill: 999px;/* кнопки */
+
+  /* Тени — только мягкие */
+  --ig-shadow-card: 0 2px 8px rgba(28, 31, 34, .06);
+  --ig-shadow-card-hover: 0 8px 24px rgba(28, 31, 34, .12);
+  --ig-shadow-dropdown: 0 12px 32px rgba(28, 31, 34, .14);
+  --ig-shadow-modal: 0 24px 64px rgba(28, 31, 34, .20);
+
+  /* Движение */
+  --ig-dur-fast: 120ms;
+  --ig-dur-base: 200ms;
+  --ig-dur-slow: 320ms;
+  --ig-ease: cubic-bezier(.4, 0, .2, 1);
+
+  /* Сетка */
+  --ig-section-max: 1920px;
+  --ig-container: 1440px;
+  --ig-gutter: 24px;
+
+  /* Типографика — desktop */
+  --ig-h1: 700 54px/1.1 var(--ig-font);
+  --ig-h2: 700 40px/1.15 var(--ig-font);
+  --ig-h3: 700 32px/1.2 var(--ig-font);
+  --ig-h4: 600 24px/1.3 var(--ig-font);
+  --ig-h5: 600 18px/1.4 var(--ig-font);
+  --ig-h6: 600 16px/1.4 var(--ig-font);
+  --ig-body: 400 16px/1.5 var(--ig-font);
+  --ig-small: 400 14px/1.45 var(--ig-font);
+  --ig-micro: 500 12px/1.4 var(--ig-font);
+  --ig-price-l: 700 30px/1.1 var(--ig-font);
+  --ig-price-m: 700 22px/1.15 var(--ig-font);
+  --ig-price-s: 700 16px/1.3 var(--ig-font);
+  --ig-stat: 700 48px/1 var(--ig-font);
+}
+
+@media (max-width: 599px) {
+  :root {
+    --ig-gutter: 16px;
+    --ig-h1: 700 32px/1.15 var(--ig-font);
+    --ig-h2: 700 28px/1.2 var(--ig-font);
+    --ig-h3: 700 22px/1.25 var(--ig-font);
+    --ig-h4: 600 20px/1.3 var(--ig-font);
+    --ig-price-l: 700 24px/1.1 var(--ig-font);
+    --ig-price-m: 700 20px/1.15 var(--ig-font);
+    --ig-stat: 700 36px/1 var(--ig-font);
+  }
+}
+
+/* Базовые стили */
+body { margin: 0; background: var(--ig-bg); color: var(--ig-text); font: var(--ig-body); -webkit-font-smoothing: antialiased; }
+a { color: var(--ig-primary-pressed); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { color: var(--ig-primary-dark); }
+
+.ig-h1 { font: var(--ig-h1); margin: 0; text-wrap: balance; }
+.ig-h1--caps { text-transform: uppercase; letter-spacing: .01em; }
+.ig-h2 { font: var(--ig-h2); margin: 0; text-wrap: balance; }
+.ig-h3 { font: var(--ig-h3); margin: 0; }
+.ig-h4 { font: var(--ig-h4); margin: 0; }
+.ig-h5 { font: var(--ig-h5); margin: 0; }
+.ig-h6 { font: var(--ig-h6); margin: 0; }
+.ig-body { font: var(--ig-body); margin: 0; text-wrap: pretty; }
+.ig-small { font: var(--ig-small); margin: 0; }
+.ig-micro { font: var(--ig-micro); margin: 0; }
+.ig-label { font: var(--ig-micro); text-transform: uppercase; letter-spacing: .06em; color: var(--ig-text-2); }
+.ig-price-l { font: var(--ig-price-l); font-variant-numeric: tabular-nums; }
+.ig-price-m { font: var(--ig-price-m); font-variant-numeric: tabular-nums; }
+.ig-price-s { font: var(--ig-price-s); font-variant-numeric: tabular-nums; }
+.ig-stat { font: var(--ig-stat); font-variant-numeric: tabular-nums; }
+.ig-muted { color: var(--ig-text-2); }
+
+/* Контейнер: фон секции до 1920, контент 1440 */
+.ig-section { width: 100%; max-width: var(--ig-section-max); margin: 0 auto; }
+.ig-container { max-width: var(--ig-container); margin: 0 auto; padding-inline: var(--ig-gutter); box-sizing: border-box; }

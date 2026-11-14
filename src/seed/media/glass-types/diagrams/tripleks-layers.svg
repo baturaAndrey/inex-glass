@@ -1,0 +1,36 @@
+<svg width="880" height="240" viewBox="0 50 880 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tripleks-layers-title tripleks-layers-desc" font-family="Rubik, system-ui, sans-serif">
+  <!--
+    Source of the triplex layer diagram (no Paper mockup for «Триплекс»; drawn after the processing
+    diagrams, src/seed/content/processing/README.md «Схемы»). The site shows the raster
+    `tripleks-layers.webp` next to this file (2x, Rubik baked in): the media collection does not accept
+    SVG uploads (stored XSS). After editing this file, re-export the WebP under a NEW file name
+    (seed media are keyed by file name) and update src/seed/content/glass-types/tripleks.ts.
+    Not to scale: the film is drawn thicker than 0,38 mm to be visible.
+    Colours = tokens: #16403D primary-dark, #1F6B60 primary-pressed, #2B8C7E primary,
+    #DCEBE8 teal-wash, #5B636B text-2.
+  -->
+  <title id="tripleks-layers-title">Сечение триплекса 6+6</title>
+  <desc id="tripleks-layers-desc">Два стекла по 6 мм склеены слоем плёнки EVA 0,38 мм, общая толщина около 12,4 мм. При ударе стекло трескается, но осколки остаются на плёнке.</desc>
+  <!-- layers -->
+  <rect x="100" y="70" width="460" height="60" fill="#DCEBE8" stroke="#2B8C7E" stroke-width="2" />
+  <rect x="100" y="131" width="460" height="12" fill="#16403D" />
+  <rect x="100" y="144" width="460" height="60" fill="#DCEBE8" stroke="#2B8C7E" stroke-width="2" />
+  <!-- cracks in the top glass: the fragments stay on the film -->
+  <polyline points="300,70 290,95 305,112 296,130" fill="none" stroke="#1F6B60" stroke-width="2" />
+  <polyline points="290,95 262,104 248,130" fill="none" stroke="#1F6B60" stroke-width="2" />
+  <polyline points="305,112 334,100 352,70" fill="none" stroke="#1F6B60" stroke-width="2" />
+  <polyline points="305,112 330,130" fill="none" stroke="#1F6B60" stroke-width="2" />
+  <!-- total thickness -->
+  <line x1="70" y1="70" x2="70" y2="204" stroke="#1F6B60" stroke-width="2" />
+  <line x1="58" y1="70" x2="82" y2="70" stroke="#1F6B60" stroke-width="2" />
+  <line x1="58" y1="204" x2="82" y2="204" stroke="#1F6B60" stroke-width="2" />
+  <text x="60" y="236" font-size="16" font-weight="600" fill="#16403D">≈ 12,4 мм</text>
+  <!-- labels -->
+  <line x1="560" y1="100" x2="600" y2="100" stroke="#5B636B" stroke-width="1.5" />
+  <text x="610" y="106" font-size="16" fill="#1F6B60">стекло 6 мм</text>
+  <line x1="560" y1="137" x2="600" y2="137" stroke="#5B636B" stroke-width="1.5" />
+  <text x="610" y="143" font-size="16" font-weight="500" fill="#16403D">плёнка EVA 0,38 мм</text>
+  <line x1="560" y1="174" x2="600" y2="174" stroke="#5B636B" stroke-width="1.5" />
+  <text x="610" y="180" font-size="16" fill="#1F6B60">стекло 6 мм</text>
+  <text x="100" y="266" font-size="16" fill="#5B636B">при ударе стекло трескается, осколки остаются на плёнке</text>
+</svg>
