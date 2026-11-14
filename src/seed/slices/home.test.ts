@@ -69,7 +69,8 @@ function contentStrings(): string[] {
     HOME_PRODUCTION.lead,
     HOME_PRODUCTION.moreLabel,
     ...HOME_PRODUCTION.stats.flatMap((stat) => [stat.value, stat.text]),
-    ...HOME_PRODUCTION.photos,
+    ...HOME_PRODUCTION.photos.flatMap((photo) => [photo.title, photo.image.alt]),
+    HOME_DESIGN.image.alt,
     HOME_GLASS.heading,
     ...HOME_GLASS.items.flatMap((item) => [
       item.title,
@@ -183,6 +184,21 @@ describe("home content", () => {
     expect(HOME_DESIGN.levels).toHaveLength(2);
     expect(HOME_PRODUCTION.stats).toHaveLength(4);
     expect(HOME_PRODUCTION.photos).toHaveLength(4);
+  });
+
+  it("ships every card photo in src/seed/media (client request 2026-11-14)", () => {
+    const images = [
+      HOME_HERO.image,
+      HOME_DESIGN.image,
+      ...HOME_PRODUCTION.photos.map((photo) => photo.image),
+      ...HOME_GLASS.items.map((item) => item.image),
+      ...HOME_CONSTRUCTIONS.items.map((item) => item.image),
+      ...HOME_USEFUL.items.flatMap((item) => ("image" in item ? [item.image] : [])),
+    ];
+    const missing = images
+      .map((image) => path.join("src/seed/media", image.group, image.file))
+      .filter((file) => !existsSync(path.join(ROOT, file)));
+    expect(missing).toEqual([]);
   });
 
   it("starts the objects subtitle with the only allowed experience phrase", () => {

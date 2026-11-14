@@ -111,7 +111,7 @@ test.describe("home page", () => {
     // Wide seed photo of finished products (client request 2026-11-10), preloaded LCP image.
     const heroImage = hero.locator("img");
     await expect(heroImage).toHaveCount(1);
-    await expect(heroImage).toHaveAttribute("alt", /^Готовые изделия из стекла в цехе/);
+    await expect(heroImage).toHaveAttribute("alt", /^Готовые стеклянные конструкции в цехе/);
     await expect(heroImage).toHaveAttribute("fetchpriority", "high");
   });
 

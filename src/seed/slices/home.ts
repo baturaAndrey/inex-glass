@@ -31,6 +31,7 @@ import {
 import { mayOverwrite, upsertByField } from "../context";
 import { markdown } from "../lexical";
 import { ensureSeedImage } from "../seed-media";
+import type { HomeImage } from "../content/home";
 import type { SeedContext } from "../context";
 
 /**
@@ -41,7 +42,10 @@ import type { SeedContext } from "../context";
  * Update rule: the document is created when missing; an existing one is overwritten only with
  * `--force` or while it is unchanged since the seed's last write (`mayOverwrite` in
  * `../context.ts`, seed markers). An edited home page is skipped with a log line.
- * The slice never creates objects or globals; it uploads the hero photo once (`../seed-media.ts`).
+ * The slice never creates objects or globals; it uploads the hero and card photos once
+ * (`../seed-media.ts`; a photo shared with another page reuses that page's media document).
+ * `--force` rewrites the whole layout, so the card images replace whatever an earlier run or
+ * `scripts/attach-generated-media.ts` attached (the generated `gen-*` placeholders).
  */
 
 /** Anchors of the home sections — read by the template. */
@@ -86,6 +90,30 @@ const card = (
   link: customLink(item.url),
   ...extra,
 });
+
+/** `image` of a card: the id of the seed photo's media document (uploaded on the first run). */
+const cardImage = async (ctx: SeedContext, image: HomeImage): Promise<Partial<CardItem>> => ({
+  image: await ensureSeedImage(ctx, image),
+});
+
+/** Card with the photo of the item when it has one (sequential: uploads are not parallelised). */
+async function imageCard(
+  ctx: SeedContext,
+  item: { title: string; text?: string; url: string; image?: HomeImage },
+  extra: Partial<CardItem> = {}
+): Promise<CardItem> {
+  return card(item, { ...extra, ...(item.image ? await cardImage(ctx, item.image) : {}) });
+}
+
+/** Maps the items one after another (each may upload a photo). */
+async function mapSequential<T, R>(
+  items: readonly T[],
+  map: (item: T) => Promise<R>
+): Promise<R[]> {
+  const result: R[] = [];
+  for (const item of items) result.push(await map(item));
+  return result;
+}
 
 /** The 16 blocks of the home page, in display order. */
 export async function buildHomeLayout(ctx: SeedContext): Promise<LayoutBlock[]> {
@@ -155,16 +183,19 @@ export async function buildHomeLayout(ctx: SeedContext): Promise<LayoutBlock[]> 
     ],
   };
 
+  // The template shows the image of the first level card only (`design.tsx`).
+  const designImage = await cardImage(ctx, HOME_DESIGN.image);
   const designLevels: CardsBlock = {
     blockType: "cards",
     anchorId: HOME_ANCHORS.designLevels,
     background: "bg",
     layout: "g3",
-    items: HOME_DESIGN.levels.map((level) => ({
+    items: HOME_DESIGN.levels.map((level, index) => ({
       title: level.title,
       text: level.text,
       priceHint: level.bottom,
       tone: level.dark ? "accent" : "default",
+      ...(index === 0 ? designImage : {}),
     })),
   };
 
@@ -201,7 +232,10 @@ export async function buildHomeLayout(ctx: SeedContext): Promise<LayoutBlock[]> 
     anchorId: HOME_ANCHORS.productionPhotos,
     background: "primaryDark",
     layout: "g4",
-    items: HOME_PRODUCTION.photos.map((title) => ({ title })),
+    items: await mapSequential(HOME_PRODUCTION.photos, async (photo) => ({
+      title: photo.title,
+      ...(await cardImage(ctx, photo.image)),
+    })),
   };
 
   const glass: CardsBlock = {
@@ -212,8 +246,8 @@ export async function buildHomeLayout(ctx: SeedContext): Promise<LayoutBlock[]> 
     heading: HOME_GLASS.heading,
     // No `sub`: the price footnote comes from the `prices.caption` global (see HomeGlassCards).
     sub: null,
-    items: HOME_GLASS.items.map((item) =>
-      card(item, "priceHint" in item ? { priceHint: item.priceHint } : {})
+    items: await mapSequential(HOME_GLASS.items, (item) =>
+      imageCard(ctx, item, "priceHint" in item ? { priceHint: item.priceHint } : {})
     ),
   };
 
@@ -237,7 +271,7 @@ export async function buildHomeLayout(ctx: SeedContext): Promise<LayoutBlock[]> 
     layout: "g3",
     heading: HOME_CONSTRUCTIONS.heading,
     sub: HOME_CONSTRUCTIONS.sub,
-    items: HOME_CONSTRUCTIONS.items.map((item) => card(item)),
+    items: await mapSequential(HOME_CONSTRUCTIONS.items, (item) => imageCard(ctx, item)),
   };
 
   const segments: CardsBlock = {
@@ -286,7 +320,7 @@ export async function buildHomeLayout(ctx: SeedContext): Promise<LayoutBlock[]> 
     background: "bg",
     layout: "g4",
     heading: HOME_USEFUL.heading,
-    items: HOME_USEFUL.items.map((item) => card(item)),
+    items: await mapSequential(HOME_USEFUL.items, (item) => imageCard(ctx, item)),
   };
 
   const form: FormBlock = {

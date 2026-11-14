@@ -10,11 +10,27 @@
  * and the unit test reads it directly.
  */
 
+import { articleCover } from "./blog";
+
 export interface HomeLink {
   title: string;
   text?: string;
   url: string;
 }
+
+/**
+ * A card photo (`src/seed/media/<group>/<file>`, `ensureSeedImage` input). Photos shared with
+ * another page repeat that page's `group`, `file` and `alt`: the media document is found by
+ * `seed:<group>/<file>`, so the home reuses it instead of uploading a copy (client request
+ * 2026-11-14: the newer photos replace the generated `gen-*` placeholders on the home cards).
+ */
+export interface HomeImage {
+  group: string;
+  file: string;
+  alt: string;
+}
+
+const homeImage = (group: string, file: string, alt: string): HomeImage => ({ group, file, alt });
 
 /** Path of the home page; the document is identified by `isHome`. */
 export const HOME_PATH = "/";
@@ -142,6 +158,15 @@ export const HOME_DESIGN = {
   moreLabel: "Подробнее о проектировании",
   moreUrl: "/proektirovanie/",
   taskLabel: "Отправить задачу",
+  /**
+   * Illustration of the first level card (`design.tsx` renders `cards[0].image`, 16:9 /
+   * 360 px high): generated via kie.ai on 2026-11-14, no real object.
+   */
+  image: homeImage(
+    "home",
+    "design.webp",
+    "Мониторы с 3D-моделью углового соединения стеклянной перегородки и чертежи узла на столе инженера"
+  ),
   levels: [
     {
       title: "Конструкторский проект",
@@ -161,7 +186,9 @@ export const HOME_DESIGN = {
 /**
  * «Производство» (Paper mockup `2560_home`, frame `production`, 2026-11-12; not in teksty/01 —
  * listed in `HOME_CLIENT_APPROVED_STRINGS`): a `cta` block (eyebrow, H2, lead, button), a
- * `stats` block (figures) and a `cards` block (workshop photos, uploaded later).
+ * `stats` block (figures) and a `cards` block (workshop photos, 427:300). The photos are
+ * generated via kie.ai on 2026-11-14 (3:2, `src/seed/media/home/production/`) until the client
+ * sends photos of the workshop; replace the files under the same names to update them.
  */
 export const HOME_PRODUCTION = {
   eyebrow: "Производство",
@@ -179,10 +206,38 @@ export const HOME_PRODUCTION = {
     { value: "ОТК", text: "каждое стекло на стенде перед упаковкой, фото при отгрузке" },
   ],
   photos: [
-    "Резка и фрезеровка профиля",
-    "Сварка каркасов и рам",
-    "Сборка со стеклом на мягких столах",
-    "Контроль и упаковка",
+    {
+      title: "Резка и фрезеровка профиля",
+      image: homeImage(
+        "home",
+        "production/rezka-profilya.webp",
+        "Рабочие в перчатках подают алюминиевый профиль к дисковой пиле на рольганге в цехе"
+      ),
+    },
+    {
+      title: "Сварка каркасов и рам",
+      image: homeImage(
+        "home",
+        "production/svarka-karkasov.webp",
+        "Сварщик в маске сваривает угол рамы из стальной профильной трубы на сварочном столе"
+      ),
+    },
+    {
+      title: "Сборка со стеклом на мягких столах",
+      image: homeImage(
+        "home",
+        "production/sborka-so-steklom.webp",
+        "Двое рабочих опускают лист стекла в чёрную раму на столе с войлочным покрытием"
+      ),
+    },
+    {
+      title: "Контроль и упаковка",
+      image: homeImage(
+        "home",
+        "production/kontrol-i-upakovka.webp",
+        "Рабочий проверяет стекло в защитной плёнке с уголками на деревянной пирамиде"
+      ),
+    },
   ],
 } as const;
 
@@ -201,17 +256,45 @@ export const HOME_GLASS = {
       text: "4–19 мм",
       priceHint: "от {цена_4мм} ₽/м²*",
       url: "/zakalennoe-steklo/",
+      // Hero of /zakalennoe-steklo/ (`ZAK_HUB.hero.image`).
+      image: homeImage(
+        "zak-hub",
+        "zak-hero.webp",
+        "Листы закалённого стекла на пирамиде у печи закалки, рабочие в цехе"
+      ),
     },
-    { title: "Триплекс", text: "по ГОСТ 30826-2014", url: "/tripleks/" },
+    {
+      title: "Триплекс",
+      text: "по ГОСТ 30826-2014",
+      url: "/tripleks/",
+      // Hero of /tripleks/ (`glass-types/tripleks.ts`).
+      image: homeImage(
+        "glass-types",
+        "hero/tripleks.webp",
+        "Торец триплекса: слои стекла и плёнка в зажиме ограждения"
+      ),
+    },
     {
       title: "Виды стекла",
       text: "осветлённое, матовое, тонированное, крашеное по RAL, рифлёное, гнутое",
       url: "/zakalennoe-steklo/#vidy",
+      // Card «Крашеное по RAL» of /zakalennoe-steklo/: several kinds of glass side by side.
+      image: homeImage(
+        "zak-hub",
+        "okrashennoe.webp",
+        "Панели крашеного стекла — зелёная, бежевая, графитовая и белая — на фоне кухни"
+      ),
     },
     {
       title: "Для производителей мебели",
       text: "фасады и столешницы",
       url: "/zakalennoe-steklo/dlya-mebeli/",
+      // Hero of /zakalennoe-steklo/dlya-mebeli/ (`glass-types/dlya-mebeli.ts`).
+      image: homeImage(
+        "glass-types",
+        "hero/dlya-mebeli.webp",
+        "Стеклянная столешница, дверца и полки в интерьере"
+      ),
     },
   ],
 } as const;
@@ -235,20 +318,92 @@ export const HOME_PROCESSING = {
   },
 } as const;
 
-/** «Конструкции из стекла для объектов». */
+/**
+ * «Конструкции из стекла для объектов». Photos: the cards of the hub /konstrukcii/
+ * (`constructions.ts`, HUB_CARDS), the glazing / mirrors pages (`glazing-mirrors.ts`) and the
+ * hero of /furnitura/.
+ */
 export const HOME_CONSTRUCTIONS = {
   heading: "Конструкции из стекла для объектов",
   sub: "Проектируем, комплектуем и отправляем на объект. Подберём проверенную монтажную бригаду или проведём шеф-монтаж с вашими специалистами.",
   items: [
-    { title: "Стеклянные перегородки", url: "/steklyannye-peregorodki/" },
-    { title: "Ограждения и перила", url: "/steklyannye-ograzhdeniya/" },
-    { title: "Душевые перегородки для проектов", url: "/dushevye-peregorodki/" },
-    { title: "Козырьки", url: "/steklyannye-kozyrki/" },
-    { title: "Стеклянные фасады", url: "/osteklenie/fasadov/" },
-    { title: "Остекление витрин, лифтовых шахт, веранд", url: "/osteklenie/" },
-    { title: "Торговые витрины", url: "/torgovye-vitriny/" },
-    { title: "Зеркала для залов", url: "/zerkala/dlya-zalov/" },
-    { title: "Зажимной профиль и спайдеры", url: "/furnitura/" },
+    {
+      title: "Стеклянные перегородки",
+      url: "/steklyannye-peregorodki/",
+      image: homeImage(
+        "constructions",
+        "peregorodki.webp",
+        "Цельностеклянная перегородка в светлом офисе"
+      ),
+    },
+    {
+      title: "Ограждения и перила",
+      url: "/steklyannye-ograzhdeniya/",
+      image: homeImage(
+        "constructions",
+        "ograzhdeniya.webp",
+        "Стеклянное ограждение галереи в атриуме"
+      ),
+    },
+    {
+      title: "Душевые перегородки для проектов",
+      url: "/dushevye-peregorodki/",
+      image: homeImage("constructions", "dushevye.webp", "Стеклянные душевые перегородки в ряд"),
+    },
+    {
+      title: "Козырьки",
+      url: "/steklyannye-kozyrki/",
+      image: homeImage(
+        "constructions",
+        "kozyrki.webp",
+        "Стеклянный козырёк на тягах над входом в здание"
+      ),
+    },
+    {
+      title: "Стеклянные фасады",
+      url: "/osteklenie/fasadov/",
+      image: homeImage(
+        "glazing",
+        "fasady.webp",
+        "Стеклянный фасад в алюминиевом профиле, угол здания"
+      ),
+    },
+    {
+      title: "Остекление витрин, лифтовых шахт, веранд",
+      url: "/osteklenie/",
+      image: homeImage(
+        "glazing",
+        "liftovye-shahty.webp",
+        "Стеклянная шахта лифта у входа в здание"
+      ),
+    },
+    {
+      title: "Торговые витрины",
+      url: "/torgovye-vitriny/",
+      image: homeImage(
+        "constructions",
+        "vitriny.webp",
+        "Стеклянная торговая витрина с подсветкой в магазине"
+      ),
+    },
+    {
+      title: "Зеркала для залов",
+      url: "/zerkala/dlya-zalov/",
+      image: homeImage(
+        "mirrors",
+        "hero/dlya-zalov.webp",
+        "Кромка зеркальной стены в тренажёрном зале"
+      ),
+    },
+    {
+      title: "Зажимной профиль и спайдеры",
+      url: "/furnitura/",
+      image: homeImage(
+        "constructions",
+        "hardware/hero.webp",
+        "Стекло в зажимном профиле и спайдер с двумя стёклами"
+      ),
+    },
   ],
 } as const;
 
@@ -353,11 +508,14 @@ export const HOME_USEFUL = {
       title: "Можно ли резать закалённое стекло",
       text: "и что делать, если размер не подошёл",
       url: "/blog/mozhno-li-rezat-zakalennoe-steklo/",
+      // The card shows its own image, not the linked article's: reuse the article cover.
+      image: articleCover("mozhno-li-rezat-zakalennoe-steklo"),
     },
     {
       title: "Как снять размеры проёма",
       text: "чтобы стекло встало с первого раза",
       url: "/blog/kak-snyat-razmery-dlya-stekla/",
+      image: articleCover("kak-snyat-razmery-dlya-stekla"),
     },
   ],
 } as const;
@@ -411,7 +569,11 @@ export const HOME_CLIENT_APPROVED_STRINGS: readonly string[] = [
   HOME_PRODUCTION.lead,
   HOME_PRODUCTION.moreLabel,
   ...HOME_PRODUCTION.stats.flatMap((stat) => [stat.value, stat.text]),
-  ...HOME_PRODUCTION.photos,
+  ...HOME_PRODUCTION.photos.map((photo) => photo.title),
+  // Alts of the generated design / workshop pictures (describe the photo, not page copy):
+  // client request 2026-11-14.
+  HOME_DESIGN.image.alt,
+  ...HOME_PRODUCTION.photos.map((photo) => photo.image.alt),
 ];
 
 /** Strings taken from the prototype `Home.dc.html` (not present in teksty/01). */
