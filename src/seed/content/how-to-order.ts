@@ -46,7 +46,7 @@ export const HOW_TO_ORDER_MEDIA_GROUP = "how-to-order";
 
 /**
  * Hero photos of the Paper mockups `2560_kak-zakazat` (hub) and `2560_kak-zakazat_trebovaniya`
- * (every subpage: one photo for the template until per-page photos arrive). Generated
+ * (subpages): one generated illustration per page, matching its topic. Generated
  * illustrations: flagged temporary in the media library.
  */
 export const HOW_TO_ORDER_IMAGES = {
@@ -54,9 +54,37 @@ export const HOW_TO_ORDER_IMAGES = {
     file: "order-hero.webp",
     alt: "Закалённое стекло с отверстием на столе рядом с чертежом, за ним инженер у монитора",
   },
-  subpage: {
+  drawings: {
     file: "drawings-hero.webp",
     alt: "Закалённое стекло с обработанной кромкой на чертеже, рядом карандаш и линейка",
+  },
+  gost: {
+    file: "gost-hero.webp",
+    alt: "Штангенциркуль и рулетка на кромке закалённого стекла на столе контроля",
+  },
+  terms: {
+    file: "terms-hero.webp",
+    alt: "Готовые листы закалённого стекла на деревянной пирамиде в цехе, за ними рабочие",
+  },
+  delivery: {
+    file: "delivery-hero.webp",
+    alt: "Закалённое стекло в плёнке с уголками и стяжками на пирамиде у ворот погрузки",
+  },
+  documents: {
+    file: "documents-hero.webp",
+    alt: "Паспорт и сертификат на закалённое стекло на столе рядом с образцом стекла",
+  },
+  acceptance: {
+    file: "acceptance-hero.webp",
+    alt: "Рабочий в перчатках осматривает лист закалённого стекла на объекте",
+  },
+  payment: {
+    file: "payment-hero.webp",
+    alt: "Договор, ручка, калькулятор и образец закалённого стекла на столе менеджера",
+  },
+  quality: {
+    file: "quality-hero.webp",
+    alt: "Контролёр проверяет лист закалённого стекла на просвет в цехе",
   },
 } as const satisfies Record<string, HeroImage>;
 
@@ -280,7 +308,7 @@ const drawings: ServicePageSeed = {
     {
       type: "hero",
       lead: "Закалённое стекло нельзя подогнать на объекте. Поэтому чертёж — главный документ заказа: что в нём написано, то и будет изготовлено.",
-      image: HOW_TO_ORDER_IMAGES.subpage,
+      image: HOW_TO_ORDER_IMAGES.drawings,
       buttons: SUBPAGE_BUTTONS,
     },
     {
@@ -379,7 +407,7 @@ const gost: ServicePageSeed = {
     {
       type: "hero",
       lead: "Мы работаем по ГОСТ 30698-2014 «Стекло закалённое. Технические условия». Ниже — нормы, которые влияют на чертёж, монтаж и приёмку.",
-      image: HOW_TO_ORDER_IMAGES.subpage,
+      image: HOW_TO_ORDER_IMAGES.gost,
       buttons: SUBPAGE_BUTTONS,
     },
     {
@@ -483,7 +511,7 @@ const terms: ServicePageSeed = {
   source: TEKSTY_HOW_TO_ORDER,
   hideQuizCta: true,
   layout: [
-    { type: "hero", image: HOW_TO_ORDER_IMAGES.subpage, buttons: SUBPAGE_BUTTONS },
+    { type: "hero", image: HOW_TO_ORDER_IMAGES.terms, buttons: SUBPAGE_BUTTONS },
     {
       type: "table",
       columns: ["Изделие", "Срок, рабочих дней"],
@@ -549,7 +577,7 @@ const delivery: ServicePageSeed = {
   source: TEKSTY_HOW_TO_ORDER,
   hideQuizCta: true,
   layout: [
-    { type: "hero", image: HOW_TO_ORDER_IMAGES.subpage, buttons: SUBPAGE_BUTTONS },
+    { type: "hero", image: HOW_TO_ORDER_IMAGES.delivery, buttons: SUBPAGE_BUTTONS },
     {
       type: "richText",
       markdown: [
@@ -607,7 +635,7 @@ const documents: ServicePageSeed = {
     {
       type: "hero",
       lead: "Для сдачи объекта нужен комплект документов на стекло. Мы передаём его с каждой партией.",
-      image: HOW_TO_ORDER_IMAGES.subpage,
+      image: HOW_TO_ORDER_IMAGES.documents,
       buttons: SUBPAGE_BUTTONS,
     },
     {
@@ -669,7 +697,7 @@ const acceptance: ServicePageSeed = {
     {
       type: "hero",
       lead: "Как принять партию на объекте так, чтобы при повреждении или ошибке не остаться без компенсации.",
-      image: HOW_TO_ORDER_IMAGES.subpage,
+      image: HOW_TO_ORDER_IMAGES.acceptance,
       buttons: SUBPAGE_BUTTONS,
     },
     {
@@ -764,7 +792,7 @@ const payment: ServicePageSeed = {
   source: TEKSTY_SERVICE,
   hideQuizCta: true,
   layout: [
-    { type: "hero", image: HOW_TO_ORDER_IMAGES.subpage, buttons: SUBPAGE_BUTTONS },
+    { type: "hero", image: HOW_TO_ORDER_IMAGES.payment, buttons: SUBPAGE_BUTTONS },
     {
       type: "table",
       heading: "Условия",
@@ -834,7 +862,7 @@ const quality: ServicePageSeed = {
     {
       type: "hero",
       lead: "Стекло изготавливают заводы-партнёры в России и Китае. Мы отвечаем за то, чтобы оно пришло по чертежу, по ГОСТ и целым. Вот что для этого делаем.",
-      image: HOW_TO_ORDER_IMAGES.subpage,
+      image: HOW_TO_ORDER_IMAGES.quality,
       buttons: SUBPAGE_BUTTONS,
     },
     {
