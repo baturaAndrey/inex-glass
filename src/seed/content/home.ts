@@ -226,7 +226,7 @@ export const HOME_PRODUCTION = {
       title: "Сборка со стеклом на мягких столах",
       image: homeImage(
         "home",
-        "production/sborka-so-steklom.webp",
+        "production/sborka-so-steklom-v2.webp",
         "Двое рабочих опускают лист стекла в чёрную раму на столе с войлочным покрытием"
       ),
     },
@@ -234,7 +234,7 @@ export const HOME_PRODUCTION = {
       title: "Контроль и упаковка",
       image: homeImage(
         "home",
-        "production/kontrol-i-upakovka.webp",
+        "production/kontrol-i-upakovka-v2.webp",
         "Рабочий проверяет стекло в защитной плёнке с уголками на деревянной пирамиде"
       ),
     },
