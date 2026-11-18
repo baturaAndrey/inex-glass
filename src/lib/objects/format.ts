@@ -3,6 +3,8 @@
  * Shared by the card mapping (`@/lib/cms/objects`), the object page and the SEO fallbacks.
  */
 
+import { mediaUrl } from "@/lib/media/media-url";
+
 /** Spec row as stored (`objects.spec[]`). */
 export interface SpecRow {
   product?: string | null | undefined;
@@ -58,18 +60,15 @@ export function joinMeta(parts: ReadonlyArray<string | number | null | undefined
 }
 
 /**
- * Site-relative URL of a Payload upload (Payload may return absolute URLs with `serverURL`).
- * File URLs already come without a trailing slash (media `afterRead` hook,
- * `src/payload/hooks/media-urls.ts`).
+ * Site-relative URL of a Payload upload (Payload may return absolute URLs with `serverURL`),
+ * versioned by the media `updatedAt` (`@/lib/media/media-url`). File URLs already come without
+ * a trailing slash (media `afterRead` hook, `src/payload/hooks/media-urls.ts`).
  */
-export function mediaPath(url: string | null | undefined): string | null {
-  if (typeof url !== "string" || url.trim() === "") return null;
-  try {
-    const parsed = new URL(url, "http://local");
-    return `${parsed.pathname}${parsed.search}`;
-  } catch {
-    return null;
-  }
+export function mediaPath(
+  url: string | null | undefined,
+  updatedAt?: string | null | undefined
+): string | null {
+  return mediaUrl(url, updatedAt);
 }
 
 /** Spec rows with at least one filled cell, values trimmed. */

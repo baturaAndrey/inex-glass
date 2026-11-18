@@ -1,3 +1,5 @@
+import { mediaUrl } from "@/lib/media/media-url";
+
 /**
  * OG / JSON-LD image choice for content pages (articles, objects).
  *
@@ -6,6 +8,9 @@
  * show a stock render instead of a real photo. Placeholders are skipped; when no real image
  * remains the caller passes `null` on and `buildMetadata` falls back to `DEFAULT_OG_IMAGE`,
  * while JSON-LD omits `image`.
+ *
+ * The chosen URL is site-relative and versioned by the media `updatedAt` (`mediaUrl`): share
+ * crawlers cache images by URL, and a file replaced under the same name must look new to them.
  */
 
 /** The subset of a Payload `Media` doc the choice needs; unpopulated relations are ids (strings). */
@@ -13,6 +18,8 @@ export interface OgMediaCandidate {
   url?: string | null | undefined;
   alt?: string | null | undefined;
   isPlaceholder?: boolean | null | undefined;
+  /** Media `updatedAt`: becomes the `?v=` of the URL (unversioned when absent). */
+  updatedAt?: string | null | undefined;
 }
 
 export interface OgImage {
@@ -27,7 +34,7 @@ export function pickOgImage(
   for (const candidate of candidates) {
     if (!candidate || typeof candidate !== "object") continue;
     if (candidate.isPlaceholder) continue;
-    const url = candidate.url?.trim();
+    const url = mediaUrl(candidate.url, candidate.updatedAt);
     if (!url) continue;
     return { url, alt: candidate.alt?.trim() || null };
   }

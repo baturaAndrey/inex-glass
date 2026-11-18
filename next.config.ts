@@ -42,8 +42,11 @@ const nextConfig: NextConfig = {
   // lists into one srcset for images with `sizes`, so 384 is not below the smallest deviceSize
   // (375): it is kept on purpose as an extra step before 640 for card-width images.
   // qualities: 75 default, 60 for large hero photos (`quality={60}`) — any other value is
-  // rejected by Next 16. minimumCacheTTL 14 days: replaced media get a new file name, so stale
-  // optimized copies are not a risk (Payload renames uploads, placeholder ids are versioned).
+  // rejected by Next 16. minimumCacheTTL 14 days is safe only because media URLs are versioned:
+  // replacing the file of an existing media document KEEPS its file name, so the site appends
+  // `?v=<updatedAt>` to every media URL (`src/lib/media/media-url.ts`) and a new file is a new
+  // optimizer / browser cache key. `/api/media/file/**` therefore has no `search` restriction:
+  // Next 16 matches `search` exactly, and per-file versions cannot be listed.
   images: {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [375, 640, 828, 1080, 1366, 1536, 1920],
@@ -51,6 +54,7 @@ const nextConfig: NextConfig = {
     qualities: [60, 75],
     minimumCacheTTL: 1_209_600,
     localPatterns: [
+      // `search` omitted on purpose: allows the `?v=` media version (see above).
       { pathname: "/api/media/file/**" },
       { pathname: "/generated/**" },
       { pathname: "/images/**" },

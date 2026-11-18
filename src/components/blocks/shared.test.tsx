@@ -63,6 +63,14 @@ describe("mediaSrc", () => {
     );
     expect(mediaSrc(media("/api/media/file/a.jpg"), "hero")).toBe("/api/media/file/a.jpg");
   });
+
+  it("versions the original and size URLs by updatedAt", () => {
+    const updatedAt = "2026-11-18T10:00:00.000Z";
+    const version = Date.parse(updatedAt).toString(36);
+    const doc = { ...media("/api/media/file/a.jpg", "/api/media/file/a-card.jpg"), updatedAt };
+    expect(mediaSrc(doc)).toBe(`/api/media/file/a.jpg?v=${version}`);
+    expect(mediaSrc(doc, "card")).toBe(`/api/media/file/a-card.jpg?v=${version}`);
+  });
 });
 
 describe("toFormParams", () => {

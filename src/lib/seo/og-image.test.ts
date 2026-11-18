@@ -34,6 +34,13 @@ describe("pickOgImage", () => {
     });
   });
 
+  it("returns a site-relative URL versioned by updatedAt", () => {
+    const updatedAt = "2026-11-18T10:00:00.000Z";
+    expect(
+      pickOgImage([{ url: "http://localhost:3000/api/media/file/a.webp", updatedAt }])?.url
+    ).toBe(`/api/media/file/a.webp?v=${Date.parse(updatedAt).toString(36)}`);
+  });
+
   it("treats isPlaceholder null/false as a real image", () => {
     expect(pickOgImage([{ url: "/a.webp", isPlaceholder: null }])?.url).toBe("/a.webp");
     expect(pickOgImage([{ url: "/b.webp", isPlaceholder: false }])?.url).toBe("/b.webp");

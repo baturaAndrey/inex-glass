@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { Section, type SectionVariant } from "@/components/ig/section";
 import { replacePlaceholders, type PlaceholderContext } from "@/lib/domain";
+import { mediaUrl } from "@/lib/media/media-url";
 import { docUrl } from "@/lib/seo/doc-url";
 import { cn } from "@/lib/utils";
 import type { Media } from "@/payload-types";
@@ -225,18 +226,11 @@ export function asMedia(value: unknown): Media | null {
 }
 
 /**
- * Site-relative URL of a media file (`images.localPatterns` allows `/api/media/file/**`):
- * Payload may return absolute URLs when `serverURL` is set.
+ * Site-relative, versioned URL of a media file or one of its sizes (`mediaUrl`): `?v=` follows
+ * the document's `updatedAt`, so a file replaced under the same name gets a new URL.
  */
 export function mediaSrc(media: Media, size?: "card" | "hero" | "thumbnail"): string | null {
-  const url = (size ? media.sizes?.[size]?.url : null) ?? media.url;
-  if (!url) return null;
-  try {
-    const parsed = new URL(url, "http://local");
-    return `${parsed.pathname}${parsed.search}`;
-  } catch {
-    return null;
-  }
+  return mediaUrl((size ? media.sizes?.[size]?.url : null) ?? media.url, media.updatedAt);
 }
 
 export interface BlockImageProps {

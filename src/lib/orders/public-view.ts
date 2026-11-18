@@ -1,3 +1,4 @@
+import { mediaUrl } from "@/lib/media/media-url";
 import { fileTypeLabel, formatFileSize, isDisplayableImage, populatedFile } from "./files";
 import {
   formatOrderDate,
@@ -89,7 +90,7 @@ interface ManagerSource {
   phone?: string | null;
   email?: string | null;
   messengerUrl?: string | null;
-  photo?: Relation<{ id: string; url?: string | null }>;
+  photo?: Relation<{ id: string; url?: string | null; updatedAt?: string | null }>;
 }
 
 /** The order fields the page may use (a subset of `Order` with populated relations). */
@@ -262,8 +263,9 @@ function buildManager(order: PublicOrderSource): PublicManager | null {
     phoneHref: phoneHref(phone),
     email: clean(manager.email),
     messengerUrl: safeUrl(manager.messengerUrl, MESSENGER_PROTOCOLS),
-    // Media URLs are site-relative (`/api/media/file/…`); never an arbitrary scheme.
-    photoUrl: clean(photo?.url)?.startsWith("/") ? clean(photo?.url) : null,
+    // Media URLs are site-relative (`/api/media/file/…`); never an arbitrary scheme. Versioned
+    // by `updatedAt`: a photo replaced under the same file name must not stay cached.
+    photoUrl: clean(photo?.url)?.startsWith("/") ? mediaUrl(photo?.url, photo?.updatedAt) : null,
   };
 }
 

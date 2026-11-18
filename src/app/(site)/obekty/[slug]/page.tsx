@@ -77,7 +77,7 @@ function quizTypeOf(doc: PortfolioObject): QuizTypeId | undefined {
 function galleryPhotos(doc: PortfolioObject): GalleryPhoto[] {
   return (doc.photos ?? []).flatMap((photo) => {
     const media = populated<Media>(photo.image);
-    const src = mediaPath(media?.url);
+    const src = mediaPath(media?.url, media?.updatedAt);
     if (!media || !src) return [];
     return [
       {
@@ -100,7 +100,8 @@ function ogImageOf(doc: PortfolioObject): OgImage | null {
     const media = populated<Media>(photo.image);
     if (!media) return null;
     return {
-      url: mediaPath(media.url),
+      url: media.url,
+      updatedAt: media.updatedAt,
       alt: photo.alt?.trim() || media.alt?.trim() || doc.name,
       isPlaceholder: media.isPlaceholder,
     };

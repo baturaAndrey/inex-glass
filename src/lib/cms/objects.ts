@@ -72,7 +72,7 @@ export function toObjectCard(doc: PortfolioObject): ObjectCardData | null {
   if (!href || !doc.slug || doc.slug === RESERVED_OBJECT_SLUG) return null;
   const firstPhoto = doc.photos?.[0];
   const media = asDoc<Media>(firstPhoto?.image);
-  const src = mediaPath(media?.sizes?.card?.url ?? media?.url);
+  const src = mediaPath(media?.sizes?.card?.url ?? media?.url, media?.updatedAt);
   return {
     id: doc.id,
     slug: doc.slug,

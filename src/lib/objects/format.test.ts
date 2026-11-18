@@ -50,6 +50,13 @@ describe("joinMeta / mediaPath / specRows", () => {
     expect(mediaPath(null)).toBeNull();
   });
 
+  it("versions upload URLs by the media updatedAt", () => {
+    const updatedAt = "2026-11-18T10:00:00.000Z";
+    expect(mediaPath("/api/media/file/a.jpg", updatedAt)).toBe(
+      `/api/media/file/a.jpg?v=${Date.parse(updatedAt).toString(36)}`
+    );
+  });
+
   it("keeps rows with at least one value", () => {
     expect(specRows([{ product: " Перегородки " }, { kind: "" }])).toEqual([
       { product: "Перегородки", thickness: "", kind: "", triplexFormula: "", processing: "" },
