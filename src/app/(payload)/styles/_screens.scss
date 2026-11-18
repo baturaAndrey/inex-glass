@@ -178,6 +178,24 @@ $overlay: rgb(28 31 34 / 0.4);
   display: none;
 }
 
+// Account avatar (`AdminAvatar`, `_base.scss` `.iga-avatar--header`): a brand ring on hover and
+// on the account view, like the active state of Payload's default icon. The ring is an inset
+// outline: the header clips anything outside the 25 px box, and an outline paints over the photo.
+.app-header__account {
+  text-decoration: none;
+
+  .iga-avatar--header {
+    outline: 2px solid transparent;
+    outline-offset: -2px;
+    transition: outline-color var(--ig-dur-fast) var(--iga-ease);
+  }
+
+  &:hover .iga-avatar--header,
+  .iga-avatar--header.is-active {
+    outline-color: var(--ig-primary);
+  }
+}
+
 // =============================================================================================
 // 2. Collection lists (`.collection-list`, `.list-header`, `.list-controls`, `.search-bar`,
 //    `.pill-selector`, `.where-builder`, `.table`, `.page-controls`, `.paginator`, `.per-page`),

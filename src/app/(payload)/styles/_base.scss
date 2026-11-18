@@ -542,6 +542,24 @@ textarea.iga-input {
     height: 28px;
     font-size: 11px;
   }
+
+  // Account avatar of the top bar (`AdminAvatar`): the 25 × 25 box of Payload's default icon.
+  &--header {
+    width: 25px;
+    height: 25px;
+    overflow: hidden;
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    box-shadow: inset 0 0 0 1px var(--ig-line-teal);
+  }
+
+  &__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 // ---------------------------------------------------------------------------------------------

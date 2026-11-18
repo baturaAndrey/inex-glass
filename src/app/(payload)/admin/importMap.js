@@ -33,6 +33,7 @@ import { OrderManageView as OrderManageView_1771195cb9aa76a83b23f6cb8761737b } f
 import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { MaxGroupLinkPanel as MaxGroupLinkPanel_61a578352b3d35037675ed579b486c56 } from '../../../payload/admin/max/group-link-panel'
+import { AdminAvatar as AdminAvatar_e73b612069205caa1be6dd77f3924165 } from '../../../payload/admin/graphics/avatar'
 import { InexNav as InexNav_f98b58e01901528d58dbaa1c00bda497 } from '../../../payload/admin/nav/inex-nav'
 import { AdminIcon as AdminIcon_ee633e723f8b9791f1615014743c1551 } from '../../../payload/admin/graphics/icon'
 import { AdminLogo as AdminLogo_66af202eb74370c12520481923be2979 } from '../../../payload/admin/graphics/logo'
@@ -78,6 +79,7 @@ export const importMap = {
   "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,
   "/payload/admin/max/group-link-panel#MaxGroupLinkPanel": MaxGroupLinkPanel_61a578352b3d35037675ed579b486c56,
+  "/payload/admin/graphics/avatar#AdminAvatar": AdminAvatar_e73b612069205caa1be6dd77f3924165,
   "/payload/admin/nav/inex-nav#InexNav": InexNav_f98b58e01901528d58dbaa1c00bda497,
   "/payload/admin/graphics/icon#AdminIcon": AdminIcon_ee633e723f8b9791f1615014743c1551,
   "/payload/admin/graphics/logo#AdminLogo": AdminLogo_66af202eb74370c12520481923be2979,

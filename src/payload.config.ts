@@ -49,6 +49,8 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
     // Light only (DESIGN.md): no theme switcher in the account view.
     theme: "light",
+    // Per-user account avatar in the top bar: the `photo` of the user, else their initials.
+    avatar: { Component: "/payload/admin/graphics/avatar#AdminAvatar" },
     meta: {
       titleSuffix: " — Inex Glass",
       icons: [{ rel: "icon", type: "image/x-icon", url: "/favicon.ico" }],
