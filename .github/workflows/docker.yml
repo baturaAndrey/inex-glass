@@ -262,13 +262,15 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      # The full smoke suite in staging mode (noindex, Disallow: /, basic auth expected) — the
-      # prod gate below trusts the record only because this step passed. Read-only.
+      # The full smoke suite in the mode of the target app (default staging: noindex, Disallow: /,
+      # basic auth expected) — the prod gate below trusts the record only because this step passed.
+      # Variable STAGING_SMOKE_EXPECT_ENV of the "staging" environment = production while this job
+      # deploys the live inexglass.ru app (no separate staging app yet). Read-only.
       - name: Smoke checks (staging)
         if: env.DOKPLOY_STAGING_API_KEY != '' && env.SITE != ''
         env:
           SMOKE_BASE_URL: ${{ vars.STAGING_URL }}
-          SMOKE_EXPECT_ENV: staging
+          SMOKE_EXPECT_ENV: ${{ vars.STAGING_SMOKE_EXPECT_ENV || 'staging' }}
           SMOKE_EXPECT_RELEASE: ${{ env.RELEASE_SHA }}
           SMOKE_BASIC_AUTH: ${{ secrets.STAGING_SMOKE_BASIC_AUTH }}
         run: node scripts/ops/smoke-prod.ts
