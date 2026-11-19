@@ -53,7 +53,13 @@ export default buildConfig({
     avatar: { Component: "/payload/admin/graphics/avatar#AdminAvatar" },
     meta: {
       titleSuffix: " — Inex Glass",
-      icons: [{ rel: "icon", type: "image/x-icon", url: "/favicon.ico" }],
+      // Same brand mark as the site (`src/app/icon.svg`, `favicon.ico`); Payload replaces the
+      // file-based metadata icons with these on admin pages.
+      icons: [
+        { rel: "icon", type: "image/x-icon", sizes: "48x48", url: "/favicon.ico" },
+        { rel: "icon", type: "image/svg+xml", sizes: "any", url: "/icon.svg" },
+        { rel: "apple-touch-icon", type: "image/png", sizes: "180x180", url: "/apple-icon.png" },
+      ],
     },
     components: {
       graphics: {

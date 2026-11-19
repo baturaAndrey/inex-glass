@@ -175,6 +175,24 @@
   }
 }
 
+/*
+ * Endless horizontal logo strip of the home «Наши клиенты» (second approved exception, customer
+ * request 2026-11-19): the track holds the list twice, -50% is one seamless loop. Pause and
+ * `prefers-reduced-motion` are handled in the component (`src/components/home/clients-marquee.tsx`).
+ */
+@theme {
+  --animate-clients-marquee: clients-marquee var(--clients-marquee-duration, 60s) linear infinite;
+
+  @keyframes clients-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}
+
 /* Horizontal page gutter: 70 / 40 / 24 / 16 px (see --ig-gutter in ig-tokens.css). */
 @utility px-gutter {
   padding-inline: var(--ig-gutter);

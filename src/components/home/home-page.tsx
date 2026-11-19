@@ -10,6 +10,7 @@ import type {
 } from "@/components/blocks/types";
 import { FormSection } from "@/components/forms/form-section";
 import type { PlaceholderContext } from "@/lib/domain";
+import { HomeClientsMarquee } from "./clients-marquee";
 import { HomeConstructionCards } from "./construction-cards";
 import { HomeDesign } from "./design";
 import { HomeGlassCards } from "./glass-cards";
@@ -177,6 +178,8 @@ export async function HomePage({ layout, ctx, page }: HomePageProps) {
           fallback={s.objectsFallback?.block}
         />
       ) : null}
+      {/* Static, not a CMS block (the schema is frozen): always rendered. */}
+      <HomeClientsMarquee />
       {s.useful ? <HomeUsefulCards {...s.useful} ctx={ctx} page={page} /> : null}
       {extras.length > 0 ? <RenderBlocks blocks={extras} ctx={ctx} page={page} /> : null}
       {s.form ? <FormSection {...formSectionProps(s.form.block, ctx)} /> : null}
