@@ -62,7 +62,7 @@ import {
 
 import type { Manifest, ManifestObject, ManifestPhoto } from "./build-manifest";
 import { assertNotProduction, errorMessage, loadCmsStopWords } from "./lib/common";
-import { MediaStore, emptyMediaStats } from "./lib/media-store";
+import { MediaStore, emptyMediaStats, rejectReason } from "./lib/media-store";
 import { Taxonomies } from "./lib/taxonomies";
 import { REGION_LOCATION } from "./selectors";
 import { ROOT, TMP_DIR, inexUrl, mdRow, readJson, writeFileAtomic } from "./shared";
@@ -617,6 +617,15 @@ async function uploadFile(deps: MediaDeps, run: ObjectRun, source: PhotoSource, 
   return target;
 }
 
+/**
+ * `true` when the original photo passes the MediaStore checks (signature, ≥ 10 KB, ≥ 400 px) — the
+ * same checks a dry-run applies to it. An unreadable file is left to `fromLocalFile` to report.
+ */
+async function sourceAccepted(file: string): Promise<boolean> {
+  const bytes = await readFile(file).catch(() => null);
+  return bytes !== null && (await rejectReason(new Uint8Array(bytes))) === null;
+}
+
 /** Media ids of the content photos in content order (skipped photos are reported, not fatal). */
 async function resolvePhotos(deps: MediaDeps, run: ObjectRun): Promise<void> {
   const byKey = new Map(run.object.photos.map((photo) => [photo.key, photo]));
@@ -630,10 +639,20 @@ async function resolvePhotos(deps: MediaDeps, run: ObjectRun): Promise<void> {
     }
     const source = photoSource(deps, run, photo, index);
     let file = source.file;
+    let converted = false;
     // Known media are reused by `sourceUrl` without reading the file; dry-run never converts.
-    if (!deps.dryRun && !deps.knownSources.has(source.sourceUrl) && existsSync(source.file)) {
+    // The size checks (≥ 10 KB, ≥ 400 px) apply to the SOURCE file, as in dry-run: the WebP is
+    // often smaller, so checking it would reject photos the dry-run accepted. A rejected source
+    // is handed to `fromLocalFile` unconverted, which skips it with the same reason as dry-run.
+    if (
+      !deps.dryRun &&
+      !deps.knownSources.has(source.sourceUrl) &&
+      existsSync(source.file) &&
+      (source.preparedCover || (await sourceAccepted(source.file)))
+    ) {
       try {
         file = await uploadFile(deps, run, source, index);
+        converted = true;
       } catch (error) {
         run.errors.push(
           `фото ${index + 1} (${photo.file}): WebP не получен — ${errorMessage(error)}`
@@ -645,7 +664,8 @@ async function resolvePhotos(deps: MediaDeps, run: ObjectRun): Promise<void> {
       alt: item.alt,
       sourceUrl: source.sourceUrl,
       credit: photo.origin === "inex" ? CREDIT_INEX : CREDIT_FOLDER,
-      relaxSizeChecks: source.preparedCover,
+      // Prepared covers are checked by upscale-covers; conversions by `sourceAccepted`.
+      relaxSizeChecks: source.preparedCover || converted,
     });
     if (!id) {
       run.errors.push(`фото ${index + 1} (${photo.file}) не загружено — см. «Проблемы медиа»`);

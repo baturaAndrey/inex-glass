@@ -13,12 +13,16 @@
  * Inputs from the import (optional, used when present):
  *   - the Firecrawl cache (`scripts/.cache/firecrawl/`): parse status for R7 and `sameObject`
  *     for slug collisions (R5);
- *   - `scripts/.import-tmp/slugs.json` (`{ oldUrl: slug }`, written by `import.ts`): the slugs
- *     really stored in Payload win over the computed ones.
+ *   - `scripts/.import-tmp/slugs.json` (`{ oldUrl: slug }`, written by `import.ts`, optionally
+ *     merged with `slugs-objects.json` of `merge-objects.ts`): the slugs really stored in Payload
+ *     win over the computed ones. Several old URLs mapped to one slug are a merged object: all of
+ *     them redirect to `/obekty/<slug>/` (no collision suffix). It also drives the stair
+ *     exceptions (`STAIRS_SHOWN_AS_OBJECTS`).
  *
  * `--check` validates the result (exit code 1 on problems): URL shape, registry of
  * `docs/inex/17-meta.md`, object slugs known to the import (`slugs.json`) or — with
- * `--check-db` — present in the `objects` collection, 301/stay consistency, expected totals.
+ * `--check-db` — present in the `objects` collection, 301/stay consistency, applied stair
+ * exceptions and expected totals (object count = source object rows, not distinct targets).
  */
 import { readFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
@@ -33,6 +37,7 @@ import {
   isShowerConfigUrl,
   lastSegment,
   objectSlugFromUrl,
+  objectUrl,
   parseUrlRegistry,
   summarize,
   validateRows,
@@ -56,8 +61,23 @@ import {
   writeFileAtomic,
 } from "./shared";
 
-/** Expected totals of the task spec (checked by `--check`). */
+/**
+ * Expected totals of the task spec (checked by `--check`), before the stair exceptions below.
+ * `objects` counts SOURCE object rows (R5 + R7), not distinct targets: merged objects send several
+ * rows to one `/obekty/<slug>/` (`summary.objectTargets` < `objects`) and that is valid.
+ */
 const EXPECTED = { total: 446, redirect: 231, stay: 215, objects: 168 } as const;
+
+/**
+ * Stair pages shown on Inex Glass as objects — explicit exceptions to R1 («лестницы остаются на
+ * inex.su», ТЗ §9) decided by the user (2026-11-25). Each one gets a 301 to the slug the slugs
+ * input maps it to; without that mapping it stays R1 and `--check` reports it. Other stairs are
+ * unaffected.
+ */
+const STAIRS_SHOWN_AS_OBJECTS: ReadonlySet<string> = new Set([
+  "/portfolio/lestnicy/bolcovye/oc-vipr-mizar",
+]);
+const STAIRS_EXCEPTION_NOTE = "исключение из R1: лестница показана как объект (решение 25.11.2026)";
 
 const RULE_TITLES: Record<RuleId, string> = {
   R0: "stay — без изменений",
@@ -103,8 +123,43 @@ async function loadImportContext(): Promise<ImportContext> {
   return { parsed, slugs };
 }
 
+/**
+ * R1 → R5 for the stair pages of `STAIRS_SHOWN_AS_OBJECTS` that the slugs input maps to an object.
+ * Applied after the rules so `src/lib/migration/rules.ts` keeps R1 for every other stair URL.
+ */
+function applyStairsExceptions(fixed: readonly FixedRow[], ctx: ImportContext): FixedRow[] {
+  return fixed.map((row) => {
+    const slug = ctx.slugs[row.old_url];
+    if (row.rule !== "R1" || !STAIRS_SHOWN_AS_OBJECTS.has(row.old_url) || !slug) return row;
+    return {
+      ...row,
+      new_url: objectUrl(slug),
+      action: "301",
+      note: STAIRS_EXCEPTION_NOTE,
+      rule: "R5",
+      disputed: false,
+    };
+  });
+}
+
+function isStairsException(row: FixedRow): boolean {
+  return row.rule === "R5" && STAIRS_SHOWN_AS_OBJECTS.has(row.old_url);
+}
+
+/** `EXPECTED` shifted by the applied stair exceptions (each one moves a row from stay to 301). */
+function expectedTotals(fixed: readonly FixedRow[]) {
+  const exceptions = fixed.filter(isStairsException).length;
+  return {
+    total: EXPECTED.total,
+    redirect: EXPECTED.redirect + exceptions,
+    stay: EXPECTED.stay - exceptions,
+    objects: EXPECTED.objects,
+    exceptions,
+  };
+}
+
 function applyRules(source: readonly Row[], ctx: ImportContext): FixedRow[] {
-  return fixRows(source, {
+  const fixed = fixRows(source, {
     importStatus: (oldUrl): ImportStatus => {
       const result = ctx.parsed.get(oldUrl);
       if (!result) return "unknown";
@@ -117,6 +172,7 @@ function applyRules(source: readonly Row[], ctx: ImportContext): FixedRow[] {
     },
     importedSlug: (oldUrl) => ctx.slugs[oldUrl],
   });
+  return applyStairsExceptions(fixed, ctx);
 }
 
 /* ------------------------------------------------------------------------------------------ */
@@ -166,18 +222,26 @@ async function check(
     }
   }
 
-  if (summary.total !== EXPECTED.total)
-    problems.push(`строк ${summary.total}, ожидалось ${EXPECTED.total}`);
-  // R7 rows stay 301 (to the listing), so the 301/stay totals do not depend on the import.
-  if (summary.redirect !== EXPECTED.redirect) {
-    problems.push(`301: ${summary.redirect}, ожидалось ${EXPECTED.redirect}`);
+  for (const url of STAIRS_SHOWN_AS_OBJECTS) {
+    if (!fixed.some((row) => row.old_url === url && isStairsException(row))) {
+      problems.push(`${url}: исключение из R1 не применено — нет slug во входных slugs.json`);
+    }
   }
-  if (summary.stay !== EXPECTED.stay)
-    problems.push(`stay: ${summary.stay}, ожидалось ${EXPECTED.stay}`);
-  if (summary.byRule.R5 + summary.byRule.R7 !== EXPECTED.objects) {
-    problems.push(
-      `объектов ${summary.byRule.R5 + summary.byRule.R7}, ожидалось ${EXPECTED.objects}`
-    );
+
+  const expected = expectedTotals(fixed);
+  if (summary.total !== expected.total)
+    problems.push(`строк ${summary.total}, ожидалось ${expected.total}`);
+  // R7 rows stay 301 (to the listing), so the 301/stay totals do not depend on the import.
+  if (summary.redirect !== expected.redirect) {
+    problems.push(`301: ${summary.redirect}, ожидалось ${expected.redirect}`);
+  }
+  if (summary.stay !== expected.stay)
+    problems.push(`stay: ${summary.stay}, ожидалось ${expected.stay}`);
+  // Source object rows (R5 + R7, stair exceptions excluded), not distinct targets: merged objects
+  // legitimately send several rows to one page.
+  const objectRows = summary.byRule.R5 + summary.byRule.R7 - expected.exceptions;
+  if (objectRows !== expected.objects) {
+    problems.push(`строк объектов ${objectRows}, ожидалось ${expected.objects}`);
   }
   return problems;
 }
@@ -203,6 +267,7 @@ function buildReport(
 ): string {
   const lines: string[] = [];
   const push = (...items: string[]) => lines.push(...items);
+  const expected = expectedTotals(fixed);
   const parsedCount = [...ctx.parsed.values()].filter((result) => result.ok).length;
 
   push(
@@ -230,11 +295,25 @@ function buildReport(
     ]),
     mdRow(["Спорных строк (флаг disputed)", "—", summary.disputed]),
     "",
-    `Ожидание задачи: 301 = ${EXPECTED.redirect}, stay = ${EXPECTED.stay} (168 объектов + 20 категорий + 3 пагинации + 39 \`/produkciya/*\` + \`/materialy/steklo\`). ` +
-      (summary.redirect === EXPECTED.redirect && summary.stay === EXPECTED.stay
+    `Ожидание задачи: 301 = ${expected.redirect}, stay = ${expected.stay} (168 строк объектов + 20 категорий + 3 пагинации + 39 \`/produkciya/*\` + \`/materialy/steklo\`` +
+      (expected.exceptions > 0
+        ? ` + исключения из R1, лестницы в «Объектах»: ${expected.exceptions}`
+        : "") +
+      "). " +
+      (summary.redirect === expected.redirect && summary.stay === expected.stay
         ? "Совпадает."
         : "**Расхождение — см. ниже.**"),
     "",
+    ...(expected.exceptions > 0
+      ? [
+          "Исключения из R1 (решение 25.11.2026, лестница показана в «Объектах»):",
+          "",
+          ...fixed
+            .filter(isStairsException)
+            .map((row) => `- \`${row.old_url}\` → \`${row.new_url}\` (301)`),
+          "",
+        ]
+      : []),
     "## Изменения относительно исходного CSV по правилам",
     "",
     "| Правило | Что делает | Строк | Из них изменено |",
@@ -422,7 +501,7 @@ function buildReport(
   push(
     "## Допустимые дубли целей (many→one)",
     "",
-    "Несколько старых URL ведут на одну новую страницу — допустимо для разделов, категорий и листинга. Для объектов — только если это один и тот же объект (см. коллизии).",
+    "Несколько старых URL ведут на одну новую страницу — допустимо для разделов, категорий и листинга. Для объектов — только если это один и тот же объект: объединён импортом (`slugs.json` сопоставляет страницы одному slug, примечание «объединённый объект») или признан тем же объектом при коллизии (см. коллизии).",
     "",
     "| new_url | Старых URL | Примеры |",
     "|---|---:|---|",

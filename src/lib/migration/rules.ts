@@ -12,7 +12,8 @@
  * - R2 `/portfolio/otdelka-interera/*` → stay, leaf objects are disputed;
  * - R3 portfolio category pages → `/obekty/`;
  * - R4 old pagination (`…/2`) → `/obekty/`;
- * - R5 portfolio object → `/obekty/<latin-slug>/`, collisions merged or suffixed;
+ * - R5 portfolio object → `/obekty/<latin-slug>/`, collisions merged or suffixed
+ *   (old URLs mapped explicitly to one imported slug are one merged object, not a collision);
  * - R6 `/produkciya/*`, `/materialy/steklo` → unchanged (targets checked by the CLI);
  * - R7 portfolio object whose page could not be imported → `/obekty/`, disputed.
  *
@@ -74,6 +75,7 @@ export const NOTES = {
   pagination: "старая пагинация → листинг",
   notImported: "страница не импортирована",
   merged: "тот же объект, что и",
+  explicitMerge: "объединённый объект (slugs.json), первая страница —",
   suffixed: "коллизия slug — добавлен суффикс категории",
   doors: "двери в цельностеклянной перегородке — нужно решение Inex",
 } as const;
@@ -211,7 +213,9 @@ export interface FixContext {
   importStatus?: (oldUrl: string) => ImportStatus;
   /**
    * Slug actually written to Payload by `import.ts` (`scripts/.import-tmp/slugs.json`). Wins over
-   * the computed one so the CSV and the CMS always agree.
+   * the computed one so the CSV and the CMS always agree. Several old URLs mapped to the same slug
+   * are one merged object (e.g. `slugs-objects.json` of `merge-objects.ts`): all of them keep
+   * that slug and are not collisions.
    */
   importedSlug?: (oldUrl: string) => string | undefined;
 }
@@ -274,11 +278,29 @@ export function baseObjectSlug(oldUrl: string): string {
 }
 
 /**
+ * Old URLs of explicitly merged objects: object rows (R5 candidates) whose `importedSlug` is
+ * shared with at least one other object row. The import decided these pages are one object.
+ */
+function explicitlyMergedUrls(rows: readonly Row[], ctx: FixContext): Set<string> {
+  const urlsBySlug = new Map<string, string[]>();
+  for (const row of rows) {
+    if (fixRow(row) !== null || ctx.importStatus?.(row.old_url) === "failed") continue;
+    const slug = ctx.importedSlug?.(row.old_url);
+    if (slug === undefined) continue;
+    urlsBySlug.set(slug, [...(urlsBySlug.get(slug) ?? []), row.old_url]);
+  }
+  return new Set([...urlsBySlug.values()].filter((urls) => urls.length > 1).flat());
+}
+
+/**
  * Applies R0–R7 to the whole CSV in source order. Collisions of object slugs (R5): the first row
  * keeps the slug; a later row is merged into it when `ctx.sameObject` says so, otherwise it gets
- * the suffix `-<portfolio category>` (and a numeric one if that is taken too).
+ * the suffix `-<portfolio category>` (and a numeric one if that is taken too). Rows that
+ * `ctx.importedSlug` maps explicitly to one shared slug are a merged object, not a collision:
+ * all of them keep that slug unchanged.
  */
 export function fixRows(rows: readonly Row[], ctx: FixContext = {}): FixedRow[] {
+  const merged = explicitlyMergedUrls(rows, ctx);
   /** slug → first old URL that claimed it. */
   const owners = new Map<string, string>();
   /**
@@ -309,7 +331,13 @@ export function fixRows(rows: readonly Row[], ctx: FixContext = {}): FixedRow[] 
     const owner = owners.get(slug);
     const baseOwner = baseOwners.get(baseSlug);
     if (baseOwner === undefined) baseOwners.set(baseSlug, row.old_url);
-    if (owner === undefined && baseOwner !== undefined && baseOwner !== row.old_url) {
+    // An explicit merge wins only inside its own group: a computed slug of an unrelated row that
+    // happens to equal it (owner outside the group) is still a genuine collision below.
+    if (merged.has(row.old_url) && (owner === undefined || merged.has(owner))) {
+      if (owner !== undefined && owner !== row.old_url) {
+        notes.push(`${NOTES.explicitMerge} ${owner}`);
+      }
+    } else if (owner === undefined && baseOwner !== undefined && baseOwner !== row.old_url) {
       // The import already split the collision (its slug differs from the base one): still a
       // collision for the report, the suffixed slug comes from `slugs.json`.
       notes.push(`${NOTES.suffixed} (пара: ${baseOwner})`);

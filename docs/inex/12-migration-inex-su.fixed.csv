@@ -23,7 +23,7 @@
 /portfolio/dushevye/pryamye/dushevaya-pryamaya-08;/obekty/dushevaya-pryamaya-08/;301;;R5
 /portfolio/dushevye/pryamye/dushevaya-pryamaya-09;/obekty/dushevaya-pryamaya-09/;301;;R5
 /portfolio/dushevye/pryamye/dushevayapryamaya01;/obekty/dushevayapryamaya01/;301;;R5
-/portfolio/dushevye/pryamye/dushevayapryamaya02;/obekty/dushevayapryamaya02/;301;;R5
+/portfolio/dushevye/pryamye/dushevayapryamaya02;/obekty/buta-spa/;301;;R5
 /portfolio/dushevye/pryamye/gostinica;/obekty/gostinica/;301;;R5
 /portfolio/dushevye/pryamye/kottedzh-16;/obekty/kottedzh-16/;301;;R5
 /portfolio/dushevye/pryamye/kottedzh-18;/obekty/kottedzh-18/;301;;R5
@@ -34,7 +34,7 @@
 /portfolio/dushevye/pryamye/kottedzh-pryamaya-2;/obekty/kottedzh-pryamaya-2/;301;;R5
 /portfolio/dushevye/pryamye/kvartira-pryamaya-1;/obekty/kvartira-pryamaya-1/;301;;R5
 /portfolio/dushevye/pryamye/pryamay-dushevay-s-otkatnoy-stvorkoy;/obekty/pryamay-dushevay-s-otkatnoy-stvorkoy/;301;;R5
-/portfolio/dushevye/pryamye/pryamay-dushevay-v-gostinize-berezka;/obekty/pryamay-dushevay-v-gostinize-berezka/;301;;R5
+/portfolio/dushevye/pryamye/pryamay-dushevay-v-gostinize-berezka;/obekty/berezka-plast/;301;;R5
 /portfolio/dushevye/trepecevidnye;/obekty/;301;категория портфолио → листинг объектов;R3
 /portfolio/dushevye/trepecevidnye/dushevay-trapeziya-01;/obekty/dushevay-trapeziya-01/;301;;R5
 /portfolio/dushevye/trepecevidnye/dushevay-trapeziya-02;/obekty/dushevay-trapeziya-02/;301;;R5
@@ -120,7 +120,7 @@
 /portfolio/fasady/aluminievyi-vitrag-07;/obekty/aluminievyi-vitrag-07/;301;;R5
 /portfolio/fasady/aluminievyi-vitrag-08;/obekty/aluminievyi-vitrag-08/;301;;R5
 /portfolio/fasady/aluminievyi-vitrag-09;/obekty/aluminievyi-vitrag-09/;301;;R5
-/portfolio/fasady/fasad-kozyrek-berezka;/obekty/fasad-kozyrek-berezka/;301;;R5
+/portfolio/fasady/fasad-kozyrek-berezka;/obekty/berezka-plast/;301;объединённый объект (slugs.json), первая страница — /portfolio/dushevye/pryamye/pryamay-dushevay-v-gostinize-berezka;R5
 /portfolio/garderobnye-komnaty;;stay;не про стекло;R0
 /portfolio/garderobnye-komnaty/garderob-01;;stay;не про стекло;R0
 /portfolio/garderobnye-komnaty/proyekt-garderobnaya;;stay;не про стекло;R0
@@ -135,7 +135,7 @@
 /portfolio/kolonny/tk-kolco-kolonny;;stay;не про стекло;R0
 /portfolio/kozyrki;/obekty/;301;категория портфолио → листинг объектов;R3
 /portfolio/kozyrki/Steklyannyy-kozyrek;/obekty/steklyannyy-kozyrek/;301;;R5
-/portfolio/kozyrki/berezka-plast-kozyrek;/obekty/berezka-plast-kozyrek/;301;;R5
+/portfolio/kozyrki/berezka-plast-kozyrek;/obekty/berezka-plast/;301;объединённый объект (slugs.json), первая страница — /portfolio/dushevye/pryamye/pryamay-dushevay-v-gostinize-berezka;R5
 /portfolio/kozyrki/cokol-kozyrek;/obekty/cokol-kozyrek/;301;;R5
 /portfolio/kozyrki/energoinvest;/obekty/energoinvest/;301;;R5
 /portfolio/kozyrki/kottedzh-1;/obekty/kottedzh-1/;301;;R5
@@ -150,7 +150,7 @@
 /portfolio/lestnicy/bolcovye/kottedzh-31-vintovaya;;stay;лестницы остаются на inex.su (ТЗ §9);R1
 /portfolio/lestnicy/bolcovye/kvartira-6-lestnica;;stay;лестницы остаются на inex.su (ТЗ §9);R1
 /portfolio/lestnicy/bolcovye/micubishi-centr-chelyabinsk;;stay;лестницы остаются на inex.su (ТЗ §9);R1
-/portfolio/lestnicy/bolcovye/oc-vipr-mizar;;stay;лестницы остаются на inex.su (ТЗ §9);R1
+/portfolio/lestnicy/bolcovye/oc-vipr-mizar;/obekty/oc-vipr-mizar/;301;исключение из R1: лестница показана как объект (решение 25.11.2026);R5
 /portfolio/lestnicy/kombinirovannye;;stay;лестницы остаются на inex.su (ТЗ §9);R1
 /portfolio/lestnicy/marshevye;;stay;лестницы остаются на inex.su (ТЗ §9);R1
 /portfolio/lestnicy/marshevye/2;;stay;лестницы остаются на inex.su (ТЗ §9);R1
@@ -183,17 +183,17 @@
 /portfolio/lestnicy/vintovye/skandinaviya;;stay;лестницы остаются на inex.su (ТЗ §9);R1
 /portfolio/ograzhdeniya;/obekty/;301;категория портфолио → листинг объектов;R3
 /portfolio/ograzhdeniya/atriumnye;/obekty/;301;категория портфолио → листинг объектов;R3
-/portfolio/ograzhdeniya/atriumnye/arkaim-plaza-atrium;/obekty/arkaim-plaza-atrium/;301;;R5
+/portfolio/ograzhdeniya/atriumnye/arkaim-plaza-atrium;/obekty/arkaim-plaza/;301;;R5
 /portfolio/ograzhdeniya/atriumnye/festival-atrium;/obekty/festival-atrium/;301;;R5
 /portfolio/ograzhdeniya/atriumnye/fokus-atrium;/obekty/fokus-atrium/;301;;R5
 /portfolio/ograzhdeniya/atriumnye/kolоnna-08;/obekty/kolonna-08/;301;percent-encoded: /portfolio/ograzhdeniya/atriumnye/kol%D0%BEnna-08;R5
-/portfolio/ograzhdeniya/atriumnye/koncertnyi-zal-omsk;/obekty/koncertnyi-zal-omsk/;301;;R5
+/portfolio/ograzhdeniya/atriumnye/koncertnyi-zal-omsk;/obekty/koncertnyj-zal-omsk/;301;;R5
 /portfolio/ograzhdeniya/atriumnye/rostiks-omsk;/obekty/rostiks-omsk/;301;;R5
-/portfolio/ograzhdeniya/atriumnye/sberbank-ishim-atrium;/obekty/sberbank-ishim-atrium/;301;;R5
-/portfolio/ograzhdeniya/atriumnye/surgutneftegaz-atrium;/obekty/surgutneftegaz-atrium/;301;;R5
+/portfolio/ograzhdeniya/atriumnye/sberbank-ishim-atrium;/obekty/sberbank-ishim/;301;;R5
+/portfolio/ograzhdeniya/atriumnye/surgutneftegaz-atrium;/obekty/glavnoe-upravlenie-surgutneftegaz/;301;;R5
 /portfolio/ograzhdeniya/atriumnye/trk-gorki;/obekty/trk-gorki/;301;;R5
 /portfolio/ograzhdeniya/atriumnye/trk-rodnik;/obekty/trk-rodnik/;301;;R5
-/portfolio/ograzhdeniya/atriumnye/trk-ural-eskalator;/obekty/trk-ural-eskalator/;301;;R5
+/portfolio/ograzhdeniya/atriumnye/trk-ural-eskalator;/obekty/trk-ural/;301;;R5
 /portfolio/ograzhdeniya/balkonnye;/obekty/;301;категория портфолио → листинг объектов;R3
 /portfolio/ograzhdeniya/balkonnye/balkonnyye-ograzhdeniya;/obekty/balkonnyye-ograzhdeniya/;301;;R5
 /portfolio/ograzhdeniya/balkonnye/stanciya-pavlika-morozova;/obekty/stanciya-pavlika-morozova/;301;;R5
@@ -203,9 +203,9 @@
 /portfolio/ograzhdeniya/grand-forge/ogragdeniya-05;;stay;решение 30.09: остаётся на inex.su;R0
 /portfolio/ograzhdeniya/grand-forge/ogragdeniya-06;;stay;решение 30.09: остаётся на inex.su;R0
 /portfolio/ograzhdeniya/interernye;/obekty/;301;категория портфолио → листинг объектов;R3
-/portfolio/ograzhdeniya/interernye/arkaim-plaza-resepshn;/obekty/arkaim-plaza-resepshn/;301;;R5
-/portfolio/ograzhdeniya/interernye/koncertnyi-zal-omsk-drugoe;/obekty/koncertnyi-zal-omsk-drugoe/;301;;R5
-/portfolio/ograzhdeniya/interernye/sberbank-ishim;/obekty/sberbank-ishim/;301;;R5
+/portfolio/ograzhdeniya/interernye/arkaim-plaza-resepshn;/obekty/arkaim-plaza/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/atriumnye/arkaim-plaza-atrium;R5
+/portfolio/ograzhdeniya/interernye/koncertnyi-zal-omsk-drugoe;/obekty/koncertnyj-zal-omsk/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/atriumnye/koncertnyi-zal-omsk;R5
+/portfolio/ograzhdeniya/interernye/sberbank-ishim;/obekty/sberbank-ishim/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/atriumnye/sberbank-ishim-atrium;R5
 /portfolio/ograzhdeniya/interernye/sberbank-omsk;/obekty/sberbank-omsk/;301;;R5
 /portfolio/ograzhdeniya/lestnichnye;/obekty/;301;категория портфолио → листинг объектов;R3
 /portfolio/ograzhdeniya/lestnichnye/administraciya-omska;/obekty/administraciya-omska/;301;;R5
@@ -216,20 +216,20 @@
 /portfolio/ograzhdeniya/lestnichnye/energosbyt-chelyabinsk;/obekty/energosbyt-chelyabinsk/;301;;R5
 /portfolio/ograzhdeniya/lestnichnye/izhevsk-samonesushchie;/obekty/izhevsk-samonesushchie/;301;;R5
 /portfolio/ograzhdeniya/lestnichnye/kolonna-07;/obekty/kolonna-07/;301;;R5
-/portfolio/ograzhdeniya/lestnichnye/koncertnyi-zal-omsk-lestnica;/obekty/koncertnyi-zal-omsk-lestnica/;301;;R5
+/portfolio/ograzhdeniya/lestnichnye/koncertnyi-zal-omsk-lestnica;/obekty/koncertnyj-zal-omsk/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/atriumnye/koncertnyi-zal-omsk;R5
 /portfolio/ograzhdeniya/lestnichnye/kottedzh-3-grande-forge;/obekty/kottedzh-3-grande-forge/;301;;R5
-/portfolio/ograzhdeniya/lestnichnye/la-traktor-arena;/obekty/la-traktor-arena/;301;;R5
+/portfolio/ograzhdeniya/lestnichnye/la-traktor-arena;/obekty/traktor-arena/;301;;R5
 /portfolio/ograzhdeniya/lestnichnye/ogragdeniya-02;/obekty/ogragdeniya-02/;301;;R5
 /portfolio/ograzhdeniya/lestnichnye/profilaktorii-izumrud;/obekty/profilaktorii-izumrud/;301;;R5
 /portfolio/ograzhdeniya/lestnichnye/progimnaziya-133;/obekty/progimnaziya-133/;301;;R5
 /portfolio/ograzhdeniya/lestnichnye/rekkom-ulica;/obekty/rekkom-ulica/;301;;R5
 /portfolio/ograzhdeniya/lestnichnye/restostar;/obekty/restostar/;301;;R5
 /portfolio/ograzhdeniya/lestnichnye/sokol-fit;/obekty/sokol-fit/;301;;R5
-/portfolio/ograzhdeniya/lestnichnye/surgutneftegaz-samonesushchie;/obekty/surgutneftegaz-samonesushchie/;301;;R5
+/portfolio/ograzhdeniya/lestnichnye/surgutneftegaz-samonesushchie;/obekty/glavnoe-upravlenie-surgutneftegaz/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/atriumnye/surgutneftegaz-atrium;R5
 /portfolio/ograzhdeniya/lestnichnye/tc-komsomolskii;/obekty/tc-komsomolskii/;301;;R5
 /portfolio/ograzhdeniya/lestnichnye/td-bovid;/obekty/td-bovid/;301;;R5
 /portfolio/ograzhdeniya/lestnichnye/tk-kolco;/obekty/tk-kolco/;301;;R5
-/portfolio/ograzhdeniya/lestnichnye/tk-krasnoderevschik-steklo;/obekty/tk-krasnoderevschik-steklo/;301;;R5
+/portfolio/ograzhdeniya/lestnichnye/tk-krasnoderevschik-steklo;/obekty/tk-krasnoderevschik/;301;;R5
 /portfolio/ograzhdeniya/lestnichnye/tk-krasnoderevschik-trosy;/obekty/tk-krasnoderevschik-trosy/;301;;R5
 /portfolio/ograzhdeniya/lestnichnye/tk-paroplaza;/obekty/tk-paroplaza/;301;;R5
 /portfolio/ograzhdeniya/lestnichnye/triumf;/obekty/triumf/;301;;R5
@@ -286,33 +286,33 @@
 /portfolio/peregorodki/celnosteklyannye/chuk;/obekty/chuk/;301;;R5
 /portfolio/peregorodki/celnosteklyannye/dushevaya-pryamaya-01;/obekty/dushevaya-pryamaya-01/;301;;R5
 /portfolio/peregorodki/celnosteklyannye/dveri-08;/obekty/dveri-08/;301;двери в цельностеклянной перегородке — нужно решение Inex;R5
-/portfolio/peregorodki/celnosteklyannye/dveri-mayatnik-01;/obekty/dveri-mayatnik-01/;301;двери в цельностеклянной перегородке — нужно решение Inex;R5
+/portfolio/peregorodki/celnosteklyannye/dveri-mayatnik-01;/obekty/buta-spa/;301;"объединённый объект (slugs.json), первая страница — /portfolio/dushevye/pryamye/dushevayapryamaya02; двери в цельностеклянной перегородке — нужно решение Inex";R5
 /portfolio/peregorodki/celnosteklyannye/kottedzh-10-sauna;/obekty/;301;страница не импортирована;R7
 /portfolio/peregorodki/celnosteklyannye/kvartira-1;/obekty/kvartira-1/;301;;R5
 /portfolio/peregorodki/celnosteklyannye/kvartira-3;/obekty/kvartira-3/;301;;R5
 /portfolio/peregorodki/celnosteklyannye/linda-dver;/obekty/linda-dver/;301;двери в цельностеклянной перегородке — нужно решение Inex;R5
 /portfolio/peregorodki/celnosteklyannye/mts-omsk;/obekty/mts-omsk/;301;;R5
 /portfolio/peregorodki/celnosteklyannye/orto-lend;/obekty/orto-lend/;301;;R5
-/portfolio/peregorodki/celnosteklyannye/restostar;/obekty/restostar-peregorodki/;301;коллизия slug — добавлен суффикс категории (пара: /portfolio/ograzhdeniya/lestnichnye/restostar);R5
+/portfolio/peregorodki/celnosteklyannye/restostar;/obekty/restostar/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/lestnichnye/restostar;R5
 /portfolio/peregorodki/celnosteklyannye/sk-stroikom;/obekty/sk-stroikom/;301;;R5
 /portfolio/peregorodki/celnosteklyannye/snezhnaya-koroleva;/obekty/snezhnaya-koroleva/;301;;R5
-/portfolio/peregorodki/celnosteklyannye/sokol-fit-peregorodki;/obekty/sokol-fit-peregorodki/;301;;R5
+/portfolio/peregorodki/celnosteklyannye/sokol-fit-peregorodki;/obekty/sokol-fit/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/lestnichnye/sokol-fit;R5
 /portfolio/peregorodki/celnosteklyannye/stroimehanizaciya;/obekty/;301;страница не импортирована;R7
-/portfolio/peregorodki/celnosteklyannye/stroimehanizaciya-lift;/obekty/stroimehanizaciya-lift/;301;;R5
-/portfolio/peregorodki/celnosteklyannye/surgutneftegaz-pozharnye;/obekty/surgutneftegaz-pozharnye/;301;;R5
-/portfolio/peregorodki/celnosteklyannye/surgutneftegaz-razdvizhnaya;/obekty/surgutneftegaz-razdvizhnaya/;301;;R5
+/portfolio/peregorodki/celnosteklyannye/stroimehanizaciya-lift;/obekty/stroimehanizaciya/;301;;R5
+/portfolio/peregorodki/celnosteklyannye/surgutneftegaz-pozharnye;/obekty/glavnoe-upravlenie-surgutneftegaz/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/atriumnye/surgutneftegaz-atrium;R5
+/portfolio/peregorodki/celnosteklyannye/surgutneftegaz-razdvizhnaya;/obekty/glavnoe-upravlenie-surgutneftegaz/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/atriumnye/surgutneftegaz-atrium;R5
 /portfolio/peregorodki/celnosteklyannye/tc-bum;/obekty/tc-bum/;301;;R5
 /portfolio/peregorodki/celnosteklyannye/tc-kristal;/obekty/tc-kristal/;301;;R5
 /portfolio/peregorodki/celnosteklyannye/td-miras-pavlodar;/obekty/td-miras-pavlodar/;301;;R5
-/portfolio/peregorodki/celnosteklyannye/tk-kolco;/obekty/tk-kolco-peregorodki/;301;коллизия slug — добавлен суффикс категории (пара: /portfolio/ograzhdeniya/lestnichnye/tk-kolco);R5
-/portfolio/peregorodki/celnosteklyannye/tk-komsomolskii;/obekty/tk-komsomolskii/;301;;R5
+/portfolio/peregorodki/celnosteklyannye/tk-kolco;/obekty/tk-kolco/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/lestnichnye/tk-kolco;R5
+/portfolio/peregorodki/celnosteklyannye/tk-komsomolskii;/obekty/tc-komsomolskii/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/lestnichnye/tc-komsomolskii;R5
 /portfolio/peregorodki/celnosteklyannye/tk-panorama-zlatoust;/obekty/tk-panorama-zlatoust/;301;;R5
 /portfolio/peregorodki/celnosteklyannye/trc-kuba;/obekty/trc-kuba/;301;;R5
-/portfolio/peregorodki/celnosteklyannye/trk-gorki-lift;/obekty/trk-gorki-lift/;301;;R5
-/portfolio/peregorodki/celnosteklyannye/trk-rodnik-peregorodki;/obekty/trk-rodnik-peregorodki/;301;;R5
+/portfolio/peregorodki/celnosteklyannye/trk-gorki-lift;/obekty/trk-gorki/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/atriumnye/trk-gorki;R5
+/portfolio/peregorodki/celnosteklyannye/trk-rodnik-peregorodki;/obekty/trk-rodnik/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/atriumnye/trk-rodnik;R5
 /portfolio/peregorodki/celnosteklyannye/uglemet;/obekty/uglemet/;301;;R5
-/portfolio/peregorodki/celnosteklyannye/ugorskaya-shahmatnaya-akademiya-lift;/obekty/ugorskaya-shahmatnaya-akademiya-lift/;301;;R5
-/portfolio/peregorodki/celnosteklyannye/ugorskaya-shahmatnaya-akademiya-peregorodki;/obekty/ugorskaya-shahmatnaya-akademiya-peregorodki/;301;;R5
+/portfolio/peregorodki/celnosteklyannye/ugorskaya-shahmatnaya-akademiya-lift;/obekty/ugorskaya-shahmatnaya-akademiya/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/lestnichnye/ugorskaya-shahmatnaya-akademiya;R5
+/portfolio/peregorodki/celnosteklyannye/ugorskaya-shahmatnaya-akademiya-peregorodki;/obekty/ugorskaya-shahmatnaya-akademiya/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/lestnichnye/ugorskaya-shahmatnaya-akademiya;R5
 /portfolio/peregorodki/celnosteklyannye/usps;/obekty/usps/;301;;R5
 /portfolio/peregorodki/santehnicheskie;;stay;решение 30.09: остаётся на inex.su;R0
 /portfolio/peregorodki/santehnicheskie/Peregorodka-02;;stay;решение 30.09: остаётся на inex.su;R0
@@ -329,18 +329,18 @@
 /portfolio/peregorodki/skladnye/kottedzh-garmoshka-01;;stay;решение 30.09: остаётся на inex.su;R0
 /portfolio/peregorodki/skladnye/peregorodkaSDT150;;stay;решение 30.09: остаётся на inex.su;R0
 /portfolio/peregorodki/v-aluminievom-profile;/obekty/;301;категория портфолио → листинг объектов;R3
-/portfolio/peregorodki/v-aluminievom-profile/Peregorodka-01;/obekty/peregorodka-01/;301;;R5
+/portfolio/peregorodki/v-aluminievom-profile/Peregorodka-01;/obekty/buta-spa/;301;объединённый объект (slugs.json), первая страница — /portfolio/dushevye/pryamye/dushevayapryamaya02;R5
 /portfolio/peregorodki/v-aluminievom-profile/bank-mmb;/obekty/bank-mmb/;301;;R5
 /portfolio/peregorodki/v-aluminievom-profile/fristail-surgut;/obekty/fristail-surgut/;301;;R5
 /portfolio/peregorodki/v-aluminievom-profile/khp-varna;/obekty/khp-varna/;301;;R5
 /portfolio/peregorodki/v-aluminievom-profile/kolonna-04;/obekty/kolonna-04/;301;;R5
-/portfolio/peregorodki/v-aluminievom-profile/la-traktor-peregorodki;/obekty/la-traktor-peregorodki/;301;;R5
+/portfolio/peregorodki/v-aluminievom-profile/la-traktor-peregorodki;/obekty/traktor-arena/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/lestnichnye/la-traktor-arena;R5
 /portfolio/peregorodki/v-aluminievom-profile/medcentr-chelyabinsk;/obekty/medcentr-chelyabinsk/;301;;R5
 /portfolio/peregorodki/v-aluminievom-profile/oc-prospekt;/obekty/oc-prospekt/;301;;R5
 /portfolio/peregorodki/v-aluminievom-profile/prigorodnyi-zhd-vokzal;/obekty/prigorodnyi-zhd-vokzal/;301;;R5
 /portfolio/peregorodki/v-aluminievom-profile/promsvyazbank-chelyabinsk;/obekty/promsvyazbank-chelyabinsk/;301;;R5
 /portfolio/peregorodki/v-aluminievom-profile/rossiiskaya-277;/obekty/rossiiskaya-277/;301;;R5
-/portfolio/peregorodki/v-aluminievom-profile/sberbank-ishim-pozharnye;/obekty/sberbank-ishim-pozharnye/;301;;R5
+/portfolio/peregorodki/v-aluminievom-profile/sberbank-ishim-pozharnye;/obekty/sberbank-ishim/;301;объединённый объект (slugs.json), первая страница — /portfolio/ograzhdeniya/atriumnye/sberbank-ishim-atrium;R5
 /portfolio/peregorodki/v-aluminievom-profile/tk-mayak;/obekty/tk-mayak/;301;;R5
 /portfolio/peregorodki/v-aluminievom-profile/zavod-peregorodka-1;/obekty/zavod-peregorodka-1/;301;;R5
 /portfolio/peregorodki/v-aluminievom-profile/zavod-peregorodka-2;/obekty/zavod-peregorodka-2/;301;;R5

@@ -130,9 +130,10 @@ const sha1Of = (bytes: Uint8Array): string => createHash("sha1").update(bytes).d
 
 /**
  * Why the bytes are not an importable photo (`null` = fine): signature JPEG/PNG/WebP, and unless
- * `relaxSize` at least `MIN_PHOTO_BYTES` and `MIN_PHOTO_SIDE` px on the long side.
+ * `relaxSize` at least `MIN_PHOTO_BYTES` and `MIN_PHOTO_SIDE` px on the long side. Exported for
+ * callers that convert a photo before `fromLocalFile` and must check the source file instead.
  */
-async function rejectReason(bytes: Uint8Array, relaxSize = false): Promise<string | null> {
+export async function rejectReason(bytes: Uint8Array, relaxSize = false): Promise<string | null> {
   if (!relaxSize && bytes.byteLength < MIN_PHOTO_BYTES) {
     return `меньше ${MIN_PHOTO_BYTES / 1024} КБ`;
   }

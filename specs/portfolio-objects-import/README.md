@@ -162,4 +162,4 @@ The source CSV `docs/inex/12-migration-inex-su.csv` is never edited. No task cha
 - [x] [task-07-merge-objects-loader](./tasks/task-07-merge-objects-loader.md) — merge-objects.ts loader/publisher
 
 ### Wave 3
-- [ ] [task-08-local-verification](./tasks/task-08-local-verification.md) — Full cover run, load into a local prod copy, audit, screenshots, redirect CSV
+- [x] [task-08-local-verification](./tasks/task-08-local-verification.md) — Full cover run, load into a local prod copy, audit, screenshots, redirect CSV

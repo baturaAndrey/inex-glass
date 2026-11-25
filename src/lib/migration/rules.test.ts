@@ -211,6 +211,61 @@ describe("fixRows — slug collisions (R5)", () => {
   });
 });
 
+describe("fixRows — explicitly merged objects (R5)", () => {
+  const berezka = [
+    row("/portfolio/dushevye/pryamay-dushevay-v-gostinize-berezka", "/obekty/berezka/"),
+    row("/portfolio/fasady/fasad-kozyrek-berezka", "/obekty/fasad-kozyrek-berezka/"),
+    row("/portfolio/kozyrki/berezka-plast-kozyrek", "/obekty/berezka-plast-kozyrek/"),
+  ];
+  const mergedSlugs: Record<string, string> = Object.fromEntries(
+    berezka.map((r) => [r.old_url, "berezka-plast"])
+  );
+
+  it("sends every page of a merged object to its slug without suffixes", () => {
+    const fixed = fixRows(berezka, { importedSlug: (url) => mergedSlugs[url] });
+    expect(fixed.map((r) => r.new_url)).toEqual(Array(3).fill("/obekty/berezka-plast/"));
+    expect(fixed.every((r) => r.rule === "R5" && !r.disputed)).toBe(true);
+  });
+
+  it("does not report a merged object as a collision", () => {
+    const fixed = fixRows(berezka, { importedSlug: (url) => mergedSlugs[url] });
+    expect(fixed[0]?.note).toBe("");
+    for (const r of fixed.slice(1)) {
+      expect(r.note).toBe(`${NOTES.explicitMerge} ${berezka[0]?.old_url}`);
+      expect(r.note).not.toContain(NOTES.suffixed);
+    }
+  });
+
+  it("merges a split collision once both URLs map to the same slug", () => {
+    const rows = [
+      row("/portfolio/ograzhdeniya/lestnichnye/restostar", "/obekty/restostar/"),
+      row("/portfolio/peregorodki/celnosteklyannye/restostar", "/obekty/restostar/"),
+    ];
+    const fixed = fixRows(rows, { importedSlug: () => "restostar", sameObject: () => false });
+    expect(fixed.map((r) => r.new_url)).toEqual(["/obekty/restostar/", "/obekty/restostar/"]);
+    expect(fixed[1]?.note).toBe(`${NOTES.explicitMerge} ${rows[0]?.old_url}`);
+  });
+
+  it("still suffixes a computed slug that collides with a merged one", () => {
+    const rows = [
+      row("/portfolio/fasady/a-plast", "/obekty/a-plast/"),
+      row("/portfolio/kozyrki/a-plast-kozyrek", "/obekty/a-plast-kozyrek/"),
+      row("/portfolio/peregorodki/celnosteklyannye/a-plast", "/obekty/a-plast/"),
+    ];
+    const slugs: Record<string, string> = {
+      "/portfolio/fasady/a-plast": "a-plast",
+      "/portfolio/kozyrki/a-plast-kozyrek": "a-plast",
+    };
+    const fixed = fixRows(rows, { importedSlug: (url) => slugs[url] });
+    expect(fixed.map((r) => r.new_url)).toEqual([
+      "/obekty/a-plast/",
+      "/obekty/a-plast/",
+      "/obekty/a-plast-peregorodki/",
+    ]);
+    expect(fixed[2]?.note).toBe(`${NOTES.suffixed} (пара: ${rows[0]?.old_url})`);
+  });
+});
+
 describe("validation", () => {
   it("accepts only lower-case, slash-terminated paths", () => {
     expect(isValidNewUrl("/obekty/")).toBe(true);

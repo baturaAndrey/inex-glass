@@ -20,7 +20,7 @@ Manual steps that must be completed by a human (or by the coordinator with expli
       and `docker run --rm -v inex-glass-prod-media:/d -v /root:/b alpine tar czf /b/media-pre-objects.tgz -C /d .`
 - [ ] **Commit + CI** — merge the scripts so the `ghcr.io/baturaandrey/inex-glass:sha-<commit>-tools` image contains them;
       deploy that commit first (the tools image must match the live app: `prodMigrations` runs on init).
-- [ ] **Copy inputs to the VDS** — manifest, content, covers and source photos (`scripts/.import-tmp/photos`, `res/Объекты`)
+- [ ] **Copy inputs to the VDS** — `scripts/import-inex/data/` (manifest + content), covers `scripts/.import-tmp/covers/` (all `*.webp` + `report.json` — without them every object fails «обложка не подготовлена»), source photos `scripts/.import-tmp/photos/` and `res/Объекты/` (both outside git, ~320 MB total)
       to e.g. `/root/objects-import/` (same relative layout), plus an empty writable dir `/root/objects-import/out`;
       `chown -R 1000:1000 /root/objects-import`, bind-mount into the tools container (inputs read-only is fine).
 - [ ] **Run** — env from `docker exec <app> printenv` (DATABASE_URL, PAYLOAD_SECRET, FORM_HMAC_SECRET, ORDER_TOKEN_SECRET,

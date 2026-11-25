@@ -1,6 +1,6 @@
 # Карта редиректов inex.su → Inex Glass: исправления и спорные URL
 
-Сформировано скриптом `scripts/import-inex/fix-csv.ts` (2026-10-21).
+Сформировано скриптом `scripts/import-inex/fix-csv.ts` (2026-11-25).
 Исходник — `docs/inex/12-migration-inex-su.csv`, результат — `docs/inex/12-migration-inex-su.fixed.csv`
 (колонки `old_url;new_url;action;note;rule`, порядок строк как в исходнике, UTF-8 с BOM).
 Правила — `src/lib/migration/rules.ts` (R0–R7), тесты — `src/lib/migration/rules.test.ts`.
@@ -10,26 +10,30 @@
 | Показатель | Исходный CSV | Исправленный CSV |
 |---|---:|---:|
 | Всего строк | 446 | 446 |
-| 301 | 283 | 231 |
-| stay | 163 | 215 |
-| Объекты портфолио → `/obekty/<slug>/` (R5) | — | 162 |
-| Уникальных страниц объектов (после слияния дублей) | — | 162 |
+| 301 | 283 | 232 |
+| stay | 163 | 214 |
+| Объекты портфолио → `/obekty/<slug>/` (R5) | — | 163 |
+| Уникальных страниц объектов (после слияния дублей) | — | 142 |
 | Объекты, не импортированные с inex.su (R7) | — | 6 |
 | Страниц объектов разобрано из кэша Firecrawl | — | 162 из 168 |
 | Спорных строк (флаг disputed) | — | 17 |
 
-Ожидание задачи: 301 = 231, stay = 215 (168 объектов + 20 категорий + 3 пагинации + 39 `/produkciya/*` + `/materialy/steklo`). Совпадает.
+Ожидание задачи: 301 = 232, stay = 214 (168 строк объектов + 20 категорий + 3 пагинации + 39 `/produkciya/*` + `/materialy/steklo` + исключения из R1, лестницы в «Объектах»: 1). Совпадает.
+
+Исключения из R1 (решение 25.11.2026, лестница показана в «Объектах»):
+
+- `/portfolio/lestnicy/bolcovye/oc-vipr-mizar` → `/obekty/oc-vipr-mizar/` (301)
 
 ## Изменения относительно исходного CSV по правилам
 
 | Правило | Что делает | Строк | Из них изменено |
 |---|---|---:|---:|
 | R0 | stay — без изменений | 163 | 0 |
-| R1 | лестницы → stay | 42 | 42 |
+| R1 | лестницы → stay | 41 | 41 |
 | R2 | отделка интерьера → stay | 10 | 10 |
 | R3 | категории портфолио → /obekty/ | 20 | 15 |
 | R4 | старая пагинация → /obekty/ | 3 | 3 |
-| R5 | объекты → /obekty/<slug>/ | 162 | 5 |
+| R5 | объекты → /obekty/<slug>/ | 163 | 30 |
 | R6 | /produkciya/*, /materialy/steklo — без изменений | 40 | 0 |
 | R7 | объект не импортирован → /obekty/ | 6 | 6 |
 
@@ -65,11 +69,11 @@
 
 **R5** — примеры:
 
+- `/portfolio/dushevye/pryamye/dushevayapryamaya02`: `/obekty/dushevayapryamaya02/` (301) → `/obekty/buta-spa/` (301)
+- `/portfolio/dushevye/pryamye/pryamay-dushevay-v-gostinize-berezka`: `/obekty/pryamay-dushevay-v-gostinize-berezka/` (301) → `/obekty/berezka-plast/` (301)
+- `/portfolio/fasady/fasad-kozyrek-berezka`: `/obekty/fasad-kozyrek-berezka/` (301) → `/obekty/berezka-plast/` (301)
 - `/portfolio/kozyrki/Steklyannyy-kozyrek`: `/obekty/Steklyannyy-kozyrek/` (301) → `/obekty/steklyannyy-kozyrek/` (301)
-- `/portfolio/ograzhdeniya/atriumnye/kolоnna-08`: `/obekty/kolоnna-08/` (301) → `/obekty/kolonna-08/` (301)
-- `/portfolio/peregorodki/celnosteklyannye/restostar`: `/obekty/restostar/` (301) → `/obekty/restostar-peregorodki/` (301)
-- `/portfolio/peregorodki/celnosteklyannye/tk-kolco`: `/obekty/tk-kolco/` (301) → `/obekty/tk-kolco-peregorodki/` (301)
-- `/portfolio/peregorodki/v-aluminievom-profile/Peregorodka-01`: `/obekty/Peregorodka-01/` (301) → `/obekty/peregorodka-01/` (301)
+- `/portfolio/kozyrki/berezka-plast-kozyrek`: `/obekty/berezka-plast-kozyrek/` (301) → `/obekty/berezka-plast/` (301)
 
 **R7** — примеры:
 
@@ -83,11 +87,36 @@
 
 | old_url | было | стало |
 |---|---|---|
+| `/portfolio/dushevye/pryamye/dushevayapryamaya02` | `/obekty/dushevayapryamaya02/` | `/obekty/buta-spa/` |
+| `/portfolio/dushevye/pryamye/pryamay-dushevay-v-gostinize-berezka` | `/obekty/pryamay-dushevay-v-gostinize-berezka/` | `/obekty/berezka-plast/` |
+| `/portfolio/fasady/fasad-kozyrek-berezka` | `/obekty/fasad-kozyrek-berezka/` | `/obekty/berezka-plast/` |
 | `/portfolio/kozyrki/Steklyannyy-kozyrek` | `/obekty/Steklyannyy-kozyrek/` | `/obekty/steklyannyy-kozyrek/` |
+| `/portfolio/kozyrki/berezka-plast-kozyrek` | `/obekty/berezka-plast-kozyrek/` | `/obekty/berezka-plast/` |
+| `/portfolio/ograzhdeniya/atriumnye/arkaim-plaza-atrium` | `/obekty/arkaim-plaza-atrium/` | `/obekty/arkaim-plaza/` |
 | `/portfolio/ograzhdeniya/atriumnye/kolоnna-08` | `/obekty/kolоnna-08/` | `/obekty/kolonna-08/` |
-| `/portfolio/peregorodki/celnosteklyannye/restostar` | `/obekty/restostar/` | `/obekty/restostar-peregorodki/` |
-| `/portfolio/peregorodki/celnosteklyannye/tk-kolco` | `/obekty/tk-kolco/` | `/obekty/tk-kolco-peregorodki/` |
-| `/portfolio/peregorodki/v-aluminievom-profile/Peregorodka-01` | `/obekty/Peregorodka-01/` | `/obekty/peregorodka-01/` |
+| `/portfolio/ograzhdeniya/atriumnye/koncertnyi-zal-omsk` | `/obekty/koncertnyi-zal-omsk/` | `/obekty/koncertnyj-zal-omsk/` |
+| `/portfolio/ograzhdeniya/atriumnye/sberbank-ishim-atrium` | `/obekty/sberbank-ishim-atrium/` | `/obekty/sberbank-ishim/` |
+| `/portfolio/ograzhdeniya/atriumnye/surgutneftegaz-atrium` | `/obekty/surgutneftegaz-atrium/` | `/obekty/glavnoe-upravlenie-surgutneftegaz/` |
+| `/portfolio/ograzhdeniya/atriumnye/trk-ural-eskalator` | `/obekty/trk-ural-eskalator/` | `/obekty/trk-ural/` |
+| `/portfolio/ograzhdeniya/interernye/arkaim-plaza-resepshn` | `/obekty/arkaim-plaza-resepshn/` | `/obekty/arkaim-plaza/` |
+| `/portfolio/ograzhdeniya/interernye/koncertnyi-zal-omsk-drugoe` | `/obekty/koncertnyi-zal-omsk-drugoe/` | `/obekty/koncertnyj-zal-omsk/` |
+| `/portfolio/ograzhdeniya/lestnichnye/koncertnyi-zal-omsk-lestnica` | `/obekty/koncertnyi-zal-omsk-lestnica/` | `/obekty/koncertnyj-zal-omsk/` |
+| `/portfolio/ograzhdeniya/lestnichnye/la-traktor-arena` | `/obekty/la-traktor-arena/` | `/obekty/traktor-arena/` |
+| `/portfolio/ograzhdeniya/lestnichnye/surgutneftegaz-samonesushchie` | `/obekty/surgutneftegaz-samonesushchie/` | `/obekty/glavnoe-upravlenie-surgutneftegaz/` |
+| `/portfolio/ograzhdeniya/lestnichnye/tk-krasnoderevschik-steklo` | `/obekty/tk-krasnoderevschik-steklo/` | `/obekty/tk-krasnoderevschik/` |
+| `/portfolio/peregorodki/celnosteklyannye/dveri-mayatnik-01` | `/obekty/dveri-mayatnik-01/` | `/obekty/buta-spa/` |
+| `/portfolio/peregorodki/celnosteklyannye/sokol-fit-peregorodki` | `/obekty/sokol-fit-peregorodki/` | `/obekty/sokol-fit/` |
+| `/portfolio/peregorodki/celnosteklyannye/stroimehanizaciya-lift` | `/obekty/stroimehanizaciya-lift/` | `/obekty/stroimehanizaciya/` |
+| `/portfolio/peregorodki/celnosteklyannye/surgutneftegaz-pozharnye` | `/obekty/surgutneftegaz-pozharnye/` | `/obekty/glavnoe-upravlenie-surgutneftegaz/` |
+| `/portfolio/peregorodki/celnosteklyannye/surgutneftegaz-razdvizhnaya` | `/obekty/surgutneftegaz-razdvizhnaya/` | `/obekty/glavnoe-upravlenie-surgutneftegaz/` |
+| `/portfolio/peregorodki/celnosteklyannye/tk-komsomolskii` | `/obekty/tk-komsomolskii/` | `/obekty/tc-komsomolskii/` |
+| `/portfolio/peregorodki/celnosteklyannye/trk-gorki-lift` | `/obekty/trk-gorki-lift/` | `/obekty/trk-gorki/` |
+| `/portfolio/peregorodki/celnosteklyannye/trk-rodnik-peregorodki` | `/obekty/trk-rodnik-peregorodki/` | `/obekty/trk-rodnik/` |
+| `/portfolio/peregorodki/celnosteklyannye/ugorskaya-shahmatnaya-akademiya-lift` | `/obekty/ugorskaya-shahmatnaya-akademiya-lift/` | `/obekty/ugorskaya-shahmatnaya-akademiya/` |
+| `/portfolio/peregorodki/celnosteklyannye/ugorskaya-shahmatnaya-akademiya-peregorodki` | `/obekty/ugorskaya-shahmatnaya-akademiya-peregorodki/` | `/obekty/ugorskaya-shahmatnaya-akademiya/` |
+| `/portfolio/peregorodki/v-aluminievom-profile/Peregorodka-01` | `/obekty/Peregorodka-01/` | `/obekty/buta-spa/` |
+| `/portfolio/peregorodki/v-aluminievom-profile/la-traktor-peregorodki` | `/obekty/la-traktor-peregorodki/` | `/obekty/traktor-arena/` |
+| `/portfolio/peregorodki/v-aluminievom-profile/sberbank-ishim-pozharnye` | `/obekty/sberbank-ishim-pozharnye/` | `/obekty/sberbank-ishim/` |
 
 ## Спорные URL — нужно решение Inex
 
@@ -113,7 +142,7 @@
 | URL | Решение по умолчанию | Вопрос |
 |---|---|---|
 | `/portfolio/peregorodki/celnosteklyannye/dveri-08` | 301 → `/obekty/dveri-08/` | Переносить на Inex Glass или оставить на inex.su (двери)? |
-| `/portfolio/peregorodki/celnosteklyannye/dveri-mayatnik-01` | 301 → `/obekty/dveri-mayatnik-01/` | Переносить на Inex Glass или оставить на inex.su (двери)? |
+| `/portfolio/peregorodki/celnosteklyannye/dveri-mayatnik-01` | 301 → `/obekty/buta-spa/` | Переносить на Inex Glass или оставить на inex.su (двери)? |
 | `/portfolio/peregorodki/celnosteklyannye/linda-dver` | 301 → `/obekty/linda-dver/` | Переносить на Inex Glass или оставить на inex.su (двери)? |
 
 ### 3. Лестничные ограждения (31 URL: категория + объекты) — подтвердить группой
@@ -127,9 +156,9 @@
 | `/portfolio/ograzhdeniya/lestnichnye/kolonna-07` | 301 → `/obekty/kolonna-07/` | Колонны остаются на inex.su — это стеклянная конструкция или колонна? |
 | `/portfolio/ograzhdeniya/lestnichnye/kottedzh-3-grande-forge` | 301 → `/obekty/kottedzh-3-grande-forge/` | Ограждения Grand Forge остаются на inex.su (решение 30.09) — переносить объект? |
 | `/portfolio/peregorodki/celnosteklyannye/dushevaya-pryamaya-01` | 301 → `/obekty/dushevaya-pryamaya-01/` | Душевая в разделе цельностеклянных перегородок — оставить в портфолио? |
-| `/portfolio/peregorodki/celnosteklyannye/surgutneftegaz-pozharnye` | 301 → `/obekty/surgutneftegaz-pozharnye/` | Пожарные преграды остаются на inex.su — переносить объект? |
+| `/portfolio/peregorodki/celnosteklyannye/surgutneftegaz-pozharnye` | 301 → `/obekty/glavnoe-upravlenie-surgutneftegaz/` | Пожарные преграды остаются на inex.su — переносить объект? |
 | `/portfolio/peregorodki/v-aluminievom-profile/kolonna-04` | 301 → `/obekty/kolonna-04/` | Колонны остаются на inex.su — это стеклянная конструкция или колонна? |
-| `/portfolio/peregorodki/v-aluminievom-profile/sberbank-ishim-pozharnye` | 301 → `/obekty/sberbank-ishim-pozharnye/` | Пожарные преграды остаются на inex.su — переносить объект? |
+| `/portfolio/peregorodki/v-aluminievom-profile/sberbank-ishim-pozharnye` | 301 → `/obekty/sberbank-ishim/` | Пожарные преграды остаются на inex.su — переносить объект? |
 
 ### 5. Коллизии slug объектов (R5)
 
@@ -137,10 +166,7 @@
 
 | URL | Решение | Вопрос |
 |---|---|---|
-| `/portfolio/peregorodki/celnosteklyannye/restostar` | 301 → `/obekty/restostar-peregorodki/` (коллизия slug — добавлен суффикс категории (пара: /portfolio/ograzhdeniya/lestnichnye/restostar)) | Это один и тот же объект или разные? Если разные — устраивает ли имя с суффиксом категории? |
-| `/portfolio/peregorodki/celnosteklyannye/tk-kolco` | 301 → `/obekty/tk-kolco-peregorodki/` (коллизия slug — добавлен суффикс категории (пара: /portfolio/ograzhdeniya/lestnichnye/tk-kolco)) | Это один и тот же объект или разные? Если разные — устраивает ли имя с суффиксом категории? |
-
-Коллизий: 2 (первый URL пары сохраняет slug без суффикса).
+| — | коллизий нет |  |
 
 ### 6. Объекты, которые не удалось импортировать (R7): 6
 
@@ -161,16 +187,30 @@
 
 ## Допустимые дубли целей (many→one)
 
-Несколько старых URL ведут на одну новую страницу — допустимо для разделов, категорий и листинга. Для объектов — только если это один и тот же объект (см. коллизии).
+Несколько старых URL ведут на одну новую страницу — допустимо для разделов, категорий и листинга. Для объектов — только если это один и тот же объект: объединён импортом (`slugs.json` сопоставляет страницы одному slug, примечание «объединённый объект») или признан тем же объектом при коллизии (см. коллизии).
 
 | new_url | Старых URL | Примеры |
 |---|---:|---|
 | `/obekty/` | 29 | `/portfolio/dushevye`, `/portfolio/dushevye/pryamye`, `/portfolio/dushevye/trepecevidnye`, … |
 | `/dushevye-peregorodki/` | 22 | `/produkciya/dushevye`, `/produkciya/dushevye/p-obraznaya-s-raspashnoi-dveryu-dopolnitelnymi-sekciyami-na-shtange`, `/produkciya/dushevye/p-obraznaya-s-raspashnoi-dveryu-na-shtange`, … |
 | `/steklyannye-ograzhdeniya/` | 6 | `/produkciya/ograzhdeniya`, `/produkciya/ograzhdeniya/atriumnye`, `/produkciya/ograzhdeniya/balkonnye`, … |
+| `/obekty/glavnoe-upravlenie-surgutneftegaz/` | 4 | `/portfolio/ograzhdeniya/atriumnye/surgutneftegaz-atrium`, `/portfolio/ograzhdeniya/lestnichnye/surgutneftegaz-samonesushchie`, `/portfolio/peregorodki/celnosteklyannye/surgutneftegaz-pozharnye`, … |
 | `/osteklenie/verand-terras-besedok/` | 4 | `/produkciya/osteklenie`, `/produkciya/osteklenie/osteklenie-besedki`, `/produkciya/osteklenie/osteklenie-terrasy`, … |
+| `/obekty/buta-spa/` | 3 | `/portfolio/dushevye/pryamye/dushevayapryamaya02`, `/portfolio/peregorodki/celnosteklyannye/dveri-mayatnik-01`, `/portfolio/peregorodki/v-aluminievom-profile/Peregorodka-01` |
+| `/obekty/berezka-plast/` | 3 | `/portfolio/dushevye/pryamye/pryamay-dushevay-v-gostinize-berezka`, `/portfolio/fasady/fasad-kozyrek-berezka`, `/portfolio/kozyrki/berezka-plast-kozyrek` |
+| `/obekty/koncertnyj-zal-omsk/` | 3 | `/portfolio/ograzhdeniya/atriumnye/koncertnyi-zal-omsk`, `/portfolio/ograzhdeniya/interernye/koncertnyi-zal-omsk-drugoe`, `/portfolio/ograzhdeniya/lestnichnye/koncertnyi-zal-omsk-lestnica` |
+| `/obekty/sberbank-ishim/` | 3 | `/portfolio/ograzhdeniya/atriumnye/sberbank-ishim-atrium`, `/portfolio/ograzhdeniya/interernye/sberbank-ishim`, `/portfolio/peregorodki/v-aluminievom-profile/sberbank-ishim-pozharnye` |
+| `/obekty/ugorskaya-shahmatnaya-akademiya/` | 3 | `/portfolio/ograzhdeniya/lestnichnye/ugorskaya-shahmatnaya-akademiya`, `/portfolio/peregorodki/celnosteklyannye/ugorskaya-shahmatnaya-akademiya-lift`, `/portfolio/peregorodki/celnosteklyannye/ugorskaya-shahmatnaya-akademiya-peregorodki` |
 | `/steklyannye-peregorodki/` | 3 | `/produkciya/peregorodki`, `/produkciya/peregorodki/celnosteklyannye`, `/produkciya/peregorodki/v-aluminievom-profile` |
 | `/zakalennoe-steklo/` | 2 | `/materialy/steklo`, `/produkciya/steklo-proizvodstvo` |
+| `/obekty/arkaim-plaza/` | 2 | `/portfolio/ograzhdeniya/atriumnye/arkaim-plaza-atrium`, `/portfolio/ograzhdeniya/interernye/arkaim-plaza-resepshn` |
+| `/obekty/trk-gorki/` | 2 | `/portfolio/ograzhdeniya/atriumnye/trk-gorki`, `/portfolio/peregorodki/celnosteklyannye/trk-gorki-lift` |
+| `/obekty/trk-rodnik/` | 2 | `/portfolio/ograzhdeniya/atriumnye/trk-rodnik`, `/portfolio/peregorodki/celnosteklyannye/trk-rodnik-peregorodki` |
+| `/obekty/traktor-arena/` | 2 | `/portfolio/ograzhdeniya/lestnichnye/la-traktor-arena`, `/portfolio/peregorodki/v-aluminievom-profile/la-traktor-peregorodki` |
+| `/obekty/restostar/` | 2 | `/portfolio/ograzhdeniya/lestnichnye/restostar`, `/portfolio/peregorodki/celnosteklyannye/restostar` |
+| `/obekty/sokol-fit/` | 2 | `/portfolio/ograzhdeniya/lestnichnye/sokol-fit`, `/portfolio/peregorodki/celnosteklyannye/sokol-fit-peregorodki` |
+| `/obekty/tc-komsomolskii/` | 2 | `/portfolio/ograzhdeniya/lestnichnye/tc-komsomolskii`, `/portfolio/peregorodki/celnosteklyannye/tk-komsomolskii` |
+| `/obekty/tk-kolco/` | 2 | `/portfolio/ograzhdeniya/lestnichnye/tk-kolco`, `/portfolio/peregorodki/celnosteklyannye/tk-kolco` |
 
 ## Технические замечания для администратора inex.su
 
