@@ -30,7 +30,8 @@
  * Review flags: a manifest entry may carry `needsRedo: true` + `redoReason` (set by hand after
  * review). Re-converting a cached source keeps the flag; a fresh, successful generation clears it.
  *
- * Never logs KIE_AI_API_KEY. Do not generate portfolio objects, staff, packaging or documents.
+ * Never logs the kie.ai key (KIE_AI_API_app_KEY, legacy KIE_AI_API_KEY). Do not generate
+ * portfolio objects, staff, packaging or documents.
  */
 import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, rename, stat, writeFile } from "node:fs/promises";
@@ -51,7 +52,14 @@ import {
   type PromptSpec,
   type StyleSpec,
 } from "./image-prompts/schema";
-import { DEFAULT_MODEL, KIE_MODELS, KieClient, KieFatalError, KieTaskError } from "./lib/kie";
+import {
+  DEFAULT_MODEL,
+  KIE_MODELS,
+  KieClient,
+  KieFatalError,
+  KieTaskError,
+  kieApiKey,
+} from "./lib/kie";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const PROMPTS_DIR = path.join(ROOT, "scripts", "image-prompts");
@@ -593,7 +601,7 @@ function printSummary(outcomes: Outcome[], fatal: KieFatalError | null) {
 
 async function main() {
   const options = parseOptions();
-  const apiKey = process.env.KIE_AI_API_KEY ?? "";
+  const apiKey = kieApiKey();
 
   if (options.checkCredit) {
     const credits = await new KieClient({ apiKey }).getCredits();

@@ -14,6 +14,7 @@ const config = [
       "src/app/(payload)/admin/importMap.js",
       ".data/**",
       "scripts/**",
+      "specs/**/research/**",
       "e2e/.auth/**",
       "playwright-report/**",
       "blob-report/**",

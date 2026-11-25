@@ -1,9 +1,13 @@
 /**
- * Minimal kie.ai Market API client used by `scripts/gen-images.ts` (dev-only tooling).
+ * Minimal kie.ai Market API client used by `scripts/gen-images.ts` and the portfolio import
+ * cover upscaler (dev-only tooling).
  *
- * Docs (checked 2026-10-20):
+ * Docs (checked 2026-10-20; upscale + upload checked 2026-11-25):
  * - https://docs.kie.ai/market/google/nano-banana            (createTask input)
  * - https://docs.kie.ai/market/google/pro-image-to-image     (nano-banana-pro input)
+ * - https://docs.kie.ai/market/topaz/image-upscale           (topaz/image-upscale input)
+ * - https://docs.kie.ai/market/recraft/crisp-upscale         (recraft/crisp-upscale input)
+ * - https://docs.kie.ai/file-upload-api/upload-file-stream   (multipart file upload)
  * - https://docs.kie.ai/market/common/get-task-detail        (recordInfo polling)
  * - https://docs.kie.ai/common-api/get-account-credits       (credit balance)
  *
@@ -16,7 +20,42 @@
  * included in error messages.
  */
 
+import { createHash } from "node:crypto";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+
 const KIE_BASE_URL = "https://api.kie.ai";
+
+/**
+ * File stream upload hosts, tried in order. The docs' curl example uses the redpandaai host,
+ * while their OpenAPI `servers` block lists api.kie.ai; the second one is used only on 404.
+ */
+const UPLOAD_URLS = [
+  "https://kieai.redpandaai.co/api/file-stream-upload",
+  `${KIE_BASE_URL}/api/file-stream-upload`,
+] as const;
+const UPLOAD_TIMEOUT_MS = 120_000;
+const HTTP_NOT_FOUND = 404;
+
+/** Max input file size accepted by both upscale models (`image_url` / `image`, per the docs). */
+export const KIE_UPSCALE_MAX_INPUT_BYTES = 10 * 1024 * 1024;
+
+/** Extensions → MIME types the upscale models accept (jpeg / png / webp). */
+const UPLOAD_MIME_TYPES: Readonly<Record<string, string>> = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".webp": "image/webp",
+};
+
+/**
+ * The kie.ai API key from the environment. `KIE_AI_API_app_KEY` is the current key; the legacy
+ * `KIE_AI_API_KEY` (rotated, answers 401) is kept as a fallback for older `.env` files.
+ * Returns "" when neither is set — `KieClient` then throws a descriptive error. Never log it.
+ */
+export function kieApiKey(): string {
+  return process.env.KIE_AI_API_app_KEY || process.env.KIE_AI_API_KEY || "";
+}
 
 const POLL_INTERVAL_MS = 5_000;
 /** Overall per-task timeout (matches kie.ai's own 408 "no result for > 10 min"). */
@@ -30,6 +69,7 @@ const MAX_BACKOFF_MS = 60_000;
 /** Body `code` values documented by kie.ai. */
 const CODE_OK = 200;
 const CODE_UNAUTHORIZED = 401;
+const HTTP_FORBIDDEN = 403;
 const CODE_INSUFFICIENT_CREDITS = 402;
 const CODE_RATE_LIMITED = 429;
 
@@ -72,6 +112,39 @@ export const KIE_MODELS: Readonly<Record<string, ModelDefinition>> = {
 };
 
 export const DEFAULT_MODEL = "google/nano-banana";
+
+export type UpscaleModel = "topaz/image-upscale" | "recraft/crisp-upscale";
+
+/** Upscale factor; only Topaz honours it, Recraft crisp picks its own (up to ×4). */
+export type UpscaleFactor = 1 | 2 | 4;
+
+interface UpscaleModelDefinition {
+  /** Per-image price for estimates (the real value comes from `creditsConsumed`). */
+  credits: number;
+  /** Builds the documented `input` object from a public image URL. */
+  buildInput: (imageUrl: string, factor: UpscaleFactor) => Record<string, unknown>;
+}
+
+/**
+ * Image-to-image upscale models (content-preserving super-resolution only). Inputs are public
+ * URLs (see `KieClient.uploadFile`), jpeg/png/webp up to `KIE_UPSCALE_MAX_INPUT_BYTES`.
+ * `kie/image-upscale` is deliberately absent: it is generative and invents detail, which is
+ * forbidden for photos of real objects.
+ */
+export const KIE_UPSCALE_MODELS: Readonly<Record<UpscaleModel, UpscaleModelDefinition>> = {
+  // Topaz: ×1/×2/×4 (`upscale_factor` is a string enum "1" | "2" | "4"), long side × factor
+  // ≤ 20000 px; 10 credits up to 2K output, 20 credits for 4K. Pure SR (content-preserving).
+  "topaz/image-upscale": {
+    credits: 10,
+    buildInput: (image_url, factor) => ({ image_url, upscale_factor: String(factor) }),
+  },
+  // Recraft crisp: no factor (up to ×4, exact size undocumented), 0.5 credits; input ≤ 16 MP,
+  // sides 32–4096 px.
+  "recraft/crisp-upscale": {
+    credits: 0.5,
+    buildInput: (image) => ({ image }),
+  },
+};
 
 /** Unrecoverable for the whole run (bad key, no credits) — the CLI stops all workers. */
 export class KieFatalError extends Error {
@@ -211,7 +284,9 @@ export class KieClient {
 
   constructor(options: KieClientOptions) {
     if (!options.apiKey) {
-      throw new Error("KIE_AI_API_KEY is not set (expected in the root .env file)");
+      throw new Error(
+        "KIE_AI_API_app_KEY (or legacy KIE_AI_API_KEY) is not set (expected in the root .env file)"
+      );
     }
     this.apiKey = options.apiKey;
     this.log = options.log ?? (() => {});
@@ -227,14 +302,20 @@ export class KieClient {
 
   /** Creates a task and returns its id (`POST /api/v1/jobs/createTask`). */
   async createTask(model: string, prompt: string, aspect: AspectRatio): Promise<string> {
-    const definition = KIE_MODELS[model];
-    if (!definition) throw new Error(`kie.ai: model "${model}" is not in KIE_MODELS`);
+    return this.submitTask(model, textToImageDefinition(model).buildInput(prompt, aspect));
+  }
+
+  /**
+   * Shared createTask POST for every model. Never retried on an ambiguous failure (see
+   * RetryPolicy) so a task is never created — and billed — twice.
+   */
+  private async submitTask(model: string, input: Record<string, unknown>): Promise<string> {
     let data: { taskId?: string } | null;
     try {
       data = await this.request<{ taskId?: string }>(
         "POST",
         "/api/v1/jobs/createTask",
-        { model, input: definition.buildInput(prompt, aspect) },
+        { model, input },
         "non-idempotent"
       );
     } catch (error) {
@@ -281,9 +362,117 @@ export class KieClient {
 
   /** Creates a task and waits for its result. */
   async generate(model: string, prompt: string, aspect: AspectRatio): Promise<TaskResult> {
-    const taskId = await this.createTask(model, prompt, aspect);
+    return this.runTask(model, textToImageDefinition(model).buildInput(prompt, aspect));
+  }
+
+  /**
+   * Upscales a publicly reachable image (e.g. a `uploadFile` URL) and waits for the result.
+   * `factor` is ignored by models without one (Recraft crisp). Each call is a paid task.
+   */
+  async upscale(
+    model: UpscaleModel,
+    imageUrl: string,
+    factor: UpscaleFactor = 2
+  ): Promise<TaskResult> {
+    const definition = KIE_UPSCALE_MODELS[model];
+    if (!definition) throw new Error(`kie.ai: model "${model}" is not in KIE_UPSCALE_MODELS`);
+    if (!/^https?:\/\//i.test(imageUrl)) {
+      throw new Error("kie.ai: upscale input must be a public http(s) URL (see uploadFile)");
+    }
+    return this.runTask(model, definition.buildInput(imageUrl, factor));
+  }
+
+  /**
+   * Uploads a local image (`POST /api/file-stream-upload`, multipart) and returns its public
+   * `downloadUrl`, usable as an upscale input. kie.ai deletes uploads after 24 h.
+   *
+   * The remote file name is the sha1 of the bytes + extension: ASCII-safe for Cyrillic local
+   * names, and deterministic, so a retried upload overwrites the same file instead of
+   * creating a duplicate (which makes the call safe to retry).
+   */
+  async uploadFile(filePath: string, uploadPath = "inex-objects"): Promise<string> {
+    const extension = path.extname(filePath).toLowerCase();
+    const mimeType = UPLOAD_MIME_TYPES[extension];
+    if (!mimeType) {
+      throw new Error(`kie.ai: unsupported upload type "${extension}" (jpeg, png or webp only)`);
+    }
+    const normalizedUploadPath = uploadPath.replace(/^\/+|\/+$/g, "");
+    if (!normalizedUploadPath) throw new Error("kie.ai: uploadPath must not be empty");
+
+    const bytes = await readFile(filePath);
+    if (bytes.length === 0) throw new Error(`kie.ai: ${filePath} is empty`);
+    const fileName = `${createHash("sha1").update(bytes).digest("hex")}${extension}`;
+
+    for (const [index, url] of UPLOAD_URLS.entries()) {
+      const isLastHost = index === UPLOAD_URLS.length - 1;
+      const downloadUrl = await this.withRetries(`upload ${fileName}`, "idempotent", () =>
+        this.postUpload(url, bytes, mimeType, fileName, normalizedUploadPath)
+      );
+      if (downloadUrl !== null) return downloadUrl;
+      if (isLastHost) break;
+      this.log(`  upload: ${new URL(url).host} answered 404, trying the next host`);
+    }
+    throw new Error("kie.ai: file upload endpoint not found on any known host (HTTP 404)");
+  }
+
+  /** Shared create → poll path for text-to-image and upscale tasks. */
+  private async runTask(model: string, input: Record<string, unknown>): Promise<TaskResult> {
+    const taskId = await this.submitTask(model, input);
     this.log(`  task created: ${taskId}`);
     return this.waitForTask(taskId);
+  }
+
+  /**
+   * One multipart upload attempt. Returns `null` on HTTP 404 (host has no such endpoint) so
+   * the caller can fall back to the next host; the form is rebuilt for every attempt.
+   */
+  private async postUpload(
+    url: string,
+    bytes: Buffer,
+    mimeType: string,
+    fileName: string,
+    uploadPath: string
+  ): Promise<string | null> {
+    const form = new FormData();
+    form.append("file", new Blob([new Uint8Array(bytes)], { type: mimeType }), fileName);
+    form.append("uploadPath", uploadPath);
+    form.append("fileName", fileName);
+
+    // No Content-Type header: fetch sets the multipart boundary itself.
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${this.apiKey}` },
+      body: form,
+      signal: this.timeoutSignal(UPLOAD_TIMEOUT_MS),
+    });
+    if (response.status === HTTP_NOT_FOUND) return null;
+    if (response.status === CODE_RATE_LIMITED) {
+      throw new RetryableError(`upload HTTP ${response.status}`, true);
+    }
+    if (response.status === CODE_UNAUTHORIZED || response.status === HTTP_FORBIDDEN) {
+      throw new KieFatalError(`kie.ai: invalid or missing API key (${response.status})`, response.status);
+    }
+    if (response.status >= 500) throw new RetryableError(`upload HTTP ${response.status}`);
+    let envelope: KieEnvelope<{ downloadUrl?: unknown }> & { success?: boolean };
+    try {
+      envelope = (await response.json()) as typeof envelope;
+    } catch {
+      throw new RetryableError(`upload: non-JSON response (HTTP ${response.status})`);
+    }
+    const { code, msg = "" } = envelope;
+    if (code === CODE_UNAUTHORIZED || response.status === CODE_UNAUTHORIZED) {
+      throw new KieFatalError(`kie.ai: invalid or missing API key (401)`, CODE_UNAUTHORIZED);
+    }
+    if (code === CODE_RATE_LIMITED) throw new RetryableError(`upload code ${code}: ${msg}`, true);
+    if (isServerErrorCode(code)) throw new RetryableError(`upload code ${code}: ${msg}`);
+    if (code !== CODE_OK || envelope.success === false) {
+      throw new Error(`kie.ai: upload failed, code ${code}: ${msg}`);
+    }
+    const downloadUrl = envelope.data?.downloadUrl;
+    if (typeof downloadUrl !== "string" || !downloadUrl) {
+      throw new Error("kie.ai: upload response has no data.downloadUrl");
+    }
+    return downloadUrl;
   }
 
   /** Downloads a result file (the URL is public and contains no credentials). */
@@ -368,6 +557,12 @@ export class KieClient {
       }
     }
   }
+}
+
+function textToImageDefinition(model: string): ModelDefinition {
+  const definition = KIE_MODELS[model];
+  if (!definition) throw new Error(`kie.ai: model "${model}" is not in KIE_MODELS`);
+  return definition;
 }
 
 function parseResultUrls(resultJson: string | null | undefined): string[] {

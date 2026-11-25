@@ -33,13 +33,8 @@
  * Safety: refuses to run against production (`SITE_ENV=production` or a `DATABASE_URL` host
  * listed in `IMPORT_PROD_GUARD_HOSTS`, comma-separated) without `--i-know-this-is-prod`.
  */
-import { createHash } from "node:crypto";
-import { existsSync } from "node:fs";
-import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { parseArgs } from "node:util";
-
-import sharp from "sharp";
 
 import {
   fixRows,
@@ -58,41 +53,36 @@ import {
 import type { Object as PortfolioObject, ShowerConfig } from "@/payload-types";
 
 import {
+  IMPORT_NOTES_DATE,
+  assertNotProduction,
+  errorMessage,
+  importNotesText,
+  loadCmsStopWords,
+  photoAlts,
+} from "./lib/common";
+import { MediaStore } from "./lib/media-store";
+import { Taxonomies } from "./lib/taxonomies";
+import {
   parseAllObjects,
-  photoFileName,
   photoKey,
   sameObject,
   type ParseResult,
   type ParsedObject,
-  type StopWordCheck,
-  type ParsedPhoto,
   type TextNote,
 } from "./parse-objects";
 import { parseAllShowers, type ParsedShower } from "./parse-showers";
-import {
-  CATEGORY_PRODUCTS,
-  MIN_PHOTO_BYTES,
-  MIN_PHOTO_SIDE,
-  OBJECT_TYPE_RULES,
-  REGION_LOCATION,
-} from "./selectors";
-import { cmsStopWordCheck, type CmsStopWord } from "./stop-words";
 import {
   CRAWL_STATS_JSON,
   IMPORT_REPORT,
   SLUGS_JSON,
   TMP_DIR,
   inexUrl,
-  mapLimit,
   mdRow,
   readJson,
   readSourceCsv,
-  sleep,
   writeFileAtomic,
 } from "./shared";
 
-const PHOTO_DIR = path.join(TMP_DIR, "photos");
-const MEDIA_INDEX_JSON = path.join(TMP_DIR, "media-index.json");
 const RUNS_JSON = path.join(TMP_DIR, "import-runs.json");
 const OUTCOME_LABELS: Readonly<Record<string, string>> = {
   created: "создано",
@@ -100,13 +90,9 @@ const OUTCOME_LABELS: Readonly<Record<string, string>> = {
   unchanged: "без изменений",
 };
 
-const DOWNLOAD_CONCURRENCY = 4;
-const DOWNLOAD_TIMEOUT_MS = 30_000;
-const DOWNLOAD_ATTEMPTS = 3;
 const MAX_TASK_LENGTH = 300;
 /** Slug of the shower construction (seeded by task 26). */
 const SHOWER_CONSTRUCTION_SLUG = "dushevye-peregorodki";
-const MEDIA_CREDIT = "inex.su";
 
 /**
  * `sortDate` of an imported object without a date on its page or a year in its text (none of
@@ -120,39 +106,6 @@ const IMPORT_SORT_DATE_FALLBACK = "2020-01-01T00:00:00.000Z";
 const SORT_DATE_DEFAULT_TOLERANCE_MS = 60_000;
 /** Slack after an import run's recorded duration when matching `createdAt` to the run. */
 const RUN_WINDOW_SLACK_MS = 60_000;
-
-/** Aliases of the task-30 object types (reference data seeded earlier under other slugs). */
-const OBJECT_TYPE_ALIASES: Readonly<Record<string, readonly string[]>> = {
-  tc: ["torgovye-centry"],
-  bank: ["banki"],
-  office: ["ofisy"],
-  arena: ["areny"],
-  airport: ["aeroporty"],
-};
-
-/* ------------------------------------------------------------------------------------------ */
-/* Safety guard                                                                               */
-/* ------------------------------------------------------------------------------------------ */
-
-function assertNotProduction(allowProd: boolean): void {
-  const guardHosts = (process.env.IMPORT_PROD_GUARD_HOSTS ?? "")
-    .split(",")
-    .map((host) => host.trim().toLowerCase())
-    .filter(Boolean);
-  let dbHost = "";
-  try {
-    dbHost = new URL(process.env.DATABASE_URL ?? "").hostname.toLowerCase();
-  } catch {
-    // An unparsable URL fails later in Payload with a clear message.
-  }
-  const isProd = process.env.SITE_ENV === "production" || guardHosts.includes(dbHost);
-  if (isProd && !allowProd) {
-    throw new Error(
-      `похоже на production (SITE_ENV=${process.env.SITE_ENV ?? "?"}, хост БД ${dbHost || "?"}). ` +
-        "Запуск только с флагом --i-know-this-is-prod"
-    );
-  }
-}
 
 /* ------------------------------------------------------------------------------------------ */
 /* Report state                                                                               */
@@ -200,312 +153,9 @@ const stats = {
   stopWordSource: "",
 };
 
-const errorMessage = (error: unknown): string => {
-  if (error instanceof Error) {
-    const data = (error as { data?: unknown }).data;
-    return data ? `${error.message} ${JSON.stringify(data)}` : error.message;
-  }
-  return String(error);
-};
-
-/* ------------------------------------------------------------------------------------------ */
-/* Taxonomies                                                                                 */
-/* ------------------------------------------------------------------------------------------ */
-
-type TaxonomyCollection = "products" | "cities" | "object-types";
-
-class Taxonomies {
-  private readonly cache = new Map<string, string | null>();
-
-  constructor(
-    private readonly ctx: SeedContext,
-    private readonly dryRun: boolean
-  ) {}
-
-  /** Id of the first record with one of `slugs`; `null` when none exists. */
-  private async find(collection: TaxonomyCollection, slugs: readonly string[], name?: string) {
-    const or = [{ slug: { in: [...slugs] } }, ...(name ? [{ name: { equals: name } }] : [])];
-    const { docs } = await this.ctx.payload.find({
-      collection,
-      where: { or },
-      limit: 10,
-      depth: 0,
-      pagination: false,
-      overrideAccess: true,
-    });
-    const bySlug = slugs.map((slug) => docs.find((doc) => doc.slug === slug)).find(Boolean);
-    return (bySlug ?? docs[0])?.id ?? null;
-  }
-
-  private async findOrCreate(
-    collection: "products" | "cities",
-    slug: string,
-    name: string,
-    aliases: readonly string[] = []
-  ): Promise<string | null> {
-    const key = `${collection}:${slug}`;
-    if (this.cache.has(key)) return this.cache.get(key) ?? null;
-    let id = await this.find(collection, [slug, ...aliases], name);
-    if (!id && !this.dryRun) {
-      const doc = await this.ctx.payload.create({
-        collection,
-        data: { name, slug },
-        depth: 0,
-        overrideAccess: true,
-        context: SEED_REQUEST_CONTEXT,
-      });
-      this.ctx.log(`${collection} ${slug}: создан`);
-      id = doc.id;
-    }
-    this.cache.set(key, id);
-    return id;
-  }
-
-  product(category: string): Promise<string | null> {
-    const spec = CATEGORY_PRODUCTS[category];
-    if (!spec) return Promise.resolve(null);
-    return this.findOrCreate("products", spec.slug, spec.name, spec.aliases);
-  }
-
-  city(name: string): Promise<string | null> {
-    // Defense in depth: the parser already moves regions out of `city`.
-    if (REGION_LOCATION.test(name)) return Promise.resolve(null);
-    return this.findOrCreate("cities", toLatinSlug(name), name);
-  }
-
-  /** `cities` records whose name is a region — created by the first import (wave 6). */
-  async regionCities(): Promise<Array<{ id: string; name: string; createdAt: string }>> {
-    const { docs } = await this.ctx.payload.find({
-      collection: "cities",
-      pagination: false,
-      depth: 0,
-      overrideAccess: true,
-    });
-    return docs
-      .filter((doc) => REGION_LOCATION.test(doc.name))
-      .map(({ id, name, createdAt }) => ({ id, name, createdAt }));
-  }
-
-  /** Object type by keyword; only existing records are used. */
-  async objectType(text: string): Promise<string | null> {
-    const rule = OBJECT_TYPE_RULES.find(([, pattern]) => pattern.test(text));
-    if (!rule) return null;
-    const [slug] = rule;
-    const key = `object-types:${slug}`;
-    if (!this.cache.has(key)) {
-      this.cache.set(
-        key,
-        await this.find("object-types", [slug, ...(OBJECT_TYPE_ALIASES[slug] ?? [])])
-      );
-    }
-    return this.cache.get(key) ?? null;
-  }
-}
-
-/* ------------------------------------------------------------------------------------------ */
-/* Media                                                                                      */
-/* ------------------------------------------------------------------------------------------ */
-
-interface MediaIndex {
-  /** sha1 of the file content → media id. */
-  bySha1: Record<string, string>;
-}
-
-/** Recognises JPEG / PNG / WebP by their magic bytes; returns the MIME type. */
-function sniffImage(bytes: Uint8Array): string | null {
-  if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg";
-  if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {
-    return "image/png";
-  }
-  const riff = Buffer.from(bytes.slice(0, 4)).toString("ascii");
-  const webp = Buffer.from(bytes.slice(8, 12)).toString("ascii");
-  return riff === "RIFF" && webp === "WEBP" ? "image/webp" : null;
-}
-
-async function download(src: string): Promise<Uint8Array> {
-  let lastError: unknown;
-  for (let attempt = 1; attempt <= DOWNLOAD_ATTEMPTS; attempt += 1) {
-    try {
-      // inex.su serves Cyrillic-free paths, but encode defensively.
-      const response = await fetch(encodeURI(decodeURI(src)), {
-        signal: AbortSignal.timeout(DOWNLOAD_TIMEOUT_MS),
-      });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return new Uint8Array(await response.arrayBuffer());
-    } catch (error) {
-      lastError = error;
-      if (attempt < DOWNLOAD_ATTEMPTS) await sleep(1000 * attempt);
-    }
-  }
-  throw lastError instanceof Error ? lastError : new Error(String(lastError));
-}
-
-class MediaStore {
-  private readonly bySource = new Map<string, string>();
-  private index: MediaIndex = { bySha1: {} };
-
-  constructor(
-    private readonly ctx: SeedContext,
-    private readonly dryRun: boolean
-  ) {}
-
-  /** Loads media already imported from inex.su (idempotency across runs). */
-  async init(): Promise<void> {
-    const { docs } = await this.ctx.payload.find({
-      collection: "media",
-      where: { sourceUrl: { like: "inex.su" } },
-      pagination: false,
-      depth: 0,
-      overrideAccess: true,
-      select: { sourceUrl: true },
-    });
-    for (const doc of docs) if (doc.sourceUrl) this.bySource.set(doc.sourceUrl, doc.id);
-    const index = await readJson<MediaIndex>(MEDIA_INDEX_JSON, { bySha1: {} });
-    // Keep only ids that still exist (media may have been deleted by an editor).
-    const ids = new Set(docs.map((doc) => doc.id));
-    this.index = {
-      bySha1: Object.fromEntries(Object.entries(index.bySha1).filter(([, id]) => ids.has(id))),
-    };
-  }
-
-  async save(): Promise<void> {
-    if (!this.dryRun) await writeFileAtomic(MEDIA_INDEX_JSON, JSON.stringify(this.index, null, 2));
-  }
-
-  /**
-   * Media ids for the photos (order kept, skipped photos dropped). Downloads in parallel,
-   * creates the media documents one by one (Payload resizes with sharp).
-   */
-  async resolve(
-    photos: readonly ParsedPhoto[],
-    alts: readonly string[]
-  ): Promise<Array<{ id: string; alt: string }>> {
-    stats.photosFound += photos.length;
-    if (this.dryRun)
-      return photos.map((photo, index) => ({ id: `dry-run:${photo.src}`, alt: alts[index] ?? "" }));
-
-    const files = await mapLimit(photos, DOWNLOAD_CONCURRENCY, async (photo) => {
-      if (this.bySource.has(photo.src)) return { photo, reuse: this.bySource.get(photo.src) };
-      try {
-        const bytes = await download(photo.src);
-        stats.photosDownloaded += 1;
-        return { photo, bytes };
-      } catch (error) {
-        stats.photosSkipped.push({ src: photo.src, reason: `скачивание: ${errorMessage(error)}` });
-        return { photo };
-      }
-    });
-
-    const result: Array<{ id: string; alt: string }> = [];
-    for (const [index, file] of files.entries()) {
-      const alt = alts[index] ?? "";
-      if (file.reuse) {
-        stats.mediaReused += 1;
-        result.push({ id: file.reuse, alt });
-        continue;
-      }
-      if (!file.bytes) continue;
-      const id = await this.createMedia(file.photo.src, file.bytes, alt);
-      if (id) result.push({ id, alt });
-    }
-    return result;
-  }
-
-  private async createMedia(src: string, bytes: Uint8Array, alt: string): Promise<string | null> {
-    const skip = (reason: string) => {
-      stats.photosSkipped.push({ src, reason });
-      return null;
-    };
-    if (bytes.byteLength < MIN_PHOTO_BYTES) return skip(`меньше ${MIN_PHOTO_BYTES / 1024} КБ`);
-    const mime = sniffImage(bytes);
-    if (!mime) return skip("не JPEG/PNG/WebP по сигнатуре");
-    const meta = await sharp(bytes)
-      .metadata()
-      .catch(() => null);
-    if (!meta?.width || !meta.height) return skip("не удалось прочитать размеры");
-    if (Math.max(meta.width, meta.height) < MIN_PHOTO_SIDE) {
-      return skip(`меньше ${MIN_PHOTO_SIDE} px (${meta.width}×${meta.height})`);
-    }
-
-    const sha1 = createHash("sha1").update(bytes).digest("hex");
-    const known = this.index.bySha1[sha1];
-    if (known) {
-      stats.mediaReused += 1;
-      this.bySource.set(src, known);
-      return known;
-    }
-
-    // `<sha1>/<original name>`: Payload keeps the original file name (deduplicated on disk).
-    const photoDir = path.resolve(PHOTO_DIR, sha1);
-    const filePath = path.resolve(photoDir, photoFileName(src));
-    // Defense in depth: `photoFileName` already sanitizes, but a name taken from a remote URL
-    // must never escape the download directory.
-    if (path.dirname(filePath) !== photoDir) return skip("недопустимое имя файла");
-    await mkdir(path.dirname(filePath), { recursive: true });
-    if (!existsSync(filePath)) await writeFile(filePath, bytes);
-    try {
-      const doc = await this.ctx.payload.create({
-        collection: "media",
-        data: { alt, kind: "photo", isPlaceholder: false, sourceUrl: src, credit: MEDIA_CREDIT },
-        filePath,
-        depth: 0,
-        overrideAccess: true,
-        context: SEED_REQUEST_CONTEXT,
-      });
-      stats.mediaCreated += 1;
-      this.bySource.set(src, doc.id);
-      this.index.bySha1[sha1] = doc.id;
-      return doc.id;
-    } catch (error) {
-      stats.errors.push({ what: `media ${src}`, error: errorMessage(error) });
-      return null;
-    }
-  }
-}
-
 /* ------------------------------------------------------------------------------------------ */
 /* Helpers                                                                                    */
 /* ------------------------------------------------------------------------------------------ */
-
-/** Alt text per photo: the source caption, or the deterministic «<name> — фото N». */
-function photoAlts(
-  name: string,
-  photos: readonly ParsedPhoto[]
-): { alts: string[]; generated: string[] } {
-  const generated: string[] = [];
-  const alts = photos.map((photo, index) => {
-    if (photo.alt?.trim()) return photo.alt.trim();
-    const alt = `${name} — фото ${index + 1}`;
-    generated.push(alt);
-    return alt;
-  });
-  return { alts, generated };
-}
-
-const today = () => new Date().toISOString().slice(0, 10);
-
-/** Date in the first line of import notes («Импорт с inex.su 2026-10-21 (task 37).»). */
-const IMPORT_NOTES_DATE = /^Импорт с inex\.su (\d{4}-\d{2}-\d{2}) /;
-
-function importNotesText(
-  oldUrls: readonly string[],
-  notes: readonly TextNote[],
-  extra: readonly string[] = [],
-  date: string = today()
-): string {
-  const labels: Record<TextNote["kind"], string> = {
-    removed: "Удалено из текста (монтаж/замер/под ключ — ТЗ §11)",
-    contact: "Удалено из текста (контакты inex.su)",
-    flagged: "Проверить (двери остаются на inex.su)",
-    "stop-word": "Стоп-слово (ТЗ §11)",
-  };
-  return [
-    `Импорт с inex.su ${date} (task 37).`,
-    ...oldUrls.map((url) => `Источник: ${inexUrl(url)}`),
-    ...extra,
-    ...notes.map((note) => `${labels[note.kind]}: ${note.text}`),
-  ].join("\n");
-}
 
 /**
  * `sortDate` of an imported object: the page date, else 1 January of the year found in the
@@ -1351,27 +1001,6 @@ async function writeReport(startedAt: Date, mode: string): Promise<void> {
 /* Main                                                                                       */
 /* ------------------------------------------------------------------------------------------ */
 
-/**
- * Stop-word check with the CMS list (`site-settings.stopWords`, `experienceText`) merged into
- * the built-in rules. Without the global (empty DB) the built-ins alone are used.
- */
-async function loadCmsStopWords(ctx: SeedContext): Promise<StopWordCheck> {
-  const settings = await ctx.payload.findGlobal({
-    slug: "site-settings",
-    depth: 0,
-    overrideAccess: true,
-  });
-  const rows: CmsStopWord[] = (settings.stopWords ?? []).flatMap((row) =>
-    row.word?.trim() && row.kind ? [{ word: row.word, kind: row.kind }] : []
-  );
-  stats.stopWordSource =
-    rows.length > 0
-      ? `встроенные правила + список CMS (site-settings.stopWords: ${rows.length})`
-      : "встроенные правила (в site-settings.stopWords пусто)";
-  ctx.log(`стоп-слова: ${stats.stopWordSource}`);
-  return cmsStopWordCheck({ stopWords: rows, experiencePhrase: settings.experienceText });
-}
-
 /** Old-parser output, region «cities» and import-run windows for `--fix-existing`. */
 async function buildFixContext(ctx: SeedContext, taxonomies: Taxonomies): Promise<FixContext> {
   const legacy = { legacyBr: true } as const;
@@ -1459,10 +1088,12 @@ async function main(): Promise<void> {
   const startedAt = new Date();
   const ctx = await getSeedContext({ log: (msg) => process.stdout.write(`[import] ${msg}\n`) });
   const taxonomies = new Taxonomies(ctx, dryRun);
-  const media = new MediaStore(ctx, dryRun);
+  const media = new MediaStore(ctx, { dryRun, stats });
   await media.init();
   const slugs = await readJson<Record<string, string>>(SLUGS_JSON, {});
-  const parseOptions = { stopWords: await loadCmsStopWords(ctx) };
+  const cmsStopWords = await loadCmsStopWords(ctx);
+  stats.stopWordSource = cmsStopWords.source;
+  const parseOptions = { stopWords: cmsStopWords.check };
   const fix = fixExisting ? await buildFixContext(ctx, taxonomies) : null;
 
   if (only !== "showers") {

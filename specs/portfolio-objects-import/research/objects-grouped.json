@@ -1,0 +1,5685 @@
+{
+ "generatedAt": "2026-11-25T11:39:47.002Z",
+ "method": "key = normalized Yandex-map label (iconContent) when not generic, split by city/region; generic labels grouped only by identical geocode address; coords used as confirmation only (city-default coords excluded)",
+ "defaultCoords": [
+  "55.160406,61.403302",
+  "54.989342,73.368212",
+  "55.163384,61.430312",
+  "61.254052,73.396204"
+ ],
+ "xlsxWithoutInexPages": [
+  "02 РМК-Арена",
+  "03 Аэропорт Челябинск",
+  "04 ТРЦ «Алмаз»",
+  "014 Мизар"
+ ],
+ "groups": [
+  {
+   "groupName": "Сургутнефтегаз",
+   "key": "L:сургутнефтегаз",
+   "city": "Сургут",
+   "cities": [
+    "Сургут"
+   ],
+   "addresses": [],
+   "coords": [
+    "61.261987,73.374249"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/atriumnye/surgutneftegaz-atrium",
+     "category": "ograzhdeniya/atriumnye",
+     "name": "Ограждение атриумов и балконов в Сургутнефтегаз",
+     "mapLabel": "Сургутнефтегаз",
+     "location": "Сургут",
+     "photos": 10,
+     "glass": "yes (visual)"
+    },
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/surgutneftegaz-samonesushchie",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Цельностеклянные самонесущие лестничные ограждения в Сургутнефтегаз",
+     "mapLabel": "Сургутнефтегаз",
+     "location": "Сургут",
+     "photos": 8,
+     "glass": "yes (name)"
+    },
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/surgutneftegaz-pozharnye",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Противопожарные перегородки и двери в Сургутнефтегаз",
+     "mapLabel": "Сургутнефтегаз",
+     "location": "Сургут",
+     "photos": 8,
+     "glass": "yes (category)"
+    },
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/surgutneftegaz-razdvizhnaya",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Раздвижные светопрозрачные перегородки в Сургутнефтегаз",
+     "mapLabel": "Сургутнефтегаз",
+     "location": "Сургут",
+     "photos": 4,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/atriumnye",
+    "ograzhdeniya/lestnichnye",
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 30,
+   "photosLocal": 30,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "high",
+    "signals": [
+     "same map label",
+     "same specific coords",
+     "same city on all pages"
+    ],
+    "flags": []
+   },
+   "uncachedSiblings": [
+    "/portfolio/lestnicy/marshevye/surgutneftegaz-lestnica [301]"
+   ],
+   "suggestedLinks": [
+    {
+     "why": "НГДУ is a Сургутнефтегаз division — kept separate",
+     "with": [
+      "НГДУ (kolonna-04)"
+     ]
+    }
+   ],
+   "xlsx": {
+    "folder": "09 Сургутнефтегаз",
+    "name": "Главное управление «Сургутнефтегаз»",
+    "slug": "glavnoe-upravlenie-surgutneftegaz"
+   }
+  },
+  {
+   "groupName": "SPA Березка",
+   "key": "L:березка",
+   "city": "Пласт",
+   "cities": [
+    "Пласт"
+   ],
+   "addresses": [
+    "Пласт переулок Гаражный, 1а"
+   ],
+   "coords": [
+    "54.374406,60.815118"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/pryamay-dushevay-v-gostinize-berezka",
+     "category": "dushevye/pryamye",
+     "name": "Прямые душевые в SPA комплексе гостиницы Березка",
+     "mapLabel": "SPA Березка",
+     "location": "Пласт",
+     "photos": 13,
+     "glass": "yes (category)"
+    },
+    {
+     "url": "/portfolio/fasady/fasad-kozyrek-berezka",
+     "category": "fasady",
+     "name": "Витражное остекление фасадов в гостинице Березка",
+     "mapLabel": "гостиница Березка",
+     "location": "Пласт",
+     "photos": 12,
+     "glass": "yes (category)"
+    },
+    {
+     "url": "/portfolio/kozyrki/berezka-plast-kozyrek",
+     "category": "kozyrki",
+     "name": "Стеклянный козырек в гостинице Березка",
+     "mapLabel": "Березка",
+     "location": "Пласт",
+     "photos": 6,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye",
+    "fasady",
+    "kozyrki"
+   ],
+   "photoCount": 31,
+   "photosLocal": 31,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "high",
+    "signals": [
+     "same map label",
+     "same city on all pages",
+     "same geocode address"
+    ],
+    "flags": []
+   },
+   "uncachedSiblings": [
+    "/portfolio/dveri/celnosteklyannye/dveri-steklyannye-v-gostinize-berezka [stay: двери остаются на inex.su]",
+    "/portfolio/dveri/celnosteklyannye/dveri-steklyannye-v-gostinize-berezka-belye [stay: двери остаются на inex.su]"
+   ],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Сбербанк",
+   "key": "L:сбербанк",
+   "city": "Ишим",
+   "cities": [
+    "Ишим"
+   ],
+   "addresses": [],
+   "coords": [
+    "56.11055,69.479639"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/atriumnye/sberbank-ishim-atrium",
+     "category": "ograzhdeniya/atriumnye",
+     "name": "Самонесущие цельностеклянные ограждение атриума в Сбербанке",
+     "mapLabel": "Сбербанк",
+     "location": "Ишим",
+     "photos": 15,
+     "glass": "yes (name)"
+    },
+    {
+     "url": "/portfolio/ograzhdeniya/interernye/sberbank-ishim",
+     "category": "ograzhdeniya/interernye",
+     "name": "Цельностеклянные перегородки, двери и ограждения в Сбербанке",
+     "mapLabel": "Сбербанк",
+     "location": "Ишим",
+     "photos": 8,
+     "glass": "yes (name)"
+    },
+    {
+     "url": "/portfolio/peregorodki/v-aluminievom-profile/sberbank-ishim-pozharnye",
+     "category": "peregorodki/v-aluminievom-profile",
+     "name": "Противопожарные перегородки и двери в Сбербанке",
+     "mapLabel": "Сбербанк",
+     "location": "Ишим",
+     "photos": 8,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/atriumnye",
+    "ograzhdeniya/interernye",
+    "peregorodki/v-aluminievom-profile"
+   ],
+   "photoCount": 31,
+   "photosLocal": 31,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "high",
+    "signals": [
+     "same map label",
+     "same specific coords",
+     "same city on all pages"
+    ],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": {
+    "folder": "07 Сбербанк Ишим",
+    "name": "Сбербанк (Ишим)",
+    "slug": "sberbank-ishim"
+   }
+  },
+  {
+   "groupName": "Шахматная академия",
+   "key": "L:шахматная академия",
+   "city": "Ханты-Мансийский автономный округ – Югра",
+   "cities": [
+    "Ханты-Мансийский автономный округ – Югра",
+    "Сургут"
+   ],
+   "addresses": [
+    "Ханты-Мансийский автономный округ – Югра улица Лопарёва, 6"
+   ],
+   "coords": [
+    "61.254052,73.396204"
+   ],
+   "coordsAreCityDefault": [
+    "61.254052,73.396204"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/ugorskaya-shahmatnaya-akademiya",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Ограждение атриума и лестницы в Югорской шахматной академии",
+     "mapLabel": "Шахматная академия",
+     "location": "Ханты-Мансийский автономный округ – Югра",
+     "photos": 8,
+     "glass": "yes (visual)"
+    },
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/ugorskaya-shahmatnaya-akademiya-lift",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Облицовка шахты лифта стеклом в Югорской шахматной академии",
+     "mapLabel": "Шахматная академия",
+     "location": "Сургут",
+     "photos": 8,
+     "glass": "yes (category)"
+    },
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/ugorskaya-shahmatnaya-akademiya-peregorodki",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянные перегородки и двери в Югорской шахматной академии",
+     "mapLabel": "Шахматная академия",
+     "location": "Сургут",
+     "photos": 6,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye",
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 22,
+   "photosLocal": 22,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "medium",
+    "signals": [
+     "same map label"
+    ],
+    "flags": [
+     "different city/region strings: Ханты-Мансийский автономный округ – Югра / Сургут"
+    ]
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": {
+    "folder": "05 Угорская шахматная академия",
+    "name": "Угорская шахматная академия",
+    "slug": "ugorskaya-shahmatnaya-akademiya"
+   }
+  },
+  {
+   "groupName": "Аркаим Плаза",
+   "key": "L:аркаим плаза",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.165904,61.41257"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/atriumnye/arkaim-plaza-atrium",
+     "category": "ograzhdeniya/atriumnye",
+     "name": "Ограждение атриума в деловом центре Аркаим Плаза",
+     "mapLabel": "Аркаим Плаза",
+     "location": "Челябинск",
+     "photos": 8,
+     "glass": "yes (visual)"
+    },
+    {
+     "url": "/portfolio/ograzhdeniya/interernye/arkaim-plaza-resepshn",
+     "category": "ograzhdeniya/interernye",
+     "name": "Ограждение в деловом центре Аркаим Плаза",
+     "mapLabel": "Аркаим Плаза",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "yes (visual)"
+    },
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/arkaim-plaza-lestnica",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничные ограждения в деловом центре «Аркаим-Плаза»",
+     "mapLabel": "Аркаим Плаза",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "no (visual: stainless/metal only)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/atriumnye",
+    "ograzhdeniya/interernye",
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 16,
+   "photosLocal": 16,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "high",
+    "signals": [
+     "same map label",
+     "same specific coords",
+     "same city on all pages"
+    ],
+    "flags": []
+   },
+   "uncachedSiblings": [
+    "/portfolio/ograzhdeniya/ulichnye/arkaim-plaza-pandus [stay: решение 30.09: остаётся на inex.su]"
+   ],
+   "suggestedLinks": [],
+   "xlsx": {
+    "folder": "06 Аркаим Плаза",
+    "name": "Аркаим Плаза",
+    "slug": "arkaim-plaza"
+   }
+  },
+  {
+   "groupName": "Концертный зал",
+   "key": "L:концертный зал",
+   "city": "Омск",
+   "cities": [
+    "Омск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/atriumnye/koncertnyi-zal-omsk",
+     "category": "ograzhdeniya/atriumnye",
+     "name": "Ограждение атриума в Концертном зале, Омск",
+     "mapLabel": "Концертный зал",
+     "location": "Омск",
+     "photos": 4,
+     "glass": "unclear (visual)"
+    },
+    {
+     "url": "/portfolio/ograzhdeniya/interernye/koncertnyi-zal-omsk-drugoe",
+     "category": "ograzhdeniya/interernye",
+     "name": "Ограждения и поручни в Концертном зале, Омск",
+     "mapLabel": "Концертный зал",
+     "location": "Омск",
+     "photos": 3,
+     "glass": "unclear (visual)"
+    },
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/koncertnyi-zal-omsk-lestnica",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничные ограждения в Концертном зале, Омск",
+     "mapLabel": "Концертный зал",
+     "location": "Омск",
+     "photos": 5,
+     "glass": "unclear (visual)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/atriumnye",
+    "ograzhdeniya/interernye",
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 12,
+   "photosLocal": 12,
+   "photosMaxWidth": 1000,
+   "glass": "unclear",
+   "merge": {
+    "confidence": "high",
+    "signals": [
+     "same map label",
+     "same city on all pages"
+    ],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": {
+    "folder": "010 Концертный зал (Омск)",
+    "name": "Концертный зал (Омск)",
+    "slug": "koncertnyj-zal-omsk"
+   }
+  },
+  {
+   "groupName": "Buta Spa",
+   "key": "L:buta spa",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск Бр. Кашириных, 140."
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/dushevayapryamaya02",
+     "category": "dushevye/pryamye",
+     "name": "Стеклянные перегородки в душевой",
+     "mapLabel": "Buta Spa",
+     "location": "Челябинск",
+     "photos": 2,
+     "glass": "yes (category)"
+    },
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/dveri-mayatnik-01",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Стеклянная маятниковая дверь",
+     "mapLabel": "Buta Spa",
+     "location": "Челябинск",
+     "photos": 1,
+     "glass": "yes (category)"
+    },
+    {
+     "url": "/portfolio/peregorodki/v-aluminievom-profile/Peregorodka-01",
+     "category": "peregorodki/v-aluminievom-profile",
+     "name": "Перегородка из стекла в курительную комнату",
+     "mapLabel": "Buta Spa",
+     "location": "Челябинск",
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye",
+    "peregorodki/celnosteklyannye",
+    "peregorodki/v-aluminievom-profile"
+   ],
+   "photoCount": 6,
+   "photosLocal": 6,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "high",
+    "signals": [
+     "same map label",
+     "same city on all pages",
+     "same geocode address"
+    ],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Родник",
+   "key": "L:родник",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.171051,61.355985"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/atriumnye/trk-rodnik",
+     "category": "ograzhdeniya/atriumnye",
+     "name": "Ограждение атриумов в торгово-развлекательном комплексе Родник",
+     "mapLabel": "Родник",
+     "location": "Челябинск",
+     "photos": 30,
+     "glass": "yes (visual)"
+    },
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/trk-rodnik-peregorodki",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянные перегородки, откатные и поворотные двери в торгово-развлекательном комплексе Родни",
+     "mapLabel": "Родник",
+     "location": "Челябинск",
+     "photos": 27,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/atriumnye",
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 57,
+   "photosLocal": 57,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "high",
+    "signals": [
+     "same map label",
+     "same specific coords",
+     "same city on all pages"
+    ],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": {
+    "folder": "013 ТРК Родник",
+    "name": "ТРК «Родник»",
+    "slug": "trk-rodnik"
+   }
+  },
+  {
+   "groupName": "Группа Рестостар",
+   "key": "L:рестостар",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.162582,61.296004"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/restostar",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Цельностеклянные самонесущие ограждения в Группе Рестостар",
+     "mapLabel": "Группа Рестостар",
+     "location": "Челябинск",
+     "photos": 6,
+     "glass": "yes (name)"
+    },
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/restostar",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянные перегородки и двери в Группе Рестостар",
+     "mapLabel": "Группа Рестостар",
+     "location": "Челябинск",
+     "photos": 11,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye",
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 17,
+   "photosLocal": 17,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "high",
+    "signals": [
+     "same map label",
+     "same specific coords",
+     "same city on all pages"
+    ],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Sokol Fit",
+   "key": "L:sokol fit",
+   "city": "поселок Соколиная гора",
+   "cities": [
+    "поселок Соколиная гора"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.314815,61.350088"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/sokol-fit",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничные ограждения в фитнес-клубе Sokol Fit",
+     "mapLabel": "Sokol Fit",
+     "location": "поселок Соколиная гора",
+     "photos": 7,
+     "glass": "no (visual: stainless/metal only)"
+    },
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/sokol-fit-peregorodki",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянные перегородки в фитнес-клубе Sokol Fit",
+     "mapLabel": "Sokol Fit",
+     "location": "поселок Соколиная гора",
+     "photos": 10,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye",
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 17,
+   "photosLocal": 17,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "high",
+    "signals": [
+     "same map label",
+     "same specific coords",
+     "same city on all pages"
+    ],
+    "flags": []
+   },
+   "uncachedSiblings": [
+    "/portfolio/dveri/celnosteklyannye/sokol-fit-dveri-1 [stay: двери остаются на inex.su]",
+    "/portfolio/dveri/celnosteklyannye/sokol-fit-dveri-2 [stay: двери остаются на inex.su]",
+    "/portfolio/peregorodki/santehnicheskie/sokol-fit-dushevaya [stay: решение 30.09: остаётся на inex.su]"
+   ],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Урал",
+   "key": "L:урал",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.157428,61.394918"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/atriumnye/trk-ural-eskalator",
+     "category": "ograzhdeniya/atriumnye",
+     "name": "Ограждения эскалатора в торгово-развлекательном комплексе Урал",
+     "mapLabel": "Урал",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "yes (visual)"
+    },
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/trk-ural-lestnica",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничные ограждения в ТРК Урал",
+     "mapLabel": "Урал",
+     "location": "Челябинск",
+     "photos": 8,
+     "glass": "no (visual: stainless/metal only)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/atriumnye",
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 12,
+   "photosLocal": 12,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "high",
+    "signals": [
+     "same map label",
+     "same specific coords",
+     "same city on all pages"
+    ],
+    "flags": []
+   },
+   "uncachedSiblings": [
+    "/portfolio/ograzhdeniya/torgovye-otboiniki-telezhek/trk-ural-kolonny [stay: решение 30.09: остаётся на inex.su]",
+    "/portfolio/pozharnye-pregrady/trk-ural-pazharnye [stay: не про стекло]"
+   ],
+   "suggestedLinks": [],
+   "xlsx": {
+    "folder": "012 ТРК Урал",
+    "name": "ТРК «Урал»",
+    "slug": "trk-ural"
+   }
+  },
+  {
+   "groupName": "Комсомольский",
+   "key": "L:комсомольский",
+   "city": "Магнитогорск",
+   "cities": [
+    "Магнитогорск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/tc-komsomolskii",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничные ограждения в торговом центре «Комсомольский», Магнитогорск",
+     "mapLabel": "Комсомольский",
+     "location": "Магнитогорск",
+     "photos": 6,
+     "glass": "yes (visual)"
+    },
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/tk-komsomolskii",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Стеклянные перегородки в ТК Комсомольский",
+     "mapLabel": "Комсомольский",
+     "location": null,
+     "photos": 6,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye",
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 12,
+   "photosLocal": 12,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "medium",
+    "signals": [
+     "same map label"
+    ],
+    "flags": [
+     "some pages have no city"
+    ]
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Горки",
+   "key": "L:горки",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.163384,61.430312"
+   ],
+   "coordsAreCityDefault": [
+    "55.163384,61.430312"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/atriumnye/trk-gorki",
+     "category": "ograzhdeniya/atriumnye",
+     "name": "Ограждение атриума в торгово-развлекательном центре «Горки», Челябинск",
+     "mapLabel": "Горки",
+     "location": "Челябинск",
+     "photos": 7,
+     "glass": "yes (visual)"
+    },
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/trk-gorki-lift",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Облицовка стеклом шахты лифта в ТРК Горки",
+     "mapLabel": "Горки",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/atriumnye",
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 11,
+   "photosLocal": 11,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "high",
+    "signals": [
+     "same map label",
+     "same city on all pages"
+    ],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [
+    {
+     "why": "Снежная Королева has exactly the coords of ТРК Горки (store inside the mall?)",
+     "with": [
+      "Снежная Королева (snezhnaya-koroleva)"
+     ]
+    }
+   ],
+   "xlsx": null
+  },
+  {
+   "groupName": "Краснодеревщик",
+   "key": "L:краснодеревщик",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/tk-krasnoderevschik-steklo",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничное ограждение в торговом комплексе «Краснодеревщик», Челябинск",
+     "mapLabel": "Краснодеревщик",
+     "location": "Челябинск",
+     "photos": 7,
+     "glass": "yes (visual)"
+    },
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/tk-krasnoderevschik-trosy",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничное ограждение в торговом комплексе «Краснодеревщик», Челябинск",
+     "mapLabel": "Краснодеревщик",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "no (visual: stainless/metal only)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 11,
+   "photosLocal": 11,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "high",
+    "signals": [
+     "same map label",
+     "same city on all pages"
+    ],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Кольцо",
+   "key": "L:кольцо",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск ул. Дарвина 18"
+   ],
+   "coords": [
+    "55.126843,61.370115"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/tk-kolco",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничные цельностеклянные ограждения в торговом комплексе «Кольцо», Челябинск",
+     "mapLabel": "Кольцо",
+     "location": "Челябинск",
+     "photos": 6,
+     "glass": "yes (name)"
+    },
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/tk-kolco",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Стеклянные перегородки и двери, отделка стеклом колонн в ТК Кольцо",
+     "mapLabel": "Кольцо",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye",
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 10,
+   "photosLocal": 10,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "high",
+    "signals": [
+     "same map label",
+     "same city on all pages"
+    ],
+    "flags": []
+   },
+   "uncachedSiblings": [
+    "/portfolio/kolonny/tk-kolco-kolonny [stay: не про стекло]"
+   ],
+   "suggestedLinks": [],
+   "xlsx": {
+    "folder": "01 ТРК Кольцо",
+    "name": "ТРК «Кольцо»",
+    "slug": "tk-kolco"
+   }
+  },
+  {
+   "groupName": "Трактор",
+   "key": "L:трактор",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.174722,61.286896"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/la-traktor-arena",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Ограждения и поручни из нержавеющей стали и стекла в ледовой арене Трактор",
+     "mapLabel": "Трактор",
+     "location": "Челябинск",
+     "photos": 5,
+     "glass": "yes (name)"
+    },
+    {
+     "url": "/portfolio/peregorodki/v-aluminievom-profile/la-traktor-peregorodki",
+     "category": "peregorodki/v-aluminievom-profile",
+     "name": "Светопрозрачные перегородки в ледовой арене Трактор",
+     "mapLabel": "Трактор",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye",
+    "peregorodki/v-aluminievom-profile"
+   ],
+   "photoCount": 9,
+   "photosLocal": 9,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "high",
+    "signals": [
+     "same map label",
+     "same specific coords",
+     "same city on all pages"
+    ],
+    "flags": []
+   },
+   "uncachedSiblings": [
+    "/portfolio/peregorodki/santehnicheskie/la-traktor-kabiny [stay: решение 30.09: остаётся на inex.su]"
+   ],
+   "suggestedLinks": [],
+   "xlsx": {
+    "folder": "011 Трактор",
+    "name": "«Трактор» арена",
+    "slug": "traktor-arena"
+   }
+  },
+  {
+   "groupName": "Витражное остекление фасадов",
+   "key": "A:ак королева 33",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск ул. Ак. Королева д. 33"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/fasady/aluminievyi-vitrag-01",
+     "category": "fasady",
+     "name": "Витражное остекление фасадов",
+     "mapLabel": "Салон красоты",
+     "location": "Челябинск",
+     "photos": 1,
+     "glass": "yes (category)"
+    },
+    {
+     "url": "/portfolio/fasady/aluminievyi-vitrag-010",
+     "category": "fasady",
+     "name": "Витражное остекление фасадов",
+     "mapLabel": "Административное здание",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "fasady"
+   ],
+   "photoCount": 5,
+   "photosLocal": 5,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "high",
+    "signals": [
+     "same geocode address",
+     "same city on all pages"
+    ],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Сбербанк",
+   "key": "L:сбербанк@Омск",
+   "city": "Омск",
+   "cities": [
+    "Омск"
+   ],
+   "addresses": [],
+   "coords": [
+    "54.989342,73.368212"
+   ],
+   "coordsAreCityDefault": [
+    "54.989342,73.368212"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/interernye/sberbank-omsk",
+     "category": "ograzhdeniya/interernye",
+     "name": "Цельностеклянные стационарные и декоративные перегородки, двери и ограждения в Сбербанке",
+     "mapLabel": "Сбербанк",
+     "location": "Омск",
+     "photos": 24,
+     "glass": "yes (name)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/interernye"
+   ],
+   "photoCount": 24,
+   "photosLocal": 24,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [
+    {
+     "why": "same coords = Omsk city default, NOT a signal",
+     "with": [
+      "МТС (mts-omsk)"
+     ]
+    }
+   ],
+   "xlsx": {
+    "folder": "08 Сбербанк Омск",
+    "name": "Сбербанк (Омск)",
+    "slug": "sberbank-omsk"
+   }
+  },
+  {
+   "groupName": "Облицовка колонн нержавеющей сталью, изготовление ограждений в оздоровительном комплексе Аленушка",
+   "key": "U:/portfolio/ograzhdeniya/lestnichnye/kolonna-07",
+   "city": "Челябинская область",
+   "cities": [
+    "Челябинская область"
+   ],
+   "addresses": [],
+   "coords": [
+    "54.92029,60.221516"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/kolonna-07",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Облицовка колонн нержавеющей сталью, изготовление ограждений в оздоровительном комплексе Аленушка",
+     "mapLabel": "оздоровительный комплекс",
+     "location": "Челябинская область",
+     "photos": 21,
+     "glass": "yes (visual)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 21,
+   "photosLocal": 21,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Лестничные ограждения Grande Forge в частном коттедже",
+   "key": "U:/portfolio/ograzhdeniya/lestnichnye/kottedzh-3-grande-forge",
+   "city": "поселок Вавиловец",
+   "cities": [
+    "поселок Вавиловец"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.149367,61.236608"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/kottedzh-3-grande-forge",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничные ограждения Grande Forge в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": "поселок Вавиловец",
+     "photos": 11,
+     "glass": "no (visual: stainless/metal only)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 11,
+   "photosLocal": 11,
+   "photosMaxWidth": 1000,
+   "glass": "no",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [
+    {
+     "why": "both cottages in пос. Вавиловец — maybe one house",
+     "with": [
+      "Перегородка для душа с откатной дверью \"Грация\" (dushevaya-pryamaya-09)"
+     ]
+    }
+   ],
+   "xlsx": null
+  },
+  {
+   "groupName": "Лестничные ограждения в офисном здании",
+   "key": "U:/portfolio/ograzhdeniya/lestnichnye/zavod-ograzhdeniya",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/zavod-ograzhdeniya",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничные ограждения в офисном здании",
+     "mapLabel": "Офисное здание",
+     "location": "Челябинск",
+     "photos": 10,
+     "glass": "no (visual: stainless/metal only)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 10,
+   "photosLocal": 10,
+   "photosMaxWidth": 1000,
+   "glass": "no",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [
+    {
+     "why": "slug stem «zavod-*», all «Офисное здание» Челябинск, coords = city default — likely one building, confirm",
+     "with": [
+      "Противопожарная перегородка и двери в офисном здании (zavod-peregorodka-1)",
+      "Перегородки светопрозрачные в офисном здании (zavod-peregorodka-2)"
+     ]
+    }
+   ],
+   "xlsx": null
+  },
+  {
+   "groupName": "Цельностеклянные ограждения, ограждения на стальных тросах",
+   "key": "A:карпов пруд невская 20",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск пос. Карпов пруд, ул.Невская,20."
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/ogragdeniya-02",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Цельностеклянные ограждения, ограждения на стальных тросах",
+     "mapLabel": "Частный коттедж",
+     "location": "Челябинск",
+     "photos": 9,
+     "glass": "yes (name)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 9,
+   "photosLocal": 9,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Террасные ограждения в пентхаусе",
+   "key": "U:/portfolio/ograzhdeniya/terrasnye/penthaus-1-terrasa",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/terrasnye/penthaus-1-terrasa",
+     "category": "ograzhdeniya/terrasnye",
+     "name": "Террасные ограждения в пентхаусе",
+     "mapLabel": "Пентхаус",
+     "location": "Челябинск",
+     "photos": 9,
+     "glass": "yes (visual)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/terrasnye"
+   ],
+   "photoCount": 9,
+   "photosLocal": 9,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [
+    "/portfolio/lestnicy/marshevye/penthaus-1-lestnica [301]"
+   ],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Перегородка для душа с откатной дверью \"Грация\"",
+   "key": "A:вавиловец южная",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск поселок Вавиловец ул. Южная"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/dushevaya-pryamaya-09",
+     "category": "dushevye/pryamye",
+     "name": "Перегородка для душа с откатной дверью \"Грация\"",
+     "mapLabel": "коттедж",
+     "location": "Челябинск",
+     "photos": 8,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 8,
+   "photosLocal": 6,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [
+    {
+     "why": "both cottages in пос. Вавиловец — maybe one house",
+     "with": [
+      "Лестничные ограждения Grande Forge в частном коттедже (kottedzh-3-grande-forge)"
+     ]
+    }
+   ],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевые перегородки в гостинице",
+   "key": "U:/portfolio/dushevye/pryamye/gostinica",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/gostinica",
+     "category": "dushevye/pryamye",
+     "name": "Душевые перегородки в гостинице",
+     "mapLabel": "Гостиница",
+     "location": "Челябинск",
+     "photos": 8,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 8,
+   "photosLocal": 8,
+   "photosMaxWidth": 667,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [
+    {
+     "why": "uncached dveri/gostinica-dveri-1/-2 may be the same hotel",
+     "with": []
+    }
+   ],
+   "xlsx": null
+  },
+  {
+   "groupName": "Фестиваль",
+   "key": "L:фестиваль",
+   "city": "Омск",
+   "cities": [
+    "Омск"
+   ],
+   "addresses": [],
+   "coords": [
+    "54.980823,73.321527"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/atriumnye/festival-atrium",
+     "category": "ograzhdeniya/atriumnye",
+     "name": "Ограждения атриума из нержавеющей стали в торговом комплексе Фестиваль",
+     "mapLabel": "Фестиваль",
+     "location": "Омск",
+     "photos": 8,
+     "glass": "no (visual: stainless/metal only)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/atriumnye"
+   ],
+   "photoCount": 8,
+   "photosLocal": 8,
+   "photosMaxWidth": 1000,
+   "glass": "no",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [
+    "/portfolio/ograzhdeniya/ulichnye/festival-pandus [stay: решение 30.09: остаётся на inex.su]"
+   ],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Ограждение лестницы в Прогимназии №133",
+   "key": "U:/portfolio/ograzhdeniya/lestnichnye/progimnaziya-133",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.146517,61.369945"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/progimnaziya-133",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Ограждение лестницы в Прогимназии №133",
+     "mapLabel": "Прогимназия",
+     "location": "Челябинск",
+     "photos": 8,
+     "glass": "no (visual: stainless/metal only)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 8,
+   "photosLocal": 8,
+   "photosMaxWidth": 1000,
+   "glass": "no",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Бовид",
+   "key": "L:бовид",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/td-bovid",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Ограждение атриума и лестницы в торговом доме «Бовид», Челябинск",
+     "mapLabel": "Бовид",
+     "location": "Челябинск",
+     "photos": 8,
+     "glass": "yes (visual)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 8,
+   "photosLocal": 8,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Восточная",
+   "key": "L:восточная",
+   "city": "Пласт",
+   "cities": [
+    "Пласт"
+   ],
+   "addresses": [],
+   "coords": [
+    "54.363281,60.808399"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/uzk-vostochnaya",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничные ограждения в Уральской золотодобывающей компании Восточная",
+     "mapLabel": "Восточная",
+     "location": "Пласт",
+     "photos": 8,
+     "glass": "yes (visual)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 8,
+   "photosLocal": 8,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Куба",
+   "key": "L:куба",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.164855,61.405069"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/trc-kuba",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянные перегородки и двери в ТРЦ Куба",
+     "mapLabel": "Куба",
+     "location": "Челябинск",
+     "photos": 8,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 8,
+   "photosLocal": 8,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "НГДУ",
+   "key": "L:нгду",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/v-aluminievom-profile/kolonna-04",
+     "category": "peregorodki/v-aluminievom-profile",
+     "name": "Облицовка колонн, перегородки в алюминиевом профиле.",
+     "mapLabel": "НГДУ",
+     "location": null,
+     "photos": 8,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/v-aluminievom-profile"
+   ],
+   "photoCount": 8,
+   "photosLocal": 8,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [
+    {
+     "why": "НГДУ is a Сургутнефтегаз division — kept separate",
+     "with": [
+      "Сургутнефтегаз (surgutneftegaz-atrium,surgutneftegaz-samonesushchie,surgutneftegaz-pozharnye,surgutneftegaz-razdvizhnaya)"
+     ]
+    }
+   ],
+   "xlsx": null
+  },
+  {
+   "groupName": "Стеклянные двери в офисном помещении",
+   "key": "U:/portfolio/peregorodki/v-aluminievom-profile/rossiiskaya-277",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.15554,61.418642"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/v-aluminievom-profile/rossiiskaya-277",
+     "category": "peregorodki/v-aluminievom-profile",
+     "name": "Стеклянные двери в офисном помещении",
+     "mapLabel": "Офис",
+     "location": "Челябинск",
+     "photos": 8,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/v-aluminievom-profile"
+   ],
+   "photoCount": 8,
+   "photosLocal": 8,
+   "photosMaxWidth": 667,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Противопожарная перегородка и двери в офисном здании",
+   "key": "U:/portfolio/peregorodki/v-aluminievom-profile/zavod-peregorodka-1",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/v-aluminievom-profile/zavod-peregorodka-1",
+     "category": "peregorodki/v-aluminievom-profile",
+     "name": "Противопожарная перегородка и двери в офисном здании",
+     "mapLabel": "Офисное здание",
+     "location": "Челябинск",
+     "photos": 8,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/v-aluminievom-profile"
+   ],
+   "photoCount": 8,
+   "photosLocal": 8,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [
+    {
+     "why": "slug stem «zavod-*», all «Офисное здание» Челябинск, coords = city default — likely one building, confirm",
+     "with": [
+      "Лестничные ограждения в офисном здании (zavod-ograzhdeniya)",
+      "Перегородки светопрозрачные в офисном здании (zavod-peregorodka-2)"
+     ]
+    }
+   ],
+   "xlsx": null
+  },
+  {
+   "groupName": "Угловая душевая",
+   "key": "A:одуванчиковый переулок",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск Одуванчиковый переулок"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/dushevay-uglovaya-01",
+     "category": "dushevye/uglovye",
+     "name": "Угловая душевая",
+     "mapLabel": "Частный коттедж",
+     "location": "Челябинск",
+     "photos": 7,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 7,
+   "photosLocal": 5,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Фокус",
+   "key": "L:фокус",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.190668,61.302859"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/atriumnye/fokus-atrium",
+     "category": "ograzhdeniya/atriumnye",
+     "name": "Ограждение атриума в ТРК Фокус",
+     "mapLabel": "Фокус",
+     "location": "Челябинск",
+     "photos": 7,
+     "glass": "unclear (visual)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/atriumnye"
+   ],
+   "photoCount": 7,
+   "photosLocal": 7,
+   "photosMaxWidth": 1000,
+   "glass": "unclear",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Челябэнерго",
+   "key": "L:челябэнерго",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/chelyabenergo",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничные ограждение в Челябэнерго",
+     "mapLabel": "Челябэнерго",
+     "location": "Челябинск",
+     "photos": 7,
+     "glass": "no (visual: stainless/metal only)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 7,
+   "photosLocal": 7,
+   "photosMaxWidth": 665,
+   "glass": "no",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Изумруд",
+   "key": "L:изумруд",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/profilaktorii-izumrud",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничное ограждение в профилактории «Изумруд», Челябинск",
+     "mapLabel": "Изумруд",
+     "location": "Челябинск",
+     "photos": 7,
+     "glass": "no (visual: stainless/metal only)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 7,
+   "photosLocal": 7,
+   "photosMaxWidth": 1000,
+   "glass": "no",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Банк Снежинский",
+   "key": "L:банк снежинский",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/bank-snejinskii",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Светопрозрачные перегородки и двери в Банк Снежинский",
+     "mapLabel": "Банк Снежинский",
+     "location": "Челябинск",
+     "photos": 7,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 7,
+   "photosLocal": 7,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Откатные перегородки в частной квартире",
+   "key": "U:/portfolio/peregorodki/celnosteklyannye/kvartira-3",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/kvartira-3",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Откатные перегородки в частной квартире",
+     "mapLabel": "Квартира",
+     "location": "Челябинск",
+     "photos": 7,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 7,
+   "photosLocal": 7,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "МТС",
+   "key": "L:мтс",
+   "city": "Омск",
+   "cities": [
+    "Омск"
+   ],
+   "addresses": [],
+   "coords": [
+    "54.989342,73.368212"
+   ],
+   "coordsAreCityDefault": [
+    "54.989342,73.368212"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/mts-omsk",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянные перегородки в офисе оператора мобильной связи МТС",
+     "mapLabel": "МТС",
+     "location": "Омск",
+     "photos": 7,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 7,
+   "photosLocal": 7,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [
+    {
+     "why": "same coords = Omsk city default, NOT a signal",
+     "with": [
+      "Сбербанк (sberbank-omsk)"
+     ]
+    }
+   ],
+   "xlsx": null
+  },
+  {
+   "groupName": "Орто-ленд",
+   "key": "L:орто-ленд",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.166542,61.294136"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/orto-lend",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянные перегородки и двери в Орто-ленд",
+     "mapLabel": "Орто-ленд",
+     "location": "Челябинск",
+     "photos": 7,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 7,
+   "photosLocal": 7,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Перегородки светопрозрачные в офисном здании",
+   "key": "U:/portfolio/peregorodki/v-aluminievom-profile/zavod-peregorodka-2",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/v-aluminievom-profile/zavod-peregorodka-2",
+     "category": "peregorodki/v-aluminievom-profile",
+     "name": "Перегородки светопрозрачные в офисном здании",
+     "mapLabel": "Офисное здание",
+     "location": "Челябинск",
+     "photos": 7,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/v-aluminievom-profile"
+   ],
+   "photoCount": 7,
+   "photosLocal": 7,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [
+    {
+     "why": "slug stem «zavod-*», all «Офисное здание» Челябинск, coords = city default — likely one building, confirm",
+     "with": [
+      "Лестничные ограждения в офисном здании (zavod-ograzhdeniya)",
+      "Противопожарная перегородка и двери в офисном здании (zavod-peregorodka-1)"
+     ]
+    }
+   ],
+   "xlsx": null
+  },
+  {
+   "groupName": "Стеклянный козырек",
+   "key": "U:/portfolio/kozyrki/kottedzh-1",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/kozyrki/kottedzh-1",
+     "category": "kozyrki",
+     "name": "Стеклянный козырек",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 6,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "kozyrki"
+   ],
+   "photoCount": 6,
+   "photosLocal": 6,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [
+    {
+     "why": "uncached lestnicy/kottedzh-1 has the same slug",
+     "with": []
+    }
+   ],
+   "xlsx": null
+  },
+  {
+   "groupName": "Триумф",
+   "key": "L:триумф",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/triumf",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничное ограждение в Триумф",
+     "mapLabel": "Триумф",
+     "location": "Челябинск",
+     "photos": 6,
+     "glass": "no (visual: stainless/metal only)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 6,
+   "photosLocal": 6,
+   "photosMaxWidth": 1000,
+   "glass": "no",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Стройком",
+   "key": "L:стройком",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/sk-stroikom",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянные перегородки и двери в офисе СК Стройком",
+     "mapLabel": "Стройком",
+     "location": "Челябинск",
+     "photos": 6,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 6,
+   "photosLocal": 6,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Строймеханизация",
+   "key": "L:строймеханизация",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/stroimehanizaciya-lift",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Облицовка стеклом шахты лифта и стен в Строймеханизация",
+     "mapLabel": "Строймеханизация",
+     "location": "Челябинск",
+     "photos": 6,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 6,
+   "photosLocal": 6,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Банк ММБ",
+   "key": "L:банк ммб",
+   "city": "Магнитогорск",
+   "cities": [
+    "Магнитогорск"
+   ],
+   "addresses": [],
+   "coords": [
+    "53.407211,58.979186"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/v-aluminievom-profile/bank-mmb",
+     "category": "peregorodki/v-aluminievom-profile",
+     "name": "Светопрозрачные офисные перегородки и двери в Московском Международном Банке",
+     "mapLabel": "Банк ММБ",
+     "location": "Магнитогорск",
+     "photos": 6,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/v-aluminievom-profile"
+   ],
+   "photoCount": 6,
+   "photosLocal": 6,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "КХП",
+   "key": "L:кхп",
+   "city": "Варна",
+   "cities": [
+    "Варна"
+   ],
+   "addresses": [],
+   "coords": [
+    "53.377398,60.97871"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/v-aluminievom-profile/khp-varna",
+     "category": "peregorodki/v-aluminievom-profile",
+     "name": "Стветопрозрачные двери и перегородки в КХП",
+     "mapLabel": "КХП",
+     "location": "Варна",
+     "photos": 6,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/v-aluminievom-profile"
+   ],
+   "photoCount": 6,
+   "photosLocal": 6,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Алюминиевые стеклянные фасады",
+   "key": "A:ак королева 40",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск ул. Ак. Королева д. 40"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/fasady/aluminievyi-vitrag-04",
+     "category": "fasady",
+     "name": "Алюминиевые стеклянные фасады",
+     "mapLabel": "Жилой дом",
+     "location": "Челябинск",
+     "photos": 5,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "fasady"
+   ],
+   "photoCount": 5,
+   "photosLocal": 5,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Остекление веранды закаленным стеклом на системе \"Гармошка\"",
+   "key": "U:/portfolio/osteklenie/osteklenie-verandy/veranda-steklo",
+   "city": "Сатка",
+   "cities": [
+    "Сатка"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/osteklenie/osteklenie-verandy/veranda-steklo",
+     "category": "osteklenie/osteklenie-verandy",
+     "name": "Остекление веранды закаленным стеклом на системе \"Гармошка\"",
+     "mapLabel": "Коттедж",
+     "location": "Сатка",
+     "photos": 5,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "osteklenie/osteklenie-verandy"
+   ],
+   "photoCount": 5,
+   "photosLocal": 5,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Цельностеклянная перегородка в душевую",
+   "key": "U:/portfolio/peregorodki/celnosteklyannye/dushevaya-pryamaya-01",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/dushevaya-pryamaya-01",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянная перегородка в душевую",
+     "mapLabel": "Частный коттедж",
+     "location": "Челябинск",
+     "photos": 5,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 5,
+   "photosLocal": 5,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая в частном коттедже",
+   "key": "U:/portfolio/dushevye/pryamye/kottedzh-16",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/kottedzh-16",
+     "category": "dushevye/pryamye",
+     "name": "Душевая в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 4,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 750,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Алюминиевые стеклянные фасады",
+   "key": "A:ак королева 48",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск ул. Ак. Королева д. 48"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/fasady/aluminievyi-vitrag-05",
+     "category": "fasady",
+     "name": "Алюминиевые стеклянные фасады",
+     "mapLabel": "Жилой дом",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "fasady"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Ростикс",
+   "key": "L:ростикс",
+   "city": "Омск",
+   "cities": [
+    "Омск"
+   ],
+   "addresses": [],
+   "coords": [
+    "54.997734,73.282656"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/atriumnye/rostiks-omsk",
+     "category": "ograzhdeniya/atriumnye",
+     "name": "Ограждения для зонирования в Ростикс",
+     "mapLabel": "Ростикс",
+     "location": "Омск",
+     "photos": 4,
+     "glass": "yes (visual)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/atriumnye"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Администрация",
+   "key": "L:администрация",
+   "city": "Омск",
+   "cities": [
+    "Омск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/administraciya-omska",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничное ограждение в Администрации, Омск",
+     "mapLabel": "Администрация",
+     "location": "Омск",
+     "photos": 4,
+     "glass": "yes (visual)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Детским мир",
+   "key": "L:детский мир",
+   "city": "Омск",
+   "cities": [
+    "Омск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/detskii-mir-omsk",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Ограждения из закаленного стекла и нержавеющей стали в «Детском мире», Омск",
+     "mapLabel": "Детским мир",
+     "location": "Омск",
+     "photos": 4,
+     "glass": "yes (name)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Энергосбыт",
+   "key": "L:энергосбыт",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/energosbyt-chelyabinsk",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничное ограждение в «Энергосбыте», Челябинск",
+     "mapLabel": "Энергосбыт",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "no (visual: stainless/metal only)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 1000,
+   "glass": "no",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [
+    "/portfolio/otdelka-interera/energosbyt-chelyabinsk-steklo [301]"
+   ],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Цельностеклянные самонесущие ограждения",
+   "key": "U:/portfolio/ograzhdeniya/lestnichnye/izhevsk-samonesushchie",
+   "city": "Ижевск",
+   "cities": [
+    "Ижевск"
+   ],
+   "addresses": [],
+   "coords": [
+    "56.852775,53.211463"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/izhevsk-samonesushchie",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Цельностеклянные самонесущие ограждения",
+     "mapLabel": "Самонесущие ограждения",
+     "location": "Ижевск",
+     "photos": 4,
+     "glass": "yes (name)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Рэкком",
+   "key": "L:рэкком",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/rekkom-ulica",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Ограждения из закаленного стекла и нержавеющей стали в Реккоме",
+     "mapLabel": "Рэкком",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "yes (name)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "ПароPlaza",
+   "key": "L:пароplaza",
+   "city": "Омск",
+   "cities": [
+    "Омск"
+   ],
+   "addresses": [],
+   "coords": [
+    "54.921613,73.452708"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/tk-paroplaza",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Комбинированное ограждение в ТК «ПароPlaza»",
+     "mapLabel": "ПароPlaza",
+     "location": "Омск",
+     "photos": 4,
+     "glass": "unclear (visual)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 1000,
+   "glass": "unclear",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [
+    "/portfolio/peregorodki/santehnicheskie/paraplaza-omsk-santeh [stay: решение 30.09: остаётся на inex.su]"
+   ],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "ЧУК",
+   "key": "L:чук",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.128217,61.366738"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/chuk",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянные перегородки и двери в Челябинской угольной компании",
+     "mapLabel": "ЧУК",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Цельностеклянные перегородки в частной квартире",
+   "key": "U:/portfolio/peregorodki/celnosteklyannye/kvartira-1",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/kvartira-1",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянные перегородки в частной квартире",
+     "mapLabel": "Квартира",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Кристалл",
+   "key": "L:кристалл",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/tc-kristal",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Стеклянные перегородки в ТЦ Кристалл",
+     "mapLabel": "Кристалл",
+     "location": null,
+     "photos": 4,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Miras",
+   "key": "L:miras",
+   "city": "Павлодар",
+   "cities": [
+    "Павлодар"
+   ],
+   "addresses": [],
+   "coords": [
+    "52.280409,76.954682"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/td-miras-pavlodar",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянные перегородки и откатные двери в ТД Miras",
+     "mapLabel": "Miras",
+     "location": "Павлодар",
+     "photos": 4,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Фристайл",
+   "key": "L:фристайл",
+   "city": "Сургут",
+   "cities": [
+    "Сургут"
+   ],
+   "addresses": [],
+   "coords": [
+    "61.254052,73.396204"
+   ],
+   "coordsAreCityDefault": [
+    "61.254052,73.396204"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/v-aluminievom-profile/fristail-surgut",
+     "category": "peregorodki/v-aluminievom-profile",
+     "name": "Перегородки светопрозрачные в Фристайл",
+     "mapLabel": "Фристайл",
+     "location": "Сургут",
+     "photos": 4,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/v-aluminievom-profile"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Проспект",
+   "key": "L:проспект",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/v-aluminievom-profile/oc-prospekt",
+     "category": "peregorodki/v-aluminievom-profile",
+     "name": "Перегородки каркасные в офисном центре Проспект",
+     "mapLabel": "Проспект",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/v-aluminievom-profile"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 666,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Офисные перегородки и двери в пригородном ж/д вокзале",
+   "key": "U:/portfolio/peregorodki/v-aluminievom-profile/prigorodnyi-zhd-vokzal",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.138207,61.414151"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/v-aluminievom-profile/prigorodnyi-zhd-vokzal",
+     "category": "peregorodki/v-aluminievom-profile",
+     "name": "Офисные перегородки и двери в пригородном ж/д вокзале",
+     "mapLabel": "Вокзал",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/v-aluminievom-profile"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Промсвязьбанк",
+   "key": "L:промсвязьбанк",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/v-aluminievom-profile/promsvyazbank-chelyabinsk",
+     "category": "peregorodki/v-aluminievom-profile",
+     "name": "Светопрозрачные офисные перегородки и двери в Промсвязьбанке",
+     "mapLabel": "Промсвязьбанк",
+     "location": "Челябинск",
+     "photos": 4,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/v-aluminievom-profile"
+   ],
+   "photoCount": 4,
+   "photosLocal": 4,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая с распашной дверью в частном коттедже",
+   "key": "U:/portfolio/dushevye/pryamye/kottedzh-pryamaya-2",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/kottedzh-pryamaya-2",
+     "category": "dushevye/pryamye",
+     "name": "Душевая с распашной дверью в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 666,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая из закаленного стекла с откатной створкой, в обрамлении",
+   "key": "U:/portfolio/dushevye/pryamye/pryamay-dushevay-s-otkatnoy-stvorkoy",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/pryamay-dushevay-s-otkatnoy-stvorkoy",
+     "category": "dushevye/pryamye",
+     "name": "Душевая из закаленного стекла с откатной створкой, в обрамлении",
+     "mapLabel": "Квартира",
+     "location": null,
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 3,
+   "photosLocal": 2,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая трапециевидная перегородка с матовым закаленным стеклом",
+   "key": "U:/portfolio/dushevye/trepecevidnye/dushevay-trapeziya-01",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/trepecevidnye/dushevay-trapeziya-01",
+     "category": "dushevye/trepecevidnye",
+     "name": "Душевая трапециевидная перегородка с матовым закаленным стеклом",
+     "mapLabel": "Душевая трапеция",
+     "location": null,
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/trepecevidnye"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 585,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая в частном коттедже",
+   "key": "U:/portfolio/dushevye/trepecevidnye/kottedzh-17",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/trepecevidnye/kottedzh-17",
+     "category": "dushevye/trepecevidnye",
+     "name": "Душевая в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/trepecevidnye"
+   ],
+   "photoCount": 3,
+   "photosLocal": 1,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая в частном коттедже",
+   "key": "U:/portfolio/dushevye/trepecevidnye/kottedzh-28-uglovaya",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/trepecevidnye/kottedzh-28-uglovaya",
+     "category": "dushevye/trepecevidnye",
+     "name": "Душевая в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/trepecevidnye"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 750,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Угловая душевая перегородка из закаленного стекла",
+   "key": "U:/portfolio/dushevye/uglovye/dushevaya-ugol-02",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/dushevaya-ugol-02",
+     "category": "dushevye/uglovye",
+     "name": "Угловая душевая перегородка из закаленного стекла",
+     "mapLabel": "Квартира",
+     "location": null,
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Угловая душевая в частной квартире",
+   "key": "U:/portfolio/dushevye/uglovye/kvartira-4",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/kvartira-4",
+     "category": "dushevye/uglovye",
+     "name": "Угловая душевая в частной квартире",
+     "mapLabel": "Квартира",
+     "location": null,
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Угловая душевая с пескоструйным рисунком",
+   "key": "U:/portfolio/dushevye/uglovye/uglovayadushevaya02",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/uglovayadushevaya02",
+     "category": "dushevye/uglovye",
+     "name": "Угловая душевая с пескоструйным рисунком",
+     "mapLabel": "Квартира",
+     "location": "Челябинск",
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 563,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Алюминиевые стеклянные фасады",
+   "key": "A:ак королева 38",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск ул. Ак. Королева д. 38"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/fasady/aluminievyi-vitrag-06",
+     "category": "fasady",
+     "name": "Алюминиевые стеклянные фасады",
+     "mapLabel": "Фитнес клуб",
+     "location": "Челябинск",
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "fasady"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Алюминиевые стеклянные фасады",
+   "key": "A:бр кашириных 162",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск ул. Бр.Кашириных 162"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/fasady/aluminievyi-vitrag-08",
+     "category": "fasady",
+     "name": "Алюминиевые стеклянные фасады",
+     "mapLabel": "Жилой дом",
+     "location": "Челябинск",
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "fasady"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [
+    {
+     "why": "Бр.Кашириных 162 А vs 162 — neighbouring buildings, kept separate",
+     "with": [
+      "Алюминиевые стеклянные фасады (aluminievyi-vitrag-03)"
+     ]
+    }
+   ],
+   "xlsx": null
+  },
+  {
+   "groupName": "Стеклянный козырек",
+   "key": "U:/portfolio/kozyrki/Steklyannyy-kozyrek",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/kozyrki/Steklyannyy-kozyrek",
+     "category": "kozyrki",
+     "name": "Стеклянный козырек",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "kozyrki"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Стеклянный козырек",
+   "key": "U:/portfolio/kozyrki/cokol-kozyrek",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/kozyrki/cokol-kozyrek",
+     "category": "kozyrki",
+     "name": "Стеклянный козырек",
+     "mapLabel": "Офисное здание",
+     "location": null,
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "kozyrki"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Энергоинвест",
+   "key": "L:энергоинвест",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.157253,61.374427"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/kozyrki/energoinvest",
+     "category": "kozyrki",
+     "name": "Козырек над входной группой Энергоинвест",
+     "mapLabel": "Энергоинвест",
+     "location": "Челябинск",
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "kozyrki"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "ТК 7 небо",
+   "key": "L:7 небо",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/atriumnye/kolоnna-08",
+     "category": "ograzhdeniya/atriumnye",
+     "name": "Облицовка колонн нержавеющей сталью, изготовление ограждений в ТК 7 небо",
+     "mapLabel": "ТК 7 небо",
+     "location": null,
+     "photos": 3,
+     "glass": "yes (visual)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/atriumnye"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Балконные ограждения в детской ж/д стации Павлика Морозова",
+   "key": "U:/portfolio/ograzhdeniya/balkonnye/stanciya-pavlika-morozova",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.166296,61.368924"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/balkonnye/stanciya-pavlika-morozova",
+     "category": "ograzhdeniya/balkonnye",
+     "name": "Балконные ограждения в детской ж/д стации Павлика Морозова",
+     "mapLabel": "Станция",
+     "location": "Челябинск",
+     "photos": 3,
+     "glass": "no (visual: stainless/metal only)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/balkonnye"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 1000,
+   "glass": "no",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "ЖАСО",
+   "key": "L:жасо",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/zhaso",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Лестничные ограждения в страховой компании «ЖАСО», Челябинск",
+     "mapLabel": "ЖАСО",
+     "location": "Челябинск",
+     "photos": 3,
+     "glass": "no (visual: stainless/metal only)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 1000,
+   "glass": "no",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Бум",
+   "key": "L:бум",
+   "city": "Каменск-Уральский",
+   "cities": [
+    "Каменск-Уральский"
+   ],
+   "addresses": [],
+   "coords": [
+    "56.436114,61.893357"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/tc-bum",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Перегородки стеклянные в ТЦ Бум",
+     "mapLabel": "Бум",
+     "location": "Каменск-Уральский",
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Панорама",
+   "key": "L:панорама",
+   "city": "Златоуст",
+   "cities": [
+    "Златоуст"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.148292,59.667871"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/tk-panorama-zlatoust",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянные перегородки в ТК Панорама",
+     "mapLabel": "Панорама",
+     "location": "Златоуст",
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Уралсибпромсервис",
+   "key": "L:уралсибпромсервис",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.157161,61.369693"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/usps",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянные перегородки и маятниковые двери в Уралсибпромсервис",
+     "mapLabel": "Уралсибпромсервис",
+     "location": "Челябинск",
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Стеклянные перегородки с откатными дверями в медицинском центре",
+   "key": "U:/portfolio/peregorodki/v-aluminievom-profile/medcentr-chelyabinsk",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/v-aluminievom-profile/medcentr-chelyabinsk",
+     "category": "peregorodki/v-aluminievom-profile",
+     "name": "Стеклянные перегородки с откатными дверями в медицинском центре",
+     "mapLabel": "Медицинский центр",
+     "location": "Челябинск",
+     "photos": 3,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/v-aluminievom-profile"
+   ],
+   "photoCount": 3,
+   "photosLocal": 3,
+   "photosMaxWidth": 750,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Раздвижная створка для ванной комнаты из закаленного стекла",
+   "key": "U:/portfolio/dushevye/pryamye/dushevaya-pryamaya-03",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/dushevaya-pryamaya-03",
+     "category": "dushevye/pryamye",
+     "name": "Раздвижная створка для ванной комнаты из закаленного стекла",
+     "mapLabel": "Частный коттедж",
+     "location": null,
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая перегородка с пескоструйным рисунком",
+   "key": "U:/portfolio/dushevye/pryamye/dushevaya-pryamaya-05",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/dushevaya-pryamaya-05",
+     "category": "dushevye/pryamye",
+     "name": "Душевая перегородка с пескоструйным рисунком",
+     "mapLabel": "Квартира",
+     "location": null,
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 572,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Прямая душевая перегородка из закаленного стекла",
+   "key": "A:героя россии александра яковлева 1",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск ул. Героя России Александра Яковлева, 1"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/dushevaya-pryamaya-07",
+     "category": "dushevye/pryamye",
+     "name": "Прямая душевая перегородка из закаленного стекла",
+     "mapLabel": "Квартира",
+     "location": "Челябинск",
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Перегородка для душа с откатной дверью \"Грация\"",
+   "key": "A:соколиная гора корпус 3",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск ул. Соколиная гора, корпус, дом 3"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/dushevaya-pryamaya-08",
+     "category": "dushevye/pryamye",
+     "name": "Перегородка для душа с откатной дверью \"Грация\"",
+     "mapLabel": "Квартира",
+     "location": "Челябинск",
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 0,
+   "photosMaxWidth": 0,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая в частном коттедже",
+   "key": "U:/portfolio/dushevye/pryamye/kottedzh-25-pryamaya",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/kottedzh-25-pryamaya",
+     "category": "dushevye/pryamye",
+     "name": "Душевая в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 0,
+   "photosMaxWidth": 0,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая в частном коттедже",
+   "key": "U:/portfolio/dushevye/pryamye/kottedzh-27-pryamaya",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/kottedzh-27-pryamaya",
+     "category": "dushevye/pryamye",
+     "name": "Душевая в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 750,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая с откатной перегородкой в частной квартире",
+   "key": "U:/portfolio/dushevye/pryamye/kvartira-pryamaya-1",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/kvartira-pryamaya-1",
+     "category": "dushevye/pryamye",
+     "name": "Душевая с откатной перегородкой в частной квартире",
+     "mapLabel": "Квартира",
+     "location": null,
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Угловая душевая трапециевидной формы на трубе 40х40",
+   "key": "A:молодогвардейцев 58",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск Молодогвардейцев 58"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/trepecevidnye/dushevayatrapeziya03",
+     "category": "dushevye/trepecevidnye",
+     "name": "Угловая душевая трапециевидной формы на трубе 40х40",
+     "mapLabel": "Квартира",
+     "location": "Челябинск",
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/trepecevidnye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 688,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Угловая душевая с прозрачным стеклом",
+   "key": "A:полетаево",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск пос. Полетаево"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/dushevaya-uglovaya",
+     "category": "dushevye/uglovye",
+     "name": "Угловая душевая с прозрачным стеклом",
+     "mapLabel": "Коттедж",
+     "location": "Челябинск",
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 0,
+   "photosMaxWidth": 0,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Угловая душевая с прозрачным стеклом",
+   "key": "U:/portfolio/dushevye/uglovye/dushevaya-uglovaya-prozrachnaya",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/dushevaya-uglovaya-prozrachnaya",
+     "category": "dushevye/uglovye",
+     "name": "Угловая душевая с прозрачным стеклом",
+     "mapLabel": "Квартира",
+     "location": null,
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Угловая душевая с пескоструйным рисунком",
+   "key": "U:/portfolio/dushevye/uglovye/dushevaya-ugol-01",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/dushevaya-ugol-01",
+     "category": "dushevye/uglovye",
+     "name": "Угловая душевая с пескоструйным рисунком",
+     "mapLabel": "Квартира",
+     "location": null,
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 0,
+   "photosMaxWidth": 0,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Угловая душевая перегородка с черным матовым стеклом",
+   "key": "U:/portfolio/dushevye/uglovye/dushevayaugol01",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/dushevayaugol01",
+     "category": "dushevye/uglovye",
+     "name": "Угловая душевая перегородка с черным матовым стеклом",
+     "mapLabel": "Квартира",
+     "location": null,
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 603,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая в частном коттедже",
+   "key": "U:/portfolio/dushevye/uglovye/kottedzh-15",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/kottedzh-15",
+     "category": "dushevye/uglovye",
+     "name": "Душевая в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 664,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Угловая душевая с трубой 40х40мм",
+   "key": "U:/portfolio/dushevye/uglovye/uglovayadushevaya01",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/uglovayadushevaya01",
+     "category": "dushevye/uglovye",
+     "name": "Угловая душевая с трубой 40х40мм",
+     "mapLabel": "Квартира",
+     "location": "Челябинск",
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 563,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Витражное остекление фасадов",
+   "key": "A:бр кашириных 164 а",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск ул. Бр.Кашириных 164 А"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/fasady/aluminievyi-vitrag-02",
+     "category": "fasady",
+     "name": "Витражное остекление фасадов",
+     "mapLabel": "Жилой дом",
+     "location": "Челябинск",
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "fasady"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Алюминиевые стеклянные фасады",
+   "key": "A:бр кашириных 162 а",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск ул. Бр.Кашириных 162 А"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/fasady/aluminievyi-vitrag-03",
+     "category": "fasady",
+     "name": "Алюминиевые стеклянные фасады",
+     "mapLabel": "Жилой дом",
+     "location": "Челябинск",
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "fasady"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [
+    {
+     "why": "Бр.Кашириных 162 А vs 162 — neighbouring buildings, kept separate",
+     "with": [
+      "Алюминиевые стеклянные фасады (aluminievyi-vitrag-08)"
+     ]
+    }
+   ],
+   "xlsx": null
+  },
+  {
+   "groupName": "Алюминиевые стеклянные фасады",
+   "key": "A:бр кашириных 166",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск ул. Бр.Кашириных 166"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/fasady/aluminievyi-vitrag-09",
+     "category": "fasady",
+     "name": "Алюминиевые стеклянные фасады",
+     "mapLabel": "Жилой дом",
+     "location": "Челябинск",
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "fasady"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Балконные ограждения",
+   "key": "U:/portfolio/ograzhdeniya/balkonnye/balkonnyye-ograzhdeniya",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/balkonnye/balkonnyye-ograzhdeniya",
+     "category": "ograzhdeniya/balkonnye",
+     "name": "Балконные ограждения",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 2,
+     "glass": "unclear (visual)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/balkonnye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 1000,
+   "glass": "unclear",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Славянский",
+   "key": "L:славянский",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.168681,61.409632"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/ograzhdeniya/lestnichnye/bd-slavyanskii",
+     "category": "ograzhdeniya/lestnichnye",
+     "name": "Ограждения из закаленного стекла и нержавеющей стали в бизнес доме Славянский",
+     "mapLabel": "Славянский",
+     "location": "Челябинск",
+     "photos": 2,
+     "glass": "yes (name)"
+    }
+   ],
+   "categories": [
+    "ograzhdeniya/lestnichnye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Остекление беседки закаленным стеклом на системе \"Гармошка\"",
+   "key": "U:/portfolio/osteklenie/osteklenie-besedki/osteklenie-besedka",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/osteklenie/osteklenie-besedki/osteklenie-besedka",
+     "category": "osteklenie/osteklenie-besedki",
+     "name": "Остекление беседки закаленным стеклом на системе \"Гармошка\"",
+     "mapLabel": "Беседка",
+     "location": null,
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "osteklenie/osteklenie-besedki"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Безрамное остекление",
+   "key": "U:/portfolio/osteklenie/osteklenie-verandy/osteklenie-veranda",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/osteklenie/osteklenie-verandy/osteklenie-veranda",
+     "category": "osteklenie/osteklenie-verandy",
+     "name": "Безрамное остекление",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "osteklenie/osteklenie-verandy"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Перегородка из матового закаленного стекла на фитингах",
+   "key": "U:/portfolio/peregorodki/celnosteklyannye/dveri-08",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/dveri-08",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Перегородка из матового закаленного стекла на фитингах",
+     "mapLabel": "Квартира",
+     "location": null,
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 671,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Снежная Королева",
+   "key": "L:снежная королева",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.163384,61.430312"
+   ],
+   "coordsAreCityDefault": [
+    "55.163384,61.430312"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/snezhnaya-koroleva",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Стеклянные перегородки в отделе Снежная Королева",
+     "mapLabel": "Снежная Королева",
+     "location": "Челябинск",
+     "photos": 2,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 2,
+   "photosLocal": 2,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [
+    {
+     "why": "Снежная Королева has exactly the coords of ТРК Горки (store inside the mall?)",
+     "with": [
+      "Горки (trk-gorki,trk-gorki-lift)"
+     ]
+    }
+   ],
+   "xlsx": null
+  },
+  {
+   "groupName": "Прямая душевая из закаленного стекла на штанге",
+   "key": "U:/portfolio/dushevye/pryamye/dushevaya-pryamaya-02",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/dushevaya-pryamaya-02",
+     "category": "dushevye/pryamye",
+     "name": "Прямая душевая из закаленного стекла на штанге",
+     "mapLabel": "Частный коттедж",
+     "location": "Челябинск",
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 646,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая перегородка в ванную комнату",
+   "key": "U:/portfolio/dushevye/pryamye/dushevaya-pryamaya-04",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/dushevaya-pryamaya-04",
+     "category": "dushevye/pryamye",
+     "name": "Душевая перегородка в ванную комнату",
+     "mapLabel": "Квартира",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Прямая стеклянная душевая с откатной створкой, в обрамлении",
+   "key": "U:/portfolio/dushevye/pryamye/dushevayapryamaya01",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/dushevayapryamaya01",
+     "category": "dushevye/pryamye",
+     "name": "Прямая стеклянная душевая с откатной створкой, в обрамлении",
+     "mapLabel": "Квартира",
+     "location": "Челябинск",
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 0,
+   "photosMaxWidth": 0,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая в частном коттедже",
+   "key": "U:/portfolio/dushevye/pryamye/kottedzh-18",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/kottedzh-18",
+     "category": "dushevye/pryamye",
+     "name": "Душевая в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 882,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Прямая душевая из закаленного стекла \"Голова Версаче\"",
+   "key": "U:/portfolio/dushevye/pryamye/kottedzh-19",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/kottedzh-19",
+     "category": "dushevye/pryamye",
+     "name": "Прямая душевая из закаленного стекла \"Голова Версаче\"",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 669,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая в частном коттедже",
+   "key": "U:/portfolio/dushevye/pryamye/kottedzh-26-pryamaya",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/pryamye/kottedzh-26-pryamaya",
+     "category": "dushevye/pryamye",
+     "name": "Душевая в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/pryamye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 750,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая перегородка",
+   "key": "U:/portfolio/dushevye/trepecevidnye/dushevay-trapeziya-02",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/trepecevidnye/dushevay-trapeziya-02",
+     "category": "dushevye/trepecevidnye",
+     "name": "Душевая перегородка",
+     "mapLabel": "Квартира",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/trepecevidnye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 666,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Трапециевидная душевая кабина",
+   "key": "U:/portfolio/dushevye/trepecevidnye/dushevayatrapeziya01",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/trepecevidnye/dushevayatrapeziya01",
+     "category": "dushevye/trepecevidnye",
+     "name": "Трапециевидная душевая кабина",
+     "mapLabel": "Квартира",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/trepecevidnye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 667,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая в частном коттедже",
+   "key": "U:/portfolio/dushevye/trepecevidnye/kottedzh-13-sauna",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/trepecevidnye/kottedzh-13-sauna",
+     "category": "dushevye/trepecevidnye",
+     "name": "Душевая в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/trepecevidnye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 750,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая в частном коттедже",
+   "key": "U:/portfolio/dushevye/trepecevidnye/kottedzh-21",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/trepecevidnye/kottedzh-21",
+     "category": "dushevye/trepecevidnye",
+     "name": "Душевая в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/trepecevidnye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 688,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая перегородка из моллированного (гнутого) стекла.",
+   "key": "A:карпов пруд тюльпаннная 53",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск пос. Карпов пруд, ул. Тюльпаннная д.53"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/dushevay-uglovaya-02",
+     "category": "dushevye/uglovye",
+     "name": "Душевая перегородка из моллированного (гнутого) стекла.",
+     "mapLabel": "Частный коттедж",
+     "location": "Челябинск",
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 667,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "салон Decoler",
+   "key": "L:салон decoler",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/dushevaya-pryamaya-10",
+     "category": "dushevye/uglovye",
+     "name": "Угловая душевая с фотопечатью",
+     "mapLabel": "салон Decoler",
+     "location": "Челябинск",
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 665,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Угловая душевая с прозрачным стеклом",
+   "key": "U:/portfolio/dushevye/uglovye/dushevaya-ugol-03",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/dushevaya-ugol-03",
+     "category": "dushevye/uglovye",
+     "name": "Угловая душевая с прозрачным стеклом",
+     "mapLabel": "Квартира",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 563,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Угловая перегородка для душа с раздвижными створками, в обрамлении.",
+   "key": "U:/portfolio/dushevye/uglovye/dushevayaugol03",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/dushevayaugol03",
+     "category": "dushevye/uglovye",
+     "name": "Угловая перегородка для душа с раздвижными створками, в обрамлении.",
+     "mapLabel": "Квартира",
+     "location": "Челябинск",
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 0,
+   "photosMaxWidth": 0,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Угловая душевая в частном коттедже",
+   "key": "U:/portfolio/dushevye/uglovye/kottedzh-14-sauna",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/kottedzh-14-sauna",
+     "category": "dushevye/uglovye",
+     "name": "Угловая душевая в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 664,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Душевая в частном коттедже",
+   "key": "U:/portfolio/dushevye/uglovye/kottedzh-20",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/kottedzh-20",
+     "category": "dushevye/uglovye",
+     "name": "Душевая в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 672,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Угловая душевая в частном коттедже",
+   "key": "U:/portfolio/dushevye/uglovye/kottedzh-6",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/kottedzh-6",
+     "category": "dushevye/uglovye",
+     "name": "Угловая душевая в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Угловая душевая в частном коттедже",
+   "key": "U:/portfolio/dushevye/uglovye/kottedzh-7",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/dushevye/uglovye/kottedzh-7",
+     "category": "dushevye/uglovye",
+     "name": "Угловая душевая в частном коттедже",
+     "mapLabel": "Коттедж",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "dushevye/uglovye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 666,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Витражное остекление фасадов",
+   "key": "A:250 лет челябинску 73",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [
+    "Челябинск ул. 250 Лет Челябинску, д. 73"
+   ],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/fasady/aluminievyi-vitrag-07",
+     "category": "fasady",
+     "name": "Витражное остекление фасадов",
+     "mapLabel": "Медицинский центр",
+     "location": "Челябинск",
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "fasady"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Безрамное остекление беседки",
+   "key": "U:/portfolio/osteklenie/osteklenie-besedki/osteklenie-besedka-02",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/osteklenie/osteklenie-besedki/osteklenie-besedka-02",
+     "category": "osteklenie/osteklenie-besedki",
+     "name": "Безрамное остекление беседки",
+     "mapLabel": "Беседка",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "osteklenie/osteklenie-besedki"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Безрамное остекление беседки",
+   "key": "U:/portfolio/osteklenie/osteklenie-besedki/osteklenie-besedka-03",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/osteklenie/osteklenie-besedki/osteklenie-besedka-03",
+     "category": "osteklenie/osteklenie-besedki",
+     "name": "Безрамное остекление беседки",
+     "mapLabel": "Беседка",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "osteklenie/osteklenie-besedki"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Безрамное остекление веранды",
+   "key": "U:/portfolio/osteklenie/osteklenie-verandy/osteklenie-tveranda-01",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/osteklenie/osteklenie-verandy/osteklenie-tveranda-01",
+     "category": "osteklenie/osteklenie-verandy",
+     "name": "Безрамное остекление веранды",
+     "mapLabel": "Веранда",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "osteklenie/osteklenie-verandy"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Безрамное остекление веранды",
+   "key": "U:/portfolio/osteklenie/osteklenie-verandy/osteklenie-veranda-01",
+   "city": null,
+   "cities": [],
+   "addresses": [],
+   "coords": [],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/osteklenie/osteklenie-verandy/osteklenie-veranda-01",
+     "category": "osteklenie/osteklenie-verandy",
+     "name": "Безрамное остекление веранды",
+     "mapLabel": "Веранда",
+     "location": null,
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "osteklenie/osteklenie-verandy"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Линда",
+   "key": "L:линда",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.152022,61.382988"
+   ],
+   "coordsAreCityDefault": [],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/linda-dver",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянная маятниковая дверь в салоне фабрики мебели Линда",
+     "mapLabel": "Линда",
+     "location": "Челябинск",
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 666,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Углементбанк",
+   "key": "L:углементбанк",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/celnosteklyannye/uglemet",
+     "category": "peregorodki/celnosteklyannye",
+     "name": "Цельностеклянные перегородки и двери в Углементбанке",
+     "mapLabel": "Углементбанк",
+     "location": "Челябинск",
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/celnosteklyannye"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 750,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  },
+  {
+   "groupName": "Маяк",
+   "key": "L:маяк",
+   "city": "Челябинск",
+   "cities": [
+    "Челябинск"
+   ],
+   "addresses": [],
+   "coords": [
+    "55.160406,61.403302"
+   ],
+   "coordsAreCityDefault": [
+    "55.160406,61.403302"
+   ],
+   "pages": [
+    {
+     "url": "/portfolio/peregorodki/v-aluminievom-profile/tk-mayak",
+     "category": "peregorodki/v-aluminievom-profile",
+     "name": "Перегородки и автоматические двери в ТК Маяк",
+     "mapLabel": "Маяк",
+     "location": "Челябинск",
+     "photos": 1,
+     "glass": "yes (category)"
+    }
+   ],
+   "categories": [
+    "peregorodki/v-aluminievom-profile"
+   ],
+   "photoCount": 1,
+   "photosLocal": 1,
+   "photosMaxWidth": 1000,
+   "glass": "yes",
+   "merge": {
+    "confidence": "single",
+    "signals": [],
+    "flags": []
+   },
+   "uncachedSiblings": [],
+   "suggestedLinks": [],
+   "xlsx": null
+  }
+ ]
+}
