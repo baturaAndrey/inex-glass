@@ -646,24 +646,143 @@ $overlay: rgb(28 31 34 / 0.4);
   }
 }
 
-.collection-list--media .table .file {
+// File cell (Payload `FileCell`: `.file > .thumbnail.file__thumbnail > img` + `.file__filename`)
+// in the media list and in the «choose existing» list drawer of upload fields. The thumbnail is
+// a 96 × 64 landscape box (72 × 48 on phones); the served image is the 400 px `thumbnail` size,
+// so the box and the hover preview below stay sharp.
+$media-thumb-w: 96px;
+$media-thumb-h: 64px;
+$media-thumb-w-phone: 72px;
+$media-thumb-h-phone: 48px;
+$media-thumb-gap: 12px;
+$media-preview-w: 360px;
+$media-preview-h: 270px; // 4:3 frame; the image is `contain`-ed inside, any aspect fits
+
+// Payload's 150 px cell minimum leaves ~40 px for the name next to a 96 px thumbnail, and short
+// names break mid-word: the file column gets room for the thumbnail plus a readable name.
+.collection-list--media .table td.cell-filename,
+.list-drawer .table td.cell-filename {
+  min-width: 220px;
+
+  @media (max-width: $phone) {
+    min-width: 200px;
+  }
+}
+
+.collection-list--media .table .file,
+.list-drawer .table .file {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: $media-thumb-gap;
+  min-width: 0;
+}
+
+.collection-list--media .table .file__filename,
+.list-drawer .table .file__filename {
+  min-width: 0;
+  margin: 0; // Payload adds `margin-left: var(--base)` on top of the gap
+  overflow-wrap: break-word;
 }
 
 .collection-list--media .table .file__thumbnail,
 .list-drawer .table .file__thumbnail {
   flex: none;
-  width: 40px;
-  height: 40px;
+  align-self: center; // Payload's `.thumbnail` stretches to the row height
+  width: $media-thumb-w;
+  max-width: none; // Payload caps `.file__thumbnail` at 40 px
+  height: $media-thumb-h;
+  min-height: 0;
   border-radius: var(--ig-r-sm);
+  background: var(--ig-well); // shows while the image is lifted into the preview
   overflow: hidden;
 
   img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  @media (max-width: $phone) {
+    width: $media-thumb-w-phone;
+    height: $media-thumb-h-phone;
+  }
+}
+
+// Hover / keyboard-focus preview, pointer devices only. CSS cannot duplicate the <img>, so the
+// thumbnail's own image is lifted out of the cell as `position: fixed`:
+// - `.table` has `overflow: auto` (and the drawer body scrolls), so an absolute or scaled image
+//   would be clipped; a fixed box is not clipped by them (in the drawer `.drawer__content` has a
+//   transform and becomes the containing block, so the preview stays inside the drawer);
+// - `pointer-events: none` keeps the hover on the 96 × 64 box under the cursor: the preview
+//   never takes the pointer, so it does not flicker;
+// - Payload gives every `td` `position: relative; z-index: 1`, so later rows would paint over
+//   the preview — the active cell is raised above its siblings.
+// Placement: with CSS anchor positioning the preview sits to the right of the thumbnail and
+// flips to stay in the viewport; without it, at the fixed box's static position, shifted right
+// of the thumbnail and centred on the row.
+@media (hover: hover) {
+  .collection-list--media .table,
+  .list-drawer .table {
+    td:has(.file__thumbnail:hover),
+    td:has(:focus-visible .file__thumbnail) {
+      z-index: 2;
+    }
+
+    .file__thumbnail:hover img,
+    :focus-visible .file__thumbnail img {
+      position: fixed;
+      z-index: 1;
+      width: $media-preview-w;
+      height: $media-preview-h;
+      margin-inline-start: $media-thumb-w + $media-thumb-gap;
+      border: 1px solid var(--ig-hairline);
+      border-radius: var(--ig-r-md);
+      background: var(--ig-surface);
+      box-shadow: var(--ig-shadow-dropdown);
+      object-fit: contain;
+      pointer-events: none;
+      translate: 0 calc(-50% + #{$media-thumb-h * 0.5});
+
+      // Reduced motion: the preview appears without the fade.
+      @media (prefers-reduced-motion: no-preference) {
+        animation: iga-media-preview-in var(--ig-dur-base) var(--iga-ease);
+      }
+    }
+  }
+
+  @supports (anchor-name: --a) and (position-try-fallbacks: flip-block) {
+    .collection-list--media .table .file__thumbnail,
+    .list-drawer .table .file__thumbnail {
+      anchor-name: --iga-media-thumb;
+      anchor-scope: --iga-media-thumb;
+    }
+
+    .collection-list--media .table,
+    .list-drawer .table {
+      .file__thumbnail:hover img,
+      :focus-visible .file__thumbnail img {
+        position-anchor: --iga-media-thumb;
+        position-area: right center;
+        position-try-fallbacks:
+          right span-top,
+          right span-bottom,
+          left center,
+          left span-top,
+          left span-bottom;
+        margin-inline: $media-thumb-gap;
+        translate: none;
+      }
+    }
+  }
+}
+
+// One-shot fade-in of the preview (the image switches to `position: fixed`, which cannot be
+// transitioned, so a single-run animation stands in for the transition).
+@keyframes iga-media-preview-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
   }
 }
 
