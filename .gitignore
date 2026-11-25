@@ -80,3 +80,7 @@ nul
 
 # final acceptance (task 42): run-staging.sh logs and screenshots
 /scripts/acceptance/out/
+
+# local customer materials (not in git)
+/res/Объекты/
+/res/temp/
