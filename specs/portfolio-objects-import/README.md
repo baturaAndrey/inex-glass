@@ -156,10 +156,10 @@ The source CSV `docs/inex/12-migration-inex-su.csv` is never edited. No task cha
 - [x] [task-03-importer-library](./tasks/task-03-importer-library.md) — Extract reusable importer library from import.ts
 
 ### Wave 2
-- [ ] [task-04-content-a](./tasks/task-04-content-a.md) — Card content for manifest batch a
-- [ ] [task-05-content-b](./tasks/task-05-content-b.md) — Card content for manifest batch b
-- [ ] [task-06-upscale-covers](./tasks/task-06-upscale-covers.md) — Upscale script + pilot only (stop for user approval)
-- [ ] [task-07-merge-objects-loader](./tasks/task-07-merge-objects-loader.md) — merge-objects.ts loader/publisher
+- [x] [task-04-content-a](./tasks/task-04-content-a.md) — Card content for manifest batch a
+- [x] [task-05-content-b](./tasks/task-05-content-b.md) — Card content for manifest batch b
+- [x] [task-06-upscale-covers](./tasks/task-06-upscale-covers.md) — Upscale script + pilot only (stop for user approval)
+- [x] [task-07-merge-objects-loader](./tasks/task-07-merge-objects-loader.md) — merge-objects.ts loader/publisher
 
 ### Wave 3
 - [ ] [task-08-local-verification](./tasks/task-08-local-verification.md) — Full cover run, load into a local prod copy, audit, screenshots, redirect CSV
